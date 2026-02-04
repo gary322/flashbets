@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trace Verse Flow</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #000; color: #fff; padding: 20px; font-family: sans-serif; }
+        .log { background: #111; padding: 10px; margin: 5px 0; border-radius: 4px; font-family: monospace; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        .info { color: #FFD60A; }
+    </style>
+</head>
+<body>
+    <h1>Trace Verse Flow</h1>
+    
+    <button onclick="traceFullFlow()">Trace Full Flow</button>
+    <button onclick="clearLogs()">Clear</button>
+    
+    <div id="logs"></div>
+    
+    <!-- Test verse section -->
+    <div class="verses-section" id="versesSection" style="display: block; margin-top: 30px;">
+        <div class="section-title">Related Stages - Chain Your Leverage</div>
+        <div class="verse-flow-container" id="verseFlowContainer">
+            <svg class="verse-connections" id="verseConnections">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="10" 
+                            refX="9" refY="5" orient="auto">
+                        <polygon points="0 0, 10 5, 0 10" class="verse-arrow" />
+                    </marker>
+                </defs>
+            </svg>
+            <div class="verse-levels" id="verseLevels">
+                <!-- This should be populated -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize platform state
+        window.platformState = {
+            selectedVerses: [],
+            markets: new Map(),
+            quantumMode: false
+        };
+    </script>
+    
+    <script src="platform_main.js"></script>
+    
+    <script>
+        const logs = document.getElementById('logs');
+        
+        function log(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            logs.appendChild(div);
+            console.log(msg);
+        }
+        
+        function clearLogs() {
+            logs.innerHTML = '';
+        }
+        
+        async function traceFullFlow() {
+            clearLogs();
+            log('Starting full flow trace...');
+            
+            // Step 1: Check functions exist
+            log('Step 1: Checking functions...');
+            const functions = ['updateAvailableVerses', 'updateVerseFlow', 'createVerseCard'];
+            functions.forEach(fn => {
+                if (window[fn]) {
+                    log(`✓ ${fn} exists`, 'success');
+                } else {
+                    log(`✗ ${fn} missing`, 'error');
+                }
+            });
+            
+            // Step 2: Check DOM elements
+            log('\nStep 2: Checking DOM elements...');
+            const elements = {
+                'versesSection': document.getElementById('versesSection'),
+                'verseLevels': document.getElementById('verseLevels'),
+                'verseFlowContainer': document.getElementById('verseFlowContainer')
+            };
+            
+            for (const [name, el] of Object.entries(elements)) {
+                if (el) {
+                    log(`✓ ${name} found`, 'success');
+                } else {
+                    log(`✗ ${name} missing`, 'error');
+                }
+            }
+            
+            // Step 3: Fetch real data
+            log('\nStep 3: Fetching market data...');
+            try {
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                log(`✓ Fetched ${markets.length} markets`, 'success');
+                
+                // Find a market with verses
+                const marketWithVerses = markets.find(m => m.verses && m.verses.length > 0);
+                if (marketWithVerses) {
+                    log(`✓ Found market "${marketWithVerses.title}" with ${marketWithVerses.verses.length} verses`, 'success');
+                    
+                    // Step 4: Call updateAvailableVerses
+                    log('\nStep 4: Calling updateAvailableVerses...');
+                    
+                    // Add console interceptor to capture logs
+                    const originalLog = console.log;
+                    const capturedLogs = [];
+                    console.log = function(...args) {
+                        capturedLogs.push(args.join(' '));
+                        originalLog.apply(console, args);
+                    };
+                    
+                    try {
+                        window.updateAvailableVerses(marketWithVerses.verses);
+                        log('✓ updateAvailableVerses called', 'success');
+                        
+                        // Display captured logs
+                        if (capturedLogs.length > 0) {
+                            log('\nCaptured console logs:');
+                            capturedLogs.forEach(msg => log(`  > ${msg}`));
+                        }
+                        
+                    } finally {
+                        console.log = originalLog;
+                    }
+                    
+                    // Step 5: Check results
+                    setTimeout(() => {
+                        log('\nStep 5: Checking results...');
+                        
+                        const verseLevels = document.getElementById('verseLevels');
+                        log(`verseLevels children: ${verseLevels.children.length}`);
+                        
+                        if (verseLevels.children.length > 0) {
+                            log('✓ Verse levels created!', 'success');
+                            
+                            // Check each level
+                            Array.from(verseLevels.children).forEach((level, i) => {
+                                const cards = level.querySelectorAll('.verse-card');
+                                log(`  Level ${i + 1}: ${cards.length} verse cards`);
+                            });
+                        } else {
+                            log('✗ No verse levels created', 'error');
+                            log('verseLevels innerHTML: ' + verseLevels.innerHTML);
+                        }
+                        
+                        // Check for verse cards
+                        const allCards = document.querySelectorAll('.verse-card');
+                        log(`\nTotal verse cards in document: ${allCards.length}`);
+                        
+                    }, 500);
+                    
+                } else {
+                    log('✗ No markets with verses found', 'error');
+                }
+                
+            } catch (error) {
+                log(`✗ API Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            setTimeout(traceFullFlow, 1000);
+        });
+    </script>
+</body>
+</html>

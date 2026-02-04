@@ -1,0 +1,110 @@
+{
+  "timestamp": "2025-08-08T11:16:08.872Z",
+  "tests": 3,
+  "successful": 3,
+  "failed": 0,
+  "results": [
+    {
+      "success": true,
+      "journey": "SINGLE_BET",
+      "persona": "Degen Trader",
+      "marketId": "0x102118a37846c3afa545dc3e24fae6916ff3257117d5fe3ab372e33a318c0412",
+      "position": {
+        "id": "0xe6be39c70e431f36e80bf28e9f49c0ee71be72a683c059f25e38290c99596366",
+        "marketId": "0x102118a37846c3afa545dc3e24fae6916ff3257117d5fe3ab372e33a318c0412",
+        "size": 50,
+        "leverage": 100,
+        "side": "NO",
+        "tx": "0x496cf76e5f3bd177e88a428ebb56a576a5171dc89a2f9a2e75046d469edeb6b6",
+        "shares": "5000000000"
+      },
+      "price": 7506,
+      "realTransaction": true
+    },
+    {
+      "success": true,
+      "journey": "CHAINED_BETS",
+      "persona": "High Roller",
+      "chainLength": 3,
+      "markets": [
+        "0xc762c7bf2d094b10b0ee7e0157efb295a45c3743ab91285cd7a228ccd51612c4",
+        "0xca61147038b6cec08f60b858d515b35c27eb1a8acf9bd3a2d28292b559998e77",
+        "0xc4ee702dcb1a740ed8dae37bbdf513071d7b3bc7abe9463be95a6c3117920f8d"
+      ],
+      "leverages": [
+        30,
+        100,
+        50
+      ],
+      "initialStake": 5000,
+      "effectiveLeverage": "225",
+      "chainedBet": {
+        "id": "0xe4b489bcf1738e6b25fa65e4b8f6d5d5090c1ac493f13c7845ea3f6dd0b60c80",
+        "markets": [
+          "0xc762c7bf2d094b10b0ee7e0157efb295a45c3743ab91285cd7a228ccd51612c4",
+          "0xca61147038b6cec08f60b858d515b35c27eb1a8acf9bd3a2d28292b559998e77",
+          "0xc4ee702dcb1a740ed8dae37bbdf513071d7b3bc7abe9463be95a6c3117920f8d"
+        ],
+        "leverages": [
+          30,
+          100,
+          50
+        ],
+        "stake": 5000,
+        "effectiveLeverage": "225",
+        "tx": "0xaaae8617fef0e9e06d60d7ac251786604ceba36d616b069225709ed4c5f47589"
+      },
+      "realTransaction": true
+    },
+    {
+      "success": true,
+      "journey": "RAPID_FIRE",
+      "persona": "Cautious Better",
+      "numberOfBets": 3,
+      "positions": [
+        {
+          "marketId": "0xd65aad713260914059b0c2cc25cd1ecccec7beed9cfde3b3c582d9fa49fe3b50",
+          "position": {
+            "id": "0x7e2de842e9d73495b21ccf9834eb1eeb5fc5bc4110321db821b998e960f2619d",
+            "marketId": "0xd65aad713260914059b0c2cc25cd1ecccec7beed9cfde3b3c582d9fa49fe3b50",
+            "size": 50,
+            "leverage": 10,
+            "side": "NO",
+            "tx": "0x6921b15526a51ebe82435104f76e9ca0c8edcf54527d775b4c50cbc022c85fba",
+            "shares": "500000000"
+          }
+        },
+        {
+          "marketId": "0x6fac2d4bd795f1aa69a204cefd3c8c14eaa7ad8fcbdfe273c3825418eeab2964",
+          "position": {
+            "id": "0x5964015d833ea6d3771e0399953db756b1360a92530aa9c840cf28cfc629f744",
+            "marketId": "0x6fac2d4bd795f1aa69a204cefd3c8c14eaa7ad8fcbdfe273c3825418eeab2964",
+            "size": 20,
+            "leverage": 1,
+            "side": "NO",
+            "tx": "0x61ab788222e3fc30661e8237cc09ba16e20362b17ad2df4e4b9291424c428ac2",
+            "shares": "20000000"
+          }
+        },
+        {
+          "marketId": "0x07773fa7d7e30c15f6f367d25f3c902dfae75a51249e223b212506605e9387df",
+          "position": {
+            "id": "0x6a34b942790f9801733fa431264ad02cd4e3739c9cfecccd1b04a1fca8d19d91",
+            "marketId": "0x07773fa7d7e30c15f6f367d25f3c902dfae75a51249e223b212506605e9387df",
+            "size": 50,
+            "leverage": 1,
+            "side": "NO",
+            "tx": "0x8059ae25119f7afe942f9c33ea92b3081ac33ca59b789912d97cb79bc1eb0a18",
+            "shares": "50000000"
+          }
+        }
+      ],
+      "totalVolume": 120,
+      "realTransaction": true
+    }
+  ],
+  "onChain": {
+    "markets": "17",
+    "positions": "10"
+  }
+}

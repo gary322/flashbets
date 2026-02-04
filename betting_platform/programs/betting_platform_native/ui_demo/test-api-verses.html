@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Verses</title>
+    <style>
+        body { background: #000; color: #fff; font-family: monospace; padding: 20px; }
+        .market { background: #111; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .verse { background: #222; padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        .level-1 { border-left: 3px solid #4cd964; }
+        .level-2 { border-left: 3px solid #FFD60A; }
+        .level-3 { border-left: 3px solid #FFA500; }
+        .level-4 { border-left: 3px solid #ff3b30; }
+        pre { background: #333; padding: 10px; border-radius: 4px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>Testing Verse Generation from API</h1>
+    
+    <button onclick="testAPI()">Fetch Markets with Verses</button>
+    <button onclick="clearResults()">Clear</button>
+    
+    <div id="results"></div>
+    
+    <script>
+        async function testAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Fetching markets from API...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const markets = await response.json();
+                console.log('Fetched markets:', markets);
+                
+                results.innerHTML = `<h2 class="success">✓ Found ${markets.length} markets</h2>`;
+                
+                // Display first 5 markets with their verses
+                markets.slice(0, 5).forEach((market, index) => {
+                    const marketDiv = document.createElement('div');
+                    marketDiv.className = 'market';
+                    
+                    let html = `
+                        <h3>Market ${index + 1}: ${market.title || market.question || 'Unknown'}</h3>
+                        <p>Category: ${market.category || 'General'}</p>
+                        <p>Volume: $${((market.volume24hr || market.volume || 0) / 1000000).toFixed(2)}M</p>
+                    `;
+                    
+                    if (market.verses && market.verses.length > 0) {
+                        html += `<h4 class="success">✓ ${market.verses.length} Verses Generated:</h4>`;
+                        
+                        market.verses.forEach(verse => {
+                            html += `
+                                <div class="verse level-${verse.level}">
+                                    <strong>${verse.name}</strong> (Level ${verse.level})<br>
+                                    Multiplier: <strong>${verse.multiplier}x</strong><br>
+                                    Description: ${verse.description}<br>
+                                    Risk: ${verse.risk_tier}
+                                </div>
+                            `;
+                        });
+                    } else {
+                        html += '<p class="error">✗ No verses found</p>';
+                    }
+                    
+                    marketDiv.innerHTML = html;
+                    results.appendChild(marketDiv);
+                });
+                
+                // Show raw data for first market
+                if (markets.length > 0) {
+                    const detailsDiv = document.createElement('div');
+                    detailsDiv.innerHTML = `
+                        <h3>Raw Data for First Market:</h3>
+                        <pre>${JSON.stringify(markets[0], null, 2)}</pre>
+                    `;
+                    results.appendChild(detailsDiv);
+                }
+                
+            } catch (error) {
+                results.innerHTML = `<h2 class="error">Error: ${error.message}</h2>`;
+                console.error('API Error:', error);
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

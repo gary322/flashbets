@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Market Verses</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #000; color: #fff; padding: 20px; font-family: monospace; }
+        .controls { margin: 20px 0; }
+        button { background: #FFD60A; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .data { background: #222; padding: 10px; margin: 10px 0; border-radius: 4px; overflow: auto; max-height: 300px; white-space: pre; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+    </style>
+</head>
+<body>
+    <h1>Test Market Verses</h1>
+    
+    <div class="controls">
+        <button onclick="fetchFirstMarket()">Fetch First Market</button>
+        <button onclick="simulateMarketClick()">Simulate Market Click</button>
+        <button onclick="clearLog()">Clear</button>
+    </div>
+    
+    <div id="log"></div>
+    
+    <!-- Include platform state and main script -->
+    <script>
+        window.platformState = {
+            markets: new Map(),
+            selectedMarket: null,
+            selectedVerses: []
+        };
+    </script>
+    
+    <!-- Copy of verse display section -->
+    <div class="market-details" style="display: block; margin-top: 30px;">
+        <div class="verses-section" id="versesSection" style="display: block;">
+            <div class="section-title">Related Stages - Chain Your Leverage</div>
+            <div class="verse-flow-container" id="verseFlowContainer">
+                <svg class="verse-connections" id="verseConnections">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" 
+                                refX="9" refY="5" orient="auto">
+                            <polygon points="0 0, 10 5, 0 10" class="verse-arrow" />
+                        </marker>
+                    </defs>
+                </svg>
+                <div class="verse-levels" id="verseLevels">
+                    <!-- Verses will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="platform_main.js"></script>
+    
+    <script>
+        const logEl = document.getElementById('log');
+        
+        function log(msg, className = '') {
+            const div = document.createElement('div');
+            div.className = className;
+            div.textContent = `${new Date().toLocaleTimeString()}: ${msg}`;
+            logEl.appendChild(div);
+            console.log(msg);
+        }
+        
+        function clearLog() {
+            logEl.innerHTML = '';
+        }
+        
+        async function fetchFirstMarket() {
+            log('Fetching markets from API...');
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                
+                if (markets && markets.length > 0) {
+                    const market = markets[0];
+                    log(`Fetched market: ${market.question || market.title}`, 'success');
+                    
+                    // Store in platformState
+                    window.platformState.markets.set(market.id, market);
+                    
+                    // Check verses
+                    if (market.verses) {
+                        log(`Market has ${market.verses.length} verses`, 'success');
+                        log('Verses data:');
+                        const dataDiv = document.createElement('div');
+                        dataDiv.className = 'data';
+                        dataDiv.textContent = JSON.stringify(market.verses, null, 2);
+                        logEl.appendChild(dataDiv);
+                        
+                        // Try to display verses
+                        if (window.updateAvailableVerses) {
+                            log('Calling updateAvailableVerses...');
+                            try {
+                                window.updateAvailableVerses(market.verses);
+                                
+                                // Check results
+                                setTimeout(() => {
+                                    const verseLevels = document.getElementById('verseLevels');
+                                    const verseCards = document.querySelectorAll('.verse-card');
+                                    log(`Result: ${verseLevels.children.length} levels, ${verseCards.length} verse cards`, 
+                                        verseCards.length > 0 ? 'success' : 'error');
+                                    
+                                    // Log verse levels content
+                                    if (verseLevels.children.length === 0) {
+                                        log('verseLevels is empty!', 'error');
+                                        log('verseLevels HTML: ' + verseLevels.innerHTML);
+                                    } else {
+                                        log('Verse levels created successfully', 'success');
+                                    }
+                                }, 500);
+                            } catch (err) {
+                                log('Error in updateAvailableVerses: ' + err.message, 'error');
+                                console.error(err);
+                            }
+                        } else {
+                            log('updateAvailableVerses not found!', 'error');
+                        }
+                    } else {
+                        log('Market has no verses property!', 'error');
+                    }
+                    
+                    return market;
+                } else {
+                    log('No markets returned from API', 'error');
+                }
+            } catch (error) {
+                log('Fetch error: ' + error.message, 'error');
+            }
+        }
+        
+        async function simulateMarketClick() {
+            // First fetch market
+            const market = await fetchFirstMarket();
+            if (!market) return;
+            
+            log('\\nSimulating market click...');
+            
+            // Simulate what happens in selectSearchResult
+            window.platformState.selectedMarket = market;
+            
+            // Show verses section
+            const versesSection = document.getElementById('versesSection');
+            versesSection.style.display = 'block';
+            
+            // Call the same logic as in index.html
+            if (market.verses && market.verses.length > 0) {
+                log(`Processing ${market.verses.length} verses for display`);
+                
+                setTimeout(() => {
+                    if (window.updateAvailableVerses) {
+                        try {
+                            window.updateAvailableVerses(market.verses);
+                            log('updateAvailableVerses called', 'success');
+                        } catch (error) {
+                            log('Error calling updateAvailableVerses: ' + error.message, 'error');
+                        }
+                    }
+                }, 100);
+            }
+        }
+        
+        // Auto-fetch on load
+        window.addEventListener('load', () => {
+            setTimeout(fetchFirstMarket, 500);
+        });
+    </script>
+</body>
+</html>

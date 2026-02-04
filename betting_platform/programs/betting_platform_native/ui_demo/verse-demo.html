@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verse Flow Demo - Click Market to See</title>
+    <style>
+        body { background: #000; color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .info { background: #111; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .market-btn { 
+            background: #FFD60A; 
+            color: #000; 
+            border: none; 
+            padding: 15px 30px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px;
+        }
+        .market-btn:hover { background: #FFC700; }
+        
+        /* Copy all verse styles from index.html */
+        .verses-section { margin-top: 32px; }
+        
+        .verse-flow-container {
+            position: relative;
+            padding: 40px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            min-height: 400px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+        
+        .verse-levels {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            gap: 120px;
+            min-width: 1000px;
+            align-items: center;
+            padding: 60px 100px;
+        }
+        
+        .verse-level {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            position: relative;
+            align-items: center;
+        }
+        
+        .verse-level-label {
+            position: absolute;
+            top: -40px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 165, 0, 0.1);
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+        
+        .verse-connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .verse-connection {
+            stroke: rgba(255, 165, 0, 0.3);
+            stroke-width: 2;
+            fill: none;
+            transition: all 0.3s;
+            stroke-dasharray: 5 5;
+            animation: flow 1s linear infinite;
+        }
+        
+        @keyframes flow {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -10; }
+        }
+        
+        .verse-connection.active {
+            stroke: #FFA500;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 6px rgba(255, 165, 0, 0.5));
+            stroke-dasharray: none;
+            animation: none;
+        }
+        
+        .verse-arrow {
+            fill: #FFA500;
+        }
+        
+        .verse-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            z-index: 10;
+            width: 240px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .verse-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 16px rgba(255, 165, 0, 0.2);
+            z-index: 20;
+        }
+        
+        .verse-card.selected {
+            border-color: #FFA500;
+            background: rgba(255, 165, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.4);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 165, 0, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(255, 165, 0, 0.6); }
+        }
+        
+        .verse-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 30px;
+            height: 30px;
+            background: #FFA500;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(255, 165, 0, 0.5);
+        }
+        
+        .verse-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+        
+        .verse-title {
+            font-size: 16px;
+            font-weight: 500;
+            flex: 1;
+        }
+        
+        .verse-multiplier {
+            font-size: 24px;
+            font-weight: 600;
+            color: #FFA500;
+        }
+        
+        .verse-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 16px;
+        }
+        
+        .verse-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .verse-stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .verse-stat-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="info">
+            <h1>🚀 Verse Flow Demo - See All Features</h1>
+            <p>Click a market below to see the verse flow with arrows, levels, and animations:</p>
+        </div>
+        
+        <div style="text-align: center;">
+            <button class="market-btn" onclick="loadBitcoinMarket()">
+                Load Bitcoin Market ($100k prediction)
+            </button>
+            <button class="market-btn" onclick="loadTrumpMarket()">
+                Load Trump Market (2024 Election)
+            </button>
+        </div>
+        
+        <div id="marketInfo" style="display: none; margin: 20px 0; padding: 20px; background: #111; border-radius: 8px;">
+            <h2 id="marketTitle"></h2>
+            <p id="marketDesc"></p>
+        </div>
+        
+        <div class="verses-section" id="versesSection" style="display: none;">
+            <h2>Related Stages - Chain Your Leverage</h2>
+            <p style="color: rgba(255,255,255,0.6);">Click verses to select them and see the connections highlight!</p>
+            <div class="verse-flow-container" id="verseFlowContainer">
+                <svg class="verse-connections" id="verseConnections">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" 
+                                refX="9" refY="5" orient="auto">
+                            <polygon points="0 0, 10 5, 0 10" class="verse-arrow" />
+                        </marker>
+                        <marker id="arrowhead-active" markerWidth="10" markerHeight="10" 
+                                refX="9" refY="5" orient="auto">
+                            <polygon points="0 0, 10 5, 0 10" class="verse-arrow active" />
+                        </marker>
+                    </defs>
+                </svg>
+                <div class="verse-levels" id="verseLevels">
+                    <!-- Dynamic verse levels -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const selectedVerses = [];
+        
+        function loadBitcoinMarket() {
+            document.getElementById('marketTitle').textContent = 'Will Bitcoin reach $100k by 2025?';
+            document.getElementById('marketDesc').textContent = 'Market for predicting if BTC will hit six figures';
+            document.getElementById('marketInfo').style.display = 'block';
+            document.getElementById('versesSection').style.display = 'block';
+            
+            const verses = {
+                1: [
+                    { id: 'safe', name: 'Safe Harbor', multiplier: 1.1, description: 'Conservative multiplier' },
+                    { id: 'hodl', name: 'HODL Gang', multiplier: 1.4, description: 'Diamond hands forever' },
+                    { id: 'bull', name: 'Crypto Bull', multiplier: 1.8, description: 'General crypto optimism' }
+                ],
+                2: [
+                    { id: 'btc100k', name: 'BTC to $100k Club', multiplier: 2.5, description: 'For believers in six-figure Bitcoin' },
+                    { id: 'institutional', name: 'Institutional Wave', multiplier: 1.5, description: 'Big money entering crypto' },
+                    { id: 'halving', name: 'Halving Cycle', multiplier: 2.0, description: '4-year cycle believers' }
+                ],
+                3: [
+                    { id: 'flippening', name: 'The Flippening', multiplier: 3.0, description: 'ETH overtaking BTC market cap' },
+                    { id: 'degen', name: 'Full Degen', multiplier: 5.0, description: 'Maximum risk, maximum reward' },
+                    { id: 'tail', name: 'Tail Risk Hunter', multiplier: 3.5, description: 'Betting against consensus' }
+                ]
+            };
+            
+            displayVerses(verses);
+        }
+        
+        function loadTrumpMarket() {
+            document.getElementById('marketTitle').textContent = 'Trump GOP Nominee 2024';
+            document.getElementById('marketDesc').textContent = 'Will Trump be the Republican nominee?';
+            document.getElementById('marketInfo').style.display = 'block';
+            document.getElementById('versesSection').style.display = 'block';
+            
+            const verses = {
+                1: [
+                    { id: 'establishment', name: 'Establishment Pick', multiplier: 1.2, description: 'Safe institutional choice' },
+                    { id: 'election', name: '2024 Election Wave', multiplier: 1.3, description: 'General election momentum' }
+                ],
+                2: [
+                    { id: 'trump-factor', name: 'Trump Factor', multiplier: 2.0, description: 'The Trump phenomenon' },
+                    { id: 'maga', name: 'MAGA Movement', multiplier: 1.8, description: 'Make America Great Again' },
+                    { id: 'swing', name: 'Swing State Focus', multiplier: 1.7, description: 'Battleground state strategy' }
+                ],
+                3: [
+                    { id: 'comeback', name: 'Comeback Kid', multiplier: 2.5, description: 'Historic political comeback' },
+                    { id: 'upset', name: 'Political Upset', multiplier: 2.8, description: 'Against the odds victory' }
+                ]
+            };
+            
+            displayVerses(verses);
+        }
+        
+        function displayVerses(versesData) {
+            const verseLevels = document.getElementById('verseLevels');
+            const svgConnections = document.getElementById('verseConnections');
+            
+            // Clear existing
+            verseLevels.innerHTML = '';
+            const paths = svgConnections.querySelectorAll('path');
+            paths.forEach(path => path.remove());
+            
+            // Create levels
+            Object.entries(versesData).forEach(([level, verses]) => {
+                const levelContainer = document.createElement('div');
+                levelContainer.className = 'verse-level';
+                levelContainer.id = `verse-level-${level}`;
+                
+                const levelLabel = document.createElement('div');
+                levelLabel.className = 'verse-level-label';
+                levelLabel.textContent = `Level ${level}`;
+                levelContainer.appendChild(levelLabel);
+                
+                verses.forEach((verse, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'verse-card';
+                    card.id = `verse-${verse.id}`;
+                    card.setAttribute('data-level', level);
+                    card.setAttribute('data-index', index);
+                    card.onclick = () => toggleVerse(verse.id);
+                    
+                    card.innerHTML = `
+                        <div class="verse-header">
+                            <div class="verse-title">${verse.name}</div>
+                            <div class="verse-multiplier">${verse.multiplier}x</div>
+                        </div>
+                        <div class="verse-description">${verse.description}</div>
+                        <div class="verse-stats">
+                            <div>
+                                <div class="verse-stat-label">Level</div>
+                                <div class="verse-stat-value">L${level}</div>
+                            </div>
+                            <div>
+                                <div class="verse-stat-label">Risk</div>
+                                <div class="verse-stat-value">${getRisk(verse.multiplier)}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    levelContainer.appendChild(card);
+                });
+                
+                verseLevels.appendChild(levelContainer);
+            });
+            
+            // Draw connections
+            setTimeout(() => drawConnections(versesData), 100);
+        }
+        
+        function getRisk(multiplier) {
+            if (multiplier <= 1.5) return 'Low';
+            if (multiplier <= 2.5) return 'Med';
+            if (multiplier <= 3.5) return 'High';
+            return 'Max';
+        }
+        
+        function toggleVerse(verseId) {
+            const card = document.getElementById(`verse-${verseId}`);
+            const index = selectedVerses.indexOf(verseId);
+            
+            if (index === -1) {
+                selectedVerses.push(verseId);
+                card.classList.add('selected');
+            } else {
+                selectedVerses.splice(index, 1);
+                card.classList.remove('selected');
+            }
+            
+            // Update connections
+            updateConnections();
+        }
+        
+        function drawConnections(versesData) {
+            const svg = document.getElementById('verseConnections');
+            const container = document.getElementById('verseFlowContainer');
+            const containerRect = container.getBoundingClientRect();
+            
+            svg.setAttribute('width', containerRect.width);
+            svg.setAttribute('height', containerRect.height);
+            
+            const levels = Object.keys(versesData);
+            
+            for (let i = 0; i < levels.length - 1; i++) {
+                const currentLevel = levels[i];
+                const nextLevel = levels[i + 1];
+                
+                const currentCards = document.querySelectorAll(`#verse-level-${currentLevel} .verse-card`);
+                const nextCards = document.querySelectorAll(`#verse-level-${nextLevel} .verse-card`);
+                
+                currentCards.forEach((sourceCard, sourceIdx) => {
+                    nextCards.forEach((targetCard, targetIdx) => {
+                        const sourceRect = sourceCard.getBoundingClientRect();
+                        const targetRect = targetCard.getBoundingClientRect();
+                        
+                        const sourceX = sourceRect.right - containerRect.left;
+                        const sourceY = sourceRect.top + sourceRect.height / 2 - containerRect.top;
+                        const targetX = targetRect.left - containerRect.left;
+                        const targetY = targetRect.top + targetRect.height / 2 - containerRect.top;
+                        
+                        const midX = (sourceX + targetX) / 2;
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', `M ${sourceX} ${sourceY} Q ${midX} ${sourceY} ${midX} ${targetY} T ${targetX} ${targetY}`);
+                        path.setAttribute('class', 'verse-connection');
+                        path.setAttribute('marker-end', 'url(#arrowhead)');
+                        path.setAttribute('data-source', sourceCard.id);
+                        path.setAttribute('data-target', targetCard.id);
+                        
+                        svg.appendChild(path);
+                    });
+                });
+            }
+        }
+        
+        function updateConnections() {
+            const paths = document.querySelectorAll('.verse-connection');
+            paths.forEach(path => {
+                const sourceId = path.getAttribute('data-source').replace('verse-', '');
+                const targetId = path.getAttribute('data-target').replace('verse-', '');
+                
+                if (selectedVerses.includes(sourceId) && selectedVerses.includes(targetId)) {
+                    path.classList.add('active');
+                    path.setAttribute('marker-end', 'url(#arrowhead-active)');
+                } else {
+                    path.classList.remove('active');
+                    path.setAttribute('marker-end', 'url(#arrowhead)');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

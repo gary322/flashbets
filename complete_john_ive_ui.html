@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Betting Platform - John Ive Complete UI</title>
+    <style>
+        /* John Ive Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Main Layout */
+        .app-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 360px;
+            height: 100vh;
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Left Panel - Verses & Markets */
+        .left-panel {
+            background: #080808;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #666666 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Verse Hierarchy */
+        .verse-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .verse-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .verse-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .verse-add-btn {
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .verse-add-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #FFFFFF;
+        }
+
+        /* Verse Tree */
+        .verse-tree {
+            position: relative;
+        }
+
+        .verse-node {
+            position: relative;
+            margin-left: 0;
+            transition: all 0.3s ease;
+        }
+
+        .verse-node.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .verse-node.drag-over {
+            background: rgba(0, 122, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .verse-item {
+            padding: 8px 12px;
+            margin: 2px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .verse-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #FFFFFF;
+        }
+
+        .verse-item.active {
+            background: rgba(0, 122, 255, 0.15);
+            color: #007AFF;
+        }
+
+        .verse-expand {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .verse-expand.expanded {
+            transform: rotate(90deg);
+        }
+
+        .verse-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .verse-name {
+            flex: 1;
+        }
+
+        .verse-count {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .verse-children {
+            margin-left: 24px;
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.3s ease;
+        }
+
+        .verse-children.expanded {
+            max-height: 1000px;
+        }
+
+        /* Market List */
+        .market-list-container {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+        }
+
+        .market-search {
+            width: 100%;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #FFFFFF;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .market-search:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #007AFF;
+        }
+
+        .market-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .market-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .market-item.active {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: #007AFF;
+        }
+
+        .market-title {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .market-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .market-price {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-weight: 600;
+            color: #34C759;
+        }
+
+        /* Center Panel - Main Trading View */
+        .center-panel {
+            background: #000000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .trading-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .market-name {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .market-info-row {
+            display: flex;
+            gap: 32px;
+            align-items: baseline;
+        }
+
+        .price-display {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+        }
+
+        .current-price {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 36px;
+            font-weight: 700;
+            color: #34C759;
+        }
+
+        .price-change {
+            font-size: 18px;
+            color: #34C759;
+        }
+
+        .price-change.negative {
+            color: #FF3B30;
+        }
+
+        /* Quantum State Display */
+        .quantum-state-container {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        .quantum-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 12px;
+        }
+
+        .quantum-states {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .quantum-state {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-state::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0, 122, 255, 0.2) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .quantum-state:hover::before {
+            opacity: 1;
+        }
+
+        .quantum-state.collapsed {
+            background: rgba(0, 122, 255, 0.2);
+            border-color: #007AFF;
+            animation: quantumCollapse 0.5s ease;
+        }
+
+        @keyframes quantumCollapse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .state-name {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 4px;
+        }
+
+        .state-probability {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 20px;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .quantum-entangle-btn {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid rgba(0, 122, 255, 0.5);
+            color: #007AFF;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quantum-entangle-btn:hover {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: #007AFF;
+        }
+
+        /* Chart Area */
+        .chart-container {
+            flex: 1;
+            padding: 32px;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Trading Controls */
+        .trading-controls {
+            padding: 24px 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .control-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .control-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-tab.active {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #FFFFFF;
+        }
+
+        .leverage-control {
+            margin-bottom: 24px;
+        }
+
+        .leverage-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .leverage-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .leverage-value {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFD60A;
+            transition: color 0.2s;
+        }
+
+        .leverage-value.danger {
+            color: #FF3B30;
+        }
+
+        .leverage-slider-container {
+            position: relative;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        .leverage-track {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .leverage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #34C759 0%, #FFD60A 50%, #FF3B30 100%);
+            width: 10%;
+            transition: width 0.2s ease;
+        }
+
+        .leverage-thumb {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            cursor: grab;
+            transition: all 0.2s;
+        }
+
+        .leverage-thumb:active {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .leverage-markers {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .leverage-marker {
+            position: absolute;
+            top: 100%;
+            transform: translateX(-50%);
+            margin-top: 8px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Right Panel - Positions & Orders */
+        .right-panel {
+            background: #080808;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .panel-tab {
+            flex: 1;
+            padding: 16px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .panel-tab.active {
+            color: #FFFFFF;
+            border-bottom-color: #007AFF;
+        }
+
+        .positions-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .position-card {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .position-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .position-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .position-market {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .position-pnl {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-weight: 600;
+        }
+
+        .position-pnl.profit {
+            color: #34C759;
+        }
+
+        .position-pnl.loss {
+            color: #FF3B30;
+        }
+
+        .position-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .position-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .position-action {
+            flex: 1;
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .position-action:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #FFFFFF;
+        }
+
+        .position-action.close {
+            border-color: rgba(255, 59, 48, 0.5);
+            color: #FF3B30;
+        }
+
+        .position-action.close:hover {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: #FF3B30;
+        }
+
+        /* Order Entry */
+        .order-entry {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .order-type-toggle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .order-type-btn {
+            padding: 12px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .order-type-btn.buy {
+            border-color: rgba(52, 199, 89, 0.5);
+            color: #34C759;
+        }
+
+        .order-type-btn.buy.active {
+            background: rgba(52, 199, 89, 0.2);
+            border-color: #34C759;
+        }
+
+        .order-type-btn.sell {
+            border-color: rgba(255, 59, 48, 0.5);
+            color: #FF3B30;
+        }
+
+        .order-type-btn.sell.active {
+            background: rgba(255, 59, 48, 0.2);
+            border-color: #FF3B30;
+        }
+
+        .order-input-group {
+            margin-bottom: 16px;
+        }
+
+        .order-input-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .order-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .order-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #007AFF;
+        }
+
+        .order-submit {
+            width: 100%;
+            padding: 14px;
+            background: #007AFF;
+            border: none;
+            border-radius: 8px;
+            color: #FFFFFF;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .order-submit:hover {
+            background: #0051D5;
+            transform: translateY(-1px);
+        }
+
+        .order-submit.sell {
+            background: #FF3B30;
+        }
+
+        .order-submit.sell:hover {
+            background: #D70015;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #0A0A0A;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .modal-content {
+            margin-bottom: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
+            color: #FFFFFF;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-btn.primary {
+            background: #007AFF;
+            border-color: #007AFF;
+        }
+
+        .modal-btn.primary:hover {
+            background: #0051D5;
+            border-color: #0051D5;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: absolute;
+            background: #1A1A1A;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #FFFFFF;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Panel -->
+        <aside class="left-panel">
+            <div class="panel-header">
+                <div class="logo">Quantum</div>
+            </div>
+            
+            <!-- Verse Hierarchy -->
+            <div class="verse-container">
+                <div class="verse-header">
+                    <div class="verse-title">Verse Hierarchy</div>
+                    <button class="verse-add-btn" onclick="showAddVerseModal()">+</button>
+                </div>
+                
+                <div class="verse-tree" id="verseTree">
+                    <!-- Verses will be dynamically added here -->
+                </div>
+            </div>
+            
+            <!-- Market List -->
+            <div class="market-list-container">
+                <input type="text" class="market-search" placeholder="Search markets..." id="marketSearch">
+                <div id="marketList">
+                    <!-- Markets will be dynamically added here -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center Panel -->
+        <main class="center-panel">
+            <div class="trading-header">
+                <h1 class="market-name" id="marketName">Select a market to begin</h1>
+                <div class="market-info-row">
+                    <div class="price-display">
+                        <span class="current-price" id="currentPrice">--.--%</span>
+                        <span class="price-change" id="priceChange">--.--</span>
+                    </div>
+                </div>
+                
+                <!-- Quantum State Display -->
+                <div class="quantum-state-container" id="quantumContainer" style="display: none;">
+                    <div class="quantum-label">Quantum Superposition States</div>
+                    <div class="quantum-states" id="quantumStates">
+                        <!-- Quantum states will be added here -->
+                    </div>
+                    <button class="quantum-entangle-btn" onclick="showEntangleModal()">Entangle with Another Market</button>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-placeholder" id="chartArea">
+                    <canvas id="priceChart" style="width: 100%; height: 100%;"></canvas>
+                </div>
+            </div>
+            
+            <div class="trading-controls">
+                <div class="control-tabs">
+                    <button class="control-tab active" onclick="selectControlTab('limit')">Limit</button>
+                    <button class="control-tab" onclick="selectControlTab('market')">Market</button>
+                    <button class="control-tab" onclick="selectControlTab('stop')">Stop</button>
+                    <button class="control-tab" onclick="selectControlTab('quantum')">Quantum</button>
+                </div>
+                
+                <div class="leverage-control">
+                    <div class="leverage-header">
+                        <span class="leverage-label">Leverage</span>
+                        <span class="leverage-value" id="leverageValue">1x</span>
+                    </div>
+                    <div class="leverage-slider-container" id="leverageSlider">
+                        <div class="leverage-track">
+                            <div class="leverage-fill" id="leverageFill"></div>
+                        </div>
+                        <div class="leverage-thumb" id="leverageThumb"></div>
+                        <div class="leverage-markers">
+                            <span class="leverage-marker" style="left: 0%">1x</span>
+                            <span class="leverage-marker" style="left: 20%">20x</span>
+                            <span class="leverage-marker" style="left: 50%">50x</span>
+                            <span class="leverage-marker" style="left: 100%">100x</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="right-panel">
+            <div class="panel-tabs">
+                <button class="panel-tab active" onclick="selectPanelTab('positions')">Positions</button>
+                <button class="panel-tab" onclick="selectPanelTab('orders')">Orders</button>
+                <button class="panel-tab" onclick="selectPanelTab('history')">History</button>
+            </div>
+            
+            <div class="positions-container" id="positionsContainer">
+                <!-- Positions will be dynamically added here -->
+            </div>
+            
+            <div class="order-entry">
+                <div class="order-type-toggle">
+                    <button class="order-type-btn buy active" onclick="selectOrderType('buy')">Buy / Long</button>
+                    <button class="order-type-btn sell" onclick="selectOrderType('sell')">Sell / Short</button>
+                </div>
+                
+                <div class="order-input-group">
+                    <label class="order-input-label">Price</label>
+                    <input type="text" class="order-input" id="orderPrice" value="0.00">
+                </div>
+                
+                <div class="order-input-group">
+                    <label class="order-input-label">Amount</label>
+                    <input type="text" class="order-input" id="orderAmount" value="1000">
+                </div>
+                
+                <button class="order-submit" id="orderSubmit" onclick="submitOrder()">Place Buy Order</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalContent">
+            <!-- Modal content will be dynamically added -->
+        </div>
+    </div>
+
+    <script>
+        // Verse System
+        let verses = {
+            id: 'universe',
+            name: 'Universe',
+            expanded: true,
+            children: [
+                {
+                    id: 'crypto',
+                    name: 'Crypto',
+                    expanded: true,
+                    children: [
+                        { id: 'bitcoin', name: 'Bitcoin', children: [] },
+                        { id: 'ethereum', name: 'Ethereum', children: [] },
+                        { id: 'defi', name: 'DeFi', children: [] }
+                    ]
+                },
+                {
+                    id: 'politics',
+                    name: 'Politics',
+                    expanded: false,
+                    children: [
+                        { id: 'us', name: 'United States', children: [] },
+                        { id: 'global', name: 'Global', children: [] }
+                    ]
+                },
+                {
+                    id: 'science',
+                    name: 'Science',
+                    expanded: false,
+                    children: [
+                        { id: 'space', name: 'Space', children: [] },
+                        { id: 'ai', name: 'AI', children: [] }
+                    ]
+                }
+            ]
+        };
+
+        let markets = [
+            { id: 1, verseId: 'bitcoin', title: 'Will BTC reach $150k by 2025?', price: 65.0, change: 2.5, isQuantum: false },
+            { id: 2, verseId: 'ethereum', title: 'ETH to flip BTC market cap?', price: 35.0, change: -1.2, isQuantum: true },
+            { id: 3, verseId: 'space', title: 'SpaceX Mars landing by 2030?', price: 78.5, change: 0.8, isQuantum: false },
+            { id: 4, verseId: 'ai', title: 'AGI achieved by 2027?', price: 42.0, change: 1.5, isQuantum: true }
+        ];
+
+        let positions = [
+            { id: 1, marketId: 1, market: 'BTC > $150k', side: 'long', size: 10000, entry: 52.8, current: 65.0, pnl: 2300 },
+            { id: 2, marketId: 2, market: 'ETH Flip', side: 'short', size: 5000, entry: 40.5, current: 35.0, pnl: -275 }
+        ];
+
+        let selectedVerseId = null;
+        let selectedMarketId = null;
+        let currentOrderType = 'buy';
+        let currentLeverage = 1;
+        let draggedVerse = null;
+
+        // Initialize
+        function init() {
+            renderVerseTree();
+            renderMarkets();
+            renderPositions();
+            setupLeverageSlider();
+            setupDragAndDrop();
+            setupSearch();
+            startPriceUpdates();
+            initChart();
+        }
+
+        // Render Verse Tree
+        function renderVerseTree() {
+            const container = document.getElementById('verseTree');
+            container.innerHTML = renderVerseNode(verses);
+            setupVerseInteractions();
+        }
+
+        function renderVerseNode(node, level = 0) {
+            const hasChildren = node.children && node.children.length > 0;
+            const marketCount = markets.filter(m => m.verseId === node.id).length;
+            
+            let html = `
+                <div class="verse-node" data-verse-id="${node.id}" data-level="${level}" draggable="true">
+                    <div class="verse-item ${selectedVerseId === node.id ? 'active' : ''}" onclick="selectVerse('${node.id}')">
+                        <span class="verse-expand ${hasChildren ? (node.expanded ? 'expanded' : '') : ''}" 
+                              onclick="toggleVerse(event, '${node.id}')" style="visibility: ${hasChildren ? 'visible' : 'hidden'}">
+                            ▶
+                        </span>
+                        <span class="verse-icon">${getVerseIcon(node.name)}</span>
+                        <span class="verse-name">${node.name}</span>
+                        ${marketCount > 0 ? `<span class="verse-count">${marketCount}</span>` : ''}
+                    </div>
+                    ${hasChildren ? `
+                        <div class="verse-children ${node.expanded ? 'expanded' : ''}">
+                            ${node.children.map(child => renderVerseNode(child, level + 1)).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            return html;
+        }
+
+        function getVerseIcon(name) {
+            const icons = {
+                'Universe': '🌌',
+                'Crypto': '₿',
+                'Bitcoin': '₿',
+                'Ethereum': 'Ξ',
+                'DeFi': '🏦',
+                'Politics': '🏛',
+                'Science': '🔬',
+                'Space': '🚀',
+                'AI': '🤖'
+            };
+            return icons[name] || '📁';
+        }
+
+        function toggleVerse(event, verseId) {
+            event.stopPropagation();
+            
+            function toggleNode(node) {
+                if (node.id === verseId) {
+                    node.expanded = !node.expanded;
+                    return true;
+                }
+                if (node.children) {
+                    for (let child of node.children) {
+                        if (toggleNode(child)) return true;
+                    }
+                }
+                return false;
+            }
+            
+            toggleNode(verses);
+            renderVerseTree();
+        }
+
+        function selectVerse(verseId) {
+            selectedVerseId = verseId;
+            renderVerseTree();
+            renderMarkets();
+        }
+
+        // Drag and Drop for Verses
+        function setupDragAndDrop() {
+            document.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('verse-node')) {
+                    draggedVerse = e.target;
+                    e.target.classList.add('dragging');
+                }
+            });
+
+            document.addEventListener('dragend', (e) => {
+                if (e.target.classList.contains('verse-node')) {
+                    e.target.classList.remove('dragging');
+                    draggedVerse = null;
+                }
+            });
+
+            document.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                const afterElement = getDragAfterElement(e.clientY);
+                const container = document.getElementById('verseTree');
+                
+                if (afterElement == null) {
+                    container.appendChild(draggedVerse);
+                } else {
+                    container.insertBefore(draggedVerse, afterElement);
+                }
+            });
+
+            document.addEventListener('drop', (e) => {
+                e.preventDefault();
+                // Update verse hierarchy based on new position
+                updateVerseHierarchy();
+            });
+        }
+
+        function getDragAfterElement(y) {
+            const draggableElements = [...document.querySelectorAll('.verse-node:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function updateVerseHierarchy() {
+            // In a real app, this would update the verse tree structure
+            console.log('Verse hierarchy updated');
+        }
+
+        // Markets
+        function renderMarkets() {
+            const container = document.getElementById('marketList');
+            const filteredMarkets = selectedVerseId 
+                ? markets.filter(m => m.verseId === selectedVerseId)
+                : markets;
+            
+            container.innerHTML = filteredMarkets.map(market => `
+                <div class="market-item ${selectedMarketId === market.id ? 'active' : ''}" 
+                     onclick="selectMarket(${market.id})">
+                    <div class="market-title">${market.title}</div>
+                    <div class="market-stats">
+                        <span class="market-price">${market.price.toFixed(1)}%</span>
+                        <span class="price-change ${market.change < 0 ? 'negative' : ''}">${market.change > 0 ? '+' : ''}${market.change.toFixed(1)}%</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectMarket(marketId) {
+            selectedMarketId = marketId;
+            const market = markets.find(m => m.id === marketId);
+            
+            if (market) {
+                document.getElementById('marketName').textContent = market.title;
+                document.getElementById('currentPrice').textContent = market.price.toFixed(1) + '%';
+                document.getElementById('priceChange').textContent = (market.change > 0 ? '+' : '') + market.change.toFixed(1) + '%';
+                document.getElementById('priceChange').className = `price-change ${market.change < 0 ? 'negative' : ''}`;
+                
+                // Show quantum states if quantum market
+                const quantumContainer = document.getElementById('quantumContainer');
+                if (market.isQuantum) {
+                    quantumContainer.style.display = 'block';
+                    renderQuantumStates();
+                } else {
+                    quantumContainer.style.display = 'none';
+                }
+                
+                updateChart();
+            }
+            
+            renderMarkets();
+        }
+
+        // Quantum States
+        function renderQuantumStates() {
+            const container = document.getElementById('quantumStates');
+            const states = [
+                { name: 'State A', probability: 45 },
+                { name: 'State B', probability: 35 },
+                { name: 'State C', probability: 20 }
+            ];
+            
+            container.innerHTML = states.map((state, i) => `
+                <div class="quantum-state" onclick="collapseQuantumState(${i})">
+                    <div class="state-name">${state.name}</div>
+                    <div class="state-probability">${state.probability}%</div>
+                </div>
+            `).join('');
+        }
+
+        function collapseQuantumState(stateIndex) {
+            const states = document.querySelectorAll('.quantum-state');
+            states[stateIndex].classList.add('collapsed');
+            
+            setTimeout(() => {
+                alert('Quantum state collapsed! Market has resolved to State ' + String.fromCharCode(65 + stateIndex));
+                states[stateIndex].classList.remove('collapsed');
+            }, 500);
+        }
+
+        // Positions
+        function renderPositions() {
+            const container = document.getElementById('positionsContainer');
+            
+            if (positions.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">No open positions</div>';
+                return;
+            }
+            
+            container.innerHTML = positions.map(pos => `
+                <div class="position-card">
+                    <div class="position-header">
+                        <span class="position-market">${pos.market}</span>
+                        <span class="position-pnl ${pos.pnl > 0 ? 'profit' : 'loss'}">
+                            ${pos.pnl > 0 ? '+' : ''}$${Math.abs(pos.pnl).toLocaleString()} 
+                            (${((pos.pnl / pos.size) * 100).toFixed(1)}%)
+                        </span>
+                    </div>
+                    <div class="position-details">
+                        <div>
+                            <div style="color: rgba(255,255,255,0.4)">Size</div>
+                            <div>$${pos.size.toLocaleString()}</div>
+                        </div>
+                        <div>
+                            <div style="color: rgba(255,255,255,0.4)">Entry</div>
+                            <div>${pos.entry.toFixed(1)}%</div>
+                        </div>
+                        <div>
+                            <div style="color: rgba(255,255,255,0.4)">Current</div>
+                            <div>${pos.current.toFixed(1)}%</div>
+                        </div>
+                        <div>
+                            <div style="color: rgba(255,255,255,0.4)">Leverage</div>
+                            <div>${currentLeverage}x</div>
+                        </div>
+                    </div>
+                    <div class="position-actions">
+                        <button class="position-action" onclick="addToPosition(${pos.id})">Add</button>
+                        <button class="position-action" onclick="reducePosition(${pos.id})">Reduce</button>
+                        <button class="position-action close" onclick="closePosition(${pos.id})">Close</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Leverage Slider
+        function setupLeverageSlider() {
+            const slider = document.getElementById('leverageSlider');
+            const thumb = document.getElementById('leverageThumb');
+            const fill = document.getElementById('leverageFill');
+            const value = document.getElementById('leverageValue');
+            
+            let isDragging = false;
+            
+            const updateLeverage = (e) => {
+                if (!isDragging) return;
+                
+                const rect = slider.getBoundingClientRect();
+                const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+                const percentage = x / rect.width;
+                const leverage = Math.round(1 + percentage * 99);
+                
+                currentLeverage = leverage;
+                thumb.style.left = percentage * 100 + '%';
+                fill.style.width = percentage * 100 + '%';
+                value.textContent = leverage + 'x';
+                
+                if (leverage > 50) {
+                    value.classList.add('danger');
+                } else {
+                    value.classList.remove('danger');
+                }
+            };
+            
+            thumb.addEventListener('mousedown', () => isDragging = true);
+            document.addEventListener('mouseup', () => isDragging = false);
+            document.addEventListener('mousemove', updateLeverage);
+            
+            slider.addEventListener('click', (e) => {
+                isDragging = true;
+                updateLeverage(e);
+                isDragging = false;
+            });
+        }
+
+        // Search
+        function setupSearch() {
+            const searchInput = document.getElementById('marketSearch');
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                const marketItems = document.querySelectorAll('.market-item');
+                
+                marketItems.forEach(item => {
+                    const title = item.querySelector('.market-title').textContent.toLowerCase();
+                    item.style.display = title.includes(query) ? 'block' : 'none';
+                });
+            });
+        }
+
+        // Chart
+        function initChart() {
+            const canvas = document.getElementById('priceChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            updateChart();
+        }
+
+        function updateChart() {
+            const canvas = document.getElementById('priceChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (!selectedMarketId) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.font = '16px SF Pro Display';
+                ctx.textAlign = 'center';
+                ctx.fillText('Select a market to view chart', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+            
+            // Draw simple price chart
+            ctx.strokeStyle = '#34C759';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            const points = 100;
+            const market = markets.find(m => m.id === selectedMarketId);
+            let price = market.price - 10;
+            
+            for (let i = 0; i < points; i++) {
+                const x = (i / points) * canvas.width;
+                price += (Math.random() - 0.5) * 2;
+                const y = canvas.height - ((price / 100) * canvas.height);
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            
+            ctx.stroke();
+        }
+
+        // Price Updates
+        function startPriceUpdates() {
+            setInterval(() => {
+                markets.forEach(market => {
+                    const change = (Math.random() - 0.5) * 0.5;
+                    market.price = Math.max(0, Math.min(100, market.price + change));
+                    market.change += change;
+                });
+                
+                positions.forEach(pos => {
+                    const market = markets.find(m => m.id === pos.marketId);
+                    if (market) {
+                        pos.current = market.price;
+                        const priceDiff = pos.side === 'long' 
+                            ? pos.current - pos.entry 
+                            : pos.entry - pos.current;
+                        pos.pnl = (priceDiff / 100) * pos.size * currentLeverage;
+                    }
+                });
+                
+                if (selectedMarketId) {
+                    const market = markets.find(m => m.id === selectedMarketId);
+                    if (market) {
+                        document.getElementById('currentPrice').textContent = market.price.toFixed(1) + '%';
+                        document.getElementById('priceChange').textContent = (market.change > 0 ? '+' : '') + market.change.toFixed(1) + '%';
+                        document.getElementById('priceChange').className = `price-change ${market.change < 0 ? 'negative' : ''}`;
+                    }
+                }
+                
+                renderMarkets();
+                renderPositions();
+                updateChart();
+            }, 2000);
+        }
+
+        // UI Controls
+        function selectControlTab(tab) {
+            document.querySelectorAll('.control-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function selectPanelTab(tab) {
+            document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function selectOrderType(type) {
+            currentOrderType = type;
+            document.querySelectorAll('.order-type-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const submitBtn = document.getElementById('orderSubmit');
+            submitBtn.textContent = type === 'buy' ? 'Place Buy Order' : 'Place Sell Order';
+            submitBtn.className = `order-submit ${type === 'sell' ? 'sell' : ''}`;
+        }
+
+        function submitOrder() {
+            const price = document.getElementById('orderPrice').value;
+            const amount = document.getElementById('orderAmount').value;
+            
+            alert(`${currentOrderType.toUpperCase()} order placed:\nPrice: ${price}%\nAmount: $${amount}\nLeverage: ${currentLeverage}x`);
+        }
+
+        function closePosition(posId) {
+            if (confirm('Close this position?')) {
+                positions = positions.filter(p => p.id !== posId);
+                renderPositions();
+            }
+        }
+
+        function addToPosition(posId) {
+            alert('Add to position feature coming soon');
+        }
+
+        function reducePosition(posId) {
+            alert('Reduce position feature coming soon');
+        }
+
+        // Modals
+        function showModal(title, content) {
+            const overlay = document.getElementById('modalOverlay');
+            const modal = document.getElementById('modalContent');
+            
+            modal.innerHTML = `
+                <div class="modal-header">
+                    <h2 class="modal-title">${title}</h2>
+                </div>
+                <div class="modal-content">
+                    ${content}
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn" onclick="closeModal()">Cancel</button>
+                    <button class="modal-btn primary" onclick="saveModal()">Save</button>
+                </div>
+            `;
+            
+            overlay.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        function saveModal() {
+            closeModal();
+            alert('Changes saved!');
+        }
+
+        function showAddVerseModal() {
+            const content = `
+                <div class="order-input-group">
+                    <label class="order-input-label">Verse Name</label>
+                    <input type="text" class="order-input" placeholder="Enter verse name">
+                </div>
+                <div class="order-input-group">
+                    <label class="order-input-label">Parent Verse</label>
+                    <select class="order-input">
+                        <option>Universe</option>
+                        <option>Crypto</option>
+                        <option>Politics</option>
+                        <option>Science</option>
+                    </select>
+                </div>
+                <div class="order-input-group">
+                    <label class="order-input-label">Access Level</label>
+                    <select class="order-input">
+                        <option>Public</option>
+                        <option>Restricted</option>
+                        <option>Private</option>
+                    </select>
+                </div>
+            `;
+            
+            showModal('Create New Verse', content);
+        }
+
+        function showEntangleModal() {
+            const content = `
+                <p class="modal-subtitle">Select a market to entangle with this quantum market</p>
+                <div class="order-input-group">
+                    <label class="order-input-label">Target Market</label>
+                    <select class="order-input">
+                        ${markets.filter(m => m.id !== selectedMarketId).map(m => 
+                            `<option value="${m.id}">${m.title}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                <div class="order-input-group">
+                    <label class="order-input-label">Entanglement Strength</label>
+                    <input type="range" class="order-input" min="0" max="100" value="50">
+                </div>
+            `;
+            
+            showModal('Quantum Entanglement', content);
+        }
+
+        function setupVerseInteractions() {
+            // Add hover effects and other interactions
+            const verseItems = document.querySelectorAll('.verse-item');
+            verseItems.forEach(item => {
+                item.addEventListener('mouseenter', (e) => {
+                    // Could show tooltip or preview
+                });
+            });
+        }
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>

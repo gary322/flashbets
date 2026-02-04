@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: betting-postgres
+    environment:
+      POSTGRES_USER: betting_user
+      POSTGRES_PASSWORD: betting_pass
+      POSTGRES_DB: betting_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U betting_user -d betting_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching and queues
+  redis:
+    image: redis:7-alpine
+    container_name: betting-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Server
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: betting-api
+    environment:
+      - DATABASE_URL=postgresql://betting_user:betting_pass@postgres:5432/betting_platform
+      - REDIS_URL=redis://redis:6379
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8080
+    ports:
+      - "8081:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+      - ./.env:/app/.env:ro
+    restart: unless-stopped
+
+  # Redis Commander (optional, for development)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: betting-redis-commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8082:8081"
+    depends_on:
+      - redis
+    profiles:
+      - dev
+
+  # pgAdmin (optional, for development)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: betting-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@betting.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8083:80"
+    depends_on:
+      - postgres
+    profiles:
+      - dev
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  default:
+    name: betting-network

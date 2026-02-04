@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeFi Hub - Quantum Betting Platform</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Main Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                <svg class="navbar-logo" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="15" stroke="var(--color-primary)" stroke-width="2"/>
+                    <path d="M16 8 L16 24 M8 16 L24 16" stroke="var(--color-primary)" stroke-width="2"/>
+                    <circle cx="16" cy="16" r="4" fill="var(--color-primary)"/>
+                </svg>
+                <span>Quantum</span>
+            </a>
+            
+            <div class="navbar-menu">
+                <div class="search-container">
+                    <input type="search" placeholder="Search DeFi products..." class="search-input">
+                </div>
+                
+                <div class="navbar-actions">
+                    <button class="btn btn-icon" onclick="showNotifications()">
+                        <span class="notification-badge">3</span>
+                        🔔
+                    </button>
+                    
+                    <div class="wallet-info">
+                        <div class="wallet-balance">
+                            <span class="balance-label">Balance</span>
+                            <span class="balance-amount">◎ 1,234.56</span>
+                        </div>
+                        <button class="wallet-address" onclick="showWalletMenu()">
+                            0x7g9N...48AU
+                        </button>
+                    </div>
+                    
+                    <button class="btn btn-icon" onclick="showSettings()">⚙️</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- App Tabs -->
+    <div class="app-tabs">
+        <button class="tab" onclick="switchTab('overview')">Overview</button>
+        <button class="tab" onclick="switchTab('markets')">Markets</button>
+        <button class="tab" onclick="switchTab('create-market')">Create Market</button>
+        <button class="tab" onclick="switchTab('verses')">Verses</button>
+        <button class="tab" onclick="switchTab('portfolio')">Portfolio</button>
+        <button class="tab" onclick="switchTab('trading')">Trading</button>
+        <button class="tab" onclick="switchTab('quantum')">Quantum</button>
+        <button class="tab active" onclick="switchTab('defi')">DeFi</button>
+        <button class="tab" onclick="switchTab('analytics')">Analytics</button>
+        <button class="tab" onclick="switchTab('governance')">Governance</button>
+    </div>
+
+    <!-- DeFi Content -->
+    <main class="defi-content">
+        <div class="container">
+            <!-- DeFi Header -->
+            <section class="defi-header">
+                <h1>DeFi Hub</h1>
+                <p class="defi-subtitle">Maximize your earnings with staking, liquidity provision, and advanced DeFi strategies</p>
+            </section>
+
+            <!-- DeFi Overview -->
+            <section class="defi-overview">
+                <div class="overview-stat">
+                    <span class="stat-icon">💰</span>
+                    <div class="stat-content">
+                        <span class="stat-label">Total Value Locked</span>
+                        <span class="stat-value">$128.9M</span>
+                    </div>
+                </div>
+                <div class="overview-stat">
+                    <span class="stat-icon">🪙</span>
+                    <div class="stat-content">
+                        <span class="stat-label">MMT Price</span>
+                        <span class="stat-value">$2.45</span>
+                    </div>
+                </div>
+                <div class="overview-stat">
+                    <span class="stat-icon">📈</span>
+                    <div class="stat-content">
+                        <span class="stat-label">Avg APY</span>
+                        <span class="stat-value">24.3%</span>
+                    </div>
+                </div>
+                <div class="overview-stat">
+                    <span class="stat-icon">👥</span>
+                    <div class="stat-content">
+                        <span class="stat-label">Active Users</span>
+                        <span class="stat-value">45,678</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MMT Staking -->
+            <section class="staking-section">
+                <div class="section-header">
+                    <h2>🪙 MMT Staking</h2>
+                    <span class="section-badge">18.7% APY</span>
+                </div>
+                
+                <div class="staking-grid">
+                    <div class="staking-info">
+                        <h3>Your Staking Position</h3>
+                        <div class="staking-stats">
+                            <div class="stat-row">
+                                <span>Staked Amount</span>
+                                <span class="value">10,000 MMT</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Current Value</span>
+                                <span class="value">$24,500</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Rewards Earned</span>
+                                <span class="value positive">+456.78 MMT</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Daily Earnings</span>
+                                <span class="value">5.12 MMT ($12.54)</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Lock Period</span>
+                                <span class="value">23 days remaining</span>
+                            </div>
+                        </div>
+                        
+                        <div class="staking-actions">
+                            <button class="btn btn-primary" onclick="claimRewards()">Claim Rewards</button>
+                            <button class="btn btn-secondary" onclick="showUnstakeModal()">Unstake</button>
+                        </div>
+                    </div>
+                    
+                    <div class="staking-calculator">
+                        <h3>Staking Calculator</h3>
+                        <div class="calculator-inputs">
+                            <div class="input-group">
+                                <label>Amount to Stake</label>
+                                <input type="number" id="stakeAmount" value="1000" onchange="calculateRewards()">
+                                <span class="input-suffix">MMT</span>
+                            </div>
+                            <div class="input-group">
+                                <label>Lock Period</label>
+                                <select id="lockPeriod" onchange="calculateRewards()">
+                                    <option value="30">30 Days (15% APY)</option>
+                                    <option value="90" selected>90 Days (18.7% APY)</option>
+                                    <option value="180">180 Days (22% APY)</option>
+                                    <option value="365">365 Days (25% APY)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="calculator-results">
+                            <div class="result-row">
+                                <span>Expected Rewards</span>
+                                <span id="expectedRewards">46.75 MMT</span>
+                            </div>
+                            <div class="result-row">
+                                <span>Total Value at Maturity</span>
+                                <span id="totalValue">$2,614.54</span>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary btn-block" onclick="stakeTokens()">Stake MMT</button>
+                    </div>
+                </div>
+                
+                <div class="staking-tiers">
+                    <h3>Staking Tiers & Benefits</h3>
+                    <div class="tiers-grid">
+                        <div class="tier-card">
+                            <div class="tier-header">
+                                <span class="tier-name">Bronze</span>
+                                <span class="tier-range">1 - 1,000 MMT</span>
+                            </div>
+                            <ul class="tier-benefits">
+                                <li>15% Base APY</li>
+                                <li>1x Governance Power</li>
+                                <li>Basic Trading Rebates</li>
+                            </ul>
+                        </div>
+                        <div class="tier-card active">
+                            <div class="tier-header">
+                                <span class="tier-name">Silver</span>
+                                <span class="tier-range">1,001 - 10,000 MMT</span>
+                            </div>
+                            <ul class="tier-benefits">
+                                <li>18.7% Base APY</li>
+                                <li>2x Governance Power</li>
+                                <li>Enhanced Trading Rebates</li>
+                                <li>Priority Support</li>
+                            </ul>
+                        </div>
+                        <div class="tier-card">
+                            <div class="tier-header">
+                                <span class="tier-name">Gold</span>
+                                <span class="tier-range">10,001 - 50,000 MMT</span>
+                            </div>
+                            <ul class="tier-benefits">
+                                <li>22% Base APY</li>
+                                <li>5x Governance Power</li>
+                                <li>Maximum Trading Rebates</li>
+                                <li>Early Access Features</li>
+                            </ul>
+                        </div>
+                        <div class="tier-card">
+                            <div class="tier-header">
+                                <span class="tier-name">Platinum</span>
+                                <span class="tier-range">50,001+ MMT</span>
+                            </div>
+                            <ul class="tier-benefits">
+                                <li>25% Base APY</li>
+                                <li>10x Governance Power</li>
+                                <li>Zero Trading Fees</li>
+                                <li>Exclusive Features</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Liquidity Pools -->
+            <section class="liquidity-section">
+                <div class="section-header">
+                    <h2>💧 Liquidity Pools</h2>
+                    <button class="btn btn-secondary" onclick="showCreatePool()">Create Pool</button>
+                </div>
+                
+                <div class="pools-grid">
+                    <div class="pool-card">
+                        <div class="pool-header">
+                            <div class="pool-pair">
+                                <span class="token">MMT</span>
+                                <span class="separator">/</span>
+                                <span class="token">USDC</span>
+                            </div>
+                            <span class="pool-apy">42.3% APY</span>
+                        </div>
+                        <div class="pool-stats">
+                            <div class="stat-row">
+                                <span>TVL</span>
+                                <span>$34.5M</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>24h Volume</span>
+                                <span>$2.8M</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Your Share</span>
+                                <span>$12,345 (0.036%)</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Earned Fees</span>
+                                <span class="positive">+$234.56</span>
+                            </div>
+                        </div>
+                        <div class="pool-actions">
+                            <button class="btn btn-primary" onclick="addLiquidity('mmt-usdc')">Add</button>
+                            <button class="btn btn-secondary" onclick="removeLiquidity('mmt-usdc')">Remove</button>
+                        </div>
+                    </div>
+                    
+                    <div class="pool-card">
+                        <div class="pool-header">
+                            <div class="pool-pair">
+                                <span class="token">SOL</span>
+                                <span class="separator">/</span>
+                                <span class="token">USDC</span>
+                            </div>
+                            <span class="pool-apy">38.7% APY</span>
+                        </div>
+                        <div class="pool-stats">
+                            <div class="stat-row">
+                                <span>TVL</span>
+                                <span>$28.9M</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>24h Volume</span>
+                                <span>$4.2M</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Your Share</span>
+                                <span>$0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Pool Fee</span>
+                                <span>0.3%</span>
+                            </div>
+                        </div>
+                        <div class="pool-actions">
+                            <button class="btn btn-primary btn-block" onclick="addLiquidity('sol-usdc')">Add Liquidity</button>
+                        </div>
+                    </div>
+                    
+                    <div class="pool-card special">
+                        <div class="pool-header">
+                            <div class="pool-pair">
+                                <span class="token">MMT</span>
+                                <span class="separator">/</span>
+                                <span class="token">ETH</span>
+                            </div>
+                            <span class="pool-apy special">68.9% APY</span>
+                        </div>
+                        <div class="pool-bonus">🔥 2x Rewards Active</div>
+                        <div class="pool-stats">
+                            <div class="stat-row">
+                                <span>TVL</span>
+                                <span>$15.6M</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>24h Volume</span>
+                                <span>$1.9M</span>
+                            </div>
+                            <div class="stat-row">
+                                <span>Bonus Period</span>
+                                <span>14 days left</span>
+                            </div>
+                        </div>
+                        <div class="pool-actions">
+                            <button class="btn btn-warning btn-block" onclick="addLiquidity('mmt-eth')">Add to Bonus Pool</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Flash Loans -->
+            <section class="flash-loans-section">
+                <div class="section-header">
+                    <h2>⚡ Flash Loans</h2>
+                    <span class="section-info">Zero-collateral instant loans for arbitrage</span>
+                </div>
+                
+                <div class="flash-loans-grid">
+                    <div class="flash-loan-info">
+                        <h3>Available for Flash Loans</h3>
+                        <div class="available-assets">
+                            <div class="asset-row">
+                                <div class="asset-info">
+                                    <span class="asset-icon">◎</span>
+                                    <span class="asset-name">SOL</span>
+                                </div>
+                                <span class="asset-amount">10,000 SOL</span>
+                                <span class="asset-fee">2%</span>
+                            </div>
+                            <div class="asset-row">
+                                <div class="asset-info">
+                                    <span class="asset-icon">🪙</span>
+                                    <span class="asset-name">MMT</span>
+                                </div>
+                                <span class="asset-amount">500,000 MMT</span>
+                                <span class="asset-fee">2%</span>
+                            </div>
+                            <div class="asset-row">
+                                <div class="asset-info">
+                                    <span class="asset-icon">💵</span>
+                                    <span class="asset-name">USDC</span>
+                                </div>
+                                <span class="asset-amount">$2,000,000</span>
+                                <span class="asset-fee">1%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flash-loan-stats">
+                        <h3>Flash Loan Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <span class="stat-label">Total Volume</span>
+                                <span class="stat-value">$156.7M</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">24h Loans</span>
+                                <span class="stat-value">234</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">Success Rate</span>
+                                <span class="stat-value">98.7%</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-label">Avg Profit</span>
+                                <span class="stat-value">$1,234</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="showFlashLoanBuilder()">Build Flash Loan</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Yield Farming -->
+            <section class="farming-section">
+                <div class="section-header">
+                    <h2>🌾 Yield Farming</h2>
+                    <span class="section-badge">Up to 180% APY</span>
+                </div>
+                
+                <div class="farms-list">
+                    <div class="farm-card">
+                        <div class="farm-header">
+                            <div class="farm-info">
+                                <h3>MMT-USDC LP Farm</h3>
+                                <span class="farm-multiplier">3x Rewards</span>
+                            </div>
+                            <div class="farm-apy">
+                                <span class="apy-label">APY</span>
+                                <span class="apy-value">126.8%</span>
+                            </div>
+                        </div>
+                        <div class="farm-details">
+                            <div class="detail-row">
+                                <span>Staked LP</span>
+                                <span>234.56 LP</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Pending Rewards</span>
+                                <span class="positive">45.67 MMT</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Daily Earnings</span>
+                                <span>12.34 MMT</span>
+                            </div>
+                        </div>
+                        <div class="farm-actions">
+                            <button class="btn btn-success" onclick="harvestRewards('farm-1')">Harvest</button>
+                            <button class="btn btn-secondary" onclick="stakeLPTokens('farm-1')">Stake More</button>
+                        </div>
+                    </div>
+                    
+                    <div class="farm-card new">
+                        <div class="farm-banner">🆕 New Farm</div>
+                        <div class="farm-header">
+                            <div class="farm-info">
+                                <h3>SOL-MMT LP Farm</h3>
+                                <span class="farm-multiplier">5x Launch Bonus</span>
+                            </div>
+                            <div class="farm-apy">
+                                <span class="apy-label">APY</span>
+                                <span class="apy-value special">180.5%</span>
+                            </div>
+                        </div>
+                        <div class="farm-details">
+                            <div class="detail-row">
+                                <span>Total Staked</span>
+                                <span>$2.4M</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Rewards Pool</span>
+                                <span>100,000 MMT</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Ends In</span>
+                                <span>28 days</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-block" onclick="startFarming('farm-2')">Start Farming</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DeFi Strategies -->
+            <section class="strategies-section">
+                <div class="section-header">
+                    <h2>🎯 Auto-Yield Strategies</h2>
+                    <button class="btn btn-secondary" onclick="showAllStrategies()">View All</button>
+                </div>
+                
+                <div class="strategies-grid">
+                    <div class="strategy-card">
+                        <div class="strategy-header">
+                            <h3>Conservative Yield</h3>
+                            <span class="risk-level low">Low Risk</span>
+                        </div>
+                        <div class="strategy-stats">
+                            <div class="stat">
+                                <span class="label">Expected APY</span>
+                                <span class="value">15-20%</span>
+                            </div>
+                            <div class="stat">
+                                <span class="label">Strategy</span>
+                                <span class="value">Stablecoin Farming</span>
+                            </div>
+                        </div>
+                        <p class="strategy-description">
+                            Automatically compounds stablecoin yields across multiple protocols for steady returns.
+                        </p>
+                        <button class="btn btn-secondary" onclick="deployStrategy('conservative')">Deploy Capital</button>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <div class="strategy-header">
+                            <h3>Balanced Growth</h3>
+                            <span class="risk-level medium">Medium Risk</span>
+                        </div>
+                        <div class="strategy-stats">
+                            <div class="stat">
+                                <span class="label">Expected APY</span>
+                                <span class="value">30-50%</span>
+                            </div>
+                            <div class="stat">
+                                <span class="label">Strategy</span>
+                                <span class="value">LP + Farming</span>
+                            </div>
+                        </div>
+                        <p class="strategy-description">
+                            Provides liquidity to high-volume pools and farms rewards for enhanced yields.
+                        </p>
+                        <button class="btn btn-primary" onclick="deployStrategy('balanced')">Deploy Capital</button>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <div class="strategy-header">
+                            <h3>Degen Mode</h3>
+                            <span class="risk-level high">High Risk</span>
+                        </div>
+                        <div class="strategy-stats">
+                            <div class="stat">
+                                <span class="label">Expected APY</span>
+                                <span class="value">100-300%</span>
+                            </div>
+                            <div class="stat">
+                                <span class="label">Strategy</span>
+                                <span class="value">Leveraged Farming</span>
+                            </div>
+                        </div>
+                        <p class="strategy-description">
+                            Uses flash loans and leverage for maximum yield. High risk of liquidation.
+                        </p>
+                        <button class="btn btn-danger" onclick="deployStrategy('degen')">YOLO Deploy</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-items">
+            <a href="dashboard.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">🏠</span>
+                <span class="mobile-nav-label">Home</span>
+            </a>
+            <a href="markets.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">📊</span>
+                <span class="mobile-nav-label">Markets</span>
+            </a>
+            <a href="create-market.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">➕</span>
+                <span class="mobile-nav-label">Create</span>
+            </a>
+            <a href="portfolio.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">💼</span>
+                <span class="mobile-nav-label">Portfolio</span>
+            </a>
+            <a href="defi.html" class="mobile-nav-item active">
+                <span class="mobile-nav-icon">🏦</span>
+                <span class="mobile-nav-label">DeFi</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Styles specific to DeFi page -->
+    <style>
+        /* DeFi Content */
+        .defi-content {
+            padding: var(--spacing-xl) 0;
+            min-height: calc(100vh - 64px - 48px);
+        }
+        
+        /* DeFi Header */
+        .defi-header {
+            text-align: center;
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .defi-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 1.125rem;
+        }
+        
+        /* DeFi Overview */
+        .defi-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .overview-stat {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            transition: all var(--transition-base);
+        }
+        
+        .overview-stat:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+        }
+        
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .section-badge {
+            background-color: var(--color-success-bg);
+            color: var(--color-success);
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .section-info {
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        /* Staking Section */
+        .staking-section {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .staking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .staking-info,
+        .staking-calculator {
+            background-color: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-xl);
+        }
+        
+        .staking-stats {
+            margin: var(--spacing-lg) 0;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--color-border-primary);
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .value {
+            font-weight: 600;
+        }
+        
+        .staking-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+        
+        /* Calculator */
+        .calculator-inputs {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .input-group {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-md);
+            color: var(--color-text-primary);
+        }
+        
+        .input-suffix {
+            position: absolute;
+            right: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-tertiary);
+        }
+        
+        .calculator-results {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+        }
+        
+        /* Staking Tiers */
+        .staking-tiers {
+            margin-top: var(--spacing-xl);
+        }
+        
+        .tiers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .tier-card {
+            background-color: var(--color-bg-primary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            transition: all var(--transition-base);
+        }
+        
+        .tier-card.active {
+            border-color: var(--color-primary);
+            background-color: rgba(29, 155, 240, 0.1);
+        }
+        
+        .tier-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .tier-name {
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+        
+        .tier-range {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .tier-benefits {
+            list-style: none;
+            font-size: 0.875rem;
+        }
+        
+        .tier-benefits li {
+            padding: var(--spacing-xs) 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .tier-benefits li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--color-success);
+        }
+        
+        /* Liquidity Pools */
+        .liquidity-section {
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .pools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-xl);
+        }
+        
+        .pool-card {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            transition: all var(--transition-base);
+        }
+        
+        .pool-card:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+        }
+        
+        .pool-card.special {
+            border-color: var(--color-warning);
+            background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(251, 191, 36, 0.1) 100%);
+        }
+        
+        .pool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .pool-pair {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .token {
+            color: var(--color-text-primary);
+        }
+        
+        .separator {
+            color: var(--color-text-tertiary);
+        }
+        
+        .pool-apy {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--color-success);
+        }
+        
+        .pool-apy.special {
+            color: var(--color-warning);
+        }
+        
+        .pool-bonus {
+            background-color: var(--color-warning-bg);
+            color: var(--color-warning);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-md);
+            text-align: center;
+            margin-bottom: var(--spacing-md);
+            font-weight: 600;
+        }
+        
+        .pool-stats {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .pool-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+        
+        /* Flash Loans */
+        .flash-loans-section {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .flash-loans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--spacing-xl);
+        }
+        
+        .flash-loan-info,
+        .flash-loan-stats {
+            background-color: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-xl);
+        }
+        
+        .available-assets {
+            margin-top: var(--spacing-lg);
+        }
+        
+        .asset-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md);
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .asset-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .asset-icon {
+            font-size: 1.5rem;
+        }
+        
+        .asset-name {
+            font-weight: 600;
+        }
+        
+        .asset-amount {
+            color: var(--color-text-secondary);
+        }
+        
+        .asset-fee {
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .stat-card {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            text-align: center;
+        }
+        
+        /* Yield Farming */
+        .farming-section {
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .farms-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--spacing-xl);
+        }
+        
+        .farm-card {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            position: relative;
+            transition: all var(--transition-base);
+        }
+        
+        .farm-card:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+        }
+        
+        .farm-card.new {
+            border-color: var(--color-success);
+        }
+        
+        .farm-banner {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background-color: var(--color-success);
+            color: white;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .farm-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .farm-info h3 {
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .farm-multiplier {
+            font-size: 0.875rem;
+            color: var(--color-warning);
+            font-weight: 600;
+        }
+        
+        .farm-apy {
+            text-align: right;
+        }
+        
+        .apy-label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .apy-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-success);
+        }
+        
+        .apy-value.special {
+            color: var(--color-warning);
+        }
+        
+        .farm-details {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            font-size: 0.875rem;
+        }
+        
+        .farm-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+        
+        /* DeFi Strategies */
+        .strategies-section {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+        }
+        
+        .strategies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-xl);
+        }
+        
+        .strategy-card {
+            background-color: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-xl);
+            transition: all var(--transition-base);
+        }
+        
+        .strategy-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .strategy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .risk-level {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .risk-level.low {
+            background-color: var(--color-success-bg);
+            color: var(--color-success);
+        }
+        
+        .risk-level.medium {
+            background-color: var(--color-warning-bg);
+            color: var(--color-warning);
+        }
+        
+        .risk-level.high {
+            background-color: var(--color-danger-bg);
+            color: var(--color-danger);
+        }
+        
+        .strategy-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .strategy-stats .stat {
+            text-align: center;
+        }
+        
+        .strategy-stats .label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .strategy-stats .value {
+            font-weight: 600;
+        }
+        
+        .strategy-description {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .defi-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .staking-grid,
+            .flash-loans-grid,
+            .farms-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .pools-grid,
+            .strategies-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tiers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <!-- DeFi JavaScript -->
+    <script>
+        // Initialize DeFi page
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDeFi();
+            calculateRewards();
+        });
+        
+        // Initialize DeFi
+        function initializeDeFi() {
+            // Update APY values periodically
+            setInterval(updateAPYs, 30000);
+        }
+        
+        // Calculate staking rewards
+        function calculateRewards() {
+            const amount = parseFloat(document.getElementById('stakeAmount').value) || 0;
+            const lockPeriod = document.getElementById('lockPeriod').value;
+            
+            let apy;
+            switch(lockPeriod) {
+                case '30': apy = 0.15; break;
+                case '90': apy = 0.187; break;
+                case '180': apy = 0.22; break;
+                case '365': apy = 0.25; break;
+            }
+            
+            const rewards = amount * apy * (lockPeriod / 365);
+            const totalValue = (amount + rewards) * 2.45; // MMT price
+            
+            document.getElementById('expectedRewards').textContent = rewards.toFixed(2) + ' MMT';
+            document.getElementById('totalValue').textContent = '$' + totalValue.toFixed(2);
+        }
+        
+        // Update APYs
+        function updateAPYs() {
+            const apyElements = document.querySelectorAll('.pool-apy, .apy-value');
+            apyElements.forEach(el => {
+                const currentAPY = parseFloat(el.textContent);
+                const change = (Math.random() - 0.5) * 2;
+                const newAPY = Math.max(0, currentAPY + change);
+                el.textContent = newAPY.toFixed(1) + '%';
+            });
+        }
+        
+        // Switch tabs
+        function switchTab(tabName) {
+            window.location.href = tabName + '.html';
+        }
+        
+        // Staking actions
+        function claimRewards() {
+            showNotification('success', 'Rewards Claimed', '456.78 MMT has been added to your wallet');
+        }
+        
+        function showUnstakeModal() {
+            showNotification('warning', 'Unstake Warning', 'Unstaking before lock period ends will forfeit 50% of rewards');
+        }
+        
+        function stakeTokens() {
+            const amount = document.getElementById('stakeAmount').value;
+            showNotification('success', 'Tokens Staked', `${amount} MMT has been staked successfully`);
+        }
+        
+        // Liquidity actions
+        function addLiquidity(poolId) {
+            showNotification('info', 'Add Liquidity', 'Liquidity provision interface coming soon');
+        }
+        
+        function removeLiquidity(poolId) {
+            showNotification('info', 'Remove Liquidity', 'Liquidity removal interface coming soon');
+        }
+        
+        function showCreatePool() {
+            showNotification('info', 'Create Pool', 'Pool creation interface coming soon');
+        }
+        
+        // Flash loan actions
+        function showFlashLoanBuilder() {
+            showNotification('info', 'Flash Loan Builder', 'Advanced flash loan builder coming soon');
+        }
+        
+        // Farming actions
+        function harvestRewards(farmId) {
+            showNotification('success', 'Rewards Harvested', '45.67 MMT has been claimed');
+        }
+        
+        function stakeLPTokens(farmId) {
+            showNotification('info', 'Stake LP Tokens', 'LP staking interface coming soon');
+        }
+        
+        function startFarming(farmId) {
+            showNotification('info', 'Start Farming', 'Farming interface coming soon');
+        }
+        
+        // Strategy actions
+        function deployStrategy(strategyType) {
+            const messages = {
+                conservative: 'Deploying conservative yield strategy...',
+                balanced: 'Deploying balanced growth strategy...',
+                degen: 'Deploying high-risk degen strategy... Good luck!'
+            };
+            showNotification('success', 'Strategy Deployed', messages[strategyType]);
+        }
+        
+        function showAllStrategies() {
+            showNotification('info', 'All Strategies', 'Complete strategy list coming soon');
+        }
+        
+        // Show notification
+        function showNotification(type, title, message) {
+            const container = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification fade-in';
+            notification.innerHTML = `
+                <div class="notification-icon ${type}">${getNotificationIcon(type)}</div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close" onclick="closeNotification(this)">×</button>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+        
+        function getNotificationIcon(type) {
+            switch(type) {
+                case 'success': return '✓';
+                case 'error': return '✗';
+                case 'warning': return '⚠';
+                default: return 'ℹ';
+            }
+        }
+        
+        function closeNotification(button) {
+            button.parentElement.remove();
+        }
+        
+        // Show wallet menu
+        function showWalletMenu() {
+            alert('Wallet Menu:\n\n• Copy Address\n• View on Explorer\n• Disconnect Wallet\n• Export Private Key');
+        }
+        
+        // Show notifications
+        function showNotifications() {
+            showNotification('info', 'Notifications', 'You have 3 new notifications');
+        }
+        
+        // Show settings
+        function showSettings() {
+            window.location.href = 'settings.html';
+        }
+    </script>
+</body>
+</html>

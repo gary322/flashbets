@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM - Verse System Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .header {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 2px solid #FFD60A;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Bungee', cursive;
+            font-size: 36px;
+            background: linear-gradient(45deg, #FFD60A, #FFA500, #FF6B35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            padding: 8px 16px;
+            background: rgba(255, 214, 10, 0.1);
+            border: 1px solid #FFD60A;
+            color: #FFD60A;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 214, 10, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .speed-selector {
+            display: flex;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .speed-btn {
+            padding: 4px 8px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .speed-btn.active {
+            background: #FFD60A;
+            color: #0a0a0a;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 999;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD60A, #FFA500);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(255, 214, 10, 0.5);
+        }
+
+        .step-indicator {
+            position: fixed;
+            top: 90px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            font-size: 14px;
+            z-index: 998;
+        }
+
+        .main-content {
+            margin-top: 100px;
+            padding: 20px;
+            min-height: calc(100vh - 100px);
+            position: relative;
+        }
+
+        .narrator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(255, 214, 10, 0.95), rgba(255, 165, 0, 0.95));
+            color: #0a0a0a;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(255, 214, 10, 0.3);
+            z-index: 2000;
+            animation: slideIn 0.5s ease;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .narrator.hidden {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+            pointer-events: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .narrator-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .narrator-content {
+            font-size: 16px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .narrator-timer {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Verse System specific styles */
+        .verse-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            min-height: 600px;
+        }
+
+        .verse-tree {
+            position: relative;
+            padding: 40px;
+        }
+
+        .verse-node {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            min-width: 150px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .verse-node:hover {
+            transform: scale(1.05);
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.1);
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.3);
+        }
+
+        .verse-node.root {
+            background: linear-gradient(135deg, rgba(255, 214, 10, 0.2), rgba(255, 165, 0, 0.1));
+            border-color: #FFD60A;
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.2);
+        }
+
+        .verse-node.active {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+            animation: nodePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes nodePulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(76, 175, 80, 0.5);
+            }
+        }
+
+        .verse-node-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .verse-node-value {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .verse-node-bonus {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #4CAF50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .verse-connection {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, #FFD60A, transparent);
+            height: 2px;
+            transform-origin: left center;
+            animation: flowConnection 2s ease-in-out infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes flowConnection {
+            0%, 100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .depth-indicator {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 80px;
+        }
+
+        .depth-level {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .depth-number {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 214, 10, 0.2);
+            border: 1px solid #FFD60A;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .depth-label {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .verse-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFD60A;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .verse-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .breadcrumb-item {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .breadcrumb-item.active {
+            background: linear-gradient(135deg, #FFD60A, #FFA500);
+            color: #0a0a0a;
+            font-weight: 600;
+        }
+
+        .breadcrumb-separator {
+            color: #666;
+        }
+
+        .verse-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #FFD60A, #FFA500);
+            color: #0a0a0a;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 214, 10, 0.3);
+        }
+
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .bonus-visualization {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.05));
+            border: 2px solid #4CAF50;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .bonus-bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .bonus-bar-fill {
+            flex: 1;
+            height: 40px;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bonus-bar-segment {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            border-right: 2px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .verse-example {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .example-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFD60A;
+            margin-bottom: 15px;
+        }
+
+        .example-description {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .verse-tree {
+                padding: 20px;
+                overflow-x: auto;
+            }
+
+            .verse-node {
+                position: relative;
+                margin: 10px;
+            }
+
+            .verse-connection {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">BOOM</div>
+        <div class="controls">
+            <button class="control-btn" id="playPauseBtn">⏸ Pause</button>
+            <button class="control-btn" id="restartBtn">↺ Restart</button>
+            <div class="speed-selector">
+                <button class="speed-btn" data-speed="0.5">0.5x</button>
+                <button class="speed-btn active" data-speed="1">1x</button>
+                <button class="speed-btn" data-speed="2">2x</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+        <span id="stepIndicator">Step 1 of 60</span>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="verse-container" id="verseContainer">
+            <!-- Dynamic content will be inserted here -->
+        </div>
+    </div>
+
+    <!-- Narrator -->
+    <div class="narrator hidden" id="narrator">
+        <div class="narrator-timer" id="narratorTimer">5s</div>
+        <div class="narrator-title">
+            <span>🌳</span>
+            <span id="narratorTitle">Verse System</span>
+        </div>
+        <div class="narrator-content" id="narratorContent">
+            Understanding the hierarchical betting structure.
+        </div>
+    </div>
+
+    <script>
+        // Verse System Demo Implementation
+        class VerseSystemDemo {
+            constructor() {
+                this.currentStep = 0;
+                this.isPlaying = true;
+                this.speed = 1;
+                this.totalSteps = 60;
+                this.stepTimer = null;
+                this.narratorTimer = null;
+
+                // Verse data structure
+                this.verseTree = {
+                    root: {
+                        id: 'root',
+                        title: 'Global Events',
+                        level: 0,
+                        children: [
+                            {
+                                id: 'politics',
+                                title: 'Politics',
+                                level: 1,
+                                children: [
+                                    {
+                                        id: 'us-politics',
+                                        title: 'US Politics',
+                                        level: 2,
+                                        children: [
+                                            {
+                                                id: 'presidential',
+                                                title: '2024 Presidential',
+                                                level: 3,
+                                                children: [
+                                                    {
+                                                        id: 'dem-primary',
+                                                        title: 'Democratic Primary',
+                                                        level: 4
+                                                    },
+                                                    {
+                                                        id: 'rep-primary',
+                                                        title: 'Republican Primary',
+                                                        level: 4
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                id: 'congress',
+                                                title: 'Congress',
+                                                level: 3,
+                                                children: [
+                                                    {
+                                                        id: 'senate',
+                                                        title: 'Senate Control',
+                                                        level: 4
+                                                    },
+                                                    {
+                                                        id: 'house',
+                                                        title: 'House Control',
+                                                        level: 4
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        id: 'eu-politics',
+                                        title: 'EU Politics',
+                                        level: 2,
+                                        children: [
+                                            {
+                                                id: 'brexit',
+                                                title: 'Brexit Effects',
+                                                level: 3
+                                            },
+                                            {
+                                                id: 'eu-elections',
+                                                title: 'EU Elections',
+                                                level: 3
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                id: 'economics',
+                                title: 'Economics',
+                                level: 1,
+                                children: [
+                                    {
+                                        id: 'recession',
+                                        title: 'Recession 2025',
+                                        level: 2,
+                                        children: [
+                                            {
+                                                id: 'us-recession',
+                                                title: 'US Recession',
+                                                level: 3
+                                            },
+                                            {
+                                                id: 'global-recession',
+                                                title: 'Global Recession',
+                                                level: 3
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        id: 'crypto',
+                                        title: 'Cryptocurrency',
+                                        level: 2,
+                                        children: [
+                                            {
+                                                id: 'btc-price',
+                                                title: 'Bitcoin Price',
+                                                level: 3,
+                                                children: [
+                                                    {
+                                                        id: 'btc-100k',
+                                                        title: 'BTC >$100k',
+                                                        level: 4
+                                                    },
+                                                    {
+                                                        id: 'btc-150k',
+                                                        title: 'BTC >$150k',
+                                                        level: 4
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                id: 'sports',
+                                title: 'Sports',
+                                level: 1,
+                                children: [
+                                    {
+                                        id: 'nfl',
+                                        title: 'NFL',
+                                        level: 2,
+                                        children: [
+                                            {
+                                                id: 'super-bowl',
+                                                title: 'Super Bowl',
+                                                level: 3,
+                                                children: [
+                                                    {
+                                                        id: 'sb-winner',
+                                                        title: 'SB Winner',
+                                                        level: 4
+                                                    },
+                                                    {
+                                                        id: 'sb-mvp',
+                                                        title: 'SB MVP',
+                                                        level: 4
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        id: 'nba',
+                                        title: 'NBA',
+                                        level: 2,
+                                        children: [
+                                            {
+                                                id: 'nba-champion',
+                                                title: 'NBA Champion',
+                                                level: 3
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                };
+
+                this.initialize();
+            }
+
+            initialize() {
+                this.bindControls();
+                this.start();
+            }
+
+            bindControls() {
+                document.getElementById('playPauseBtn').addEventListener('click', () => this.togglePlayPause());
+                document.getElementById('restartBtn').addEventListener('click', () => this.restart());
+
+                document.querySelectorAll('.speed-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.speed = parseFloat(e.target.dataset.speed);
+                    });
+                });
+            }
+
+            start() {
+                this.currentStep = 0;
+                this.runStep();
+            }
+
+            runStep() {
+                if (this.currentStep >= this.totalSteps) {
+                    this.complete();
+                    return;
+                }
+
+                this.updateProgress();
+                this.updateStepIndicator();
+
+                // Execute current step
+                const steps = [
+                    // Introduction (5 steps)
+                    () => this.introductionStep(),
+                    () => this.explainVerseConceptDeprecated(),
+                    () => this.showHierarchyBenefits(),
+                    () => this.explainDepthBonus(),
+                    () => this.showBonusCalculation(),
+                    
+                    // Example 1: Politics Verse (15 steps)
+                    () => this.startPoliticsExample(),
+                    () => this.showGlobalPolitics(),
+                    () => this.drillToUSPolitics(),
+                    () => this.showUSElections(),
+                    () => this.navigateToPresidential(),
+                    () => this.showPrimaryMarkets(),
+                    () => this.placePoliticsBet(),
+                    () => this.calculatePoliticsBonus(),
+                    () => this.showPoliticsDepth(),
+                    () => this.demonstrateCascade(),
+                    () => this.showParentChildRelation(),
+                    () => this.explainInheritance(),
+                    () => this.showPoliticsStats(),
+                    () => this.analyzePoliticsPerformance(),
+                    () => this.completePoliticsExample(),
+                    
+                    // Example 2: Crypto Economics Verse (15 steps)
+                    () => this.startCryptoExample(),
+                    () => this.showEconomicsRoot(),
+                    () => this.navigateToCrypto(),
+                    () => this.showBitcoinMarkets(),
+                    () => this.drillToPriceTargets(),
+                    () => this.showBTC150k(),
+                    () => this.placeCryptoBet(),
+                    () => this.calculateCryptoBonus(),
+                    () => this.showCryptoDepth(),
+                    () => this.demonstrateCryptoFlow(),
+                    () => this.showCorrelatedMarkets(),
+                    () => this.explainCryptoStrategy(),
+                    () => this.showCryptoStats(),
+                    () => this.analyzeCryptoPerformance(),
+                    () => this.completeCryptoExample(),
+                    
+                    // Verse Creation (10 steps)
+                    () => this.startVerseCreation(),
+                    () => this.showCreateInterface(),
+                    () => this.selectParentVerse(),
+                    () => this.defineVerseProperties(),
+                    () => this.setVerseRules(),
+                    () => this.previewNewVerse(),
+                    () => this.confirmCreation(),
+                    () => this.showVerseActivation(),
+                    () => this.demonstrateNewVerse(),
+                    () => this.completeVerseCreation(),
+                    
+                    // Advanced Features (10 steps)
+                    () => this.showVerseMigration(),
+                    () => this.demonstrateMigration(),
+                    () => this.showBulkOperations(),
+                    () => this.demonstrateBulkBetting(),
+                    () => this.showAutoSpread(),
+                    () => this.demonstrateAutoSpread(),
+                    () => this.showVerseAnalytics(),
+                    () => this.demonstrateAnalytics(),
+                    () => this.showVerseOptimization(),
+                    () => this.completeAdvancedFeatures(),
+                    
+                    // Summary (5 steps)
+                    () => this.startSummary(),
+                    () => this.recapDepthBonus(),
+                    () => this.recapNavigation(),
+                    () => this.recapStrategies(),
+                    () => this.finalConclusion()
+                ];
+
+                if (steps[this.currentStep]) {
+                    steps[this.currentStep]();
+                }
+
+                if (this.isPlaying) {
+                    this.stepTimer = setTimeout(() => {
+                        this.currentStep++;
+                        this.runStep();
+                    }, 8000 / this.speed);
+                }
+            }
+
+            // Step implementations
+            introductionStep() {
+                this.showNarrator('Welcome to Verse System', 
+                    'Verses organize betting markets in a hierarchical tree structure, with depth bonuses at each level.');
+                
+                document.getElementById('verseContainer').innerHTML = `
+                    <div style="text-align: center; padding: 100px 20px;">
+                        <h1 style="font-size: 48px; margin-bottom: 30px; color: #FFD60A;">Verse Hierarchy System</h1>
+                        <p style="font-size: 20px; color: #888; margin-bottom: 40px;">
+                            Organize Markets • Earn Depth Bonuses • Navigate Efficiently
+                        </p>
+                        <div class="verse-stats">
+                            <div class="stat-card">
+                                <div class="stat-value">+10%</div>
+                                <div class="stat-label">Bonus Per Level</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">5</div>
+                                <div class="stat-label">Maximum Depth</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">+50%</div>
+                                <div class="stat-label">Max Total Bonus</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">∞</div>
+                                <div class="stat-label">Verses Possible</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            explainVerseConcept() {
+                this.showNarrator('What are Verses?', 
+                    'Verses are hierarchical categories that group related betting markets. Think of them as folders for your bets.');
+
+                document.getElementById('verseContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h2 style="text-align: center; color: #FFD60A; margin-bottom: 40px;">
+                            Understanding Verses
+                        </h2>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="verse-example">
+                                <div class="example-title">🌍 Global Events</div>
+                                <div class="example-description">
+                                    Root verse containing all major world events. This is the starting point for navigation.
+                                </div>
+                            </div>
+                            <div class="verse-example">
+                                <div class="example-title">🏛️ Politics → US → Presidential</div>
+                                <div class="example-description">
+                                    Navigate from broad categories to specific markets. Each level adds context and bonuses.
+                                </div>
+                            </div>
+                            <div class="verse-example">
+                                <div class="example-title">💰 Economics → Crypto → Bitcoin</div>
+                                <div class="example-description">
+                                    Related markets grouped together. Bet on correlated events with strategic advantage.
+                                </div>
+                            </div>
+                            <div class="verse-example">
+                                <div class="example-title">🏈 Sports → NFL → Super Bowl</div>
+                                <div class="example-description">
+                                    Sports hierarchy from leagues to specific games. Deeper bets get bigger bonuses.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showHierarchyBenefits() {
+                this.showNarrator('Hierarchy Benefits', 
+                    'Verses provide organization, context, and financial incentives through depth bonuses.');
+
+                document.getElementById('verseContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                            Why Use Verses?
+                        </h3>
+                        <div style="max-width: 800px; margin: 0 auto;">
+                            <div style="display: flex; align-items: center; margin-bottom: 25px;">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #4CAF50, #8BC34A); 
+                                     border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                                     color: white; font-size: 24px; margin-right: 20px;">📊</div>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Organization</div>
+                                    <div style="color: #888;">Find related markets quickly. Navigate intuitively through categories.</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 25px;">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #FFD60A, #FFA500); 
+                                     border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                                     color: white; font-size: 24px; margin-right: 20px;">💰</div>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Depth Bonuses</div>
+                                    <div style="color: #888;">Earn +10% bonus for each level deep. Up to +50% at maximum depth.</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 25px;">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #03A9F4, #00BCD4); 
+                                     border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                                     color: white; font-size: 24px; margin-right: 20px;">🔗</div>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Correlation</div>
+                                    <div style="color: #888;">Bet on related events together. See connections between markets.</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #9C27B0, #E91E63); 
+                                     border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                                     color: white; font-size: 24px; margin-right: 20px;">⚡</div>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Efficiency</div>
+                                    <div style="color: #888;">Bulk operations on verse groups. Automated spreading strategies.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            explainDepthBonus() {
+                this.showNarrator('Depth Bonus System', 
+                    'Each level deeper in the verse tree adds +10% to your potential winnings. Maximum depth is 5 levels.');
+
+                document.getElementById('verseContainer').innerHTML = `
+                    <div class="bonus-visualization">
+                        <h3 style="text-align: center; color: #4CAF50; margin-bottom: 30px;">
+                            Depth Bonus Calculation
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 30px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: 700; color: #FFD60A;">Level 1</div>
+                                <div style="font-size: 32px; margin: 10px 0;">+10%</div>
+                                <div style="color: #888; font-size: 14px;">Base Bonus</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: 700; color: #FFD60A;">Level 2</div>
+                                <div style="font-size: 32px; margin: 10px 0;">+20%</div>
+                                <div style="color: #888; font-size: 14px;">Growing</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: 700; color: #FFD60A;">Level 3</div>
+                                <div style="font-size: 32px; margin: 10px 0;">+30%</div>
+                                <div style="color: #888; font-size: 14px;">Better</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: 700; color: #FFD60A;">Level 4</div>
+                                <div style="font-size: 32px; margin: 10px 0;">+40%</div>
+                                <div style="color: #888; font-size: 14px;">Great</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: 700; color: #FFD60A;">Level 5</div>
+                                <div style="font-size: 32px; margin: 10px 0; color: #4CAF50;">+50%</div>
+                                <div style="color: #888; font-size: 14px;">Maximum!</div>
+                            </div>
+                        </div>
+                        <div class="bonus-bar">
+                            <div style="flex: 0 0 100px; text-align: right; padding-right: 20px;">Progress:</div>
+                            <div class="bonus-bar-fill">
+                                <div class="bonus-bar-segment" style="left: 20%;"></div>
+                                <div class="bonus-bar-segment" style="left: 40%;"></div>
+                                <div class="bonus-bar-segment" style="left: 60%;"></div>
+                                <div class="bonus-bar-segment" style="left: 80%;"></div>
+                            </div>
+                            <div style="flex: 0 0 100px; padding-left: 20px; color: #4CAF50; font-weight: 600;">+50%</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showBonusCalculation() {
+                this.showNarrator('Bonus Example', 
+                    'Bet $1,000 at Level 5 with 2:1 odds. Base win: $2,000. With +50% bonus: $3,000 total!');
+
+                document.getElementById('verseContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                            Real Bonus Calculation
+                        </h3>
+                        <div style="max-width: 600px; margin: 0 auto; background: rgba(255, 255, 255, 0.02); 
+                             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 30px;">
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <div style="font-size: 20px; color: #888;">Your Bet</div>
+                                <div style="font-size: 48px; font-weight: 700; color: #FFD60A; margin: 10px 0;">$1,000</div>
+                                <div style="color: #888;">at Level 5 (Maximum Depth)</div>
+                            </div>
+                            <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px; margin-top: 20px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                    <span>Base Odds:</span>
+                                    <span style="color: #fff;">2.00x</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                    <span>Base Winnings:</span>
+                                    <span style="color: #fff;">$2,000</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                    <span>Depth Bonus (Level 5):</span>
+                                    <span style="color: #4CAF50;">+50%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                    <span>Bonus Amount:</span>
+                                    <span style="color: #4CAF50;">+$1,000</span>
+                                </div>
+                                <div style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 15px; margin-top: 15px; 
+                                     display: flex; justify-content: space-between; font-size: 24px; font-weight: 600;">
+                                    <span>Total Payout:</span>
+                                    <span style="color: #4CAF50;">$3,000</span>
+                                </div>
+                            </div>
+                            <div style="text-align: center; margin-top: 30px; padding: 15px; 
+                                 background: rgba(76, 175, 80, 0.1); border-radius: 12px;">
+                                <div style="color: #4CAF50; font-weight: 600;">50% Extra Profit!</div>
+                                <div style="color: #888; font-size: 14px; margin-top: 5px;">
+                                    Just for betting deep in the verse hierarchy
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            startPoliticsExample() {
+                this.showNarrator('Example 1: Politics Verse', 
+                    'Let\'s navigate through the Politics verse from Global Events down to specific primary elections.');
+
+                this.renderVerseTree('politics');
+            }
+
+            showGlobalPolitics() {
+                this.showNarrator('Starting at Root', 
+                    'Global Events is our root verse. All betting markets branch from here.');
+
+                const rootNode = document.querySelector('.verse-node.root');
+                if (rootNode) {
+                    rootNode.classList.add('active');
+                }
+            }
+
+            drillToUSPolitics() {
+                this.showNarrator('Navigate to Politics', 
+                    'Click Politics to see all political betting markets. Notice the +10% bonus indicator.');
+
+                document.getElementById('verseContainer').innerHTML += `
+                    <div class="verse-breadcrumb">
+                        <div class="breadcrumb-item">Global Events</div>
+                        <div class="breadcrumb-separator">→</div>
+                        <div class="breadcrumb-item active">Politics</div>
+                    </div>
+                `;
+            }
+
+            showUSElections() {
+                this.showNarrator('US Politics Branch', 
+                    'Drilling into US Politics. Now at Level 2 with +20% bonus on all bets here.');
+
+                document.getElementById('verseContainer').innerHTML += `
+                    <div class="verse-breadcrumb">
+                        <div class="breadcrumb-item">Global Events</div>
+                        <div class="breadcrumb-separator">→</div>
+                        <div class="breadcrumb-item">Politics</div>
+                        <div class="breadcrumb-separator">→</div>
+                        <div class="breadcrumb-item active">US Politics</div>
+                    </div>
+                `;
+            }
+
+            navigateToPresidential() {
+                this.showNarrator('Presidential Elections', 
+                    '2024 Presidential race. Level 3 = +30% bonus. Getting more profitable!');
+            }
+
+            showPrimaryMarkets() {
+                this.showNarrator('Primary Elections', 
+                    'Democratic and Republican primaries. Level 4 = +40% bonus on these specific markets.');
+
+                document.getElementById('verseContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <div class="verse-breadcrumb">
+                            <div class="breadcrumb-item">Global Events</div>
+                            <div class="breadcrumb-separator">→</div>
+                            <div class="breadcrumb-item">Politics</div>
+                            <div class="breadcrumb-separator">→</div>
+                            <div class="breadcrumb-item">US Politics</div>
+                            <div class="breadcrumb-separator">→</div>
+                            <div class="breadcrumb-item">2024 Presidential</div>
+                            <div class="breadcrumb-separator">→</div>
+                            <div class="breadcrumb-item active">Democratic Primary</div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 30px;">
+                            <div style="background: rgba(255, 255, 255, 0.02); border: 2px solid #03A9F4; 
+                                 border-radius: 12px; padding: 20px; text-align: center;">
+                                <div style="font-size: 20px; font-weight: 600; color: #03A9F4; margin-bottom: 10px;">
+                                    Democratic Primary
+                                </div>
+                                <div style="font-size: 14px; color: #888; margin-bottom: 20px;">
+                                    Who wins the Democratic nomination?
+                                </div>
+                                <div style="font-size: 32px; font-weight: 700; color: #4CAF50;">+40%</div>
+                                <div style="color: #888; font-size: 14px;">Depth Bonus</div>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.02); border: 2px solid #FF5252; 
+                                 border-radius: 12px; padding: 20px; text-align: center;">
+                                <div style="font-size: 20px; font-weight: 600; color: #FF5252; margin-bottom: 10px;">
+                                    Republican Primary
+                                </div>
+                                <div style="font-size: 14px; color: #888; margin-bottom: 20px;">
+                                    Who wins the Republican nomination?
+                                </div>
+                                <div style="font-size: 32px; font-weight: 700; color: #4CAF50;">+40%</div>
+                                <div style="color: #888; font-size: 14px;">Depth Bonus</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            placePoliticsBet() {
+                this.showNarrator('Place Deep Bet', 
+                    'Betting $500 on Democratic Primary winner at Level 4. Watch the bonus calculation.');
+            }
+
+            calculatePoliticsBonus() {
+                this.showNarrator('Bonus Applied', 
+                    '$500 bet at 3:1 odds = $1,500 base. With +40% bonus = $2,100 total payout!');
+            }
+
+            showPoliticsDepth() {
+                this.showNarrator('Depth Advantage', 
+                    'Same bet at root level: $1,500. At Level 4: $2,100. That\'s $600 extra!');
+            }
+
+            demonstrateCascade() {
+                this.showNarrator('Cascade Effect', 
+                    'When you bet on a parent verse, it can cascade to all children with proportional allocation.');
+            }
+
+            showParentChildRelation() {
+                this.showNarrator('Parent-Child Links', 
+                    'Each verse inherits properties from its parent. Changes cascade down the tree.');
+            }
+
+            explainInheritance() {
+                this.showNarrator('Verse Inheritance', 
+                    'Child verses inherit rules, limits, and settings from parents unless overridden.');
+            }
+
+            showPoliticsStats() {
+                this.showNarrator('Politics Verse Stats', 
+                    'This verse branch has 127 active markets with $2.3M total volume.');
+            }
+
+            analyzePoliticsPerformance() {
+                this.showNarrator('Performance Analysis', 
+                    'Average ROI in Politics verse: +18.5%. Best performing sub-verse: State Elections.');
+            }
+
+            completePoliticsExample() {
+                this.showNarrator('Politics Example Complete', 
+                    'You\'ve seen how navigating deep into Politics verse multiplies your profits.');
+            }
+
+            startCryptoExample() {
+                this.showNarrator('Example 2: Crypto Verse', 
+                    'Now let\'s explore the Economics → Cryptocurrency → Bitcoin price verse.');
+
+                this.renderVerseTree('economics');
+            }
+
+            showEconomicsRoot() {
+                this.showNarrator('Economics Branch', 
+                    'Starting from Global Events, we navigate to Economics for all economic markets.');
+            }
+
+            navigateToCrypto() {
+                this.showNarrator('Cryptocurrency Verse', 
+                    'The Crypto verse contains all cryptocurrency-related betting markets. Level 2 = +20%.');
+            }
+
+            showBitcoinMarkets() {
+                this.showNarrator('Bitcoin Price Verse', 
+                    'Bitcoin-specific markets. Will it reach $100k? $150k? Level 3 = +30% bonus.');
+            }
+
+            drillToPriceTargets() {
+                this.showNarrator('Price Targets', 
+                    'Specific price target markets. Each is a separate betting opportunity.');
+            }
+
+            showBTC150k() {
+                this.showNarrator('BTC >$150k Market', 
+                    'Will Bitcoin exceed $150k by Dec 2025? Level 4 market with +40% depth bonus.');
+
+                document.getElementById('verseContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <div class="verse-breadcrumb">
+                            <div class="breadcrumb-item">Global Events</div>
+                            <div class="breadcrumb-separator">→</div>
+                            <div class="breadcrumb-item">Economics</div>
+                            <div class="breadcrumb-separator">→</div>
+                            <div class="breadcrumb-item">Cryptocurrency</div>
+                            <div class="breadcrumb-separator">→</div>
+                            <div class="breadcrumb-item">Bitcoin Price</div>
+                            <div class="breadcrumb-separator">→</div>
+                            <div class="breadcrumb-item active">BTC >$150k</div>
+                        </div>
+                        <div style="max-width: 600px; margin: 40px auto; background: linear-gradient(135deg, rgba(255, 165, 0, 0.1), rgba(255, 140, 0, 0.05)); 
+                             border: 2px solid #FFA500; border-radius: 16px; padding: 30px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 600; color: #FFA500; margin-bottom: 20px;">
+                                Bitcoin >$150k by Dec 2025
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                                <div>
+                                    <div style="color: #888; font-size: 14px;">YES</div>
+                                    <div style="font-size: 32px; color: #4CAF50; font-weight: 700;">65%</div>
+                                </div>
+                                <div>
+                                    <div style="color: #888; font-size: 14px;">NO</div>
+                                    <div style="font-size: 32px; color: #FF5252; font-weight: 700;">35%</div>
+                                </div>
+                            </div>
+                            <div style="padding: 20px; background: rgba(76, 175, 80, 0.1); border-radius: 12px;">
+                                <div style="font-size: 14px; color: #888; margin-bottom: 5px;">Depth Level 4</div>
+                                <div style="font-size: 36px; color: #4CAF50; font-weight: 700;">+40% BONUS</div>
+                                <div style="color: #888; margin-top: 5px;">On all winnings</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            placeCryptoBet() {
+                this.showNarrator('Place Crypto Bet', 
+                    'Betting $2,000 on YES for Bitcoin >$150k. Let\'s calculate the potential payout.');
+            }
+
+            calculateCryptoBonus() {
+                this.showNarrator('Crypto Bonus Math', 
+                    '$2,000 at 1.54x odds = $3,080 base. With +40% = $4,312 total. Extra $1,232!');
+            }
+
+            showCryptoDepth() {
+                this.showNarrator('Depth Comparison', 
+                    'Surface bet: $3,080. Deep bet (Level 4): $4,312. Depth adds 40% more profit!');
+            }
+
+            demonstrateCryptoFlow() {
+                this.showNarrator('Money Flow', 
+                    'Your bet flows: You → BOOM → Polymarket. Bonus calculated by BOOM on win.');
+            }
+
+            showCorrelatedMarkets() {
+                this.showNarrator('Correlated Markets', 
+                    'In this verse: BTC >$100k, ETH >$10k, Total Crypto Cap >$5T. All related.');
+            }
+
+            explainCryptoStrategy() {
+                this.showNarrator('Verse Strategy', 
+                    'Bet on multiple correlated markets in the same verse for compounded bonuses.');
+            }
+
+            showCryptoStats() {
+                this.showNarrator('Crypto Verse Stats', 
+                    'Bitcoin verse: 43 markets, $8.7M volume, 67% average YES probability.');
+            }
+
+            analyzeCryptoPerformance() {
+                this.showNarrator('Crypto Performance', 
+                    'Historical accuracy: 71%. Best depth for profits: Level 3-4 markets.');
+            }
+
+            completeCryptoExample() {
+                this.showNarrator('Crypto Example Complete', 
+                    'You\'ve mastered navigating the Crypto verse for maximum depth bonuses.');
+            }
+
+            startVerseCreation() {
+                this.showNarrator('Creating New Verses', 
+                    'Users can create custom verses under existing branches. Let\'s create one!');
+            }
+
+            showCreateInterface() {
+                this.showNarrator('Creation Interface', 
+                    'Simple form to define your new verse. Choose parent, name, and rules.');
+
+                document.getElementById('verseContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                            Create New Verse
+                        </h3>
+                        <div style="max-width: 600px; margin: 0 auto; background: rgba(255, 255, 255, 0.02); 
+                             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 30px;">
+                            <div style="margin-bottom: 25px;">
+                                <label style="display: block; color: #888; font-size: 14px; margin-bottom: 8px;">
+                                    Parent Verse
+                                </label>
+                                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); 
+                                     border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px;">
+                                    Sports → NBA
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 25px;">
+                                <label style="display: block; color: #888; font-size: 14px; margin-bottom: 8px;">
+                                    Verse Name
+                                </label>
+                                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); 
+                                     border: 2px solid #FFD60A; border-radius: 8px;">
+                                    Lakers 2025 Season
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 25px;">
+                                <label style="display: block; color: #888; font-size: 14px; margin-bottom: 8px;">
+                                    Description
+                                </label>
+                                <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); 
+                                     border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; 
+                                     min-height: 80px;">
+                                    All Lakers-related markets for the 2025 season including games, 
+                                    player stats, and championship odds.
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 25px;">
+                                <label style="display: block; color: #888; font-size: 14px; margin-bottom: 8px;">
+                                    Depth Level
+                                </label>
+                                <div style="padding: 12px; background: rgba(76, 175, 80, 0.1); 
+                                     border: 1px solid #4CAF50; border-radius: 8px;">
+                                    Level 3 (+30% Bonus)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            selectParentVerse() {
+                this.showNarrator('Select Parent', 
+                    'Choose Sports → NBA as parent. Your verse inherits NBA properties.');
+            }
+
+            defineVerseProperties() {
+                this.showNarrator('Set Properties', 
+                    'Name it "Lakers 2025 Season". This becomes a hub for all Lakers bets.');
+            }
+
+            setVerseRules() {
+                this.showNarrator('Define Rules', 
+                    'Set minimum bet, maximum exposure, and allowed market types for this verse.');
+            }
+
+            previewNewVerse() {
+                this.showNarrator('Preview Verse', 
+                    'Review your new verse structure. It will be at Level 3 with +30% bonus.');
+            }
+
+            confirmCreation() {
+                this.showNarrator('Create Verse', 
+                    'Confirm creation. Small fee required to prevent spam. Verse goes live instantly.');
+            }
+
+            showVerseActivation() {
+                this.showNarrator('Verse Active!', 
+                    'Your "Lakers 2025 Season" verse is live! Others can now bet within it.');
+
+                document.getElementById('verseContainer').innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <div style="font-size: 60px; margin-bottom: 20px;">🎉</div>
+                        <h2 style="color: #4CAF50; margin-bottom: 20px;">Verse Created Successfully!</h2>
+                        <div style="max-width: 500px; margin: 0 auto; padding: 20px; 
+                             background: rgba(76, 175, 80, 0.1); border: 2px solid #4CAF50; 
+                             border-radius: 12px;">
+                            <div style="font-size: 20px; font-weight: 600; margin-bottom: 10px;">
+                                Lakers 2025 Season
+                            </div>
+                            <div style="color: #888;">
+                                Sports → NBA → Lakers 2025 Season
+                            </div>
+                            <div style="margin-top: 20px; font-size: 28px; color: #4CAF50; font-weight: 700;">
+                                +30% Depth Bonus
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            demonstrateNewVerse() {
+                this.showNarrator('Using New Verse', 
+                    'Add markets: "Lakers win Championship", "LeBron MVP", etc. All get +30% bonus.');
+            }
+
+            completeVerseCreation() {
+                this.showNarrator('Creation Complete', 
+                    'You can create unlimited verses to organize markets and maximize bonuses.');
+            }
+
+            showVerseMigration() {
+                this.showNarrator('Verse Migration', 
+                    'Move verses to different parents when market conditions change.');
+            }
+
+            demonstrateMigration() {
+                this.showNarrator('Migration Process', 
+                    'Moving "Tech Stocks" from Economics to Technology verse. Depth bonus updates.');
+            }
+
+            showBulkOperations() {
+                this.showNarrator('Bulk Operations', 
+                    'Perform actions on entire verse branches at once. Massive time saver.');
+            }
+
+            demonstrateBulkBetting() {
+                this.showNarrator('Bulk Betting', 
+                    'Bet $100 on every market in "NFL Week 10" verse with one click. 16 bets placed!');
+            }
+
+            showAutoSpread() {
+                this.showNarrator('Auto-Spread', 
+                    'Automatically distribute funds across verse markets based on probability weights.');
+            }
+
+            demonstrateAutoSpread() {
+                this.showNarrator('Spreading $1000', 
+                    '$1000 spreads: $400 to 70% market, $300 to 60% market, $200 to 50% market, $100 to 40% market.');
+            }
+
+            showVerseAnalytics() {
+                this.showNarrator('Verse Analytics', 
+                    'Deep analytics on verse performance, ROI, volume, and user activity.');
+
+                document.getElementById('verseContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                            Verse Analytics Dashboard
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                            <div class="stat-card">
+                                <div class="stat-value">$12.3M</div>
+                                <div class="stat-label">Total Volume</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">3,847</div>
+                                <div class="stat-label">Active Markets</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">+23.5%</div>
+                                <div class="stat-label">Average ROI</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">67%</div>
+                                <div class="stat-label">Win Rate</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">2.8</div>
+                                <div class="stat-label">Avg Depth</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">+28%</div>
+                                <div class="stat-label">Avg Bonus</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 30px; padding: 20px; background: rgba(255, 255, 255, 0.02); 
+                             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;">
+                            <div style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">
+                                Top Performing Verses
+                            </div>
+                            <div style="display: grid; gap: 10px;">
+                                <div style="display: flex; justify-content: space-between; padding: 10px; 
+                                     background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                    <span>Politics → US → Presidential</span>
+                                    <span style="color: #4CAF50;">+42.3% ROI</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 10px; 
+                                     background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                    <span>Crypto → Bitcoin → Price Targets</span>
+                                    <span style="color: #4CAF50;">+38.7% ROI</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 10px; 
+                                     background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                    <span>Sports → NFL → Super Bowl</span>
+                                    <span style="color: #4CAF50;">+31.2% ROI</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            demonstrateAnalytics() {
+                this.showNarrator('Analytics Insights', 
+                    'Best strategy: Bet at Level 3-4 for optimal risk/reward. Level 5 for max bonus.');
+            }
+
+            showVerseOptimization() {
+                this.showNarrator('AI Optimization', 
+                    'AI suggests optimal verse paths based on historical performance and current odds.');
+            }
+
+            completeAdvancedFeatures() {
+                this.showNarrator('Advanced Features Complete', 
+                    'You\'ve learned migration, bulk ops, auto-spread, and analytics.');
+            }
+
+            startSummary() {
+                this.showNarrator('Verse System Summary', 
+                    'Let\'s recap the key features and benefits of the Verse hierarchy system.');
+            }
+
+            recapDepthBonus() {
+                this.showNarrator('Depth Bonus Recap', 
+                    '+10% per level, up to +50% at Level 5. Deeper bets = bigger profits.');
+            }
+
+            recapNavigation() {
+                this.showNarrator('Navigation Recap', 
+                    'Intuitive tree structure. Breadcrumb trails. Quick jumping between verses.');
+            }
+
+            recapStrategies() {
+                this.showNarrator('Strategy Recap', 
+                    'Bulk operations, auto-spread, correlated betting, and depth optimization.');
+            }
+
+            finalConclusion() {
+                this.showNarrator('Verse Mastery Complete!', 
+                    'You understand verses: organization + depth bonuses = maximum profits!');
+
+                document.getElementById('verseContainer').innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <h1 style="font-size: 48px; margin-bottom: 30px; color: #FFD60A;">
+                            Verse System Mastered! 🌳
+                        </h1>
+                        <p style="font-size: 20px; color: #888; margin-bottom: 40px;">
+                            Navigate deeper, earn more with the BOOM Verse hierarchy
+                        </p>
+                        <div class="verse-stats">
+                            <div class="stat-card">
+                                <div class="stat-value">✓</div>
+                                <div class="stat-label">Organization</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">✓</div>
+                                <div class="stat-label">Depth Bonuses</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">✓</div>
+                                <div class="stat-label">Navigation</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">✓</div>
+                                <div class="stat-label">Creation</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 40px;">
+                            <button onclick="location.reload()" class="action-btn">
+                                REPLAY DEMO
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Helper methods
+            showNarrator(title, content) {
+                const narrator = document.getElementById('narrator');
+                const narratorTitle = document.getElementById('narratorTitle');
+                const narratorContent = document.getElementById('narratorContent');
+                const narratorTimer = document.getElementById('narratorTimer');
+
+                narratorTitle.textContent = title;
+                narratorContent.innerHTML = content;
+                narrator.classList.remove('hidden');
+
+                let timeLeft = Math.floor(5000 / this.speed / 1000);
+                narratorTimer.textContent = `${timeLeft}s`;
+                
+                const updateTimer = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeft > 0) {
+                        narratorTimer.textContent = `${timeLeft}s`;
+                    } else {
+                        clearInterval(updateTimer);
+                    }
+                }, 1000);
+
+                clearTimeout(this.narratorTimer);
+                this.narratorTimer = setTimeout(() => {
+                    narrator.classList.add('hidden');
+                    clearInterval(updateTimer);
+                    
+                    setTimeout(() => {
+                        if (this.isPlaying) {
+                            narrator.classList.remove('hidden');
+                        }
+                    }, 3000 / this.speed);
+                }, 5000 / this.speed);
+            }
+
+            renderVerseTree(focusBranch) {
+                const container = document.getElementById('verseContainer');
+                container.innerHTML = `
+                    <div class="verse-tree" style="height: 600px; position: relative;">
+                        <!-- Depth indicators -->
+                        <div class="depth-indicator">
+                            <div class="depth-level">
+                                <div class="depth-number">0</div>
+                                <div class="depth-label">Root</div>
+                            </div>
+                            <div class="depth-level">
+                                <div class="depth-number">1</div>
+                                <div class="depth-label">+10%</div>
+                            </div>
+                            <div class="depth-level">
+                                <div class="depth-number">2</div>
+                                <div class="depth-label">+20%</div>
+                            </div>
+                            <div class="depth-level">
+                                <div class="depth-number">3</div>
+                                <div class="depth-label">+30%</div>
+                            </div>
+                            <div class="depth-level">
+                                <div class="depth-number">4</div>
+                                <div class="depth-label">+40%</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Root node -->
+                        <div class="verse-node root" style="top: 280px; left: 100px; width: 180px;">
+                            <div class="verse-node-title">Global Events</div>
+                            <div class="verse-node-value">Root Verse</div>
+                        </div>
+                        
+                        <!-- Level 1 nodes -->
+                        <div class="verse-node" style="top: 100px; left: 350px;">
+                            <div class="verse-node-title">Politics</div>
+                            <div class="verse-node-value">847 markets</div>
+                            <div class="verse-node-bonus">+10%</div>
+                        </div>
+                        <div class="verse-connection" style="top: 295px; left: 280px; width: 100px; transform: rotate(-30deg);"></div>
+                        
+                        <div class="verse-node" style="top: 280px; left: 350px;">
+                            <div class="verse-node-title">Economics</div>
+                            <div class="verse-node-value">623 markets</div>
+                            <div class="verse-node-bonus">+10%</div>
+                        </div>
+                        <div class="verse-connection" style="top: 295px; left: 280px; width: 70px;"></div>
+                        
+                        <div class="verse-node" style="top: 460px; left: 350px;">
+                            <div class="verse-node-title">Sports</div>
+                            <div class="verse-node-value">1,234 markets</div>
+                            <div class="verse-node-bonus">+10%</div>
+                        </div>
+                        <div class="verse-connection" style="top: 295px; left: 280px; width: 100px; transform: rotate(30deg);"></div>
+                        
+                        <!-- Level 2 nodes (example for Politics) -->
+                        <div class="verse-node" style="top: 50px; left: 550px;">
+                            <div class="verse-node-title">US Politics</div>
+                            <div class="verse-node-value">423 markets</div>
+                            <div class="verse-node-bonus">+20%</div>
+                        </div>
+                        <div class="verse-connection" style="top: 115px; left: 500px; width: 80px; transform: rotate(-20deg);"></div>
+                        
+                        <div class="verse-node" style="top: 150px; left: 550px;">
+                            <div class="verse-node-title">EU Politics</div>
+                            <div class="verse-node-value">234 markets</div>
+                            <div class="verse-node-bonus">+20%</div>
+                        </div>
+                        <div class="verse-connection" style="top: 115px; left: 500px; width: 80px; transform: rotate(20deg);"></div>
+                        
+                        <!-- Level 3 nodes -->
+                        <div class="verse-node" style="top: 20px; left: 750px;">
+                            <div class="verse-node-title">Presidential</div>
+                            <div class="verse-node-value">89 markets</div>
+                            <div class="verse-node-bonus">+30%</div>
+                        </div>
+                        <div class="verse-connection" style="top: 65px; left: 700px; width: 80px; transform: rotate(-15deg);"></div>
+                        
+                        <div class="verse-node" style="top: 90px; left: 750px;">
+                            <div class="verse-node-title">Congress</div>
+                            <div class="verse-node-value">156 markets</div>
+                            <div class="verse-node-bonus">+30%</div>
+                        </div>
+                        <div class="verse-connection" style="top: 65px; left: 700px; width: 80px; transform: rotate(15deg);"></div>
+                        
+                        <!-- Level 4 nodes -->
+                        <div class="verse-node" style="top: 0px; left: 950px;">
+                            <div class="verse-node-title">Dem Primary</div>
+                            <div class="verse-node-value">12 markets</div>
+                            <div class="verse-node-bonus">+40%</div>
+                        </div>
+                        <div class="verse-connection" style="top: 35px; left: 900px; width: 70px; transform: rotate(-10deg);"></div>
+                        
+                        <div class="verse-node" style="top: 60px; left: 950px;">
+                            <div class="verse-node-title">Rep Primary</div>
+                            <div class="verse-node-value">15 markets</div>
+                            <div class="verse-node-bonus">+40%</div>
+                        </div>
+                        <div class="verse-connection" style="top: 35px; left: 900px; width: 70px; transform: rotate(10deg);"></div>
+                    </div>
+                `;
+            }
+
+            updateProgress() {
+                const progress = ((this.currentStep + 1) / this.totalSteps) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+            }
+
+            updateStepIndicator() {
+                document.getElementById('stepIndicator').textContent = 
+                    `Step ${this.currentStep + 1} of ${this.totalSteps}`;
+            }
+
+            togglePlayPause() {
+                this.isPlaying = !this.isPlaying;
+                document.getElementById('playPauseBtn').innerHTML = this.isPlaying ? '⏸ Pause' : '▶ Play';
+                
+                if (this.isPlaying) {
+                    this.runStep();
+                } else {
+                    clearTimeout(this.stepTimer);
+                    clearTimeout(this.narratorTimer);
+                }
+            }
+
+            restart() {
+                clearTimeout(this.stepTimer);
+                clearTimeout(this.narratorTimer);
+                this.currentStep = 0;
+                this.isPlaying = true;
+                document.getElementById('playPauseBtn').innerHTML = '⏸ Pause';
+                this.runStep();
+            }
+
+            complete() {
+                this.showNarrator('Demo Complete!', 
+                    'You\'ve mastered the Verse hierarchy system. Use it to maximize your profits!');
+                this.isPlaying = false;
+                document.getElementById('playPauseBtn').innerHTML = '▶ Play';
+            }
+
+            // Fix for the typo in the function name
+            explainVerseConceptDeprecated() {
+                this.explainVerseConcept();
+            }
+        }
+
+        // Initialize demo
+        const demo = new VerseSystemDemo();
+    </script>
+</body>
+</html>

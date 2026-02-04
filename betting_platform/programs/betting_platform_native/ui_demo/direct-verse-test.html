@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct Verse Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #000; color: #fff; padding: 20px; }
+        .controls { margin: 20px 0; }
+        button { background: #FFD60A; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        .status { background: #111; padding: 15px; margin: 20px 0; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Direct Verse Test</h1>
+    
+    <div class="controls">
+        <button onclick="manuallyCreateVerses()">Manually Create Verses</button>
+        <button onclick="testWithRealData()">Test With Real Data</button>
+        <button onclick="clearVerses()">Clear</button>
+    </div>
+    
+    <div class="status" id="status">Ready...</div>
+    
+    <!-- Main app verse section -->
+    <div class="market-details">
+        <div class="verses-section" id="versesSection" style="display: block;">
+            <div class="section-title">Related Stages - Chain Your Leverage</div>
+            <div class="verse-flow-container" id="verseFlowContainer">
+                <svg class="verse-connections" id="verseConnections">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" 
+                                refX="9" refY="5" orient="auto">
+                            <polygon points="0 0, 10 5, 0 10" class="verse-arrow" />
+                        </marker>
+                    </defs>
+                </svg>
+                <div class="verse-levels" id="verseLevels">
+                    <!-- Verses should appear here -->
+                </div>
+            </div>
+            <div class="verse-grid" id="verseGrid" style="display: none;">
+                <!-- Mobile grid view -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize minimal platform state
+        window.platformState = {
+            selectedVerses: [],
+            markets: new Map()
+        };
+        
+        const status = document.getElementById('status');
+        
+        function updateStatus(msg, color = '#fff') {
+            status.innerHTML = `<div style="color: ${color}">${msg}</div>`;
+            console.log(msg);
+        }
+        
+        function clearVerses() {
+            const verseLevels = document.getElementById('verseLevels');
+            verseLevels.innerHTML = '';
+            updateStatus('Verses cleared');
+        }
+        
+        function manuallyCreateVerses() {
+            updateStatus('Creating verses manually...');
+            
+            const verseLevels = document.getElementById('verseLevels');
+            verseLevels.innerHTML = '';
+            
+            // Create Level 1
+            const level1 = document.createElement('div');
+            level1.className = 'verse-level';
+            level1.innerHTML = `
+                <div class="verse-level-label">Level 1</div>
+                <div class="verse-card" onclick="alert('Verse clicked!')">
+                    <div class="verse-header">
+                        <div class="verse-title">General Markets</div>
+                        <div class="verse-multiplier">1.2x</div>
+                    </div>
+                    <div class="verse-description">Various prediction markets across different topics</div>
+                    <div class="verse-stats">
+                        <div class="verse-stat">
+                            <div class="verse-stat-label">Level</div>
+                            <div class="verse-stat-value">L1</div>
+                        </div>
+                        <div class="verse-stat">
+                            <div class="verse-stat-label">Risk</div>
+                            <div class="verse-stat-value">Low</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Create Level 2
+            const level2 = document.createElement('div');
+            level2.className = 'verse-level';
+            level2.innerHTML = `
+                <div class="verse-level-label">Level 2</div>
+                <div class="verse-card has-parent" onclick="alert('Verse clicked!')">
+                    <div class="verse-header">
+                        <div class="verse-title">Economic Indicators</div>
+                        <div class="verse-multiplier">2.64x</div>
+                    </div>
+                    <div class="verse-description">Federal Reserve and economic data</div>
+                    <div class="verse-stats">
+                        <div class="verse-stat">
+                            <div class="verse-stat-label">Level</div>
+                            <div class="verse-stat-value">L2</div>
+                        </div>
+                        <div class="verse-stat">
+                            <div class="verse-stat-label">Risk</div>
+                            <div class="verse-stat-value">Medium</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            verseLevels.appendChild(level1);
+            verseLevels.appendChild(level2);
+            
+            updateStatus('✓ Manually created 2 verse levels', '#4cd964');
+            
+            // Draw connections
+            setTimeout(() => {
+                drawConnections();
+            }, 100);
+        }
+        
+        function drawConnections() {
+            const svg = document.getElementById('verseConnections');
+            const container = document.getElementById('verseFlowContainer');
+            
+            // Clear existing paths
+            svg.querySelectorAll('path').forEach(p => p.remove());
+            
+            // Get card positions
+            const cards = document.querySelectorAll('.verse-card');
+            if (cards.length < 2) return;
+            
+            const rect1 = cards[0].getBoundingClientRect();
+            const rect2 = cards[1].getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            // Calculate relative positions
+            const x1 = rect1.right - containerRect.left;
+            const y1 = rect1.top + rect1.height/2 - containerRect.top;
+            const x2 = rect2.left - containerRect.left;
+            const y2 = rect2.top + rect2.height/2 - containerRect.top;
+            
+            // Create path
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const midX = (x1 + x2) / 2;
+            
+            path.setAttribute('d', `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`);
+            path.setAttribute('stroke', '#FFD60A');
+            path.setAttribute('stroke-width', '2');
+            path.setAttribute('fill', 'none');
+            path.setAttribute('opacity', '0.5');
+            path.setAttribute('marker-end', 'url(#arrowhead)');
+            
+            svg.appendChild(path);
+            
+            updateStatus('✓ Connections drawn', '#4cd964');
+        }
+        
+        async function testWithRealData() {
+            updateStatus('Fetching real data...');
+            
+            try {
+                // Load platform_main.js functions
+                const script = document.createElement('script');
+                script.src = 'platform_main.js';
+                script.onload = async () => {
+                    updateStatus('Script loaded, fetching markets...');
+                    
+                    const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                    const markets = await response.json();
+                    
+                    const marketWithVerses = markets.find(m => m.verses && m.verses.length > 0);
+                    if (marketWithVerses && window.updateAvailableVerses) {
+                        updateStatus(`Found market with ${marketWithVerses.verses.length} verses`);
+                        
+                        // Force large screen mode
+                        const originalWidth = window.innerWidth;
+                        Object.defineProperty(window, 'innerWidth', {
+                            writable: true,
+                            configurable: true,
+                            value: 1400
+                        });
+                        
+                        window.updateAvailableVerses(marketWithVerses.verses);
+                        
+                        // Restore
+                        Object.defineProperty(window, 'innerWidth', {
+                            writable: true,
+                            configurable: true,
+                            value: originalWidth
+                        });
+                        
+                        setTimeout(() => {
+                            const verseLevels = document.getElementById('verseLevels');
+                            const cards = document.querySelectorAll('.verse-card');
+                            updateStatus(`✓ Created ${verseLevels.children.length} levels with ${cards.length} cards`, '#4cd964');
+                        }, 500);
+                    } else {
+                        updateStatus('No markets with verses found', '#ff3b30');
+                    }
+                };
+                document.body.appendChild(script);
+                
+            } catch (error) {
+                updateStatus(`Error: ${error.message}`, '#ff3b30');
+            }
+        }
+    </script>
+</body>
+</html>

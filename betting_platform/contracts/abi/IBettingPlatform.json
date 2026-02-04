@@ -1,0 +1,20 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "marketId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "settlementPrice",
+        "type": "uint256"
+      }
+    ],
+    "name": "resolveMarket",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

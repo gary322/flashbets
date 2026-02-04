@@ -1,0 +1,92 @@
+ GlobalConfig Manages platform-wide configuration
+ FeeVault Collects and distributes platform fees
+ MMTToken Platform governance token
+ StakingPool MMT staking and rewards
+ AdminAuthority Admin access control
+ CircuitBreaker Emergency halt mechanism
+ ErrorHandler Centralized error management
+ StateManager Global state coordination
+ UpgradeAuthority Program upgrade control
+ SystemClock Time synchronization
+ LMSR Logarithmic Market Scoring Rule
+ PMAMM Parimutuel AMM implementation
+ L2AMM L2-optimized AMM
+ AMMSelector Auto-selects best AMM type
+ LiquidityPool Manages liquidity providers
+ PriceOracle Price feed integration
+ MarketMaker Automated market making
+ SpreadManager Dynamic spread adjustment
+ VolumeTracker Trade volume monitoring
+ FeeCalculator AMM fee computation
+ SlippageProtection Max slippage enforcement
+ ImpermanentLoss IL calculation engine
+ DepthAggregator Order book depth
+ PriceImpact Price impact calculator
+ LiquidityIncentives LP reward distribution
+ OrderBook Order matching engine
+ PositionManager Position lifecycle management
+ MarginEngine Margin requirements calculator
+ LeverageController Leverage limits enforcer
+ CollateralManager Multi-collateral support
+ PnLCalculator Profit/loss computation
+ TradeExecutor Trade execution logic
+ OrderValidator Order validation rules
+ RiskChecker Pre-trade risk checks
+ SettlementEngine Trade settlement processor
+ TradeRecorder Trade history storage
+ PositionNFT NFT position representation
+ LiquidationEngine Graduated liquidation system
+ MarginCall Margin call notifications
+ RiskOracle Risk parameter updates
+ CollateralOracle Collateral valuations
+ PortfolioRisk Portfolio-level risk
+ CorrelationMatrix Cross-market correlations
+ VaRCalculator Value at Risk metrics
+ StressTest Stress testing engine
+ MarketFactory Creates new markets
+ MarketRegistry Market metadata storage
+ OutcomeResolver Market resolution logic
+ DisputeResolution Dispute handling system
+ MarketIngestion External market import
+ CategoryClassifier Market categorization
+ VerseManager Verse hierarchy management
+ MarketStats Market statistics tracker
+ MarketLifecycle Market state transitions
+ ResolutionOracle Resolution data feeds
+ FlashLoan Flash loan provider
+ YieldFarm Yield farming rewards
+ Vault Asset vault management
+ Borrowing Collateralized borrowing
+ Lending Peer-to-peer lending
+ Staking Asset staking pools
+ RewardDistributor Reward calculations
+ CompoundingEngine Auto-compounding logic
+ StopLoss Stop loss orders
+ TakeProfit Take profit orders
+ IcebergOrder Hidden size orders
+ TWAPOrder Time-weighted orders
+ ConditionalOrder If-then orders
+ ChainExecution Conditional chains
+ OrderScheduler Scheduled execution
+ KeeperRegistry Keeper registration
+ KeeperIncentives Keeper rewards
+ TaskQueue Task prioritization
+ KeeperValidator Performance tracking
+ KeeperSlashing Misbehavior penalties
+ KeeperCoordinator Task assignment
+ DarkPool Private order matching
+ CommitReveal MEV protection
+ ZKProofs Zero-knowledge proofs
+ EncryptedOrders Order encryption
+ PrivacyMixer Transaction mixing
+ AccessControl Role-based access
+ AuditLog Transaction auditing
+ SecurityMonitor Threat detection
+ EventEmitter Event broadcasting
+ MetricsCollector Performance metrics
+ DataAggregator Data summarization
+ ReportGenerator Report creation
+ AlertSystem Threshold alerts
+ HealthMonitor System health checks
+ UsageTracker Resource usage
+ PerformanceProfiler Performance analysis

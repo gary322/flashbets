@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Market - Quantum Betting Platform</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation (same as dashboard) -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                <svg class="navbar-logo" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="15" stroke="var(--color-primary)" stroke-width="2"/>
+                    <path d="M16 8 L16 24 M8 16 L24 16" stroke="var(--color-primary)" stroke-width="2"/>
+                    <circle cx="16" cy="16" r="4" fill="var(--color-primary)"/>
+                </svg>
+                <span>Quantum</span>
+            </a>
+            
+            <div class="navbar-menu">
+                <div class="navbar-actions">
+                    <div class="wallet-info">
+                        <div class="wallet-balance">
+                            <span class="balance-label">Balance</span>
+                            <span class="balance-amount">◎ 1,234.56</span>
+                        </div>
+                        <button class="wallet-address">0x7g9N...48AU</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Create Market Wizard -->
+    <main class="create-market-page">
+        <div class="container">
+            <div class="wizard-container">
+                <!-- Progress Bar -->
+                <div class="wizard-progress">
+                    <div class="progress-step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Basic Info</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Verse Location</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Market Type</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-label">Parameters</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-label">Review & Deploy</div>
+                    </div>
+                </div>
+
+                <!-- Wizard Content -->
+                <div class="wizard-content">
+                    <!-- Step 1: Basic Information -->
+                    <div class="wizard-step active" id="step1">
+                        <h2>Create Your Prediction Market</h2>
+                        <p class="step-description">Start by providing basic information about your market</p>
+                        
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label class="form-label">Market Question</label>
+                                <input type="text" class="form-input" id="marketQuestion" 
+                                       placeholder="e.g., Will Bitcoin reach $100,000 by December 2025?"
+                                       maxlength="200">
+                                <div class="form-helper">Be specific and include a clear resolution date</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-textarea" id="marketDescription" rows="4"
+                                          placeholder="Provide additional context about how this market will resolve..."></textarea>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-select" id="marketCategory">
+                                        <option value="">Select a category</option>
+                                        <option value="politics">Politics</option>
+                                        <option value="sports">Sports</option>
+                                        <option value="crypto">Cryptocurrency</option>
+                                        <option value="finance">Finance</option>
+                                        <option value="technology">Technology</option>
+                                        <option value="science">Science</option>
+                                        <option value="entertainment">Entertainment</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Resolution Date</label>
+                                    <input type="datetime-local" class="form-input" id="resolutionDate">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Tags (Optional)</label>
+                                <input type="text" class="form-input" id="marketTags" 
+                                       placeholder="bitcoin, crypto, price, 2025">
+                                <div class="form-helper">Separate tags with commas</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Verse Location -->
+                    <div class="wizard-step" id="step2">
+                        <h2>Choose Verse Location</h2>
+                        <p class="step-description">Select where your market will live in the verse hierarchy</p>
+                        
+                        <div class="verse-selector">
+                            <div class="verse-search">
+                                <input type="search" class="form-input" placeholder="Search verses..." 
+                                       id="verseSearch" onkeyup="searchVerses()">
+                            </div>
+                            
+                            <div class="verse-options">
+                                <div class="verse-option" onclick="selectVerse('root')">
+                                    <input type="radio" name="verse" value="root" id="verse-root">
+                                    <label for="verse-root">
+                                        <div class="verse-info">
+                                            <h4>🌍 Root Universe</h4>
+                                            <p>Top-level verse for general markets</p>
+                                            <span class="verse-stats">12,456 markets • Level 0</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <div class="verse-option" onclick="selectVerse('crypto')">
+                                    <input type="radio" name="verse" value="crypto" id="verse-crypto">
+                                    <label for="verse-crypto">
+                                        <div class="verse-info">
+                                            <h4>💰 Crypto Verse</h4>
+                                            <p>All cryptocurrency and DeFi related markets</p>
+                                            <span class="verse-stats">3,234 markets • Level 1</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <div class="verse-option" onclick="selectVerse('crypto-bitcoin')">
+                                    <input type="radio" name="verse" value="crypto-bitcoin" id="verse-crypto-bitcoin">
+                                    <label for="verse-crypto-bitcoin">
+                                        <div class="verse-info">
+                                            <h4>₿ Bitcoin Sub-Verse</h4>
+                                            <p>Bitcoin-specific predictions</p>
+                                            <span class="verse-stats">567 markets • Level 2</span>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <div class="verse-option create-new" onclick="showCreateVerse()">
+                                    <div class="verse-info">
+                                        <h4>➕ Create New Verse</h4>
+                                        <p>Create a custom verse for your market</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="verse-preview">
+                                <h3>Selected Path:</h3>
+                                <div class="verse-breadcrumb" id="verseBreadcrumb">
+                                    Root Universe → Crypto Verse → Bitcoin Sub-Verse
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Market Type -->
+                    <div class="wizard-step" id="step3">
+                        <h2>Select Market Type</h2>
+                        <p class="step-description">Choose the automated market maker (AMM) type for your market</p>
+                        
+                        <div class="market-type-options">
+                            <div class="market-type-card" onclick="selectMarketType('binary')">
+                                <input type="radio" name="marketType" value="binary" id="type-binary">
+                                <label for="type-binary">
+                                    <h3>Binary Market (LMSR)</h3>
+                                    <p>Simple YES/NO outcomes. Best for clear binary questions.</p>
+                                    <ul>
+                                        <li>2 outcomes only</li>
+                                        <li>Logarithmic Market Scoring Rule</li>
+                                        <li>Most liquid and efficient</li>
+                                        <li>Lowest fees (0.3%)</li>
+                                    </ul>
+                                    <div class="recommended-badge">Recommended</div>
+                                </label>
+                            </div>
+                            
+                            <div class="market-type-card" onclick="selectMarketType('multiple')">
+                                <input type="radio" name="marketType" value="multiple" id="type-multiple">
+                                <label for="type-multiple">
+                                    <h3>Multiple Outcome (PM-AMM)</h3>
+                                    <p>2-64 discrete outcomes. Perfect for elections, sports, etc.</p>
+                                    <ul>
+                                        <li>Up to 64 outcomes</li>
+                                        <li>Prediction Market AMM</li>
+                                        <li>Dynamic liquidity</li>
+                                        <li>Standard fees (0.5%)</li>
+                                    </ul>
+                                </label>
+                            </div>
+                            
+                            <div class="market-type-card" onclick="selectMarketType('continuous')">
+                                <input type="radio" name="marketType" value="continuous" id="type-continuous">
+                                <label for="type-continuous">
+                                    <h3>Continuous (L2-AMM)</h3>
+                                    <p>Continuous range outcomes. For prices, temperatures, etc.</p>
+                                    <ul>
+                                        <li>Continuous distribution</li>
+                                        <li>L2 Norm AMM</li>
+                                        <li>Gaussian/Uniform distribution</li>
+                                        <li>Higher fees (0.75%)</li>
+                                    </ul>
+                                </label>
+                            </div>
+                            
+                            <div class="market-type-card quantum" onclick="selectMarketType('quantum')">
+                                <input type="radio" name="marketType" value="quantum" id="type-quantum">
+                                <label for="type-quantum">
+                                    <h3>Quantum Market ⚛️</h3>
+                                    <p>Markets in superposition. Advanced quantum mechanics.</p>
+                                    <ul>
+                                        <li>Superposition states</li>
+                                        <li>Entanglement with other markets</li>
+                                        <li>Observation collapses state</li>
+                                        <li>Premium fees (1%)</li>
+                                    </ul>
+                                    <div class="advanced-badge">Advanced</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Market Parameters -->
+                    <div class="wizard-step" id="step4">
+                        <h2>Configure Market Parameters</h2>
+                        <p class="step-description">Fine-tune your market settings</p>
+                        
+                        <!-- Binary Market Parameters -->
+                        <div class="param-section" id="binaryParams" style="display: none;">
+                            <h3>Binary Market Settings</h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Initial Probability</label>
+                                <div class="slider-container">
+                                    <input type="range" class="form-slider" id="initialProb" 
+                                           min="1" max="99" value="50" oninput="updateSliderValue('initialProb')">
+                                    <span class="slider-value" id="initialProbValue">50%</span>
+                                </div>
+                                <div class="form-helper">Starting YES probability</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Liquidity Parameter (b)</label>
+                                <input type="number" class="form-input" id="liquidityB" value="100" min="10" max="10000">
+                                <div class="form-helper">Higher values = more stable prices, more liquidity needed</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Multiple Outcome Parameters -->
+                        <div class="param-section" id="multipleParams" style="display: none;">
+                            <h3>Multiple Outcome Settings</h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Number of Outcomes</label>
+                                <input type="number" class="form-input" id="numOutcomes" value="3" min="2" max="64" 
+                                       onchange="updateOutcomeFields()">
+                            </div>
+                            
+                            <div class="outcomes-list" id="outcomesList">
+                                <div class="outcome-input">
+                                    <input type="text" class="form-input" placeholder="Outcome 1 name">
+                                    <input type="number" class="form-input small" placeholder="Initial %" min="0" max="100">
+                                </div>
+                                <div class="outcome-input">
+                                    <input type="text" class="form-input" placeholder="Outcome 2 name">
+                                    <input type="number" class="form-input small" placeholder="Initial %" min="0" max="100">
+                                </div>
+                                <div class="outcome-input">
+                                    <input type="text" class="form-input" placeholder="Outcome 3 name">
+                                    <input type="number" class="form-input small" placeholder="Initial %" min="0" max="100">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Common Parameters -->
+                        <div class="param-section">
+                            <h3>General Settings</h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Initial Liquidity</label>
+                                    <input type="number" class="form-input" id="initialLiquidity" 
+                                           value="1000" min="100" placeholder="Amount in SOL">
+                                    <div class="form-helper">You'll provide this as the market creator</div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Trading Fee</label>
+                                    <select class="form-select" id="tradingFee">
+                                        <option value="0.003">0.3% (Low)</option>
+                                        <option value="0.005" selected>0.5% (Standard)</option>
+                                        <option value="0.01">1.0% (High)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Resolution Source</label>
+                                <select class="form-select" id="resolutionSource">
+                                    <option value="creator">Creator (You)</option>
+                                    <option value="oracle">External Oracle</option>
+                                    <option value="dao">DAO Voting</option>
+                                    <option value="api">API Integration</option>
+                                </select>
+                            </div>
+                            
+                            <div class="advanced-settings">
+                                <h4>Advanced Options</h4>
+                                
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="enableLeverage">
+                                        <span>Enable leveraged trading (up to 100x)</span>
+                                    </label>
+                                    
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="enableQuantum">
+                                        <span>Enable quantum features</span>
+                                    </label>
+                                    
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="enableDarkPool">
+                                        <span>Enable dark pool trading</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Review & Deploy -->
+                    <div class="wizard-step" id="step5">
+                        <h2>Review & Deploy Market</h2>
+                        <p class="step-description">Review your market configuration before deploying</p>
+                        
+                        <div class="review-section">
+                            <div class="review-card">
+                                <h3>Market Details</h3>
+                                <div class="review-item">
+                                    <span class="review-label">Question:</span>
+                                    <span class="review-value" id="reviewQuestion">Will Bitcoin reach $100,000 by December 2025?</span>
+                                </div>
+                                <div class="review-item">
+                                    <span class="review-label">Category:</span>
+                                    <span class="review-value" id="reviewCategory">Cryptocurrency</span>
+                                </div>
+                                <div class="review-item">
+                                    <span class="review-label">Resolution Date:</span>
+                                    <span class="review-value" id="reviewDate">December 31, 2025</span>
+                                </div>
+                            </div>
+                            
+                            <div class="review-card">
+                                <h3>Verse Location</h3>
+                                <div class="review-item">
+                                    <span class="review-label">Path:</span>
+                                    <span class="review-value" id="reviewVerse">Root → Crypto → Bitcoin</span>
+                                </div>
+                                <div class="review-item">
+                                    <span class="review-label">Verse Level:</span>
+                                    <span class="review-value">Level 2</span>
+                                </div>
+                            </div>
+                            
+                            <div class="review-card">
+                                <h3>Market Configuration</h3>
+                                <div class="review-item">
+                                    <span class="review-label">Type:</span>
+                                    <span class="review-value" id="reviewType">Binary (LMSR)</span>
+                                </div>
+                                <div class="review-item">
+                                    <span class="review-label">Initial Liquidity:</span>
+                                    <span class="review-value" id="reviewLiquidity">◎ 1,000 SOL</span>
+                                </div>
+                                <div class="review-item">
+                                    <span class="review-label">Trading Fee:</span>
+                                    <span class="review-value" id="reviewFee">0.5%</span>
+                                </div>
+                                <div class="review-item">
+                                    <span class="review-label">Features:</span>
+                                    <span class="review-value" id="reviewFeatures">Leverage ✓, Quantum ✗, Dark Pool ✗</span>
+                                </div>
+                            </div>
+                            
+                            <div class="deployment-cost">
+                                <h3>Deployment Costs</h3>
+                                <div class="cost-breakdown">
+                                    <div class="cost-item">
+                                        <span>Initial Liquidity:</span>
+                                        <span>◎ 1,000.00</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Deployment Fee:</span>
+                                        <span>◎ 5.00</span>
+                                    </div>
+                                    <div class="cost-item">
+                                        <span>Verse Registration:</span>
+                                        <span>◎ 0.50</span>
+                                    </div>
+                                    <div class="cost-item total">
+                                        <span>Total Cost:</span>
+                                        <span>◎ 1,005.50</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="deployment-actions">
+                                <button class="btn btn-secondary" onclick="saveAsDraft()">Save as Draft</button>
+                                <button class="btn btn-primary btn-lg" onclick="deployMarket()">
+                                    🚀 Deploy Market
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="wizard-navigation">
+                    <button class="btn btn-secondary" id="prevBtn" onclick="changeStep(-1)">Previous</button>
+                    <button class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">Next</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create Verse Modal -->
+    <div class="modal" id="createVerseModal">
+        <div class="modal-backdrop" onclick="closeCreateVerseModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Verse</h2>
+                <button class="modal-close" onclick="closeCreateVerseModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Verse Name</label>
+                    <input type="text" class="form-input" placeholder="e.g., DeFi Protocols">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Parent Verse</label>
+                    <select class="form-select">
+                        <option>Root Universe</option>
+                        <option>Crypto Verse</option>
+                        <option>Finance Verse</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" rows="3" placeholder="Describe this verse..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Access Level</label>
+                    <select class="form-select">
+                        <option>Public - Anyone can create markets</option>
+                        <option>Restricted - Approval required</option>
+                        <option>Private - Invite only</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCreateVerseModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="createVerse()">Create Verse</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Styles specific to create market -->
+    <style>
+        .create-market-page {
+            padding: var(--spacing-xl) 0;
+            min-height: calc(100vh - 64px);
+        }
+        
+        .wizard-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        /* Progress Bar */
+        .wizard-progress {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-3xl);
+            padding: 0 var(--spacing-xl);
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-sm);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            background-color: var(--color-bg-tertiary);
+            border: 2px solid var(--color-border-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all var(--transition-base);
+        }
+        
+        .progress-step.active .step-number {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: white;
+        }
+        
+        .progress-step.completed .step-number {
+            background-color: var(--color-success);
+            border-color: var(--color-success);
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 0.875rem;
+            color: var(--color-text-tertiary);
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        .progress-step.active .step-label {
+            color: var(--color-text-primary);
+        }
+        
+        .progress-line {
+            flex: 1;
+            height: 2px;
+            background-color: var(--color-border-primary);
+            margin: 0 var(--spacing-md);
+            position: relative;
+            top: -20px;
+        }
+        
+        /* Wizard Content */
+        .wizard-content {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-3xl);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .wizard-step {
+            display: none;
+        }
+        
+        .wizard-step.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .step-description {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        /* Form Sections */
+        .form-section {
+            margin-top: var(--spacing-xl);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-lg);
+        }
+        
+        /* Verse Selector */
+        .verse-selector {
+            margin-top: var(--spacing-xl);
+        }
+        
+        .verse-search {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .verse-options {
+            display: grid;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .verse-option {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .verse-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        .verse-option label {
+            display: block;
+            padding: var(--spacing-lg);
+            background-color: var(--color-bg-primary);
+            border: 2px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-base);
+            cursor: pointer;
+        }
+        
+        .verse-option:hover label {
+            border-color: var(--color-border-secondary);
+        }
+        
+        .verse-option input[type="radio"]:checked + label {
+            border-color: var(--color-primary);
+            background-color: var(--color-bg-tertiary);
+        }
+        
+        .verse-info h4 {
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .verse-info p {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .verse-stats {
+            font-size: 0.875rem;
+            color: var(--color-text-tertiary);
+        }
+        
+        .verse-option.create-new {
+            border: 2px dashed var(--color-border-secondary);
+            background-color: var(--color-bg-primary);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .verse-option.create-new:hover {
+            border-color: var(--color-primary);
+            background-color: var(--color-bg-tertiary);
+        }
+        
+        .verse-preview {
+            padding: var(--spacing-lg);
+            background-color: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+        }
+        
+        .verse-breadcrumb {
+            font-family: var(--font-mono);
+            color: var(--color-primary);
+        }
+        
+        /* Market Type Cards */
+        .market-type-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .market-type-card {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .market-type-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        .market-type-card label {
+            display: block;
+            padding: var(--spacing-xl);
+            background-color: var(--color-bg-primary);
+            border: 2px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-base);
+            cursor: pointer;
+            height: 100%;
+        }
+        
+        .market-type-card:hover label {
+            border-color: var(--color-border-secondary);
+            transform: translateY(-2px);
+        }
+        
+        .market-type-card input[type="radio"]:checked + label {
+            border-color: var(--color-primary);
+            background-color: var(--color-bg-tertiary);
+        }
+        
+        .market-type-card.quantum label {
+            border-color: var(--color-warning);
+            background: linear-gradient(135deg, rgba(255, 212, 0, 0.05) 0%, rgba(29, 155, 240, 0.05) 100%);
+        }
+        
+        .market-type-card h3 {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .market-type-card p {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .market-type-card ul {
+            list-style: none;
+            font-size: 0.875rem;
+            color: var(--color-text-tertiary);
+        }
+        
+        .market-type-card li {
+            padding-left: var(--spacing-lg);
+            margin-bottom: var(--spacing-xs);
+            position: relative;
+        }
+        
+        .market-type-card li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--color-success);
+        }
+        
+        .recommended-badge,
+        .advanced-badge {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+        }
+        
+        .recommended-badge {
+            background-color: var(--color-success-bg);
+            color: var(--color-success);
+        }
+        
+        .advanced-badge {
+            background-color: var(--color-warning-bg);
+            color: var(--color-warning);
+        }
+        
+        /* Parameters Section */
+        .param-section {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .param-section h3 {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .form-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-full);
+            outline: none;
+        }
+        
+        .form-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--color-primary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+        }
+        
+        .slider-value {
+            font-weight: 600;
+            min-width: 50px;
+            text-align: right;
+        }
+        
+        .outcomes-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .outcome-input {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+        }
+        
+        .outcome-input .form-input {
+            flex: 1;
+        }
+        
+        .outcome-input .form-input.small {
+            flex: 0 0 100px;
+        }
+        
+        .advanced-settings {
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-xl);
+            border-top: 1px solid var(--color-border-primary);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            cursor: pointer;
+        }
+        
+        .checkbox-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        /* Review Section */
+        .review-section {
+            margin-top: var(--spacing-xl);
+        }
+        
+        .review-card {
+            background-color: var(--color-bg-primary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .review-card h3 {
+            margin-bottom: var(--spacing-lg);
+            color: var(--color-primary);
+        }
+        
+        .review-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--color-border-primary);
+        }
+        
+        .review-item:last-child {
+            border-bottom: none;
+        }
+        
+        .review-label {
+            color: var(--color-text-tertiary);
+        }
+        
+        .review-value {
+            font-weight: 600;
+            text-align: right;
+        }
+        
+        .deployment-cost {
+            background-color: var(--color-bg-primary);
+            border: 2px solid var(--color-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .cost-breakdown {
+            margin-top: var(--spacing-lg);
+        }
+        
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            font-family: var(--font-mono);
+        }
+        
+        .cost-item.total {
+            padding-top: var(--spacing-md);
+            border-top: 2px solid var(--color-border-primary);
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+        
+        .deployment-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+        }
+        
+        /* Navigation */
+        .wizard-navigation {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .wizard-progress {
+                padding: 0;
+            }
+            
+            .step-label {
+                display: none;
+            }
+            
+            .market-type-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .wizard-content {
+                padding: var(--spacing-xl);
+            }
+        }
+    </style>
+
+    <!-- Create Market JavaScript -->
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+        let marketData = {};
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateProgressBar();
+            updateNavigationButtons();
+        });
+        
+        // Change step
+        function changeStep(direction) {
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            currentStepElement.classList.remove('active');
+            
+            // Update completed status
+            if (direction > 0 && validateStep(currentStep)) {
+                document.querySelector(`[data-step="${currentStep}"]`).classList.add('completed');
+            }
+            
+            currentStep += direction;
+            currentStep = Math.max(1, Math.min(currentStep, totalSteps));
+            
+            const newStepElement = document.getElementById(`step${currentStep}`);
+            newStepElement.classList.add('active');
+            
+            updateProgressBar();
+            updateNavigationButtons();
+            
+            // Update review if on last step
+            if (currentStep === 5) {
+                updateReview();
+            }
+        }
+        
+        // Validate current step
+        function validateStep(step) {
+            switch(step) {
+                case 1:
+                    const question = document.getElementById('marketQuestion').value;
+                    const category = document.getElementById('marketCategory').value;
+                    const date = document.getElementById('resolutionDate').value;
+                    if (!question || !category || !date) {
+                        alert('Please fill in all required fields');
+                        return false;
+                    }
+                    marketData.question = question;
+                    marketData.category = category;
+                    marketData.resolutionDate = date;
+                    return true;
+                    
+                case 2:
+                    const verse = document.querySelector('input[name="verse"]:checked');
+                    if (!verse) {
+                        alert('Please select a verse location');
+                        return false;
+                    }
+                    marketData.verse = verse.value;
+                    return true;
+                    
+                case 3:
+                    const type = document.querySelector('input[name="marketType"]:checked');
+                    if (!type) {
+                        alert('Please select a market type');
+                        return false;
+                    }
+                    marketData.type = type.value;
+                    showRelevantParams(type.value);
+                    return true;
+                    
+                case 4:
+                    return true;
+                    
+                default:
+                    return true;
+            }
+        }
+        
+        // Update progress bar
+        function updateProgressBar() {
+            document.querySelectorAll('.progress-step').forEach((step, index) => {
+                if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+        
+        // Update navigation buttons
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.style.display = currentStep === 1 ? 'none' : 'block';
+            nextBtn.textContent = currentStep === totalSteps ? 'Review' : 'Next';
+            
+            if (currentStep === totalSteps) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'block';
+            }
+        }
+        
+        // Verse selection
+        function selectVerse(verseId) {
+            document.getElementById(`verse-${verseId}`).checked = true;
+        }
+        
+        function searchVerses() {
+            const search = document.getElementById('verseSearch').value.toLowerCase();
+            // Filter verses based on search
+        }
+        
+        function showCreateVerse() {
+            document.getElementById('createVerseModal').classList.add('active');
+        }
+        
+        function closeCreateVerseModal() {
+            document.getElementById('createVerseModal').classList.remove('active');
+        }
+        
+        function createVerse() {
+            // Create new verse logic
+            closeCreateVerseModal();
+            alert('New verse created successfully!');
+        }
+        
+        // Market type selection
+        function selectMarketType(type) {
+            document.getElementById(`type-${type}`).checked = true;
+        }
+        
+        function showRelevantParams(type) {
+            // Hide all param sections
+            document.querySelectorAll('.param-section').forEach(section => {
+                if (section.id.includes('Params')) {
+                    section.style.display = 'none';
+                }
+            });
+            
+            // Show relevant section
+            if (type === 'binary') {
+                document.getElementById('binaryParams').style.display = 'block';
+            } else if (type === 'multiple') {
+                document.getElementById('multipleParams').style.display = 'block';
+            }
+        }
+        
+        // Update slider value
+        function updateSliderValue(sliderId) {
+            const slider = document.getElementById(sliderId);
+            const valueSpan = document.getElementById(sliderId + 'Value');
+            valueSpan.textContent = slider.value + '%';
+        }
+        
+        // Update outcome fields
+        function updateOutcomeFields() {
+            const num = parseInt(document.getElementById('numOutcomes').value);
+            const list = document.getElementById('outcomesList');
+            list.innerHTML = '';
+            
+            for (let i = 1; i <= num; i++) {
+                const div = document.createElement('div');
+                div.className = 'outcome-input';
+                div.innerHTML = `
+                    <input type="text" class="form-input" placeholder="Outcome ${i} name">
+                    <input type="number" class="form-input small" placeholder="Initial %" min="0" max="100">
+                `;
+                list.appendChild(div);
+            }
+        }
+        
+        // Update review
+        function updateReview() {
+            document.getElementById('reviewQuestion').textContent = marketData.question || 'Not set';
+            document.getElementById('reviewCategory').textContent = marketData.category || 'Not set';
+            document.getElementById('reviewDate').textContent = new Date(marketData.resolutionDate).toLocaleDateString() || 'Not set';
+            document.getElementById('reviewVerse').textContent = document.getElementById('verseBreadcrumb').textContent;
+            
+            const typeMap = {
+                'binary': 'Binary (LMSR)',
+                'multiple': 'Multiple Outcome (PM-AMM)',
+                'continuous': 'Continuous (L2-AMM)',
+                'quantum': 'Quantum Market'
+            };
+            document.getElementById('reviewType').textContent = typeMap[marketData.type] || 'Not set';
+            
+            const liquidity = document.getElementById('initialLiquidity').value || '1000';
+            document.getElementById('reviewLiquidity').textContent = `◎ ${liquidity} SOL`;
+            
+            const fee = document.getElementById('tradingFee').value;
+            document.getElementById('reviewFee').textContent = (fee * 100) + '%';
+            
+            const features = [];
+            if (document.getElementById('enableLeverage').checked) features.push('Leverage ✓');
+            else features.push('Leverage ✗');
+            if (document.getElementById('enableQuantum').checked) features.push('Quantum ✓');
+            else features.push('Quantum ✗');
+            if (document.getElementById('enableDarkPool').checked) features.push('Dark Pool ✓');
+            else features.push('Dark Pool ✗');
+            document.getElementById('reviewFeatures').textContent = features.join(', ');
+        }
+        
+        // Deploy market
+        function deployMarket() {
+            if (confirm('Deploy this market? This will cost ◎ 1,005.50 SOL')) {
+                // Show loading
+                alert('Market deployed successfully! 🎉\n\nMarket ID: MKT-2024-0142\nTransaction: 5xY9k...');
+                window.location.href = 'markets.html';
+            }
+        }
+        
+        // Save as draft
+        function saveAsDraft() {
+            localStorage.setItem('marketDraft', JSON.stringify(marketData));
+            alert('Market saved as draft!');
+        }
+    </script>
+</body>
+</html>

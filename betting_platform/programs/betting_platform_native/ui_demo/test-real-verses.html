@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Real Verses</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #000; color: #fff; padding: 20px; }
+        .controls { margin: 20px 0; }
+        button { background: #FFD60A; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .debug { background: #111; padding: 20px; margin: 20px 0; border-radius: 8px; font-family: monospace; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        .verse-info { background: #222; padding: 10px; margin: 5px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Test Real Verses</h1>
+    
+    <div class="controls">
+        <button onclick="testMarketClick()">Test Market Click Flow</button>
+        <button onclick="clearDebug()">Clear</button>
+    </div>
+    
+    <div id="debug" class="debug"></div>
+    
+    <!-- Market search for testing -->
+    <div style="margin: 20px 0;">
+        <input type="text" id="testSearchInput" placeholder="Search markets..." style="padding: 10px; width: 300px;">
+        <button onclick="searchMarkets()">Search</button>
+    </div>
+    
+    <div id="searchResults" style="margin: 20px 0;"></div>
+    
+    <!-- Copy exact structure from index.html -->
+    <div class="market-details" id="marketDetails" style="display: none;">
+        <h2 id="selectedMarketTitle"></h2>
+        
+        <div class="verses-section" id="versesSection" style="display: block;">
+            <div class="section-title">Related Stages - Chain Your Leverage</div>
+            <div class="verse-flow-container" id="verseFlowContainer">
+                <svg class="verse-connections" id="verseConnections">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" 
+                                refX="9" refY="5" orient="auto">
+                            <polygon points="0 0, 10 5, 0 10" class="verse-arrow" />
+                        </marker>
+                    </defs>
+                </svg>
+                <div class="verse-levels" id="verseLevels">
+                    <!-- Verses will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize platform state
+        window.platformState = {
+            selectedVerses: [],
+            markets: new Map(),
+            selectedMarket: null
+        };
+    </script>
+    
+    <script src="backend_integration.js"></script>
+    <script src="platform_main.js"></script>
+    
+    <script>
+        const debug = document.getElementById('debug');
+        
+        function log(msg, className = '') {
+            const div = document.createElement('div');
+            div.className = className;
+            div.innerHTML = `${new Date().toLocaleTimeString()}: ${msg}`;
+            debug.appendChild(div);
+            console.log(msg);
+        }
+        
+        function clearDebug() {
+            debug.innerHTML = '';
+        }
+        
+        async function searchMarkets() {
+            const query = document.getElementById('testSearchInput').value;
+            log(`Searching for: ${query}`);
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                
+                // Filter markets by query
+                const filtered = markets.filter(m => {
+                    const title = m.question || m.title || '';
+                    return title.toLowerCase().includes(query.toLowerCase());
+                });
+                
+                displaySearchResults(filtered.slice(0, 5));
+            } catch (error) {
+                log(`Search error: ${error.message}`, 'error');
+            }
+        }
+        
+        function displaySearchResults(markets) {
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = markets.map(market => `
+                <div style="background: #222; padding: 15px; margin: 10px 0; border-radius: 8px; cursor: pointer;"
+                     onclick="selectMarket('${market.id}')">
+                    <h3>${market.question || market.title}</h3>
+                    <p>Category: ${market.category} | Verses: ${market.verses ? market.verses.length : 0}</p>
+                </div>
+            `).join('');
+        }
+        
+        async function selectMarket(marketId) {
+            log(`\\nSelecting market: ${marketId}`);
+            
+            // Get market from search results
+            const response = await fetch('http://localhost:8081/api/polymarket/markets');
+            const markets = await response.json();
+            const market = markets.find(m => m.id === marketId);
+            
+            if (!market) {
+                log('Market not found!', 'error');
+                return;
+            }
+            
+            // Store in platformState
+            window.platformState.selectedMarket = market;
+            window.platformState.markets.set(marketId, market);
+            
+            // Show market details
+            document.getElementById('marketDetails').style.display = 'block';
+            document.getElementById('selectedMarketTitle').textContent = market.question || market.title;
+            
+            log(`Market selected: ${market.question || market.title}`, 'success');
+            log(`Market has ${market.verses ? market.verses.length : 0} verses`);
+            
+            if (market.verses && market.verses.length > 0) {
+                log('\\nVerses from market data:');
+                market.verses.forEach(verse => {
+                    const div = document.createElement('div');
+                    div.className = 'verse-info';
+                    div.innerHTML = `
+                        <strong>${verse.name}</strong> (Level ${verse.level}, ${verse.multiplier}x)<br>
+                        ID: ${verse.id}<br>
+                        Category: ${verse.category} | Risk: ${verse.risk_tier}<br>
+                        Description: ${verse.description}
+                    `;
+                    debug.appendChild(div);
+                });
+                
+                // Update verses display
+                log('\\nCalling updateAvailableVerses...', 'success');
+                if (window.updateAvailableVerses) {
+                    try {
+                        window.updateAvailableVerses(market.verses);
+                        
+                        // Check results
+                        setTimeout(() => {
+                            const verseLevels = document.getElementById('verseLevels');
+                            const verseCards = document.querySelectorAll('.verse-card');
+                            log(`\\nDisplay results: ${verseLevels.children.length} levels, ${verseCards.length} verse cards`, 
+                                verseCards.length > 0 ? 'success' : 'error');
+                            
+                            if (verseCards.length === 0) {
+                                log('No verse cards created! Checking verseLevels content...', 'error');
+                                log(`verseLevels HTML length: ${verseLevels.innerHTML.length} chars`);
+                                log(`verseLevels children: ${verseLevels.children.length}`);
+                            }
+                        }, 500);
+                    } catch (error) {
+                        log(`Error in updateAvailableVerses: ${error.message}`, 'error');
+                        console.error(error);
+                    }
+                } else {
+                    log('updateAvailableVerses not found!', 'error');
+                }
+            } else {
+                log('No verses in market data!', 'error');
+            }
+        }
+        
+        async function testMarketClick() {
+            clearDebug();
+            log('Testing market click flow...', 'success');
+            
+            // Search for a test market
+            document.getElementById('testSearchInput').value = 'Bitcoin';
+            await searchMarkets();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{
+  "passed": 2,
+  "failed": 7,
+  "tests": {
+    "Wallet Challenge Generation": {
+      "status": "passed"
+    },
+    "Wallet Signature Verification": {
+      "status": "failed",
+      "error": "bs58.encode is not a function"
+    },
+    "Demo Account Creation": {
+      "status": "failed",
+      "error": "Demo creation failed: 404"
+    },
+    "Markets List": {
+      "status": "failed",
+      "error": "Markets response not an array"
+    },
+    "Market Details": {
+      "status": "failed",
+      "error": "Cannot read properties of undefined (reading 'market_pubkey')"
+    },
+    "Market Search": {
+      "status": "failed",
+      "error": "Search response not an array"
+    },
+    "Verses List": {
+      "status": "passed"
+    },
+    "Order Placement Endpoint": {
+      "status": "failed",
+      "error": "Unexpected response: 404"
+    },
+    "Positions List": {
+      "status": "failed",
+      "error": "invalid json response body at http://localhost:8081/api/wallet/demo reason: Unexpected end of JSON input"
+    }
+  },
+  "errors": [
+    {
+      "test": "Wallet Signature Verification",
+      "error": "bs58.encode is not a function"
+    },
+    {
+      "test": "Demo Account Creation",
+      "error": "Demo creation failed: 404"
+    },
+    {
+      "test": "Markets List",
+      "error": "Markets response not an array"
+    },
+    {
+      "test": "Market Details",
+      "error": "Cannot read properties of undefined (reading 'market_pubkey')"
+    },
+    {
+      "test": "Market Search",
+      "error": "Search response not an array"
+    },
+    {
+      "test": "Order Placement Endpoint",
+      "error": "Unexpected response: 404"
+    },
+    {
+      "test": "Positions List",
+      "error": "invalid json response body at http://localhost:8081/api/wallet/demo reason: Unexpected end of JSON input"
+    }
+  ]
+}

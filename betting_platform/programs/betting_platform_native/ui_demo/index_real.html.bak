@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quantum Betting Platform - Professional prediction markets on Solana with 32-level verses, quantum mechanics, and up to 100x leverage">
+    <title>Quantum Betting - Professional Prediction Markets</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="quantum-loader">
+            <div class="orbit orbit-1"></div>
+            <div class="orbit orbit-2"></div>
+            <div class="quantum-symbol">⚛️</div>
+        </div>
+        <h2>Initializing Quantum Systems...</h2>
+    </div>
+
+    <!-- Landing Page -->
+    <div id="landingPage" class="page active">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a href="/" class="navbar-brand">
+                    <svg class="navbar-logo" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="15" stroke="var(--color-primary)" stroke-width="2"/>
+                        <path d="M16 8 L16 24 M8 16 L24 16" stroke="var(--color-primary)" stroke-width="2"/>
+                        <circle cx="16" cy="16" r="4" fill="var(--color-primary)"/>
+                    </svg>
+                    <span>Quantum</span>
+                </a>
+                
+                <div class="navbar-menu">
+                    <ul class="navbar-nav">
+                        <li><a href="#features" class="navbar-link">Features</a></li>
+                        <li><a href="javascript:void(0)" onclick="showMarkets()" class="navbar-link">Markets</a></li>
+                        <li><a href="#technology" class="navbar-link">Technology</a></li>
+                        <li><a href="javascript:void(0)" onclick="showAbout()" class="navbar-link">About</a></li>
+                    </ul>
+                    
+                    <div class="navbar-actions">
+                        <button class="btn btn-secondary" onclick="showMarkets()">Launch App</button>
+                        <button class="btn btn-primary" onclick="connectFirst()">Connect Wallet</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        Professional Prediction Markets
+                        <span class="text-primary">on Solana</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Trade on future events with up to 100x leverage. Create markets, build verse hierarchies, 
+                        and harness quantum mechanics for advanced trading strategies.
+                    </p>
+                    
+                    <div class="hero-actions">
+                        <button class="btn btn-primary btn-lg" onclick="showMarkets()">
+                            Start Trading
+                        </button>
+                        <button class="btn btn-secondary btn-lg" onclick="showDemo()">
+                            Watch Demo
+                        </button>
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <div class="stat-value">$2.5B</div>
+                            <div class="stat-label">Total Volume</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">5,250</div>
+                            <div class="stat-label">TPS</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">92</div>
+                            <div class="stat-label">Smart Contracts</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">32</div>
+                            <div class="stat-label">Verse Levels</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="page">
+        <!-- App Navigation -->
+        <nav class="app-navbar">
+            <div class="navbar-container">
+                <a href="javascript:void(0)" class="navbar-brand">
+                    <svg class="navbar-logo" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="15" stroke="var(--color-primary)" stroke-width="2"/>
+                        <path d="M16 8 L16 24 M8 16 L24 16" stroke="var(--color-primary)" stroke-width="2"/>
+                        <circle cx="16" cy="16" r="4" fill="var(--color-primary)"/>
+                    </svg>
+                    <span>Quantum</span>
+                </a>
+                
+                <div class="navbar-menu">
+                    <div class="search-container">
+                        <input type="search" placeholder="Search markets..." class="search-input">
+                    </div>
+                    
+                    <div class="navbar-actions">
+                        <button class="btn btn-icon" onclick="showNotifications()">
+                            <span class="notification-badge">3</span>
+                            🔔
+                        </button>
+                        
+                        <div class="wallet-info">
+                            <div class="wallet-balance">
+                                <span class="balance-label">Balance</span>
+                                <span class="balance-amount">◎ 0.00</span>
+                            </div>
+                            <button class="wallet-address" onclick="showWalletMenu()">
+                                Connect
+                            </button>
+                        </div>
+                        
+                        <button class="btn btn-icon" onclick="toggleTheme()">🌓</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <button class="tab active" onclick="switchTab('dashboard')">Dashboard</button>
+            <button class="tab" onclick="switchTab('markets')">Markets</button>
+            <button class="tab" onclick="switchTab('portfolio')">Portfolio</button>
+            <button class="tab" onclick="switchTab('verses')">Verses</button>
+            <button class="tab" onclick="switchTab('quantum')">Quantum</button>
+            <button class="tab" onclick="switchTab('defi')">DeFi</button>
+            <button class="tab" onclick="switchTab('leaderboard')">Leaderboard</button>
+            <button class="tab" onclick="switchTab('governance')">Governance</button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="dashboardTab" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="portfolio-summary card">
+                    <h2>Portfolio Overview</h2>
+                    <div class="stats-row">
+                        <div class="stat">
+                            <label>Total Value</label>
+                            <value id="portfolioValue">$0.00</value>
+                        </div>
+                        <div class="stat">
+                            <label>Total P&L</label>
+                            <value id="totalPnL" class="text-success">+$0.00</value>
+                        </div>
+                        <div class="stat">
+                            <label>Win Rate</label>
+                            <value>0%</value>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="marketsTab" class="tab-content">
+            <div class="markets-header">
+                <h2>Active Markets</h2>
+                <div class="market-filters">
+                    <button class="filter-btn active" onclick="filterMarkets('all')">All</button>
+                    <button class="filter-btn" onclick="filterMarkets('crypto')">Crypto</button>
+                    <button class="filter-btn" onclick="filterMarkets('politics')">Politics</button>
+                    <button class="filter-btn" onclick="filterMarkets('sports')">Sports</button>
+                    <button class="filter-btn" onclick="filterMarkets('science')">Science</button>
+                </div>
+            </div>
+            <div id="marketsGrid" class="markets-grid">
+                <!-- Markets will be loaded here -->
+            </div>
+        </div>
+
+        <div id="portfolioTab" class="tab-content">
+            <h2>Your Positions</h2>
+            <table class="positions-table">
+                <thead>
+                    <tr>
+                        <th>Market</th>
+                        <th>Side</th>
+                        <th>Size</th>
+                        <th>Entry</th>
+                        <th>Current</th>
+                        <th>P&L</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="positionsTableBody">
+                    <!-- Positions will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="versesTab" class="tab-content">
+            <h2>Verse Explorer</h2>
+            <div id="verseTree" class="verse-tree">
+                <!-- Verse tree will be loaded here -->
+            </div>
+        </div>
+
+        <div id="quantumTab" class="tab-content">
+            <h2>Quantum Trading</h2>
+            <div class="quantum-features">
+                <!-- Quantum features will be loaded here -->
+            </div>
+        </div>
+
+        <div id="defiTab" class="tab-content">
+            <h2>DeFi Hub</h2>
+            <div class="defi-grid">
+                <!-- DeFi features will be loaded here -->
+            </div>
+        </div>
+
+        <div id="leaderboardTab" class="tab-content">
+            <h2>Leaderboard</h2>
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Trader</th>
+                        <th>P&L</th>
+                        <th>Win Rate</th>
+                        <th>Volume</th>
+                        <th>Profile</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <!-- Leaderboard will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="governanceTab" class="tab-content">
+            <h2>Governance</h2>
+            <div id="proposalsList" class="proposals-list">
+                <!-- Proposals will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Wallet Modal -->
+    <div id="walletModal" class="modal">
+        <div class="modal-content">
+            <h2>Connect Wallet</h2>
+            <div class="wallet-options">
+                <button class="wallet-option" onclick="connectWallet('phantom')">
+                    <img src="https://phantom.app/img/logo.png" alt="Phantom" width="32">
+                    <span>Phantom</span>
+                </button>
+                <button class="wallet-option" onclick="connectWallet('solflare')">
+                    <img src="https://solflare.com/favicon.ico" alt="Solflare" width="32">
+                    <span>Solflare</span>
+                </button>
+                <button class="wallet-option" onclick="connectWallet('demo')">
+                    <span style="font-size: 32px;">🎮</span>
+                    <span>Demo Wallet</span>
+                </button>
+            </div>
+            <p class="wallet-help">
+                <a href="javascript:void(0)" onclick="showWalletHelp()">Need help setting up a wallet?</a>
+            </p>
+            <button class="modal-close" onclick="closeWalletModal()">×</button>
+        </div>
+    </div>
+
+    <!-- Market Detail Modal -->
+    <div id="marketModal" class="modal">
+        <div class="modal-content large">
+            <div id="marketDetailContent">
+                <!-- Market details will be loaded here -->
+            </div>
+            <button class="modal-close" onclick="closeMarketModal()">×</button>
+        </div>
+    </div>
+
+    <!-- Trade Modal -->
+    <div id="tradeModal" class="modal">
+        <div class="modal-content">
+            <h2>Place Trade</h2>
+            <div id="tradeForm">
+                <!-- Trade form will be loaded here -->
+            </div>
+            <button class="modal-close" onclick="closeTradeModal()">×</button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div style="text-align: center; padding: 40px;">
+                <div style="font-size: 64px; margin-bottom: 20px;">✅</div>
+                <h2>Success!</h2>
+                <p id="successMessage"></p>
+                <button class="btn btn-primary" onclick="closeSuccessModal()">View Position</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <!-- Scripts -->
+    <script src="js/api_client.js"></script>
+    <script src="js/wallet_adapter.js"></script>
+    <script src="app_real.js"></script>
+</body>
+</html>

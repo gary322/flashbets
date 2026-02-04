@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM - Market Search Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 20px;
+            color: #888;
+            -webkit-text-fill-color: #888;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFA500, #FFD700);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .main-content {
+            display: grid;
+            gap: 30px;
+        }
+
+        .search-interface {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 18px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #FFA500;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .filter-group {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .filter-label {
+            color: #FFA500;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .filter-select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 5px;
+            padding: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .advanced-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-chip {
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid rgba(255, 165, 0, 0.4);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-chip.active {
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        .search-results {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .results-count {
+            font-size: 18px;
+            color: #FFA500;
+        }
+
+        .sort-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .sort-btn {
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid rgba(255, 165, 0, 0.4);
+            border-radius: 5px;
+            padding: 8px 15px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sort-btn.active {
+            background: #FFA500;
+            color: #1a1a2e;
+        }
+
+        .market-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .market-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .market-card:hover {
+            transform: translateY(-2px);
+            border-color: #FFA500;
+            background: rgba(255, 165, 0, 0.05);
+        }
+
+        .market-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .market-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .market-category {
+            display: inline-block;
+            background: rgba(255, 165, 0, 0.2);
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #FFA500;
+        }
+
+        .market-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #FFD700;
+        }
+
+        .market-odds {
+            display: flex;
+            gap: 10px;
+        }
+
+        .odds-option {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .odds-option:hover {
+            background: rgba(255, 165, 0, 0.1);
+            border-color: #FFA500;
+        }
+
+        .odds-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .odds-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #FFA500;
+        }
+
+        .search-suggestions {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            margin-top: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .suggestion-title {
+            color: #FFA500;
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .suggestion-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .suggestion-chip {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 15px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: #FFA500;
+        }
+
+        .ai-search {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(255, 165, 0, 0.1));
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .ai-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #8A2BE2, #FFA500);
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .ai-query {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-style: italic;
+            color: #ddd;
+        }
+
+        .ai-results {
+            display: grid;
+            gap: 10px;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 165, 0, 0.3);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .step-indicator {
+            background: rgba(255, 165, 0, 0.2);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .narrator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #FFA500;
+            border-radius: 20px;
+            padding: 30px 40px;
+            max-width: 600px;
+            z-index: 2000;
+            display: none;
+        }
+
+        .narrator.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .narrator-title {
+            font-size: 24px;
+            color: #FFA500;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .narrator-content {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #fff;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -45%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .highlight {
+            animation: pulse 1.5s ease infinite;
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
+        }
+
+        @keyframes searchPulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.4);
+            }
+            50% { 
+                transform: scale(1.02);
+                box-shadow: 0 0 20px 5px rgba(255, 165, 0, 0.2);
+            }
+        }
+
+        .searching {
+            animation: searchPulse 1s ease infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="header">
+            <h1>🔍 BOOM Market Search Demo</h1>
+            <p>Advanced Multi-Platform Search & Discovery System</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div class="main-content">
+            <!-- Search Interface -->
+            <div class="search-interface" id="searchInterface">
+                <div class="search-bar">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search markets across all platforms...">
+                    <button class="search-btn" id="searchBtn">Search</button>
+                </div>
+
+                <div class="filters" id="filters">
+                    <div class="filter-group">
+                        <div class="filter-label">Platform</div>
+                        <select class="filter-select" id="platformFilter">
+                            <option value="all">All Platforms</option>
+                            <option value="polymarket">Polymarket</option>
+                            <option value="draftkings">DraftKings</option>
+                            <option value="fanduel">FanDuel</option>
+                            <option value="betmgm">BetMGM</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <div class="filter-label">Category</div>
+                        <select class="filter-select" id="categoryFilter">
+                            <option value="all">All Categories</option>
+                            <option value="politics">Politics</option>
+                            <option value="sports">Sports</option>
+                            <option value="crypto">Crypto</option>
+                            <option value="economics">Economics</option>
+                            <option value="entertainment">Entertainment</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <div class="filter-label">Time Frame</div>
+                        <select class="filter-select" id="timeFilter">
+                            <option value="all">All Times</option>
+                            <option value="flash">Flash (< 5 min)</option>
+                            <option value="hourly">Hourly</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <div class="filter-label">Volume</div>
+                        <select class="filter-select" id="volumeFilter">
+                            <option value="all">Any Volume</option>
+                            <option value="high">High (> $1M)</option>
+                            <option value="medium">Medium ($100K-$1M)</option>
+                            <option value="low">Low (< $100K)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="advanced-filters" id="advancedFilters">
+                    <div class="filter-chip" data-filter="trending">🔥 Trending</div>
+                    <div class="filter-chip" data-filter="new">✨ New Markets</div>
+                    <div class="filter-chip" data-filter="closing">⏰ Closing Soon</div>
+                    <div class="filter-chip" data-filter="highyield">💰 High Yield</div>
+                    <div class="filter-chip" data-filter="verse">🌳 Verse Markets</div>
+                    <div class="filter-chip" data-filter="quantum">⚛️ Quantum Eligible</div>
+                    <div class="filter-chip" data-filter="leveraged">📊 Leverage Available</div>
+                    <div class="filter-chip" data-filter="arbitrage">🔄 Arbitrage Opportunity</div>
+                </div>
+
+                <div class="search-suggestions" id="searchSuggestions" style="display: none;">
+                    <div class="suggestion-title">Popular Searches</div>
+                    <div class="suggestion-list" id="suggestionList"></div>
+                </div>
+
+                <div class="ai-search" id="aiSearch" style="display: none;">
+                    <div class="ai-badge">AI-Powered Search</div>
+                    <div class="ai-query" id="aiQuery"></div>
+                    <div class="ai-results" id="aiResults"></div>
+                </div>
+            </div>
+
+            <!-- Search Results -->
+            <div class="search-results" id="searchResults">
+                <div class="results-header">
+                    <div class="results-count" id="resultsCount">0 Markets Found</div>
+                    <div class="sort-options">
+                        <button class="sort-btn active" data-sort="relevance">Relevance</button>
+                        <button class="sort-btn" data-sort="volume">Volume</button>
+                        <button class="sort-btn" data-sort="odds">Best Odds</button>
+                        <button class="sort-btn" data-sort="closing">Closing Soon</button>
+                    </div>
+                </div>
+                <div class="market-grid" id="marketGrid"></div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="control-btn" id="prevBtn" disabled>Previous</button>
+            <div class="step-indicator">
+                <span>Step</span>
+                <span id="currentStep">1</span>
+                <span>/</span>
+                <span id="totalSteps">60</span>
+            </div>
+            <button class="control-btn" id="nextBtn">Next</button>
+            <button class="control-btn" id="playBtn">Auto Play</button>
+            <div class="speed-control">
+                <label>Speed:</label>
+                <select id="speedSelect">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Narrator -->
+        <div class="narrator" id="narrator">
+            <div class="narrator-title" id="narratorTitle"></div>
+            <div class="narrator-content" id="narratorContent"></div>
+        </div>
+    </div>
+
+    <script>
+        class MarketSearchDemo {
+            constructor() {
+                this.currentStep = 1;
+                this.totalSteps = 60;
+                this.isPlaying = false;
+                this.speed = 1;
+                this.playInterval = null;
+                this.narratorTimer = null;
+                
+                this.searchInput = document.getElementById('searchInput');
+                this.marketGrid = document.getElementById('marketGrid');
+                this.resultsCount = document.getElementById('resultsCount');
+                
+                this.init();
+            }
+
+            init() {
+                this.setupControls();
+                this.showStep(1);
+            }
+
+            setupControls() {
+                document.getElementById('nextBtn').addEventListener('click', () => this.nextStep());
+                document.getElementById('prevBtn').addEventListener('click', () => this.prevStep());
+                document.getElementById('playBtn').addEventListener('click', () => this.togglePlay());
+                document.getElementById('speedSelect').addEventListener('change', (e) => {
+                    this.speed = parseFloat(e.target.value);
+                });
+
+                // Setup filter chips
+                document.querySelectorAll('.filter-chip').forEach(chip => {
+                    chip.addEventListener('click', () => {
+                        chip.classList.toggle('active');
+                    });
+                });
+
+                // Setup sort buttons
+                document.querySelectorAll('.sort-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    });
+                });
+            }
+
+            showNarrator(title, content) {
+                const narrator = document.getElementById('narrator');
+                document.getElementById('narratorTitle').textContent = title;
+                document.getElementById('narratorContent').textContent = content;
+                narrator.classList.add('active');
+
+                clearTimeout(this.narratorTimer);
+                this.narratorTimer = setTimeout(() => {
+                    this.hideNarrator();
+                }, 5000 / this.speed);
+            }
+
+            hideNarrator() {
+                const narrator = document.getElementById('narrator');
+                narrator.classList.remove('active');
+                
+                if (this.isPlaying) {
+                    setTimeout(() => this.nextStep(), 3000 / this.speed);
+                }
+            }
+
+            typeText(element, text, callback) {
+                element.value = '';
+                let index = 0;
+                const typeInterval = setInterval(() => {
+                    if (index < text.length) {
+                        element.value += text[index];
+                        index++;
+                    } else {
+                        clearInterval(typeInterval);
+                        if (callback) callback();
+                    }
+                }, 50 / this.speed);
+            }
+
+            createMarketCard(data) {
+                return `
+                    <div class="market-card">
+                        <div class="market-header">
+                            <div>
+                                <div class="market-title">${data.title}</div>
+                                <span class="market-category">${data.category}</span>
+                            </div>
+                        </div>
+                        <div class="market-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">Volume</div>
+                                <div class="stat-value">${data.volume}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Platform</div>
+                                <div class="stat-value">${data.platform}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Closes</div>
+                                <div class="stat-value">${data.closes}</div>
+                            </div>
+                        </div>
+                        <div class="market-odds">
+                            <div class="odds-option">
+                                <div class="odds-label">Yes</div>
+                                <div class="odds-value">${data.yesOdds}%</div>
+                            </div>
+                            <div class="odds-option">
+                                <div class="odds-label">No</div>
+                                <div class="odds-value">${data.noOdds}%</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showStep(step) {
+                this.currentStep = step;
+                this.updateProgress();
+                this.updateControls();
+
+                // Clear highlights
+                document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+                document.querySelectorAll('.searching').forEach(el => el.classList.remove('searching'));
+
+                switch(step) {
+                    case 1:
+                        this.showNarrator("Welcome to BOOM Market Search", 
+                            "Let's explore BOOM's advanced multi-platform market search system that aggregates markets from Polymarket, DraftKings, FanDuel, and more!");
+                        break;
+
+                    case 2:
+                        this.showNarrator("Unified Search Interface", 
+                            "BOOM provides a single search bar to find markets across all connected platforms simultaneously");
+                        document.getElementById('searchInterface').classList.add('highlight');
+                        break;
+
+                    case 3:
+                        this.showNarrator("Basic Text Search", 
+                            "Let's start with a simple search for 'presidential election' markets");
+                        this.typeText(this.searchInput, "presidential election");
+                        break;
+
+                    case 4:
+                        this.showNarrator("Real-Time Search Results", 
+                            "BOOM queries all platforms in parallel, aggregating results in under 200ms");
+                        this.searchInput.classList.add('searching');
+                        setTimeout(() => {
+                            this.marketGrid.innerHTML = `
+                                ${this.createMarketCard({
+                                    title: "2024 US Presidential Election Winner",
+                                    category: "Politics",
+                                    volume: "$45.2M",
+                                    platform: "Polymarket",
+                                    closes: "Nov 5",
+                                    yesOdds: "52",
+                                    noOdds: "48"
+                                })}
+                                ${this.createMarketCard({
+                                    title: "Next President - Electoral College",
+                                    category: "Politics",
+                                    volume: "$2.1M",
+                                    platform: "DraftKings",
+                                    closes: "Nov 4",
+                                    yesOdds: "51",
+                                    noOdds: "49"
+                                })}
+                            `;
+                            this.resultsCount.textContent = "2 Markets Found";
+                        }, 500 / this.speed);
+                        break;
+
+                    case 5:
+                        this.showNarrator("Platform Filtering", 
+                            "Filter results by specific platforms to focus on your preferred betting sites");
+                        document.getElementById('platformFilter').value = 'polymarket';
+                        document.getElementById('platformFilter').classList.add('highlight');
+                        break;
+
+                    case 6:
+                        this.showNarrator("Category Filtering", 
+                            "BOOM automatically categorizes all markets: Politics, Sports, Crypto, Economics, Entertainment");
+                        document.getElementById('categoryFilter').value = 'sports';
+                        document.getElementById('categoryFilter').classList.add('highlight');
+                        break;
+
+                    case 7:
+                        this.showNarrator("Time-Based Filtering", 
+                            "Filter by market duration - from 60-second flash bets to monthly predictions");
+                        document.getElementById('timeFilter').value = 'flash';
+                        document.getElementById('timeFilter').classList.add('highlight');
+                        break;
+
+                    case 8:
+                        this.showNarrator("Volume Filtering", 
+                            "Find high-liquidity markets for large trades or low-volume markets for better odds");
+                        document.getElementById('volumeFilter').value = 'high';
+                        document.getElementById('volumeFilter').classList.add('highlight');
+                        break;
+
+                    case 9:
+                        this.showNarrator("Advanced Filter Chips", 
+                            "Quick filters for trending markets, new listings, and special opportunities");
+                        document.getElementById('advancedFilters').classList.add('highlight');
+                        document.querySelector('[data-filter="trending"]').classList.add('active');
+                        break;
+
+                    case 10:
+                        this.showNarrator("Trending Markets", 
+                            "See markets with rapidly increasing volume and participation");
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "Bitcoin to hit $100K this week? 🔥",
+                                category: "Crypto",
+                                volume: "$12.3M ↑85%",
+                                platform: "Polymarket",
+                                closes: "3 days",
+                                yesOdds: "28",
+                                noOdds: "72"
+                            })}
+                        `;
+                        break;
+
+                    case 11:
+                        this.showNarrator("New Market Alerts", 
+                            "Discover markets created in the last 24 hours before others find them");
+                        document.querySelector('[data-filter="new"]').classList.add('active');
+                        break;
+
+                    case 12:
+                        this.showNarrator("Closing Soon Filter", 
+                            "Find markets about to close for last-minute opportunities");
+                        document.querySelector('[data-filter="closing"]').classList.add('active');
+                        this.marketGrid.innerHTML += `
+                            ${this.createMarketCard({
+                                title: "Lakers vs Warriors - Total Points Over 220? ⏰",
+                                category: "Sports",
+                                volume: "$450K",
+                                platform: "DraftKings",
+                                closes: "45 min",
+                                yesOdds: "44",
+                                noOdds: "56"
+                            })}
+                        `;
+                        break;
+
+                    case 13:
+                        this.showNarrator("High Yield Markets", 
+                            "Identify markets with the best potential returns based on odds and volatility");
+                        document.querySelector('[data-filter="highyield"]').classList.add('active');
+                        break;
+
+                    case 14:
+                        this.showNarrator("Verse-Enabled Markets", 
+                            "Filter for markets that support BOOM's verse hierarchy system");
+                        document.querySelector('[data-filter="verse"]').classList.add('active');
+                        break;
+
+                    case 15:
+                        this.showNarrator("Quantum-Eligible Markets", 
+                            "Find markets that can be combined into quantum superposition bundles");
+                        document.querySelector('[data-filter="quantum"]').classList.add('active');
+                        break;
+
+                    case 16:
+                        this.showNarrator("Leverage Available", 
+                            "See only markets where leverage trading is supported");
+                        document.querySelector('[data-filter="leveraged"]').classList.add('active');
+                        break;
+
+                    case 17:
+                        this.showNarrator("Arbitrage Scanner", 
+                            "BOOM automatically detects price differences across platforms");
+                        document.querySelector('[data-filter="arbitrage"]').classList.add('active');
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "Fed Rate Cut This Month? 🔄 ARB OPPORTUNITY",
+                                category: "Economics",
+                                volume: "$5.2M",
+                                platform: "Multi",
+                                closes: "2 weeks",
+                                yesOdds: "Poly: 65% | DK: 71%",
+                                noOdds: "6% spread!"
+                            })}
+                        `;
+                        break;
+
+                    case 18:
+                        this.showNarrator("Search Suggestions", 
+                            "BOOM provides intelligent suggestions based on trending topics and your history");
+                        document.getElementById('searchSuggestions').style.display = 'block';
+                        document.getElementById('suggestionList').innerHTML = `
+                            <span class="suggestion-chip">Super Bowl Winner</span>
+                            <span class="suggestion-chip">Ethereum $5000</span>
+                            <span class="suggestion-chip">AI Breakthrough 2024</span>
+                            <span class="suggestion-chip">Fed Rate Decision</span>
+                            <span class="suggestion-chip">Taylor Swift Tour</span>
+                        `;
+                        break;
+
+                    case 19:
+                        this.showNarrator("Complex Query Example", 
+                            "Let's search for NFL games with specific conditions");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "NFL touchdown first quarter odds > 60%");
+                        break;
+
+                    case 20:
+                        this.showNarrator("Natural Language Processing", 
+                            "BOOM understands complex queries and translates them to market searches");
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "Chiefs vs Bills - First Quarter TD",
+                                category: "Sports",
+                                volume: "$780K",
+                                platform: "FanDuel",
+                                closes: "Sunday",
+                                yesOdds: "68",
+                                noOdds: "32"
+                            })}
+                            ${this.createMarketCard({
+                                title: "Cowboys vs Eagles - Q1 Touchdown",
+                                category: "Sports",
+                                volume: "$620K",
+                                platform: "DraftKings",
+                                closes: "Sunday",
+                                yesOdds: "71",
+                                noOdds: "29"
+                            })}
+                        `;
+                        this.resultsCount.textContent = "2 Markets Found";
+                        break;
+
+                    case 21:
+                        this.showNarrator("AI-Powered Search", 
+                            "BOOM's AI understands context and intent, not just keywords");
+                        document.getElementById('aiSearch').style.display = 'block';
+                        document.getElementById('aiQuery').textContent = '"Find me safe bets with good returns this week"';
+                        break;
+
+                    case 22:
+                        this.showNarrator("AI Recommendations", 
+                            "The AI analyzes historical data, current trends, and risk profiles");
+                        document.getElementById('aiResults').innerHTML = `
+                            <div style="color: #FFA500; margin-bottom: 10px;">✨ AI found 3 markets matching your criteria:</div>
+                            <div style="color: #888; font-size: 14px;">• S&P 500 above 5000 (82% probability, low volatility)</div>
+                            <div style="color: #888; font-size: 14px;">• Apple earnings beat estimates (74% probability, moderate risk)</div>
+                            <div style="color: #888; font-size: 14px;">• Gold price stable ±2% (91% probability, very low risk)</div>
+                        `;
+                        break;
+
+                    case 23:
+                        this.showNarrator("Sorting Options", 
+                            "Sort results by relevance, volume, best odds, or closing time");
+                        document.querySelector('[data-sort="volume"]').click();
+                        break;
+
+                    case 24:
+                        this.showNarrator("Volume-Based Sorting", 
+                            "Markets are now sorted by total trading volume for liquidity");
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "2024 Presidential Election",
+                                category: "Politics",
+                                volume: "$45.2M",
+                                platform: "Polymarket",
+                                closes: "Nov 5",
+                                yesOdds: "52",
+                                noOdds: "48"
+                            })}
+                            ${this.createMarketCard({
+                                title: "Bitcoin $100K by EOY",
+                                category: "Crypto",
+                                volume: "$12.3M",
+                                platform: "Polymarket",
+                                closes: "Dec 31",
+                                yesOdds: "35",
+                                noOdds: "65"
+                            })}
+                        `;
+                        break;
+
+                    case 25:
+                        this.showNarrator("Best Odds Sorting", 
+                            "Find markets with the most favorable odds for your position");
+                        document.querySelector('[data-sort="odds"]').click();
+                        break;
+
+                    case 26:
+                        this.showNarrator("Cross-Platform Search", 
+                            "Let's search for 'Super Bowl' across all platforms");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "Super Bowl");
+                        break;
+
+                    case 27:
+                        this.showNarrator("Multi-Platform Results", 
+                            "BOOM shows the same market from different platforms with price comparison");
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "Super Bowl Winner - Chiefs",
+                                category: "Sports",
+                                volume: "$8.2M",
+                                platform: "Polymarket",
+                                closes: "Feb 11",
+                                yesOdds: "28",
+                                noOdds: "72"
+                            })}
+                            ${this.createMarketCard({
+                                title: "Kansas City Chiefs Win Super Bowl",
+                                category: "Sports",
+                                volume: "$4.5M",
+                                platform: "DraftKings",
+                                closes: "Feb 11",
+                                yesOdds: "31",
+                                noOdds: "69"
+                            })}
+                            ${this.createMarketCard({
+                                title: "Chiefs Championship",
+                                category: "Sports",
+                                volume: "$3.1M",
+                                platform: "FanDuel",
+                                closes: "Feb 11",
+                                yesOdds: "29",
+                                noOdds: "71"
+                            })}
+                        `;
+                        this.resultsCount.textContent = "3 Markets Found (Same Event, Different Platforms)";
+                        break;
+
+                    case 28:
+                        this.showNarrator("Regex Pattern Search", 
+                            "Advanced users can use regex patterns for precise searches");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "/bitcoin.*100[kK]/i");
+                        break;
+
+                    case 29:
+                        this.showNarrator("Regex Results", 
+                            "The regex matches all Bitcoin markets mentioning 100K in any format");
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "Bitcoin reaches 100k before 2025",
+                                category: "Crypto",
+                                volume: "$5.2M",
+                                platform: "Polymarket",
+                                closes: "Dec 31",
+                                yesOdds: "35",
+                                noOdds: "65"
+                            })}
+                            ${this.createMarketCard({
+                                title: "BTC to 100K this cycle?",
+                                category: "Crypto",
+                                volume: "$2.8M",
+                                platform: "Polymarket",
+                                closes: "2025",
+                                yesOdds: "62",
+                                noOdds: "38"
+                            })}
+                        `;
+                        break;
+
+                    case 30:
+                        this.showNarrator("Saved Searches", 
+                            "Save complex search queries for quick access later");
+                        const savedSearches = document.createElement('div');
+                        savedSearches.innerHTML = `
+                            <div style="background: rgba(255,165,0,0.1); padding: 15px; border-radius: 10px; margin-top: 15px;">
+                                <div style="color: #FFA500; font-weight: 600; margin-bottom: 10px;">📌 Saved Searches</div>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <span class="suggestion-chip">My Crypto Watchlist</span>
+                                    <span class="suggestion-chip">High Volume Sports</span>
+                                    <span class="suggestion-chip">Political Arbitrage</span>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('searchInterface').appendChild(savedSearches);
+                        break;
+
+                    case 31:
+                        this.showNarrator("Search History", 
+                            "BOOM remembers your recent searches for quick re-access");
+                        break;
+
+                    case 32:
+                        this.showNarrator("Verse Search Integration", 
+                            "Search within specific verse hierarchies");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "verse:Politics/US/Presidential");
+                        break;
+
+                    case 33:
+                        this.showNarrator("Verse-Filtered Results", 
+                            "All results are now from the Politics > US > Presidential verse branch");
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "Democratic Nominee Wins Popular Vote",
+                                category: "Politics > US > Presidential",
+                                volume: "$3.2M",
+                                platform: "Polymarket",
+                                closes: "Nov 5",
+                                yesOdds: "58",
+                                noOdds: "42"
+                            })}
+                        `;
+                        break;
+
+                    case 34:
+                        this.showNarrator("Quantum Bundle Search", 
+                            "Find pre-configured quantum bundles or markets eligible for bundling");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "quantum:tech disruption");
+                        break;
+
+                    case 35:
+                        this.showNarrator("Quantum Search Results", 
+                            "BOOM shows both individual markets and suggested quantum bundles");
+                        this.marketGrid.innerHTML = `
+                            <div style="background: linear-gradient(135deg, rgba(138,43,226,0.1), rgba(255,165,0,0.1)); padding: 20px; border-radius: 15px; margin-bottom: 15px;">
+                                <div style="color: #8A2BE2; font-weight: 600; margin-bottom: 10px;">⚛️ Quantum Bundle: Tech Disruption 2024</div>
+                                <div style="color: #888;">• AI beats human in coding contest (35%)</div>
+                                <div style="color: #888;">• Quantum computer breaks RSA (12%)</div>
+                                <div style="color: #888;">• Self-driving car Level 5 achieved (28%)</div>
+                                <div style="color: #FFD700; margin-top: 10px;">Combined Probability: 18.4% | Potential Return: 5.4x</div>
+                            </div>
+                        `;
+                        break;
+
+                    case 36:
+                        this.showNarrator("Odds Range Search", 
+                            "Search for markets within specific odds ranges");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "odds:40-60");
+                        break;
+
+                    case 37:
+                        this.showNarrator("Balanced Odds Markets", 
+                            "These markets have relatively balanced odds, indicating uncertainty");
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "Fed Raises Rates in March",
+                                category: "Economics",
+                                volume: "$2.1M",
+                                platform: "Polymarket",
+                                closes: "Mar 20",
+                                yesOdds: "47",
+                                noOdds: "53"
+                            })}
+                            ${this.createMarketCard({
+                                title: "Tesla Stock Above $300 by April",
+                                category: "Stocks",
+                                volume: "$890K",
+                                platform: "Polymarket",
+                                closes: "Apr 1",
+                                yesOdds: "44",
+                                noOdds: "56"
+                            })}
+                        `;
+                        break;
+
+                    case 38:
+                        this.showNarrator("Date Range Search", 
+                            "Find markets closing within specific time windows");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "closes:next-24h");
+                        break;
+
+                    case 39:
+                        this.showNarrator("Urgent Markets", 
+                            "Markets closing in the next 24 hours requiring immediate attention");
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "Tonight's NBA: Lakers Score 110+",
+                                category: "Sports",
+                                volume: "$120K",
+                                platform: "DraftKings",
+                                closes: "8 hours",
+                                yesOdds: "62",
+                                noOdds: "38"
+                            })}
+                        `;
+                        break;
+
+                    case 40:
+                        this.showNarrator("Creator Search", 
+                            "Find markets created by specific users or verified creators");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "creator:verified");
+                        break;
+
+                    case 41:
+                        this.showNarrator("Verified Creator Markets", 
+                            "These markets are created by verified, reputable market makers");
+                        const verifiedBadge = `<span style="background: #4CAF50; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-left: 5px;">✓ VERIFIED</span>`;
+                        break;
+
+                    case 42:
+                        this.showNarrator("Liquidity Search", 
+                            "Search based on available liquidity for large trades");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "liquidity:>1M");
+                        break;
+
+                    case 43:
+                        this.showNarrator("High Liquidity Markets", 
+                            "These markets can handle large trades without significant slippage");
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "2024 Presidential Election",
+                                category: "Politics",
+                                volume: "$45.2M",
+                                platform: "Polymarket",
+                                closes: "Nov 5",
+                                yesOdds: "52",
+                                noOdds: "48"
+                            })}
+                        `;
+                        break;
+
+                    case 44:
+                        this.showNarrator("Combo Search", 
+                            "Combine multiple search criteria for precise results");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "crypto odds:>70 volume:>500k");
+                        break;
+
+                    case 45:
+                        this.showNarrator("Multi-Criteria Results", 
+                            "High-confidence crypto markets with significant volume");
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "Ethereum Stays Above $2000",
+                                category: "Crypto",
+                                volume: "$780K",
+                                platform: "Polymarket",
+                                closes: "1 week",
+                                yesOdds: "78",
+                                noOdds: "22"
+                            })}
+                        `;
+                        break;
+
+                    case 46:
+                        this.showNarrator("Negative Search", 
+                            "Exclude specific terms or criteria from results");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "sports -football -soccer");
+                        break;
+
+                    case 47:
+                        this.showNarrator("Exclusion Results", 
+                            "Sports markets excluding football and soccer");
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "NBA: Warriors Win Tonight",
+                                category: "Sports",
+                                volume: "$340K",
+                                platform: "DraftKings",
+                                closes: "6 hours",
+                                yesOdds: "55",
+                                noOdds: "45"
+                            })}
+                            ${this.createMarketCard({
+                                title: "Tennis: Djokovic Wins Australian Open",
+                                category: "Sports",
+                                volume: "$210K",
+                                platform: "FanDuel",
+                                closes: "2 weeks",
+                                yesOdds: "42",
+                                noOdds: "58"
+                            })}
+                        `;
+                        break;
+
+                    case 48:
+                        this.showNarrator("Flash Market Search", 
+                            "Find ultra-short-term markets closing in minutes");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "flash:active");
+                        break;
+
+                    case 49:
+                        this.showNarrator("Active Flash Markets", 
+                            "60-second to 5-minute markets for rapid trading");
+                        this.marketGrid.innerHTML = `
+                            ${this.createMarketCard({
+                                title: "Next Goal in Liverpool Match? ⚡",
+                                category: "Flash",
+                                volume: "$45K",
+                                platform: "BOOM Flash",
+                                closes: "3:47",
+                                yesOdds: "35",
+                                noOdds: "65"
+                            })}
+                            ${this.createMarketCard({
+                                title: "Bitcoin Moves $100 in Next 60s? ⚡",
+                                category: "Flash",
+                                volume: "$28K",
+                                platform: "BOOM Flash",
+                                closes: "0:52",
+                                yesOdds: "18",
+                                noOdds: "82"
+                            })}
+                        `;
+                        break;
+
+                    case 50:
+                        this.showNarrator("Related Markets", 
+                            "BOOM suggests related markets based on your current search");
+                        const relatedSection = document.createElement('div');
+                        relatedSection.innerHTML = `
+                            <div style="background: rgba(255,165,0,0.05); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <div style="color: #FFA500; font-weight: 600; margin-bottom: 15px;">🔗 Related Markets You Might Like</div>
+                                <div style="display: grid; gap: 10px;">
+                                    <div style="padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                                        <div style="color: #fff;">If you're interested in "Bitcoin $100K", you might also like:</div>
+                                        <div style="color: #888; font-size: 14px; margin-top: 5px;">• Ethereum $5000 by EOY (correlated 0.82)</div>
+                                        <div style="color: #888; font-size: 14px;">• Crypto Market Cap $5T (correlated 0.91)</div>
+                                        <div style="color: #888; font-size: 14px;">• Bitcoin ETF Approval (correlated 0.67)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('searchResults').appendChild(relatedSection);
+                        break;
+
+                    case 51:
+                        this.showNarrator("Search Analytics", 
+                            "BOOM tracks search trends to show what's popular");
+                        const analytics = document.createElement('div');
+                        analytics.innerHTML = `
+                            <div style="background: rgba(138,43,226,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <div style="color: #8A2BE2; font-weight: 600; margin-bottom: 15px;">📊 Trending Searches (Last Hour)</div>
+                                <div style="display: grid; gap: 8px;">
+                                    <div style="color: #fff;">1. "Super Bowl" ↑ 450%</div>
+                                    <div style="color: #fff;">2. "Bitcoin 100K" ↑ 220%</div>
+                                    <div style="color: #fff;">3. "Fed Rate Cut" ↑ 180%</div>
+                                    <div style="color: #fff;">4. "AI Breakthrough" ↑ 150%</div>
+                                    <div style="color: #fff;">5. "Election 2024" ↑ 120%</div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('searchInterface').appendChild(analytics);
+                        break;
+
+                    case 52:
+                        this.showNarrator("Voice Search", 
+                            "BOOM supports voice search for hands-free market discovery");
+                        const voiceBtn = document.createElement('button');
+                        voiceBtn.innerHTML = '🎤';
+                        voiceBtn.style.cssText = 'background: linear-gradient(135deg, #FFA500, #FFD700); border: none; border-radius: 10px; padding: 15px; font-size: 24px; cursor: pointer; margin-left: 10px;';
+                        document.querySelector('.search-bar').appendChild(voiceBtn);
+                        break;
+
+                    case 53:
+                        this.showNarrator("Image Search", 
+                            "Upload screenshots or images to find related markets");
+                        const imageBtn = document.createElement('button');
+                        imageBtn.innerHTML = '📷';
+                        imageBtn.style.cssText = 'background: linear-gradient(135deg, #FFA500, #FFD700); border: none; border-radius: 10px; padding: 15px; font-size: 24px; cursor: pointer; margin-left: 10px;';
+                        document.querySelector('.search-bar').appendChild(imageBtn);
+                        break;
+
+                    case 54:
+                        this.showNarrator("Search API", 
+                            "Developers can integrate BOOM search via REST API or WebSocket");
+                        const apiExample = document.createElement('div');
+                        apiExample.innerHTML = `
+                            <div style="background: #000; padding: 20px; border-radius: 10px; margin-top: 20px; font-family: monospace;">
+                                <div style="color: #4CAF50;">// REST API Example</div>
+                                <div style="color: #fff;">GET /api/search?q=bitcoin&platform=all&limit=10</div>
+                                <div style="color: #888; margin-top: 10px;">// WebSocket Subscription</div>
+                                <div style="color: #fff;">ws.send({action: "subscribe", query: "bitcoin", filters: {...}})</div>
+                            </div>
+                        `;
+                        document.getElementById('searchInterface').appendChild(apiExample);
+                        break;
+
+                    case 55:
+                        this.showNarrator("Export Search Results", 
+                            "Export search results to CSV, JSON, or share via link");
+                        const exportBtns = document.createElement('div');
+                        exportBtns.innerHTML = `
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <button style="background: rgba(255,165,0,0.2); border: 1px solid #FFA500; border-radius: 5px; padding: 8px 15px; color: #fff; cursor: pointer;">📊 Export CSV</button>
+                                <button style="background: rgba(255,165,0,0.2); border: 1px solid #FFA500; border-radius: 5px; padding: 8px 15px; color: #fff; cursor: pointer;">📋 Copy JSON</button>
+                                <button style="background: rgba(255,165,0,0.2); border: 1px solid #FFA500; border-radius: 5px; padding: 8px 15px; color: #fff; cursor: pointer;">🔗 Share Link</button>
+                            </div>
+                        `;
+                        document.querySelector('.results-header').appendChild(exportBtns);
+                        break;
+
+                    case 56:
+                        this.showNarrator("Search Alerts", 
+                            "Set up alerts for when new markets match your search criteria");
+                        const alertSetup = document.createElement('div');
+                        alertSetup.innerHTML = `
+                            <div style="background: linear-gradient(135deg, rgba(76,175,80,0.1), rgba(255,165,0,0.1)); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <div style="color: #4CAF50; font-weight: 600; margin-bottom: 10px;">🔔 Alert Created!</div>
+                                <div style="color: #fff;">You'll be notified when new markets match: "Bitcoin AND odds:>70"</div>
+                                <div style="color: #888; font-size: 14px; margin-top: 10px;">Notification channels: Email, SMS, Push, Discord</div>
+                            </div>
+                        `;
+                        document.getElementById('searchInterface').appendChild(alertSetup);
+                        break;
+
+                    case 57:
+                        this.showNarrator("Personalized Search", 
+                            "BOOM learns your preferences to improve search relevance over time");
+                        break;
+
+                    case 58:
+                        this.showNarrator("Multi-Language Support", 
+                            "Search in 15+ languages with automatic translation");
+                        this.searchInput.value = '';
+                        this.typeText(this.searchInput, "选举 2024");  // Chinese for "election 2024"
+                        break;
+
+                    case 59:
+                        this.showNarrator("Search Performance", 
+                            "BOOM's distributed search infrastructure ensures <200ms response times globally");
+                        const perfStats = document.createElement('div');
+                        perfStats.innerHTML = `
+                            <div style="background: rgba(0,255,0,0.1); padding: 15px; border-radius: 10px; margin-top: 20px;">
+                                <div style="color: #4CAF50; font-weight: 600; margin-bottom: 10px;">⚡ Search Performance</div>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                                    <div style="text-align: center;">
+                                        <div style="color: #FFD700; font-size: 24px; font-weight: bold;">187ms</div>
+                                        <div style="color: #888; font-size: 12px;">Avg Response Time</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="color: #FFD700; font-size: 24px; font-weight: bold;">99.9%</div>
+                                        <div style="color: #888; font-size: 12px;">Uptime</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="color: #FFD700; font-size: 24px; font-weight: bold;">10M+</div>
+                                        <div style="color: #888; font-size: 12px;">Searches/Day</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('searchInterface').appendChild(perfStats);
+                        break;
+
+                    case 60:
+                        this.showNarrator("Search Demo Complete! 🎉", 
+                            "You've explored BOOM's comprehensive market search system. From basic text search to AI-powered recommendations, multi-platform aggregation, and real-time filtering - BOOM makes finding the perfect market instant and effortless!");
+                        
+                        // Final summary display
+                        this.marketGrid.innerHTML = `
+                            <div style="background: linear-gradient(135deg, #FFA500, #FFD700); padding: 30px; border-radius: 20px; text-align: center;">
+                                <div style="color: #1a1a2e; font-size: 32px; font-weight: bold; margin-bottom: 20px;">🔍 BOOM Search Features</div>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; color: #1a1a2e; text-align: left;">
+                                    <div>✅ Multi-platform aggregation</div>
+                                    <div>✅ Real-time results (<200ms)</div>
+                                    <div>✅ Natural language queries</div>
+                                    <div>✅ AI-powered recommendations</div>
+                                    <div>✅ Advanced filtering & sorting</div>
+                                    <div>✅ Arbitrage detection</div>
+                                    <div>✅ Verse & Quantum integration</div>
+                                    <div>✅ Voice & image search</div>
+                                    <div>✅ Custom alerts & saved searches</div>
+                                    <div>✅ API & WebSocket access</div>
+                                </div>
+                                <div style="margin-top: 20px; font-size: 20px; font-weight: 600;">Find Any Market, Anywhere, Instantly!</div>
+                            </div>
+                        `;
+                        break;
+                }
+            }
+
+            updateProgress() {
+                const progress = (this.currentStep / this.totalSteps) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+                document.getElementById('currentStep').textContent = this.currentStep;
+            }
+
+            updateControls() {
+                document.getElementById('prevBtn').disabled = this.currentStep === 1;
+                document.getElementById('nextBtn').disabled = this.currentStep === this.totalSteps;
+            }
+
+            nextStep() {
+                if (this.currentStep < this.totalSteps) {
+                    this.showStep(this.currentStep + 1);
+                }
+            }
+
+            prevStep() {
+                if (this.currentStep > 1) {
+                    this.showStep(this.currentStep - 1);
+                }
+            }
+
+            togglePlay() {
+                this.isPlaying = !this.isPlaying;
+                const playBtn = document.getElementById('playBtn');
+                
+                if (this.isPlaying) {
+                    playBtn.textContent = 'Pause';
+                    this.showStep(this.currentStep);
+                } else {
+                    playBtn.textContent = 'Auto Play';
+                    clearTimeout(this.narratorTimer);
+                }
+            }
+        }
+
+        // Initialize demo
+        new MarketSearchDemo();
+    </script>
+</body>
+</html>

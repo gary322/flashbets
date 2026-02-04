@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiverse Trading Platform - Complete Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-secondary: #141414;
+            --bg-tertiary: #1A1A1A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --text-tertiary: #666666;
+            --accent-green: #00FF88;
+            --accent-red: #FF3333;
+            --accent-yellow: #FFB800;
+            --accent-blue: #3B82F6;
+            --border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', 'SF Mono', Monaco, monospace;
+        }
+
+        /* Demo Navigation */
+        .demo-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            gap: 32px;
+        }
+
+        .nav-logo {
+            font-size: 20px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-right: auto;
+        }
+
+        .nav-item {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            border-color: var(--border-color);
+        }
+
+        .nav-item.active {
+            color: var(--accent-green);
+            background: rgba(0, 255, 136, 0.05);
+            border-color: var(--accent-green);
+        }
+
+        /* Main Container */
+        .demo-container {
+            padding-top: 60px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--bg-primary) 0%, #0F0F0F 100%);
+        }
+
+        /* Demo Sections */
+        .demo-section {
+            padding: 80px 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .demo-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            background: var(--bg-tertiary);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .card-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* Grid Layouts */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--accent-green);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Market Display */
+        .market-display {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .market-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .market-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .market-badge {
+            padding: 6px 12px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--accent-green);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .price-display {
+            display: flex;
+            align-items: baseline;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .price-main {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--text-primary);
+        }
+
+        .price-change {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .price-change.positive {
+            color: var(--accent-green);
+        }
+
+        .price-change.negative {
+            color: var(--accent-red);
+        }
+
+        /* Trading Interface */
+        .trading-interface {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .leverage-slider {
+            margin: 32px 0;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .slider-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .slider-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-yellow);
+        }
+
+        .slider-track {
+            height: 8px;
+            background: linear-gradient(90deg, var(--bg-tertiary) 0%, var(--accent-green) 25%, var(--accent-yellow) 75%, var(--accent-red) 100%);
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .slider-thumb {
+            width: 24px;
+            height: 24px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .slider-thumb:active {
+            cursor: grabbing;
+        }
+
+        /* Flash Betting */
+        .flash-container {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-yellow);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flash-timer {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 80px;
+            height: 80px;
+        }
+
+        .timer-circle {
+            fill: none;
+            stroke: var(--accent-yellow);
+            stroke-width: 4;
+            stroke-dasharray: 220;
+            stroke-dashoffset: 0;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            animation: countdown 30s linear infinite;
+        }
+
+        @keyframes countdown {
+            to { stroke-dashoffset: 220; }
+        }
+
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-yellow);
+        }
+
+        .flash-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .flash-odds {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .odds-card {
+            padding: 24px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .odds-card:hover {
+            border-color: var(--accent-yellow);
+            background: rgba(255, 184, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .odds-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .odds-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--text-primary);
+        }
+
+        /* Quantum Positions */
+        .quantum-display {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(0, 255, 136, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-30px) translateX(10px); }
+            50% { transform: translateY(20px) translateX(-20px); }
+            75% { transform: translateY(-10px) translateX(30px); }
+        }
+
+        .quantum-state {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 24px;
+        }
+
+        .state-item {
+            text-align: center;
+        }
+
+        .state-probability {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 8px;
+        }
+
+        .state-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Verse Hierarchy */
+        .verse-tree {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .verse-node {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .verse-node:hover {
+            border-color: var(--accent-green);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .verse-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-size: 20px;
+        }
+
+        .verse-content {
+            flex: 1;
+        }
+
+        .verse-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .verse-meta {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .verse-children {
+            margin-left: 40px;
+            padding-left: 20px;
+            border-left: 2px solid var(--border-color);
+        }
+
+        /* Order Book */
+        .orderbook {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .orderbook-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .orderbook-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 8px 0;
+            font-size: 14px;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .orderbook-row.buy {
+            color: var(--accent-green);
+        }
+
+        .orderbook-row.sell {
+            color: var(--accent-red);
+        }
+
+        .orderbook-spread {
+            padding: 12px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin: 8px 0;
+        }
+
+        /* Portfolio */
+        .portfolio-overview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .portfolio-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .portfolio-label {
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+        }
+
+        .portfolio-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .portfolio-change {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .portfolio-change.positive {
+            color: var(--accent-green);
+        }
+
+        .portfolio-change.negative {
+            color: var(--accent-red);
+        }
+
+        /* Positions Table */
+        .positions-table {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+            padding: 16px 24px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .table-row:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .position-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .position-pnl {
+            font-weight: 700;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .position-pnl.positive {
+            color: var(--accent-green);
+        }
+
+        .position-pnl.negative {
+            color: var(--accent-red);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-primary {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background: #00E67A;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-green);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .btn-danger {
+            background: var(--accent-red);
+            color: var(--text-primary);
+        }
+
+        .btn-danger:hover {
+            background: #E62E2E;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 51, 51, 0.3);
+        }
+
+        /* Wallet Connection */
+        .wallet-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .wallet-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+        }
+
+        .wallet-address {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Live Updates */
+        .live-feed {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .feed-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .feed-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .feed-content {
+            flex: 1;
+        }
+
+        .feed-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .feed-time {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* Code Examples */
+        .code-block {
+            background: #1E1E1E;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-language {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .code-copy {
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .code-copy:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        pre {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #E5E7EB;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .token-keyword { color: #FF79C6; }
+        .token-string { color: #F1FA8C; }
+        .token-number { color: #BD93F9; }
+        .token-comment { color: #6272A4; }
+        .token-function { color: #50FA7B; }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--accent-green);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .demo-nav {
+                padding: 0 16px;
+            }
+
+            .nav-item {
+                display: none;
+            }
+
+            .demo-section {
+                padding: 40px 16px;
+            }
+
+            .section-title {
+                font-size: 32px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .portfolio-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .table-header,
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="demo-nav">
+        <div class="nav-logo">Multiverse</div>
+        <button class="nav-item active" data-section="intro">Introduction</button>
+        <button class="nav-item" data-section="polymarket">Polymarket</button>
+        <button class="nav-item" data-section="flash">Flash Betting</button>
+        <button class="nav-item" data-section="quantum">Quantum</button>
+        <button class="nav-item" data-section="leverage">Leverage</button>
+        <button class="nav-item" data-section="verse">Verses</button>
+        <button class="nav-item" data-section="trading">Trading</button>
+        <button class="nav-item" data-section="portfolio">Portfolio</button>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="demo-container">
+        <!-- Introduction Section -->
+        <section id="intro" class="demo-section active">
+            <div class="section-header">
+                <h1 class="section-title">Welcome to Multiverse Trading Platform</h1>
+                <p class="section-subtitle">The most advanced prediction market platform with 500x leverage, quantum positions, and sub-minute flash betting</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value mono">$127M</div>
+                    <div class="stat-label">Total Volume</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value mono">500x</div>
+                    <div class="stat-label">Max Leverage</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value mono">14,283</div>
+                    <div class="stat-label">Active Markets</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value mono">5-60s</div>
+                    <div class="stat-label">Flash Markets</div>
+                </div>
+            </div>
+
+            <div class="wallet-section">
+                <h2 class="card-title">Connect Your Wallet</h2>
+                <p class="card-description">Start by connecting your MetaMask or Phantom wallet to access all platform features</p>
+                
+                <div class="wallet-status">
+                    <div class="status-indicator"></div>
+                    <span>Connected</span>
+                    <span class="wallet-address">0x742d...8963</span>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="connectWallet('metamask')">Connect MetaMask</button>
+                    <button class="btn btn-secondary" onclick="connectWallet('phantom')">Connect Phantom</button>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="card">
+                    <h3 class="card-title">🎯 Polymarket Integration</h3>
+                    <p class="card-description">Trade on real-world events with deep liquidity from Polymarket's CTF Exchange. Access thousands of markets on politics, sports, crypto, and more with institutional-grade infrastructure.</p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">⚡ Flash Betting</h3>
+                    <p class="card-description">Experience sub-minute markets with 5-60 second resolution times. Our ZK-powered oracle system ensures instant, verifiable outcomes with DraftKings live data integration.</p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">🔮 Quantum Positions</h3>
+                    <p class="card-description">Enter superposition states where your position exists in multiple outcomes simultaneously. Collapse happens only at observation, maximizing profit potential across all scenarios.</p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">📈 500x Leverage</h3>
+                    <p class="card-description">Achieve up to 500x effective leverage through our innovative 3-step chaining system. Combine base leverage with liquidity provision and hedging multipliers for maximum capital efficiency.</p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">🌳 Verse Hierarchy</h3>
+                    <p class="card-description">Navigate complex market relationships through our verse system. Parent verses branch into child markets, creating depth bonuses and correlation opportunities.</p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">🤖 Advanced AMM</h3>
+                    <p class="card-description">Our micro-tau AMM adjusts pricing dynamically based on time decay, volatility, and market depth. Get better fills with our intelligent routing and MEV protection.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Polymarket Section -->
+        <section id="polymarket" class="demo-section">
+            <div class="section-header">
+                <h1 class="section-title">Polymarket Betting</h1>
+                <p class="section-subtitle">Trade on real-world events with deep liquidity and transparent odds</p>
+            </div>
+
+            <div class="market-display">
+                <div class="market-header">
+                    <h2 class="market-title">Will Bitcoin reach $150,000 by 2025?</h2>
+                    <span class="market-badge">LIVE</span>
+                </div>
+                <div class="price-display">
+                    <span class="price-main mono">65.2%</span>
+                    <span class="price-change positive">+2.5%</span>
+                </div>
+                <p class="card-description">
+                    This market is currently trading at 65.2% probability, indicating the crowd believes there's about a 2 in 3 chance Bitcoin will reach $150,000 before January 1st, 2025. The market has seen $1.2M in volume over the last 24 hours.
+                </p>
+            </div>
+
+            <div class="orderbook">
+                <h3 class="card-title">Order Book</h3>
+                <div class="orderbook-header">
+                    <span>Price</span>
+                    <span>Size</span>
+                    <span>Total</span>
+                </div>
+                <div class="orderbook-row sell">
+                    <span>65.5%</span>
+                    <span>$12,450</span>
+                    <span>$45,820</span>
+                </div>
+                <div class="orderbook-row sell">
+                    <span>65.4%</span>
+                    <span>$8,200</span>
+                    <span>$33,370</span>
+                </div>
+                <div class="orderbook-row sell">
+                    <span>65.3%</span>
+                    <span>$15,670</span>
+                    <span>$25,170</span>
+                </div>
+                <div class="orderbook-spread">Spread: 0.2%</div>
+                <div class="orderbook-row buy">
+                    <span>65.1%</span>
+                    <span>$9,500</span>
+                    <span>$9,500</span>
+                </div>
+                <div class="orderbook-row buy">
+                    <span>65.0%</span>
+                    <span>$18,320</span>
+                    <span>$27,820</span>
+                </div>
+                <div class="orderbook-row buy">
+                    <span>64.9%</span>
+                    <span>$21,180</span>
+                    <span>$49,000</span>
+                </div>
+            </div>
+
+            <div class="trading-interface">
+                <h3 class="card-title">Place Your Trade</h3>
+                <p class="card-description">
+                    Select your position size and leverage. The platform will automatically calculate your potential profit/loss and liquidation price. All trades are executed on-chain through Polymarket's CTF Exchange.
+                </p>
+                
+                <div class="leverage-slider">
+                    <div class="slider-labels">
+                        <div>
+                            <div class="slider-label">Base Leverage</div>
+                            <div class="slider-value mono">50x</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="slider-label">Effective Leverage</div>
+                            <div class="slider-value mono">118x</div>
+                        </div>
+                    </div>
+                    <div class="slider-track">
+                        <div class="slider-thumb" style="left: 50%;"></div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary">Buy YES @ 65.2%</button>
+                    <button class="btn btn-danger">Buy NO @ 34.8%</button>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">JavaScript</span>
+                    <button class="code-copy">Copy</button>
+                </div>
+                <pre><span class="token-comment">// Execute a Polymarket trade with leverage</span>
+<span class="token-keyword">const</span> <span class="token-function">executeTrade</span> = <span class="token-keyword">async</span> () => {
+    <span class="token-keyword">const</span> market = <span class="token-keyword">await</span> polymarket.<span class="token-function">getMarket</span>(<span class="token-string">'0x123...'</span>);
+    <span class="token-keyword">const</span> position = {
+        side: <span class="token-string">'YES'</span>,
+        size: <span class="token-number">10000</span>, <span class="token-comment">// $10,000 USD</span>
+        leverage: <span class="token-number">50</span>,
+        slippage: <span class="token-number">0.5</span> <span class="token-comment">// 0.5% max slippage</span>
+    };
+    
+    <span class="token-keyword">const</span> tx = <span class="token-keyword">await</span> market.<span class="token-function">trade</span>(position);
+    console.<span class="token-function">log</span>(<span class="token-string">'Trade executed:'</span>, tx.hash);
+};</pre>
+            </div>
+        </section>
+
+        <!-- Flash Betting Section -->
+        <section id="flash" class="demo-section">
+            <div class="section-header">
+                <h1 class="section-title">Flash Betting</h1>
+                <p class="section-subtitle">Ultra-fast markets with 5-60 second resolution times</p>
+            </div>
+
+            <div class="flash-container">
+                <div class="flash-timer">
+                    <svg width="80" height="80">
+                        <circle class="timer-circle" cx="40" cy="40" r="35"/>
+                    </svg>
+                    <div class="timer-text mono">30s</div>
+                </div>
+                
+                <h2 class="flash-title">Next Goal in Match: Man City vs Liverpool</h2>
+                <p class="card-description">
+                    Flash market closing in 30 seconds! This market resolves based on whether a goal is scored in the next 60 seconds of play. Data sourced live from DraftKings with ZK-proof verification.
+                </p>
+                
+                <div class="flash-odds">
+                    <div class="odds-card">
+                        <div class="odds-label">YES - Goal Scored</div>
+                        <div class="odds-value mono">28%</div>
+                    </div>
+                    <div class="odds-card">
+                        <div class="odds-label">NO - No Goal</div>
+                        <div class="odds-value mono">72%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">How Flash Betting Works</h3>
+                <p class="card-description">
+                    1. <strong>Market Creation:</strong> Flash markets are automatically created when events enter critical moments (last 5 minutes, final quarter, etc.)<br><br>
+                    2. <strong>Live Data Ingestion:</strong> We pull real-time odds from DraftKings, FanDuel, and BetMGM every 2-5 seconds<br><br>
+                    3. <strong>Micro-Tau Pricing:</strong> Our AMM uses τ = 0.0001/s time decay factor for accurate short-term pricing<br><br>
+                    4. <strong>ZK Resolution:</strong> Outcomes are proven cryptographically within 10 seconds using ark-groth16 circuits<br><br>
+                    5. <strong>Instant Settlement:</strong> Winners receive payouts immediately upon ZK proof verification
+                </p>
+            </div>
+
+            <div class="live-feed">
+                <h3 class="card-title">Recent Flash Markets</h3>
+                <div class="feed-item">
+                    <div class="feed-icon">⚽</div>
+                    <div class="feed-content">
+                        <div class="feed-title">Next Corner: Arsenal vs Chelsea - YES Won @ 43%</div>
+                        <div class="feed-time">12 seconds ago</div>
+                    </div>
+                </div>
+                <div class="feed-item">
+                    <div class="feed-icon">🏀</div>
+                    <div class="feed-content">
+                        <div class="feed-title">Lakers Score in 24s - NO Won @ 61%</div>
+                        <div class="feed-time">28 seconds ago</div>
+                    </div>
+                </div>
+                <div class="feed-item">
+                    <div class="feed-icon">🎾</div>
+                    <div class="feed-content">
+                        <div class="feed-title">Djokovic Ace This Serve - YES Won @ 35%</div>
+                        <div class="feed-time">45 seconds ago</div>
+                    </div>
+                </div>
+                <div class="feed-item">
+                    <div class="feed-icon">⚽</div>
+                    <div class="feed-content">
+                        <div class="feed-title">PSG Yellow Card in 45s - NO Won @ 88%</div>
+                        <div class="feed-time">1 minute ago</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quantum Positions Section -->
+        <section id="quantum" class="demo-section">
+            <div class="section-header">
+                <h1 class="section-title">Quantum Positions</h1>
+                <p class="section-subtitle">Enter superposition states for maximum profit potential</p>
+            </div>
+
+            <div class="quantum-display">
+                <div class="quantum-particles">
+                    <div class="particle" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+                    <div class="particle" style="top: 50%; left: 30%; animation-delay: 1s;"></div>
+                    <div class="particle" style="top: 70%; left: 60%; animation-delay: 2s;"></div>
+                    <div class="particle" style="top: 30%; left: 80%; animation-delay: 3s;"></div>
+                    <div class="particle" style="top: 60%; left: 20%; animation-delay: 4s;"></div>
+                </div>
+                
+                <h2 class="card-title">Current Quantum State</h2>
+                <p class="card-description">
+                    Your position exists in superposition across multiple market outcomes. The wavefunction will collapse upon observation (market resolution), crystallizing into the most profitable state.
+                </p>
+                
+                <div class="quantum-state">
+                    <div class="state-item">
+                        <div class="state-probability mono">42%</div>
+                        <div class="state-label">State |0⟩</div>
+                    </div>
+                    <div class="state-item">
+                        <div class="state-probability mono">31%</div>
+                        <div class="state-label">State |1⟩</div>
+                    </div>
+                    <div class="state-item">
+                        <div class="state-probability mono">27%</div>
+                        <div class="state-label">State |Ψ⟩</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="card">
+                    <h3 class="card-title">Superposition Entry</h3>
+                    <p class="card-description">
+                        Enter quantum positions by trading correlated markets simultaneously. The platform automatically calculates optimal superposition states based on market correlations and your risk profile.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Wavefunction Evolution</h3>
+                    <p class="card-description">
+                        Your position's wavefunction evolves based on market movements and new information. The probability amplitudes adjust in real-time, always seeking the highest expected value outcome.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Collapse Mechanism</h3>
+                    <p class="card-description">
+                        When markets resolve, the quantum state collapses to classical outcomes. Smart contracts ensure you receive the maximum possible payout across all superposed states.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Entanglement Bonus</h3>
+                    <p class="card-description">
+                        Create entangled positions across multiple verses for correlation bonuses. Entangled positions can achieve up to 1.5x additional leverage through quantum interference effects.
+                    </p>
+                </div>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-language">Rust</span>
+                    <button class="code-copy">Copy</button>
+                </div>
+                <pre><span class="token-comment">// Quantum position creation in Solana program</span>
+<span class="token-keyword">pub fn</span> <span class="token-function">create_quantum_position</span>(
+    ctx: Context&lt;CreateQuantum&gt;,
+    markets: Vec&lt;Pubkey&gt;,
+    amplitudes: Vec&lt;f64&gt;,
+) -> Result&lt;()&gt; {
+    <span class="token-keyword">let</span> quantum = &<span class="token-keyword">mut</span> ctx.accounts.quantum_position;
+    
+    <span class="token-comment">// Initialize superposition state</span>
+    quantum.superposition = markets
+        .iter()
+        .zip(amplitudes.iter())
+        .map(|(market, amp)| State {
+            market: *market,
+            amplitude: *amp,
+            phase: <span class="token-number">0.0</span>,
+        })
+        .collect();
+    
+    <span class="token-comment">// Calculate entanglement entropy</span>
+    quantum.entropy = calculate_entropy(&amplitudes);
+    quantum.owner = ctx.accounts.user.key();
+    
+    <span class="token-function">emit!</span>(QuantumCreated {
+        position: quantum.key(),
+        states: quantum.superposition.len(),
+        entropy: quantum.entropy,
+    });
+    
+    Ok(())
+}</pre>
+            </div>
+        </section>
+
+        <!-- Leverage Section -->
+        <section id="leverage" class="demo-section">
+            <div class="section-header">
+                <h1 class="section-title">500x Leverage System</h1>
+                <p class="section-subtitle">Achieve unprecedented capital efficiency through our 3-step chaining mechanism</p>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Leverage Calculation</h2>
+                <p class="card-description">
+                    Our platform offers up to 100x base leverage, which can be amplified to 500x through our innovative chaining system. Here's how it works:
+                </p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value mono">100x</div>
+                    <div class="stat-label">Base Leverage</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value mono">1.5x</div>
+                    <div class="stat-label">Borrow Multiplier</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value mono">1.2x</div>
+                    <div class="stat-label">Liquidity Multiplier</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value mono">1.1x</div>
+                    <div class="stat-label">Hedge Multiplier</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">3-Step Leverage Chain</h3>
+                <div style="padding: 20px 0;">
+                    <p class="card-description"><strong>Step 1 - Borrow (1.5x):</strong> Use your position as collateral to borrow additional capital at 80% LTV</p>
+                    <p class="card-description"><strong>Step 2 - Provide Liquidity (1.2x):</strong> Supply liquidity to the AMM pool for fee generation</p>
+                    <p class="card-description"><strong>Step 3 - Hedge (1.1x):</strong> Create offsetting positions in correlated markets</p>
+                    <p class="card-description" style="margin-top: 20px;"><strong>Total Effective Leverage = 100 × 1.5 × 1.2 × 1.1 = 198x</strong></p>
+                    <p class="card-description">With maximum optimization and flash market multipliers: <strong>500x</strong></p>
+                </div>
+            </div>
+
+            <div class="trading-interface">
+                <h3 class="card-title">Leverage Builder</h3>
+                <div class="leverage-slider">
+                    <div class="slider-labels">
+                        <div>
+                            <div class="slider-label">Selected Leverage</div>
+                            <div class="slider-value mono">237x</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="slider-label">Liquidation Buffer</div>
+                            <div class="slider-value mono" style="color: var(--accent-red);">0.42%</div>
+                        </div>
+                    </div>
+                    <div class="slider-track" style="background: linear-gradient(90deg, #1A1A1A 0%, #00FF88 20%, #FFB800 60%, #FF3333 100%);">
+                        <div class="slider-thumb" style="left: 75%;"></div>
+                    </div>
+                </div>
+                
+                <div class="risk-metrics" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 24px 0;">
+                    <div class="metric">
+                        <div class="metric-label">Position Size</div>
+                        <div class="metric-value mono">$237,000</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Required Margin</div>
+                        <div class="metric-value mono">$1,000</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Max Profit</div>
+                        <div class="metric-value mono">$82,950</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Max Loss</div>
+                        <div class="metric-value mono">$1,000</div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary">Apply Leverage Chain</button>
+                    <button class="btn btn-secondary">Optimize Settings</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Verse Hierarchy Section -->
+        <section id="verse" class="demo-section">
+            <div class="section-header">
+                <h1 class="section-title">Verse Hierarchy System</h1>
+                <p class="section-subtitle">Navigate complex market relationships through interconnected verses</p>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">What are Verses?</h2>
+                <p class="card-description">
+                    Verses are hierarchical market structures that group related prediction markets. Parent verses contain broad topics (like "2024 Elections") while child verses represent specific outcomes. Trading in deeper verse levels provides correlation bonuses and cross-market opportunities.
+                </p>
+            </div>
+
+            <div class="verse-tree">
+                <div class="verse-node">
+                    <div class="verse-icon">🌍</div>
+                    <div class="verse-content">
+                        <div class="verse-name">Global Politics 2024</div>
+                        <div class="verse-meta">Parent Verse • 127 markets • $45M volume</div>
+                    </div>
+                </div>
+                
+                <div class="verse-children">
+                    <div class="verse-node">
+                        <div class="verse-icon">🇺🇸</div>
+                        <div class="verse-content">
+                            <div class="verse-name">US Presidential Election</div>
+                            <div class="verse-meta">Child Verse • 43 markets • $18M volume</div>
+                        </div>
+                    </div>
+                    
+                    <div class="verse-children">
+                        <div class="verse-node">
+                            <div class="verse-icon">📊</div>
+                            <div class="verse-content">
+                                <div class="verse-name">Trump vs Biden</div>
+                                <div class="verse-meta">Sub-verse • Flash enabled • $8.2M volume</div>
+                            </div>
+                        </div>
+                        <div class="verse-node">
+                            <div class="verse-icon">🗳️</div>
+                            <div class="verse-content">
+                                <div class="verse-name">Swing States</div>
+                                <div class="verse-meta">Sub-verse • 7 markets • $4.1M volume</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="verse-node">
+                        <div class="verse-icon">🇪🇺</div>
+                        <div class="verse-content">
+                            <div class="verse-name">European Elections</div>
+                            <div class="verse-meta">Child Verse • 31 markets • $12M volume</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="card">
+                    <h3 class="card-title">Depth Bonuses</h3>
+                    <p class="card-description">
+                        Each verse level provides a 10% leverage bonus. Trading in a 3rd-level sub-verse gives you 30% additional leverage multiplier on top of base leverage.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3 class="card-title">Cross-Verse Arbitrage</h3>
+                    <p class="card-description">
+                        Identify pricing inefficiencies between related verses. Our router automatically finds profitable paths across the verse hierarchy.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trading Section -->
+        <section id="trading" class="demo-section">
+            <div class="section-header">
+                <h1 class="section-title">Advanced Trading Terminal</h1>
+                <p class="section-subtitle">Professional tools for sophisticated traders</p>
+            </div>
+
+            <div class="market-display">
+                <div class="market-header">
+                    <h2 class="market-title">ETH to flip BTC market cap in 2024</h2>
+                    <span class="market-badge">VOLATILE</span>
+                </div>
+                <div class="price-display">
+                    <span class="price-main mono">32.8%</span>
+                    <span class="price-change negative">-1.2%</span>
+                </div>
+            </div>
+
+            <div class="orderbook">
+                <h3 class="card-title">Live Order Book</h3>
+                <div class="orderbook-header">
+                    <span>Price</span>
+                    <span>Size</span>
+                    <span>Total</span>
+                </div>
+                <div class="orderbook-row sell">
+                    <span>33.2%</span>
+                    <span>$5,450</span>
+                    <span>$28,920</span>
+                </div>
+                <div class="orderbook-row sell">
+                    <span>33.0%</span>
+                    <span>$8,200</span>
+                    <span>$23,470</span>
+                </div>
+                <div class="orderbook-row sell">
+                    <span>32.9%</span>
+                    <span>$6,820</span>
+                    <span>$15,270</span>
+                </div>
+                <div class="orderbook-spread">Spread: 0.3%</div>
+                <div class="orderbook-row buy">
+                    <span>32.6%</span>
+                    <span>$4,500</span>
+                    <span>$8,450</span>
+                </div>
+                <div class="orderbook-row buy">
+                    <span>32.5%</span>
+                    <span>$11,320</span>
+                    <span>$19,770</span>
+                </div>
+                <div class="orderbook-row buy">
+                    <span>32.4%</span>
+                    <span>$7,180</span>
+                    <span>$26,950</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">Order Types</h3>
+                <div class="feature-grid">
+                    <div>
+                        <h4 style="color: var(--accent-green); margin-bottom: 8px;">Market Orders</h4>
+                        <p class="card-description">Execute immediately at best available price with slippage protection</p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--accent-green); margin-bottom: 8px;">Limit Orders</h4>
+                        <p class="card-description">Set your exact entry price and wait for execution</p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--accent-green); margin-bottom: 8px;">Stop Loss</h4>
+                        <p class="card-description">Automatically exit positions to limit downside risk</p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--accent-green); margin-bottom: 8px;">Take Profit</h4>
+                        <p class="card-description">Lock in gains when your target price is reached</p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--accent-green); margin-bottom: 8px;">Iceberg Orders</h4>
+                        <p class="card-description">Hide large orders by revealing only small portions</p>
+                    </div>
+                    <div>
+                        <h4 style="color: var(--accent-green); margin-bottom: 8px;">TWAP Orders</h4>
+                        <p class="card-description">Execute large trades over time to minimize impact</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" style="width: 100%;">Open Advanced Trading Terminal</button>
+            </div>
+        </section>
+
+        <!-- Portfolio Section -->
+        <section id="portfolio" class="demo-section">
+            <div class="section-header">
+                <h1 class="section-title">Portfolio Management</h1>
+                <p class="section-subtitle">Track and manage all your positions in one place</p>
+            </div>
+
+            <div class="portfolio-overview">
+                <div class="portfolio-card">
+                    <div class="portfolio-label">Total Value</div>
+                    <div class="portfolio-value mono">$45,782</div>
+                    <div class="portfolio-change positive">+12.4% (24h)</div>
+                </div>
+                <div class="portfolio-card">
+                    <div class="portfolio-label">Open P&L</div>
+                    <div class="portfolio-value mono">+$3,842</div>
+                    <div class="portfolio-change positive">+8.4%</div>
+                </div>
+                <div class="portfolio-card">
+                    <div class="portfolio-label">Available Balance</div>
+                    <div class="portfolio-value mono">$12,450</div>
+                    <div class="portfolio-change">Ready to trade</div>
+                </div>
+            </div>
+
+            <div class="positions-table">
+                <div class="table-header">
+                    <span>Market</span>
+                    <span>Side</span>
+                    <span>Size</span>
+                    <span>Entry</span>
+                    <span>Current</span>
+                    <span>P&L</span>
+                </div>
+                <div class="table-row">
+                    <span class="position-name">BTC > $150k</span>
+                    <span>YES</span>
+                    <span class="mono">$10,000</span>
+                    <span class="mono">61.5%</span>
+                    <span class="mono">65.2%</span>
+                    <span class="position-pnl positive mono">+$2,145</span>
+                </div>
+                <div class="table-row">
+                    <span class="position-name">ETH Flippening</span>
+                    <span>YES</span>
+                    <span class="mono">$5,000</span>
+                    <span class="mono">30.2%</span>
+                    <span class="mono">32.8%</span>
+                    <span class="position-pnl positive mono">+$892</span>
+                </div>
+                <div class="table-row">
+                    <span class="position-name">Fed Rate Cut</span>
+                    <span>YES</span>
+                    <span class="mono">$2,500</span>
+                    <span class="mono">69.8%</span>
+                    <span class="mono">72.3%</span>
+                    <span class="position-pnl positive mono">+$543</span>
+                </div>
+                <div class="table-row">
+                    <span class="position-name">Trump Election</span>
+                    <span>NO</span>
+                    <span class="mono">$1,000</span>
+                    <span class="mono">52.9%</span>
+                    <span class="mono">51.5%</span>
+                    <span class="position-pnl positive mono">+$262</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary">Export Portfolio</button>
+                <button class="btn btn-secondary">View History</button>
+                <button class="btn btn-danger">Close All Positions</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const targetSection = this.dataset.section;
+                
+                // Update nav
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update sections
+                document.querySelectorAll('.demo-section').forEach(section => section.classList.remove('active'));
+                document.getElementById(targetSection).classList.add('active');
+            });
+        });
+
+        // Wallet Connection
+        async function connectWallet(type) {
+            console.log(`Connecting ${type} wallet...`);
+            
+            if (type === 'metamask' && typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    console.log('Connected:', accounts[0]);
+                    updateWalletStatus(accounts[0]);
+                } catch (error) {
+                    console.error('Connection failed:', error);
+                }
+            } else if (type === 'phantom' && window.solana) {
+                try {
+                    const response = await window.solana.connect();
+                    console.log('Connected:', response.publicKey.toString());
+                    updateWalletStatus(response.publicKey.toString());
+                } catch (error) {
+                    console.error('Connection failed:', error);
+                }
+            } else {
+                alert(`Please install ${type} wallet extension`);
+            }
+        }
+
+        function updateWalletStatus(address) {
+            const shortAddress = address.slice(0, 6) + '...' + address.slice(-4);
+            document.querySelector('.wallet-address').textContent = shortAddress;
+        }
+
+        // Live Price Updates
+        function updatePrices() {
+            document.querySelectorAll('.price-main').forEach(element => {
+                const current = parseFloat(element.textContent);
+                const change = (Math.random() - 0.5) * 0.4;
+                const newPrice = Math.max(0, Math.min(100, current + change));
+                element.textContent = newPrice.toFixed(1) + '%';
+            });
+        }
+
+        setInterval(updatePrices, 3000);
+
+        // Flash Timer Countdown
+        let flashTime = 30;
+        setInterval(() => {
+            flashTime--;
+            if (flashTime <= 0) flashTime = 30;
+            document.querySelector('.timer-text').textContent = flashTime + 's';
+        }, 1000);
+
+        // Slider Interaction
+        document.querySelectorAll('.slider-thumb').forEach(thumb => {
+            let isDragging = false;
+            
+            thumb.addEventListener('mousedown', () => isDragging = true);
+            document.addEventListener('mouseup', () => isDragging = false);
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const track = thumb.parentElement;
+                const rect = track.getBoundingClientRect();
+                const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+                const percent = (x / rect.width) * 100;
+                
+                thumb.style.left = percent + '%';
+                
+                // Update leverage display
+                const leverage = Math.round(percent * 5);
+                const effective = Math.round(leverage * 2.37);
+                
+                const valueElements = track.closest('.leverage-slider').querySelectorAll('.slider-value');
+                if (valueElements[0]) valueElements[0].textContent = leverage + 'x';
+                if (valueElements[1]) valueElements[1].textContent = effective + 'x';
+            });
+        });
+
+        // Live Feed Updates
+        const feedMessages = [
+            { icon: '⚽', title: 'Real Madrid Penalty - YES Won @ 67%', time: 'Just now' },
+            { icon: '🏀', title: 'Warriors 3-pointer - NO Won @ 58%', time: '5 seconds ago' },
+            { icon: '🎾', title: 'Nadal Break Point - YES Won @ 41%', time: '12 seconds ago' },
+            { icon: '⚽', title: 'Bayern Corner Kick - NO Won @ 73%', time: '18 seconds ago' },
+            { icon: '🏈', title: 'Chiefs Touchdown - YES Won @ 52%', time: '25 seconds ago' }
+        ];
+
+        function addFeedItem() {
+            const feed = document.querySelector('.live-feed');
+            if (!feed) return;
+            
+            const message = feedMessages[Math.floor(Math.random() * feedMessages.length)];
+            const item = document.createElement('div');
+            item.className = 'feed-item';
+            item.innerHTML = `
+                <div class="feed-icon">${message.icon}</div>
+                <div class="feed-content">
+                    <div class="feed-title">${message.title}</div>
+                    <div class="feed-time">${message.time}</div>
+                </div>
+            `;
+            
+            feed.insertBefore(item, feed.children[1]);
+            
+            // Remove old items
+            while (feed.children.length > 6) {
+                feed.removeChild(feed.lastChild);
+            }
+        }
+
+        setInterval(addFeedItem, 5000);
+
+        // Code Copy Functionality
+        document.querySelectorAll('.code-copy').forEach(button => {
+            button.addEventListener('click', function() {
+                const codeBlock = this.closest('.code-block').querySelector('pre');
+                navigator.clipboard.writeText(codeBlock.textContent);
+                this.textContent = 'Copied!';
+                setTimeout(() => this.textContent = 'Copy', 2000);
+            });
+        });
+
+        // Initialize demo
+        console.log('Multiverse Trading Platform Demo Initialized');
+        console.log('Version: 2.0.0');
+        console.log('Features: Polymarket, Flash Betting, Quantum Positions, 500x Leverage');
+    </script>
+</body>
+</html>

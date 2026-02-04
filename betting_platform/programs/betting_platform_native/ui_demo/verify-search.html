@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify Search Working</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
+        .success { color: #4cd964; font-size: 24px; }
+        .market { background: #222; padding: 10px; margin: 10px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Verifying Market Search</h1>
+    <div id="status"></div>
+    <div id="results"></div>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:8081/api';
+        
+        async function verify() {
+            const statusEl = document.getElementById('status');
+            const resultsEl = document.getElementById('results');
+            
+            try {
+                // Test the corrected endpoint
+                const response = await fetch(`${API_BASE_URL}/polymarket/markets`);
+                const markets = await response.json();
+                
+                if (response.ok && Array.isArray(markets) && markets.length > 0) {
+                    statusEl.innerHTML = '<div class="success">✓ Market search is now working!</div>';
+                    statusEl.innerHTML += `<p>Found ${markets.length} real Polymarket markets</p>`;
+                    
+                    // Show first 5 markets
+                    resultsEl.innerHTML = '<h2>Sample Markets:</h2>';
+                    markets.slice(0, 5).forEach(market => {
+                        resultsEl.innerHTML += `
+                            <div class="market">
+                                <strong>${market.title || market.question}</strong><br>
+                                Volume: $${(market.volume24hr || 0).toLocaleString()}<br>
+                                Liquidity: $${(market.liquidityNum || 0).toLocaleString()}
+                            </div>
+                        `;
+                    });
+                    
+                    resultsEl.innerHTML += '<p style="color: #FFD60A;">Try searching for "Fed", "ETH", or "Trump" in the main platform!</p>';
+                } else {
+                    statusEl.innerHTML = '<div style="color: #ff3b30;">API issue detected</div>';
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<div style="color: #ff3b30;">Error: ${error.message}</div>`;
+            }
+        }
+        
+        verify();
+    </script>
+</body>
+</html>

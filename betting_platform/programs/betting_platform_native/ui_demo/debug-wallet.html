@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Wallet Connection</title>
+    <style>
+        body { background: #000; color: #fff; font-family: monospace; padding: 20px; }
+        .log { margin: 10px 0; padding: 10px; background: #111; border-radius: 4px; }
+        .error { color: #ff3b30; }
+        .success { color: #4cd964; }
+        button { background: #FFD60A; color: #000; border: none; padding: 10px 20px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Wallet Connection Debug</h1>
+    <button onclick="checkWallet()">Check Wallet Status</button>
+    <button onclick="connectDemo()">Connect Demo Wallet</button>
+    <div id="logs"></div>
+    
+    <script>
+        function log(message, type = '') {
+            const div = document.createElement('div');
+            div.className = 'log ' + type;
+            div.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+            document.getElementById('logs').appendChild(div);
+        }
+        
+        function checkWallet() {
+            log('Checking wallet status...');
+            
+            // Check if window.solana exists
+            if (window.solana) {
+                log('✓ window.solana found', 'success');
+                log('isPhantom: ' + window.solana.isPhantom);
+                log('isConnected: ' + window.solana.isConnected);
+            } else {
+                log('✗ window.solana not found', 'error');
+            }
+            
+            // Check localStorage
+            const savedWallet = localStorage.getItem('walletAddress');
+            if (savedWallet) {
+                log('Saved wallet in localStorage: ' + savedWallet);
+            } else {
+                log('No saved wallet in localStorage');
+            }
+            
+            // Check if the main app loaded
+            if (window.platformState) {
+                log('✓ platformState found', 'success');
+                log('Wallet: ' + (window.platformState.wallet ? 'Connected' : 'Not connected'));
+            } else {
+                log('✗ platformState not found', 'error');
+            }
+        }
+        
+        function connectDemo() {
+            log('Setting up demo wallet...');
+            
+            // Create minimal demo state
+            if (!window.platformState) {
+                window.platformState = {
+                    wallet: null,
+                    activePositions: []
+                };
+            }
+            
+            // Set demo wallet
+            window.platformState.wallet = {
+                publicKey: {
+                    toString: () => 'DemoWallet1234567890'
+                }
+            };
+            
+            // Update UI elements directly
+            const indicator = document.getElementById('walletIndicator');
+            const statusText = document.getElementById('walletStatusText');
+            const addressEl = document.getElementById('walletAddress');
+            const balanceEl = document.getElementById('balanceAmount');
+            const balanceDisplay = document.getElementById('balanceDisplay');
+            const connectBtn = document.getElementById('connectWalletBtn');
+            
+            if (indicator) {
+                indicator.classList.add('connected');
+                log('✓ Updated wallet indicator', 'success');
+            }
+            
+            if (statusText) {
+                statusText.textContent = 'Connected';
+                log('✓ Updated status text', 'success');
+            }
+            
+            if (addressEl) {
+                addressEl.textContent = 'DemoWa...7890';
+                addressEl.style.display = 'block';
+                log('✓ Updated wallet address', 'success');
+            }
+            
+            if (balanceEl && balanceDisplay) {
+                balanceEl.textContent = '100.0000 SOL';
+                balanceDisplay.style.display = 'block';
+                log('✓ Updated balance display', 'success');
+            }
+            
+            if (connectBtn) {
+                connectBtn.textContent = 'Demo Mode';
+                connectBtn.disabled = false;
+                log('✓ Updated connect button', 'success');
+            }
+            
+            log('Demo wallet setup complete!', 'success');
+        }
+        
+        // Auto-check on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(checkWallet, 1000);
+        });
+    </script>
+</body>
+</html>

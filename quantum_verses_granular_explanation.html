@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Verses: The Complete Mathematical Breakdown</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            padding: 40px;
+        }
+
+        .main-container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .title {
+            font-size: 56px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFD60A 0%, #8A61FF 50%, #00FFCC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        /* Core Concepts Section */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .concept-card {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .concept-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #FFD60A;
+        }
+
+        /* Mathematical Breakdown */
+        .math-section {
+            background: rgba(138, 97, 255, 0.05);
+            border: 2px solid rgba(138, 97, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 60px;
+        }
+
+        .equation {
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border: 1px solid rgba(138, 97, 255, 0.5);
+        }
+
+        .equation-label {
+            color: #8A61FF;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        /* Interactive Demo */
+        .interactive-demo {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .demo-area {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            min-height: 800px;
+        }
+
+        /* Market Structure */
+        .market-structure {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+        }
+
+        .market-node {
+            padding: 20px;
+            background: rgba(255, 214, 10, 0.1);
+            border: 2px solid #FFD60A;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Verse Hierarchy Visualization */
+        .verse-hierarchy {
+            position: relative;
+            margin: 40px 0;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+        }
+
+        .verse-level {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .verse-node {
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .verse-node:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .verse-node.selected {
+            background: rgba(255, 214, 10, 0.2);
+            border-color: #FFD60A;
+            box-shadow: 0 0 20px rgba(255, 214, 10, 0.5);
+        }
+
+        .verse-node.quantum-active {
+            background: rgba(138, 97, 255, 0.2);
+            border-color: #8A61FF;
+            animation: quantumPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes quantumPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(138, 97, 255, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(138, 97, 255, 0.8); }
+        }
+
+        /* Quantum State Visualization */
+        .quantum-states-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .quantum-state-box {
+            padding: 30px;
+            background: rgba(138, 97, 255, 0.1);
+            border: 2px solid rgba(138, 97, 255, 0.3);
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-state-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(138, 97, 255, 0.2) 0%, transparent 70%);
+            animation: quantumRotate 20s linear infinite;
+        }
+
+        @keyframes quantumRotate {
+            to { transform: rotate(360deg); }
+        }
+
+        .state-probability {
+            font-size: 48px;
+            font-weight: 700;
+            color: #8A61FF;
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Probability Wave Function */
+        .wave-function {
+            width: 100%;
+            height: 200px;
+            margin: 30px 0;
+            position: relative;
+            background: rgba(138, 97, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .wave-path {
+            stroke: #8A61FF;
+            stroke-width: 2;
+            fill: none;
+            filter: drop-shadow(0 0 10px rgba(138, 97, 255, 0.8));
+        }
+
+        /* Detailed Calculations */
+        .calculation-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .calculation-table th,
+        .calculation-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .calculation-table th {
+            background: rgba(255, 214, 10, 0.1);
+            color: #FFD60A;
+            font-weight: 600;
+        }
+
+        .calculation-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Collapse Visualization */
+        .collapse-demo {
+            margin: 40px 0;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .collapse-animation {
+            width: 300px;
+            height: 300px;
+            margin: 30px auto;
+            position: relative;
+        }
+
+        .quantum-sphere {
+            width: 100%;
+            height: 100%;
+            border: 3px solid #8A61FF;
+            border-radius: 50%;
+            position: relative;
+            background: radial-gradient(circle at 30% 30%, rgba(138, 97, 255, 0.3), transparent);
+            animation: sphereRotate 10s linear infinite;
+        }
+
+        @keyframes sphereRotate {
+            to { transform: rotate3d(1, 1, 0, 360deg); }
+        }
+
+        .outcome-probability {
+            position: absolute;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #8A61FF;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* Input Controls */
+        .input-group {
+            margin: 20px 0;
+        }
+
+        .input-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            outline: none;
+            margin: 15px 0;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #FFD60A;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Action Button */
+        .action-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            color: #000000;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 214, 10, 0.5);
+        }
+
+        .action-btn.quantum {
+            background: linear-gradient(135deg, #8A61FF 0%, #6B4FD9 100%);
+            color: #FFFFFF;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: rgba(255, 214, 10, 0.1);
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box.quantum {
+            background: rgba(138, 97, 255, 0.1);
+            border-color: rgba(138, 97, 255, 0.3);
+        }
+
+        .info-box h4 {
+            color: #FFD60A;
+            margin-bottom: 10px;
+        }
+
+        .info-box.quantum h4 {
+            color: #8A61FF;
+        }
+
+        /* Formula Display */
+        .formula {
+            font-family: 'Times New Roman', serif;
+            font-size: 24px;
+            text-align: center;
+            margin: 30px 0;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #8A61FF;
+            border-radius: 15px;
+        }
+
+        .formula-var {
+            color: #FFD60A;
+            font-style: italic;
+        }
+
+        .formula-operator {
+            color: #8A61FF;
+            margin: 0 10px;
+        }
+
+        /* Granular Detail Sections */
+        .detail-section {
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #FFD60A;
+        }
+
+        .detail-step {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border-left: 4px solid #FFD60A;
+        }
+
+        .step-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFD60A;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">Quantum Verses: The Mathematics of Superposition Betting</h1>
+            <p style="font-size: 24px; color: rgba(255, 255, 255, 0.7);">
+                A complete granular breakdown of how quantum mechanics meets prediction markets
+            </p>
+        </div>
+
+        <!-- Core Concepts -->
+        <div class="concept-grid">
+            <div class="concept-card">
+                <h3 class="concept-title">Traditional Betting</h3>
+                <p>You pick ONE outcome (YES or NO). Your entire stake goes to that single choice. Simple binary decision.</p>
+                <div class="equation">
+                    Payout = Stake × Odds × Leverage
+                </div>
+            </div>
+            
+            <div class="concept-card">
+                <h3 class="concept-title">Quantum Superposition</h3>
+                <p>Your bet exists in MULTIPLE states simultaneously. Like Schrödinger's cat - both alive AND dead until observed.</p>
+                <div class="equation">
+                    |Ψ⟩ = α|YES⟩ + β|NO⟩
+                </div>
+            </div>
+            
+            <div class="concept-card">
+                <h3 class="concept-title">Verse Multiplication</h3>
+                <p>Each verse is a correlated sub-market that multiplies your leverage when selected.</p>
+                <div class="equation">
+                    Total_Leverage = Base × ∏(Verse_i)
+                </div>
+            </div>
+        </div>
+
+        <!-- The Complete Mathematical Model -->
+        <div class="math-section">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #8A61FF;">
+                The Complete Quantum Betting Formula
+            </h2>
+            
+            <div class="formula">
+                <span class="formula-var">P</span><sub>final</sub> 
+                <span class="formula-operator">=</span>
+                <span class="formula-var">S</span> 
+                <span class="formula-operator">×</span>
+                <span class="formula-var">L</span><sub>base</sub>
+                <span class="formula-operator">×</span>
+                <span class="formula-operator">∏</span><span class="formula-var">V</span><sub>i</sub>
+                <span class="formula-operator">×</span>
+                <span class="formula-operator">|</span><span class="formula-var">Ψ</span><sub>collapsed</sub><span class="formula-operator">⟩</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 30px;">
+                <div class="info-box quantum">
+                    <h4>Variables Explained</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><strong>S</strong> = Your stake (investment amount)</li>
+                        <li><strong>L<sub>base</sub></strong> = Base leverage (1x-100x)</li>
+                        <li><strong>V<sub>i</sub></strong> = Verse multiplier i</li>
+                        <li><strong>|Ψ⟩</strong> = Quantum state vector</li>
+                        <li><strong>α, β</strong> = Probability amplitudes</li>
+                    </ul>
+                </div>
+                
+                <div class="info-box quantum">
+                    <h4>Quantum Properties</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li><strong>Superposition:</strong> |α|² + |β|² = 1</li>
+                        <li><strong>Entanglement:</strong> Verses create correlation</li>
+                        <li><strong>Collapse:</strong> Measurement determines outcome</li>
+                        <li><strong>Non-locality:</strong> All states affected instantly</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Demo -->
+        <div class="interactive-demo">
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <h3 style="margin-bottom: 30px; color: #FFD60A;">Configure Your Position</h3>
+                
+                <div class="input-group">
+                    <div class="input-label">Investment Amount ($)</div>
+                    <input type="number" class="input-field" id="investment" value="10000" min="100">
+                </div>
+                
+                <div class="input-group">
+                    <div class="input-label">Base Leverage</div>
+                    <input type="range" class="slider" id="baseLeverage" min="1" max="20" value="5">
+                    <div style="text-align: center; font-size: 24px; color: #FFD60A;">
+                        <span id="leverageDisplay">5</span>x
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <div class="input-label">Quantum Mode</div>
+                    <button class="action-btn quantum" onclick="toggleQuantum()">
+                        Enable Quantum Superposition
+                    </button>
+                </div>
+                
+                <div class="input-group">
+                    <div class="input-label">Market Probability</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="text-align: center;">
+                            <div style="color: #4CD964;">YES</div>
+                            <div style="font-size: 24px; font-weight: 600;">35%</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: #FF3B30;">NO</div>
+                            <div style="font-size: 24px; font-weight: 600;">65%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-box" style="margin-top: 30px;">
+                    <h4>Current Configuration</h4>
+                    <div id="configSummary">
+                        <div>Mode: <strong>Standard</strong></div>
+                        <div>Selected Verses: <strong>0</strong></div>
+                        <div>Total Leverage: <strong>5x</strong></div>
+                        <div>Total Exposure: <strong>$50,000</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo Area -->
+            <div class="demo-area">
+                <!-- Market Structure -->
+                <div class="market-structure">
+                    <div class="market-node">
+                        <h3 style="margin-bottom: 10px;">Primary Market</h3>
+                        <div style="font-size: 20px; font-weight: 600;">
+                            Will AGI surpass human intelligence by 2026?
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-bottom: 20px; text-align: center;">Select Verse Hierarchy</h3>
+                    
+                    <!-- Verse Hierarchy -->
+                    <div class="verse-hierarchy">
+                        <!-- Level 1 Verses -->
+                        <div class="verse-level">
+                            <div class="verse-node" onclick="toggleVerse('compute', 3.0, 1)">
+                                <div style="font-weight: 600;">Compute Power</div>
+                                <div style="color: #FFD60A; font-size: 20px; margin: 5px 0;">×3.0</div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.6);">GPU availability</div>
+                            </div>
+                            <div class="verse-node" onclick="toggleVerse('breakthrough', 2.5, 1)">
+                                <div style="font-weight: 600;">Algorithm Breakthrough</div>
+                                <div style="color: #FFD60A; font-size: 20px; margin: 5px 0;">×2.5</div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.6);">Novel architectures</div>
+                            </div>
+                            <div class="verse-node" onclick="toggleVerse('investment', 2.0, 1)">
+                                <div style="font-weight: 600;">Capital Investment</div>
+                                <div style="color: #FFD60A; font-size: 20px; margin: 5px 0;">×2.0</div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.6);">$500B+ funding</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Level 2 Verses -->
+                        <div class="verse-level">
+                            <div class="verse-node" onclick="toggleVerse('nvidia', 1.8, 2)">
+                                <div style="font-weight: 600;">NVIDIA Dominance</div>
+                                <div style="color: #FFD60A; font-size: 20px; margin: 5px 0;">×1.8</div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.6);">H100 production</div>
+                            </div>
+                            <div class="verse-node" onclick="toggleVerse('transformer', 1.6, 2)">
+                                <div style="font-weight: 600;">Transformer Evolution</div>
+                                <div style="color: #FFD60A; font-size: 20px; margin: 5px 0;">×1.6</div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.6);">Beyond attention</div>
+                            </div>
+                            <div class="verse-node" onclick="toggleVerse('openai', 1.5, 2)">
+                                <div style="font-weight: 600;">OpenAI Progress</div>
+                                <div style="color: #FFD60A; font-size: 20px; margin: 5px 0;">×1.5</div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.6);">GPT-6 capabilities</div>
+                            </div>
+                            <div class="verse-node" onclick="toggleVerse('regulation', 1.4, 2)">
+                                <div style="font-weight: 600;">AI Regulation</div>
+                                <div style="color: #FFD60A; font-size: 20px; margin: 5px 0;">×1.4</div>
+                                <div style="font-size: 12px; color: rgba(255,255,255,0.6);">Government stance</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quantum State Visualization -->
+                <div class="detail-section" id="quantumSection" style="display: none;">
+                    <h3 class="detail-title">Quantum Superposition States</h3>
+                    
+                    <div class="quantum-states-container">
+                        <div class="quantum-state-box">
+                            <h4 style="position: relative; z-index: 1;">YES State |α⟩</h4>
+                            <div class="state-probability" id="yesProb">35%</div>
+                            <div style="position: relative; z-index: 1;">
+                                <div style="font-size: 24px; color: #FFD60A;" id="yesAmount">$3,500</div>
+                                <div style="margin-top: 10px; font-size: 14px; color: rgba(255,255,255,0.6);">
+                                    of your $10,000 stake
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="quantum-state-box">
+                            <h4 style="position: relative; z-index: 1;">NO State |β⟩</h4>
+                            <div class="state-probability" id="noProb">65%</div>
+                            <div style="position: relative; z-index: 1;">
+                                <div style="font-size: 24px; color: #FFD60A;" id="noAmount">$6,500</div>
+                                <div style="margin-top: 10px; font-size: 14px; color: rgba(255,255,255,0.6);">
+                                    of your $10,000 stake
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Wave Function Visualization -->
+                    <div class="wave-function">
+                        <svg width="100%" height="100%" viewBox="0 0 800 200">
+                            <path class="wave-path" id="wavePath" d=""></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Granular Calculation Breakdown -->
+                <div class="detail-section">
+                    <h3 class="detail-title">Granular Calculation Breakdown</h3>
+                    
+                    <div id="standardCalculation">
+                        <div class="detail-step">
+                            <div class="step-number">Step 1: Base Position</div>
+                            <div>Investment: $<span id="calc1Investment">10,000</span></div>
+                            <div>Base Leverage: <span id="calc1Leverage">5</span>x</div>
+                            <div style="margin-top: 10px; font-size: 20px; color: #FFD60A;">
+                                = $<span id="calc1Result">50,000</span> base exposure
+                            </div>
+                        </div>
+                        
+                        <div class="detail-step" id="verseCalculations">
+                            <div class="step-number">Step 2: Apply Verse Multipliers</div>
+                            <div id="verseCalcDetails" style="color: rgba(255,255,255,0.6);">
+                                No verses selected yet
+                            </div>
+                        </div>
+                        
+                        <div class="detail-step">
+                            <div class="step-number">Step 3: Final Position</div>
+                            <table class="calculation-table">
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Value</th>
+                                        <th>Calculation</th>
+                                        <th>Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="finalCalcTable">
+                                    <tr>
+                                        <td>Initial Stake</td>
+                                        <td>$10,000</td>
+                                        <td>-</td>
+                                        <td>$10,000</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Base Leverage</td>
+                                        <td>5x</td>
+                                        <td>$10,000 × 5</td>
+                                        <td>$50,000</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Verse Multiplier</td>
+                                        <td>1x</td>
+                                        <td>$50,000 × 1</td>
+                                        <td>$50,000</td>
+                                    </tr>
+                                    <tr style="background: rgba(255,214,10,0.1);">
+                                        <td><strong>Total Exposure</strong></td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td><strong>$50,000</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="quantumCalculation" style="display: none;">
+                        <div class="detail-step">
+                            <div class="step-number">Quantum Step 1: Superposition Split</div>
+                            <div class="equation">
+                                |Ψ⟩ = √0.35|YES⟩ + √0.65|NO⟩
+                            </div>
+                            <div style="margin-top: 20px;">
+                                <div>YES allocation: $10,000 × 0.35 = $<span id="quantumYesAlloc">3,500</span></div>
+                                <div>NO allocation: $10,000 × 0.65 = $<span id="quantumNoAlloc">6,500</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-step">
+                            <div class="step-number">Quantum Step 2: Parallel Leverage Application</div>
+                            <table class="calculation-table">
+                                <thead>
+                                    <tr>
+                                        <th>Quantum State</th>
+                                        <th>Allocation</th>
+                                        <th>Total Leverage</th>
+                                        <th>State Exposure</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>|YES⟩</td>
+                                        <td id="qYesAlloc">$3,500</td>
+                                        <td id="qYesLev">5x</td>
+                                        <td style="color: #4CD964;" id="qYesExp">$17,500</td>
+                                    </tr>
+                                    <tr>
+                                        <td>|NO⟩</td>
+                                        <td id="qNoAlloc">$6,500</td>
+                                        <td id="qNoLev">5x</td>
+                                        <td style="color: #FF3B30;" id="qNoExp">$32,500</td>
+                                    </tr>
+                                    <tr style="background: rgba(138,97,255,0.1);">
+                                        <td><strong>Superposition</strong></td>
+                                        <td><strong>$10,000</strong></td>
+                                        <td>-</td>
+                                        <td><strong id="qTotalExp">$50,000</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="detail-step">
+                            <div class="step-number">Quantum Step 3: Collapse Scenarios</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div style="padding: 20px; background: rgba(76,217,100,0.1); border-radius: 10px;">
+                                    <h4 style="color: #4CD964;">If YES Wins (35% chance)</h4>
+                                    <div style="margin-top: 10px;">
+                                        <div>Your YES state: $<span id="collapseYes">17,500</span></div>
+                                        <div>Your NO state: $0</div>
+                                        <div style="margin-top: 10px; font-size: 20px; font-weight: 600;">
+                                            Payout: $<span id="collapseYesPayout">17,500</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="padding: 20px; background: rgba(255,59,48,0.1); border-radius: 10px;">
+                                    <h4 style="color: #FF3B30;">If NO Wins (65% chance)</h4>
+                                    <div style="margin-top: 10px;">
+                                        <div>Your YES state: $0</div>
+                                        <div>Your NO state: $<span id="collapseNo">32,500</span></div>
+                                        <div style="margin-top: 10px; font-size: 20px; font-weight: 600;">
+                                            Payout: $<span id="collapseNoPayout">32,500</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expected Value Analysis -->
+                <div class="detail-section">
+                    <h3 class="detail-title">Expected Value Analysis</h3>
+                    
+                    <div class="info-box">
+                        <h4>Standard Betting Expected Value</h4>
+                        <div id="standardEV" style="font-size: 20px; margin-top: 10px;">
+                            EV = 0 (You must choose YES or NO)
+                        </div>
+                    </div>
+                    
+                    <div class="info-box quantum">
+                        <h4>Quantum Betting Expected Value</h4>
+                        <div id="quantumEV" style="font-size: 20px; margin-top: 10px;">
+                            EV = (0.35 × $17,500) + (0.65 × $32,500) = $27,250
+                        </div>
+                        <div style="margin-top: 10px; font-size: 14px; color: rgba(255,255,255,0.7);">
+                            Quantum superposition allows exposure to both outcomes weighted by probability
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let quantumMode = false;
+        let selectedVerses = new Map();
+        let investment = 10000;
+        let baseLeverage = 5;
+
+        // Initialize
+        document.getElementById('investment').addEventListener('input', updateCalculations);
+        document.getElementById('baseLeverage').addEventListener('input', (e) => {
+            baseLeverage = parseInt(e.target.value);
+            document.getElementById('leverageDisplay').textContent = baseLeverage;
+            updateCalculations();
+        });
+
+        // Toggle quantum mode
+        function toggleQuantum() {
+            quantumMode = !quantumMode;
+            
+            document.getElementById('quantumSection').style.display = quantumMode ? 'block' : 'none';
+            document.getElementById('standardCalculation').style.display = quantumMode ? 'none' : 'block';
+            document.getElementById('quantumCalculation').style.display = quantumMode ? 'block' : 'none';
+            
+            // Update verse appearance
+            document.querySelectorAll('.verse-node').forEach(node => {
+                if (node.classList.contains('selected')) {
+                    if (quantumMode) {
+                        node.classList.add('quantum-active');
+                    } else {
+                        node.classList.remove('quantum-active');
+                    }
+                }
+            });
+            
+            // Draw wave function if quantum
+            if (quantumMode) {
+                drawWaveFunction();
+            }
+            
+            updateCalculations();
+        }
+
+        // Toggle verse selection
+        function toggleVerse(id, multiplier, level) {
+            const node = event.currentTarget;
+            
+            if (selectedVerses.has(id)) {
+                selectedVerses.delete(id);
+                node.classList.remove('selected', 'quantum-active');
+            } else {
+                selectedVerses.set(id, { multiplier, level, name: node.querySelector('div').textContent });
+                node.classList.add('selected');
+                if (quantumMode) {
+                    node.classList.add('quantum-active');
+                }
+            }
+            
+            updateCalculations();
+        }
+
+        // Update all calculations
+        function updateCalculations() {
+            investment = parseFloat(document.getElementById('investment').value) || 0;
+            
+            // Calculate total verse multiplier
+            let verseMultiplier = 1;
+            selectedVerses.forEach(verse => {
+                verseMultiplier *= verse.multiplier;
+            });
+            
+            const totalLeverage = baseLeverage * verseMultiplier;
+            const totalExposure = investment * totalLeverage;
+            
+            // Update config summary
+            document.getElementById('configSummary').innerHTML = `
+                <div>Mode: <strong>${quantumMode ? 'Quantum' : 'Standard'}</strong></div>
+                <div>Selected Verses: <strong>${selectedVerses.size}</strong></div>
+                <div>Total Leverage: <strong>${totalLeverage.toFixed(1)}x</strong></div>
+                <div>Total Exposure: <strong>$${totalExposure.toLocaleString()}</strong></div>
+            `;
+            
+            // Update standard calculations
+            document.getElementById('calc1Investment').textContent = investment.toLocaleString();
+            document.getElementById('calc1Leverage').textContent = baseLeverage;
+            document.getElementById('calc1Result').textContent = (investment * baseLeverage).toLocaleString();
+            
+            // Update verse calculations
+            updateVerseCalculations(verseMultiplier);
+            
+            // Update final calculation table
+            updateFinalTable(investment, baseLeverage, verseMultiplier, totalExposure);
+            
+            // Update quantum calculations if active
+            if (quantumMode) {
+                updateQuantumCalculations(investment, totalLeverage);
+            }
+        }
+
+        // Update verse calculation details
+        function updateVerseCalculations(totalMultiplier) {
+            const details = document.getElementById('verseCalcDetails');
+            
+            if (selectedVerses.size === 0) {
+                details.innerHTML = '<div style="color: rgba(255,255,255,0.6);">No verses selected yet</div>';
+                return;
+            }
+            
+            let html = '';
+            let cumulative = investment * baseLeverage;
+            
+            selectedVerses.forEach((verse, id) => {
+                const newAmount = cumulative * verse.multiplier;
+                html += `
+                    <div style="margin: 10px 0; padding: 10px; background: rgba(255,214,10,0.1); border-radius: 5px;">
+                        <strong>${verse.name}</strong> (Level ${verse.level})
+                        <div>$${cumulative.toLocaleString()} × ${verse.multiplier} = $${newAmount.toLocaleString()}</div>
+                    </div>
+                `;
+                cumulative = newAmount;
+            });
+            
+            html += `
+                <div style="margin-top: 20px; font-size: 20px; color: #FFD60A;">
+                    Combined Verse Multiplier: ${totalMultiplier.toFixed(2)}x
+                </div>
+            `;
+            
+            details.innerHTML = html;
+        }
+
+        // Update final calculation table
+        function updateFinalTable(investment, baseLeverage, verseMultiplier, totalExposure) {
+            const tbody = document.getElementById('finalCalcTable');
+            tbody.innerHTML = `
+                <tr>
+                    <td>Initial Stake</td>
+                    <td>$${investment.toLocaleString()}</td>
+                    <td>-</td>
+                    <td>$${investment.toLocaleString()}</td>
+                </tr>
+                <tr>
+                    <td>Base Leverage</td>
+                    <td>${baseLeverage}x</td>
+                    <td>$${investment.toLocaleString()} × ${baseLeverage}</td>
+                    <td>$${(investment * baseLeverage).toLocaleString()}</td>
+                </tr>
+                <tr>
+                    <td>Verse Multiplier</td>
+                    <td>${verseMultiplier.toFixed(2)}x</td>
+                    <td>$${(investment * baseLeverage).toLocaleString()} × ${verseMultiplier.toFixed(2)}</td>
+                    <td>$${totalExposure.toLocaleString()}</td>
+                </tr>
+                <tr style="background: rgba(255,214,10,0.1);">
+                    <td><strong>Total Exposure</strong></td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td><strong>$${totalExposure.toLocaleString()}</strong></td>
+                </tr>
+            `;
+        }
+
+        // Update quantum calculations
+        function updateQuantumCalculations(investment, totalLeverage) {
+            const yesAlloc = investment * 0.35;
+            const noAlloc = investment * 0.65;
+            const yesExposure = yesAlloc * totalLeverage;
+            const noExposure = noAlloc * totalLeverage;
+            
+            // Update quantum state display
+            document.getElementById('yesAmount').textContent = '$' + yesAlloc.toLocaleString();
+            document.getElementById('noAmount').textContent = '$' + noAlloc.toLocaleString();
+            
+            // Update allocation table
+            document.getElementById('quantumYesAlloc').textContent = yesAlloc.toLocaleString();
+            document.getElementById('quantumNoAlloc').textContent = noAlloc.toLocaleString();
+            
+            // Update quantum table
+            document.getElementById('qYesAlloc').textContent = '$' + yesAlloc.toLocaleString();
+            document.getElementById('qNoAlloc').textContent = '$' + noAlloc.toLocaleString();
+            document.getElementById('qYesLev').textContent = totalLeverage.toFixed(1) + 'x';
+            document.getElementById('qNoLev').textContent = totalLeverage.toFixed(1) + 'x';
+            document.getElementById('qYesExp').textContent = '$' + yesExposure.toLocaleString();
+            document.getElementById('qNoExp').textContent = '$' + noExposure.toLocaleString();
+            document.getElementById('qTotalExp').textContent = '$' + (yesExposure + noExposure).toLocaleString();
+            
+            // Update collapse scenarios
+            document.getElementById('collapseYes').textContent = yesExposure.toLocaleString();
+            document.getElementById('collapseYesPayout').textContent = yesExposure.toLocaleString();
+            document.getElementById('collapseNo').textContent = noExposure.toLocaleString();
+            document.getElementById('collapseNoPayout').textContent = noExposure.toLocaleString();
+            
+            // Update expected value
+            const ev = (0.35 * yesExposure) + (0.65 * noExposure);
+            document.getElementById('quantumEV').innerHTML = `
+                EV = (0.35 × $${yesExposure.toLocaleString()}) + (0.65 × $${noExposure.toLocaleString()}) = $${ev.toLocaleString()}
+            `;
+        }
+
+        // Draw wave function visualization
+        function drawWaveFunction() {
+            const path = document.getElementById('wavePath');
+            const width = 800;
+            const height = 200;
+            const amplitude = 80;
+            
+            let d = `M 0 ${height/2}`;
+            
+            for (let x = 0; x <= width; x += 5) {
+                const t = x / width * 4 * Math.PI;
+                const y1 = height/2 + amplitude * Math.sin(t) * Math.exp(-x/width);
+                const y2 = height/2 + amplitude * Math.sin(t * 1.5) * Math.exp(-x/width) * 0.65;
+                const y = (y1 * 0.35 + y2 * 0.65);
+                d += ` L ${x} ${y}`;
+            }
+            
+            path.setAttribute('d', d);
+        }
+
+        // Initial calculation
+        updateCalculations();
+    </script>
+</body>
+</html>

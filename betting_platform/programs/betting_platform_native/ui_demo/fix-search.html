@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fix Search Test</title>
+    <style>
+        body { background: #000; color: #fff; font-family: monospace; padding: 20px; }
+        .log { margin: 5px 0; padding: 5px; background: #111; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        pre { background: #222; padding: 10px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>Debugging Search Issue</h1>
+    <div id="logs"></div>
+    
+    <script>
+        async function debug() {
+            const logs = document.getElementById('logs');
+            
+            function log(msg, type = '') {
+                const div = document.createElement('div');
+                div.className = 'log ' + type;
+                div.innerHTML = msg;
+                logs.appendChild(div);
+            }
+            
+            log('Testing API endpoint...');
+            
+            try {
+                // Test the exact URL used in index.html
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                log(`Response status: ${response.status} ${response.statusText}`, response.ok ? 'success' : 'error');
+                
+                if (!response.ok) {
+                    log(`Response headers: ${JSON.stringify([...response.headers])}`, 'error');
+                    return;
+                }
+                
+                const text = await response.text();
+                log(`Response length: ${text.length} bytes`);
+                
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    log('Failed to parse JSON: ' + e.message, 'error');
+                    log('First 500 chars: <pre>' + text.substring(0, 500) + '</pre>');
+                    return;
+                }
+                
+                log(`Data type: ${Array.isArray(data) ? 'Array' : typeof data}`);
+                log(`Markets count: ${Array.isArray(data) ? data.length : 'N/A'}`);
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    const first = data[0];
+                    log('First market structure:', 'success');
+                    log('<pre>' + JSON.stringify({
+                        id: first.id,
+                        title: first.title,
+                        acceptingOrders: first.acceptingOrders,
+                        active: first.active,
+                        closed: first.closed,
+                        volume24hr: first.volume24hr,
+                        liquidityNum: first.liquidityNum,
+                        outcomePrices: first.outcomePrices,
+                        outcomes: first.outcomes
+                    }, null, 2) + '</pre>');
+                    
+                    // Test filtering
+                    const activeMarkets = data.filter(m => !m.closed && (m.acceptingOrders || m.active));
+                    log(`Active markets: ${activeMarkets.length}`, 'success');
+                    
+                    // Test search
+                    const query = 'eth';
+                    const searchResults = activeMarkets.filter(m => {
+                        const searchText = (m.title || m.question || m.description || '').toLowerCase();
+                        return searchText.includes(query.toLowerCase());
+                    });
+                    log(`Search results for "${query}": ${searchResults.length}`, 'success');
+                    
+                    if (searchResults.length > 0) {
+                        log(`First match: ${searchResults[0].title || searchResults[0].question}`, 'success');
+                    }
+                }
+                
+            } catch (error) {
+                log(`Fetch error: ${error.message}`, 'error');
+                log(`Stack: <pre>${error.stack}</pre>`, 'error');
+            }
+        }
+        
+        debug();
+    </script>
+</body>
+</html>

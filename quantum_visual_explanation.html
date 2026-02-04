@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Betting Visual Explanation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFD60A 0%, #8A61FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 100px;
+            padding: 40px;
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Step Indicator */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+
+        .step.active {
+            opacity: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: #FFD60A;
+            color: #000000;
+            border-color: #FFD60A;
+        }
+
+        .step.quantum .step-number {
+            background: #8A61FF;
+            border-color: #8A61FF;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Investment Input */
+        .investment-section {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .investment-input-container {
+            margin: 40px 0;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+        }
+
+        .amount-input {
+            width: 100%;
+            padding: 30px;
+            font-size: 48px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: #FFD60A;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .amount-input:focus {
+            outline: none;
+            border-color: #FFD60A;
+            box-shadow: 0 0 40px rgba(255, 214, 10, 0.3);
+        }
+
+        .preset-amounts {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .preset-btn {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .preset-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #FFD60A;
+            transform: scale(1.05);
+        }
+
+        /* Mode Selection */
+        .mode-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .mode-card {
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .mode-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.02);
+        }
+
+        .mode-card.selected {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.1);
+        }
+
+        .mode-card.quantum.selected {
+            border-color: #8A61FF;
+            background: rgba(138, 97, 255, 0.1);
+        }
+
+        .mode-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .mode-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        /* Quantum Explanation */
+        .quantum-explanation {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .explanation-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .quantum-visual {
+            position: relative;
+            height: 600px;
+            background: rgba(138, 97, 255, 0.05);
+            border: 2px solid rgba(138, 97, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            overflow: hidden;
+        }
+
+        /* Distribution Chart */
+        .distribution-chart {
+            width: 100%;
+            height: 400px;
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            background: linear-gradient(180deg, #FFD60A 0%, #FFA500 100%);
+            border-radius: 10px 10px 0 0;
+            transition: all 0.5s ease-out;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 10px;
+        }
+
+        .chart-bar:hover {
+            filter: brightness(1.2);
+            transform: scale(1.05);
+        }
+
+        .chart-bar.quantum {
+            background: linear-gradient(180deg, #8A61FF 0%, #6B4FD9 100%);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .bar-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 10px;
+        }
+
+        /* Quantum States Visual */
+        .quantum-states-visual {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .quantum-state {
+            position: relative;
+            padding: 30px;
+            background: rgba(138, 97, 255, 0.1);
+            border: 2px solid rgba(138, 97, 255, 0.3);
+            border-radius: 20px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .quantum-state::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(138, 97, 255, 0.2) 0%, transparent 70%);
+            animation: quantumRotate 20s linear infinite;
+        }
+
+        @keyframes quantumRotate {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .state-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .state-probability {
+            font-size: 48px;
+            font-weight: 700;
+            color: #8A61FF;
+            position: relative;
+            z-index: 1;
+        }
+
+        .state-amount {
+            font-size: 24px;
+            color: #FFD60A;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Verse Distribution */
+        .verse-distribution {
+            margin-top: 40px;
+        }
+
+        .verse-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            margin: 10px 0;
+            transition: all 0.3s;
+        }
+
+        .verse-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .verse-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .verse-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD60A 0%, #FFA500 100%);
+            transition: width 0.5s ease-out;
+        }
+
+        /* Navigation */
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 60px;
+        }
+
+        .nav-btn {
+            padding: 15px 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: #FFFFFF;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.primary {
+            background: #FFD60A;
+            color: #000000;
+            border-color: #FFD60A;
+        }
+
+        .nav-btn.primary:hover {
+            background: #FFA500;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(255, 214, 10, 0.1);
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box h4 {
+            color: #FFD60A;
+            margin-bottom: 10px;
+        }
+
+        /* Animations */
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+        }
+
+        .flow-animation {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #8A61FF;
+            border-radius: 50%;
+            opacity: 0;
+            animation: flow 3s linear infinite;
+        }
+
+        @keyframes flow {
+            0% {
+                opacity: 0;
+                transform: translate(0, 0);
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(100px, 100px);
+            }
+        }
+
+        /* Collapse Animation */
+        .collapse-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            pointer-events: none;
+            display: none;
+            z-index: 2000;
+        }
+
+        .collapse-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid #8A61FF;
+            border-radius: 50%;
+            animation: collapseRing 1s ease-out;
+        }
+
+        @keyframes collapseRing {
+            from {
+                transform: scale(2);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">Quantum Betting Explained</div>
+        <div style="display: flex; gap: 30px; align-items: center;">
+            <span style="color: rgba(255, 255, 255, 0.6);">Balance: $50,000</span>
+            <span style="color: #FFD60A;">MMT: 12,500</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <div>Enter Amount</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <div>Choose Mode</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <div>See Distribution</div>
+            </div>
+        </div>
+
+        <!-- Section 1: Investment Amount -->
+        <div class="section active" id="section1">
+            <div class="investment-section">
+                <h1 class="section-title">How Much to Invest?</h1>
+                <p style="font-size: 20px; color: rgba(255, 255, 255, 0.6); margin-bottom: 40px;">
+                    Enter your investment amount to see how it's distributed
+                </p>
+
+                <div class="investment-input-container">
+                    <input type="number" class="amount-input" id="amountInput" placeholder="$0" value="1000">
+                    
+                    <div class="preset-amounts">
+                        <button class="preset-btn" onclick="setAmount(100)">$100</button>
+                        <button class="preset-btn" onclick="setAmount(500)">$500</button>
+                        <button class="preset-btn" onclick="setAmount(1000)">$1,000</button>
+                        <button class="preset-btn" onclick="setAmount(5000)">$5,000</button>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="nav-btn primary" onclick="goToSection(2)">Next: Choose Mode</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Mode Selection -->
+        <div class="section" id="section2">
+            <div style="text-align: center; margin-bottom: 60px;">
+                <h1 class="section-title">Choose Your Betting Mode</h1>
+                <p style="font-size: 20px; color: rgba(255, 255, 255, 0.6);">
+                    Standard betting or Quantum superposition?
+                </p>
+            </div>
+
+            <div class="mode-selection">
+                <!-- Standard Mode -->
+                <div class="mode-card" id="standardMode" onclick="selectMode('standard')">
+                    <div class="mode-icon">📊</div>
+                    <h3 class="mode-title">Standard Mode</h3>
+                    <p style="color: rgba(255, 255, 255, 0.7); line-height: 1.6;">
+                        Traditional betting on a single outcome. Your entire position goes to either YES or NO.
+                    </p>
+                    <div style="margin-top: 30px; padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Your Investment</div>
+                        <div style="font-size: 24px; font-weight: 600; color: #FFD60A;" id="standardAmount">$1,000</div>
+                        <div style="margin-top: 10px; font-size: 14px;">Goes to one outcome</div>
+                    </div>
+                </div>
+
+                <!-- Quantum Mode -->
+                <div class="mode-card quantum" id="quantumMode" onclick="selectMode('quantum')">
+                    <div class="mode-icon">⚛️</div>
+                    <h3 class="mode-title">Quantum Mode</h3>
+                    <p style="color: rgba(255, 255, 255, 0.7); line-height: 1.6;">
+                        Bet on multiple outcomes simultaneously. Position exists in superposition until market resolves.
+                    </p>
+                    <div style="margin-top: 30px; padding: 20px; background: rgba(138, 97, 255, 0.1); border-radius: 10px;">
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Your Investment</div>
+                        <div style="font-size: 24px; font-weight: 600; color: #8A61FF;" id="quantumAmount">$1,000</div>
+                        <div style="margin-top: 10px; font-size: 14px;">Split across outcomes</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="nav-btn" onclick="goToSection(1)">Back</button>
+                <button class="nav-btn primary" onclick="goToSection(3)" id="continueBtn" style="display: none;">Continue</button>
+            </div>
+        </div>
+
+        <!-- Section 3: Distribution Visualization -->
+        <div class="section" id="section3">
+            <div class="quantum-explanation">
+                <!-- Left Panel -->
+                <div>
+                    <div class="explanation-panel">
+                        <h2 style="margin-bottom: 20px; color: #FFD60A;">How Your Money is Distributed</h2>
+                        
+                        <div id="standardExplanation" style="display: none;">
+                            <div class="info-box">
+                                <h4>Standard Betting</h4>
+                                <p>Your entire investment goes to one outcome. Simple and straightforward.</p>
+                            </div>
+                            
+                            <div style="margin-top: 30px;">
+                                <h3 style="margin-bottom: 15px;">Selected Market</h3>
+                                <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
+                                    <div style="font-weight: 600;">Will AGI be achieved by 2025?</div>
+                                    <div style="margin-top: 10px; display: flex; justify-content: space-between;">
+                                        <span>Investment:</span>
+                                        <span style="color: #FFD60A; font-weight: 600;" id="standardInvestment">$1,000</span>
+                                    </div>
+                                    <div style="margin-top: 5px; display: flex; justify-content: space-between;">
+                                        <span>Leverage:</span>
+                                        <span style="color: #FFD60A; font-weight: 600;">5x</span>
+                                    </div>
+                                    <div style="margin-top: 5px; display: flex; justify-content: space-between;">
+                                        <span>Exposure:</span>
+                                        <span style="color: #FFD60A; font-weight: 600;" id="standardExposure">$5,000</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="quantumExplanation" style="display: none;">
+                            <div class="info-box">
+                                <h4>Quantum Superposition</h4>
+                                <p>Your investment exists in multiple states simultaneously until the market resolves.</p>
+                            </div>
+
+                            <div class="quantum-states-visual">
+                                <div class="quantum-state pulse">
+                                    <div class="state-title">YES State</div>
+                                    <div class="state-probability" id="yesProb">50%</div>
+                                    <div class="state-amount" id="yesAmount">$500</div>
+                                </div>
+                                <div class="quantum-state pulse">
+                                    <div class="state-title">NO State</div>
+                                    <div class="state-probability" id="noProb">50%</div>
+                                    <div class="state-amount" id="noAmount">$500</div>
+                                </div>
+                            </div>
+
+                            <div class="info-box" style="background: rgba(138, 97, 255, 0.1); border-color: #8A61FF;">
+                                <h4 style="color: #8A61FF;">How Quantum Collapse Works</h4>
+                                <p>When the market resolves, your position "collapses" to the winning outcome. You receive the full leveraged return on your allocated amount for that outcome.</p>
+                            </div>
+                        </div>
+
+                        <div class="verse-distribution" id="verseDistribution">
+                            <h3 style="margin-bottom: 20px;">Verse Distribution</h3>
+                            <div id="verseList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel - Chart -->
+                <div>
+                    <div class="explanation-panel">
+                        <h2 style="margin-bottom: 20px; text-align: center;">Visual Distribution</h2>
+                        
+                        <div class="distribution-chart" id="distributionChart">
+                            <!-- Chart bars will be added dynamically -->
+                        </div>
+
+                        <div style="margin-top: 60px; text-align: center;">
+                            <h3 style="margin-bottom: 20px;">Total Position Summary</h3>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                                <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
+                                    <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Investment</div>
+                                    <div style="font-size: 24px; font-weight: 600; color: #FFD60A;" id="totalInvestment">$1,000</div>
+                                </div>
+                                <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
+                                    <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Total Leverage</div>
+                                    <div style="font-size: 24px; font-weight: 600; color: #FFD60A;" id="totalLeverage">5x</div>
+                                </div>
+                                <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
+                                    <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Total Exposure</div>
+                                    <div style="font-size: 24px; font-weight: 600; color: #FFD60A;" id="totalExposure">$5,000</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 30px; text-align: center;">
+                            <button class="nav-btn primary" onclick="simulateCollapse()" id="collapseBtn" style="display: none;">
+                                Simulate Quantum Collapse
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="nav-btn" onclick="goToSection(2)">Back</button>
+                <button class="nav-btn primary" onclick="executeTrade()">Execute Trade</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collapse Animation -->
+    <div class="collapse-animation" id="collapseAnimation">
+        <div class="collapse-circle"></div>
+    </div>
+
+    <script>
+        let investmentAmount = 1000;
+        let selectedMode = null;
+        let currentSection = 1;
+
+        // Sample verse data
+        const verses = [
+            { id: 1, name: 'Compute Scaling', multiplier: 2.0, allocation: 30 },
+            { id: 2, name: 'Algorithm Breakthrough', multiplier: 1.8, allocation: 25 },
+            { id: 3, name: 'Regulatory Framework', multiplier: 1.6, allocation: 20 },
+            { id: 4, name: 'Safety Measures', multiplier: 1.4, allocation: 15 },
+            { id: 5, name: 'Lab Competition', multiplier: 1.7, allocation: 10 }
+        ];
+
+        function setAmount(amount) {
+            investmentAmount = amount;
+            document.getElementById('amountInput').value = amount;
+            updateAmountDisplays();
+        }
+
+        function updateAmountDisplays() {
+            const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+            investmentAmount = amount;
+            
+            // Update all amount displays
+            document.getElementById('standardAmount').textContent = '$' + amount.toLocaleString();
+            document.getElementById('quantumAmount').textContent = '$' + amount.toLocaleString();
+            document.getElementById('standardInvestment').textContent = '$' + amount.toLocaleString();
+            document.getElementById('standardExposure').textContent = '$' + (amount * 5).toLocaleString();
+            document.getElementById('totalInvestment').textContent = '$' + amount.toLocaleString();
+            document.getElementById('totalExposure').textContent = '$' + (amount * 5).toLocaleString();
+            
+            // Update quantum states
+            document.getElementById('yesAmount').textContent = '$' + (amount * 0.5).toLocaleString();
+            document.getElementById('noAmount').textContent = '$' + (amount * 0.5).toLocaleString();
+            
+            // Update chart if visible
+            if (currentSection === 3 && selectedMode) {
+                updateDistributionChart();
+            }
+        }
+
+        function goToSection(section) {
+            // Update step indicator
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+                if (selectedMode === 'quantum') {
+                    step.classList.add('quantum');
+                }
+            });
+            document.getElementById(`step${section}`).classList.add('active');
+            
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(`section${section}`).classList.add('active');
+            currentSection = section;
+            
+            // Update displays
+            updateAmountDisplays();
+            
+            // Update chart for section 3
+            if (section === 3 && selectedMode) {
+                updateDistributionChart();
+                updateVerseDistribution();
+            }
+        }
+
+        function selectMode(mode) {
+            selectedMode = mode;
+            
+            // Update UI
+            document.querySelectorAll('.mode-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            if (mode === 'standard') {
+                document.getElementById('standardMode').classList.add('selected');
+                document.getElementById('standardExplanation').style.display = 'block';
+                document.getElementById('quantumExplanation').style.display = 'none';
+                document.getElementById('collapseBtn').style.display = 'none';
+            } else {
+                document.getElementById('quantumMode').classList.add('selected');
+                document.getElementById('standardExplanation').style.display = 'none';
+                document.getElementById('quantumExplanation').style.display = 'block';
+                document.getElementById('collapseBtn').style.display = 'inline-block';
+            }
+            
+            document.getElementById('continueBtn').style.display = 'inline-block';
+        }
+
+        function updateDistributionChart() {
+            const chart = document.getElementById('distributionChart');
+            chart.innerHTML = '';
+            
+            if (selectedMode === 'standard') {
+                // Single bar for standard mode
+                const bar = createChartBar('YES Position', investmentAmount, 100, false);
+                bar.style.left = '45%';
+                chart.appendChild(bar);
+            } else {
+                // Quantum mode - show superposition
+                const yesBar = createChartBar('YES State', investmentAmount * 0.5, 50, true);
+                yesBar.style.left = '25%';
+                chart.appendChild(yesBar);
+                
+                const noBar = createChartBar('NO State', investmentAmount * 0.5, 50, true);
+                noBar.style.left = '55%';
+                chart.appendChild(noBar);
+                
+                // Add quantum connection visual
+                const connection = document.createElement('div');
+                connection.style.cssText = `
+                    position: absolute;
+                    bottom: 200px;
+                    left: 35%;
+                    width: 30%;
+                    height: 2px;
+                    background: linear-gradient(90deg, transparent, #8A61FF, transparent);
+                    animation: quantumFlow 2s ease-in-out infinite;
+                `;
+                chart.appendChild(connection);
+            }
+        }
+
+        function createChartBar(label, amount, percentage, isQuantum) {
+            const bar = document.createElement('div');
+            bar.className = `chart-bar ${isQuantum ? 'quantum' : ''}`;
+            bar.style.width = '20%';
+            bar.style.height = `${percentage * 3}px`;
+            
+            const value = document.createElement('div');
+            value.className = 'bar-value';
+            value.textContent = '$' + amount.toLocaleString();
+            bar.appendChild(value);
+            
+            const labelEl = document.createElement('div');
+            labelEl.className = 'bar-label';
+            labelEl.textContent = label;
+            bar.appendChild(labelEl);
+            
+            return bar;
+        }
+
+        function updateVerseDistribution() {
+            const verseList = document.getElementById('verseList');
+            verseList.innerHTML = '';
+            
+            verses.forEach(verse => {
+                const allocation = (investmentAmount * verse.allocation / 100);
+                const item = document.createElement('div');
+                item.className = 'verse-item';
+                item.innerHTML = `
+                    <div>
+                        <div style="font-weight: 600;">${verse.name}</div>
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">×${verse.multiplier} leverage</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color: #FFD60A; font-weight: 600;">$${allocation.toLocaleString()}</div>
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">${verse.allocation}%</div>
+                    </div>
+                `;
+                verseList.appendChild(item);
+                
+                const progress = document.createElement('div');
+                progress.className = 'verse-progress';
+                progress.innerHTML = `<div class="verse-fill" style="width: ${verse.allocation}%"></div>`;
+                item.appendChild(progress);
+            });
+        }
+
+        function simulateCollapse() {
+            const animation = document.getElementById('collapseAnimation');
+            animation.style.display = 'block';
+            
+            // Randomly choose outcome
+            const outcome = Math.random() > 0.5 ? 'YES' : 'NO';
+            
+            setTimeout(() => {
+                animation.style.display = 'none';
+                
+                // Update chart to show collapsed state
+                const chart = document.getElementById('distributionChart');
+                chart.innerHTML = '';
+                
+                const bar = createChartBar(`${outcome} Won!`, investmentAmount, 100, false);
+                bar.style.left = '40%';
+                bar.style.background = 'linear-gradient(180deg, #4CD964 0%, #3AB851 100%)';
+                chart.appendChild(bar);
+                
+                // Show result
+                const resultDiv = document.createElement('div');
+                resultDiv.style.cssText = `
+                    position: absolute;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    padding: 20px 40px;
+                    background: rgba(76, 217, 100, 0.2);
+                    border: 2px solid #4CD964;
+                    border-radius: 15px;
+                    font-size: 20px;
+                    font-weight: 600;
+                `;
+                resultDiv.textContent = `Quantum Collapsed to ${outcome}! You win $${(investmentAmount * 5).toLocaleString()}`;
+                chart.appendChild(resultDiv);
+            }, 1000);
+        }
+
+        function executeTrade() {
+            alert(`Trade Executed!\n\nMode: ${selectedMode === 'standard' ? 'Standard' : 'Quantum'}\nInvestment: $${investmentAmount.toLocaleString()}\nLeverage: 5x\nTotal Exposure: $${(investmentAmount * 5).toLocaleString()}`);
+        }
+
+        // Event listeners
+        document.getElementById('amountInput').addEventListener('input', updateAmountDisplays);
+
+        // Add quantum flow animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes quantumFlow {
+                0%, 100% {
+                    opacity: 0.3;
+                    transform: scaleX(0.8);
+                }
+                50% {
+                    opacity: 1;
+                    transform: scaleX(1);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

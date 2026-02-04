@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Complete Market Selection Flow</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
+        .step { margin: 20px 0; padding: 15px; background: #111; border-radius: 8px; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        .warning { color: #FFD60A; }
+        button { background: #FFD60A; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        pre { background: #222; padding: 10px; border-radius: 4px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>Complete Market Selection Flow Test</h1>
+    
+    <div class="step">
+        <h2>Instructions:</h2>
+        <ol>
+            <li>Open the main platform: <a href="index.html" target="_blank" style="color: #FFD60A;">index.html</a></li>
+            <li>Make sure the API server is running on port 8081</li>
+            <li>Search for "Bitcoin" or "ETH" or "Trump"</li>
+            <li>Click on a market from search results</li>
+            <li>Then click "Run Diagnostics" below</li>
+        </ol>
+    </div>
+    
+    <div class="step">
+        <button onclick="runDiagnostics()">Run Diagnostics</button>
+        <button onclick="simulateMarketSelection()">Simulate Market Selection</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script src="platform_main.js"></script>
+    <script src="backend_integration.js"></script>
+    <script>
+        const results = document.getElementById('results');
+        
+        function log(msg, type = '') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = msg;
+            results.appendChild(div);
+        }
+        
+        function runDiagnostics() {
+            results.innerHTML = '<h2>Running Diagnostics...</h2>';
+            
+            // Check 1: Platform State
+            log('<h3>1. Platform State Check</h3>');
+            if (window.platformState) {
+                log('✓ platformState exists', 'success');
+                log('Selected Market: ' + (window.platformState.selectedMarket ? window.platformState.selectedMarket.title : 'None'));
+                log('Selected Verses: ' + window.platformState.selectedVerses.length);
+            } else {
+                log('✗ platformState not found', 'error');
+            }
+            
+            // Check 2: DOM Elements
+            log('<h3>2. DOM Elements Check</h3>');
+            const elements = {
+                'Verses Section': document.getElementById('versesSection'),
+                'Verse Flow Container': document.getElementById('verseFlowContainer'),
+                'Verse Grid': document.getElementById('verseGrid'),
+                'Verse Connections SVG': document.getElementById('verseConnections'),
+                'Verse Levels': document.getElementById('verseLevels')
+            };
+            
+            for (const [name, el] of Object.entries(elements)) {
+                if (el) {
+                    const display = window.getComputedStyle(el).display;
+                    const visibility = window.getComputedStyle(el).visibility;
+                    log(`✓ ${name}: display=${display}, visibility=${visibility}`, display !== 'none' ? 'success' : 'warning');
+                } else {
+                    log(`✗ ${name}: not found`, 'error');
+                }
+            }
+            
+            // Check 3: Functions
+            log('<h3>3. Function Availability</h3>');
+            const functions = ['getVersesForMarket', 'updateAvailableVerses', 'updateVerseFlow', 'createVerseCard'];
+            functions.forEach(fn => {
+                if (window[fn]) {
+                    log(`✓ ${fn} exists`, 'success');
+                } else {
+                    log(`✗ ${fn} not found`, 'error');
+                }
+            });
+            
+            // Check 4: Verse Generation
+            if (window.platformState?.selectedMarket && window.getVersesForMarket) {
+                log('<h3>4. Verse Generation Test</h3>');
+                const verses = window.getVersesForMarket(window.platformState.selectedMarket);
+                log(`Generated ${verses.length} verses`, verses.length > 0 ? 'success' : 'warning');
+                if (verses.length > 0) {
+                    log('<pre>' + JSON.stringify(verses[0], null, 2) + '</pre>');
+                }
+            }
+        }
+        
+        async function simulateMarketSelection() {
+            results.innerHTML = '<h2>Simulating Market Selection...</h2>';
+            
+            // Initialize platform state if needed
+            if (!window.platformState) {
+                window.platformState = {
+                    markets: new Map(),
+                    selectedMarket: null,
+                    selectedOutcome: null,
+                    selectedVerses: [],
+                    activePositions: []
+                };
+            }
+            
+            // Create test market
+            const testMarket = {
+                id: 'test-market-' + Date.now(),
+                title: 'Will Bitcoin reach $200k by end of 2025?',
+                category: 'Crypto',
+                outcomes: ['Yes', 'No'],
+                yesPrice: 0.25,
+                volume24hr: 8500000,
+                liquidityNum: 3200000
+            };
+            
+            // Store and select market
+            window.platformState.markets.set(testMarket.id, testMarket);
+            log('Created test market: ' + testMarket.title);
+            
+            // Call selectSearchResult
+            if (window.selectSearchResult) {
+                log('Calling selectSearchResult...');
+                window.selectSearchResult(testMarket.id);
+                
+                // Wait a bit for async operations
+                setTimeout(() => {
+                    log('<h3>Post-Selection Check:</h3>');
+                    
+                    // Check verses section visibility
+                    const versesSection = document.getElementById('versesSection');
+                    if (versesSection) {
+                        log('Verses Section display: ' + versesSection.style.display, 
+                            versesSection.style.display === 'block' ? 'success' : 'error');
+                    }
+                    
+                    // Check verse content
+                    const verseLevels = document.getElementById('verseLevels');
+                    if (verseLevels && verseLevels.children.length > 0) {
+                        log(`✓ Verse levels populated with ${verseLevels.children.length} levels`, 'success');
+                    } else {
+                        log('✗ No verse levels found', 'error');
+                    }
+                    
+                    // Check verse cards
+                    const verseCards = document.querySelectorAll('.verse-card');
+                    log(`Found ${verseCards.length} verse cards`, verseCards.length > 0 ? 'success' : 'warning');
+                }, 1000);
+            } else {
+                log('✗ selectSearchResult function not found', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

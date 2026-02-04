@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quantum UI Test</title>
+</head>
+<body>
+    <h1>Testing Quantum Platform UI</h1>
+    <button onclick="testAPI()">Test API Connection</button>
+    <button onclick="openQuantumUI()">Open Quantum UI</button>
+    <div id="result"></div>
+    
+    <script src="js/api_client.js"></script>
+    <script>
+        async function testAPI() {
+            const result = document.getElementById('result');
+            try {
+                // Test API connection
+                const response = await fetch('http://localhost:8081/api/markets');
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = '<p style="color: green;">✓ API Connected! Markets: ' + data.length + '</p>';
+                } else {
+                    result.innerHTML = '<p style="color: red;">✗ API Error: ' + response.status + '</p>';
+                }
+            } catch (error) {
+                result.innerHTML = '<p style="color: red;">✗ Connection Error: ' + error.message + '</p>';
+            }
+        }
+        
+        function openQuantumUI() {
+            window.location.href = 'index.html';
+        }
+        
+        // Test on load
+        window.addEventListener('DOMContentLoaded', testAPI);
+    </script>
+</body>
+</html>

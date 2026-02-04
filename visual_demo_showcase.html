@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Betting Platform - Visual Feature Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Demo Stage */
+        .demo-stage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #0A0A0A 0%, #000000 100%);
+        }
+
+        /* Demo Navigation */
+        .demo-nav {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px 40px;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .demo-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .demo-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .demo-btn.active {
+            background: #FFD60A;
+            color: #000000;
+            border-color: #FFD60A;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #FFD60A;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.5);
+        }
+
+        /* Feature Containers */
+        .feature-container {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .feature-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Verse Demo */
+        .verse-demo {
+            width: 800px;
+            background: #0A0A0A;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .verse-demo-header {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #FFD60A;
+        }
+
+        .verse-tree-demo {
+            position: relative;
+            min-height: 400px;
+        }
+
+        .verse-node-demo {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin: 10px 0;
+            cursor: move;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .verse-node-demo::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #FFD60A;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .verse-node-demo.new {
+            animation: slideInRight 0.5s ease-out;
+            border-color: rgba(255, 214, 10, 0.5);
+        }
+
+        .verse-node-demo.new::before {
+            opacity: 1;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .verse-node-demo.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+            cursor: grabbing;
+        }
+
+        .verse-node-demo[data-level="1"] { margin-left: 0px; }
+        .verse-node-demo[data-level="2"] { margin-left: 40px; }
+        .verse-node-demo[data-level="3"] { margin-left: 80px; }
+        .verse-node-demo[data-level="4"] { margin-left: 120px; }
+        .verse-node-demo[data-level="5"] { margin-left: 160px; }
+
+        .verse-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .verse-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(255, 214, 10, 0.2), rgba(255, 214, 10, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .verse-details {
+            flex: 1;
+        }
+
+        .verse-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .verse-path {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .verse-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .add-verse-animation {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .plus-icon {
+            font-size: 60px;
+            color: #FFD60A;
+            animation: addPulse 1s ease-out;
+        }
+
+        @keyframes addPulse {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Quantum Demo */
+        .quantum-demo {
+            width: 900px;
+            background: #0A0A0A;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+        }
+
+        .quantum-visualization {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            position: relative;
+        }
+
+        .quantum-center {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 214, 10, 0.3), transparent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: quantumPulse 3s infinite;
+        }
+
+        @keyframes quantumPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .quantum-core {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #FFD60A, #FFA500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+            box-shadow: 0 0 50px rgba(255, 214, 10, 0.5);
+        }
+
+        .quantum-state-demo {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quantum-state-demo.collapsed {
+            animation: quantumCollapse 0.8s ease-out;
+            background: rgba(255, 214, 10, 0.2);
+            border-color: rgba(255, 214, 10, 0.5);
+        }
+
+        @keyframes quantumCollapse {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            25% {
+                transform: scale(1.3) rotate(90deg);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(0.8) rotate(180deg);
+                opacity: 0.5;
+            }
+            75% {
+                transform: scale(1.1) rotate(270deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1) rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        .quantum-probability {
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+
+        .quantum-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .entanglement-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #9333EA, transparent);
+            transform-origin: left center;
+            animation: entanglePulse 2s infinite;
+        }
+
+        @keyframes entanglePulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Leverage Demo */
+        .leverage-demo {
+            width: 700px;
+            background: #0A0A0A;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .leverage-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .leverage-meter {
+            width: 500px;
+            height: 250px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 125px 125px 0 0;
+            overflow: hidden;
+        }
+
+        .leverage-needle {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            height: 120px;
+            background: #FFD60A;
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(-90deg);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(255, 214, 10, 0.5);
+        }
+
+        .leverage-scale {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: space-between;
+            width: 400px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .leverage-display-large {
+            font-size: 72px;
+            font-weight: 100;
+            background: linear-gradient(135deg, #FFFFFF, #FFD60A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .leverage-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+
+        .leverage-stat {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .leverage-stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .leverage-stat-value {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .risk-indicator {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .risk-level {
+            height: 100%;
+            background: linear-gradient(90deg, #00D632, #FFD60A, #FF3B30);
+            width: 10%;
+            transition: width 0.5s;
+        }
+
+        /* Trading Flow Demo */
+        .trading-demo {
+            width: 1000px;
+            background: #0A0A0A;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .trading-flow {
+            display: flex;
+            gap: 30px;
+            align-items: stretch;
+        }
+
+        .trading-step {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .trading-step.active {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: rgba(255, 214, 10, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .trading-step.active .step-number {
+            background: #FFD60A;
+            color: #000;
+            border-color: #FFD60A;
+        }
+
+        .step-arrow {
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .order-preview {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .order-detail {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .order-detail-label {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .order-detail-value {
+            font-weight: 500;
+        }
+
+        /* MMT Rewards Demo */
+        .mmt-demo {
+            width: 800px;
+            background: #0A0A0A;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .mmt-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .mmt-token {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #FFD60A, #FFA500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: #000;
+            position: relative;
+            animation: tokenFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes tokenFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .mmt-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .mmt-particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #FFD60A;
+            border-radius: 50%;
+            animation: particleFloat 2s ease-out infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .mmt-counter {
+            font-size: 48px;
+            font-weight: 300;
+            margin: 20px 0;
+        }
+
+        .mmt-actions {
+            display: flex;
+            gap: 20px;
+        }
+
+        .mmt-action-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .mmt-action-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .mmt-action-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .mmt-action-value {
+            font-size: 20px;
+            font-weight: 500;
+            color: #FFD60A;
+            margin-top: 5px;
+        }
+
+        /* Status Bar */
+        .demo-status {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 15px 30px;
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 14px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-label {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .status-value {
+            font-weight: 500;
+            color: #FFD60A;
+        }
+
+        /* Animations */
+        .glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 214, 10, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 214, 10, 0.8); }
+        }
+
+        .pulse {
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Status Bar -->
+    <div class="demo-status">
+        <div class="status-item">
+            <span class="status-label">Balance:</span>
+            <span class="status-value" id="balanceStatus">$10,000</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">MMT:</span>
+            <span class="status-value" id="mmtStatus">1,250</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Positions:</span>
+            <span class="status-value" id="positionsStatus">0</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Active Verses:</span>
+            <span class="status-value" id="versesStatus">3</span>
+        </div>
+    </div>
+
+    <!-- Demo Stage -->
+    <div class="demo-stage">
+        <!-- Verse Demo -->
+        <div class="feature-container active" id="verseDemo">
+            <div class="verse-demo">
+                <div class="verse-demo-header">Verse Hierarchy System</div>
+                <div class="verse-tree-demo" id="verseTreeDemo">
+                    <div class="verse-node-demo" data-level="1">
+                        <div class="verse-info">
+                            <div class="verse-icon">🌐</div>
+                            <div class="verse-details">
+                                <div class="verse-name">Crypto</div>
+                                <div class="verse-path">Root › Crypto</div>
+                            </div>
+                        </div>
+                        <div class="verse-stats">
+                            <span>450 markets</span>
+                            <span>$125M volume</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="add-verse-animation" id="addAnimation" style="display: none;">
+                    <div class="plus-icon">+</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quantum Demo -->
+        <div class="feature-container" id="quantumDemo">
+            <div class="quantum-demo">
+                <div class="verse-demo-header">Quantum Superposition & Entanglement</div>
+                <div class="quantum-visualization">
+                    <div class="quantum-center">
+                        <div class="quantum-core">Q</div>
+                    </div>
+                    <!-- Quantum states will be positioned around the center -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Leverage Demo -->
+        <div class="feature-container" id="leverageDemo">
+            <div class="leverage-demo">
+                <div class="verse-demo-header">Dynamic Leverage Control</div>
+                <div class="leverage-visual">
+                    <div class="leverage-display-large" id="leverageDisplayLarge">1x</div>
+                    <div class="leverage-meter">
+                        <div class="leverage-needle" id="leverageNeedle"></div>
+                        <div class="leverage-scale">
+                            <span>1x</span>
+                            <span>25x</span>
+                            <span>50x</span>
+                            <span>75x</span>
+                            <span>100x</span>
+                        </div>
+                    </div>
+                    <div class="leverage-info">
+                        <div class="leverage-stat">
+                            <div class="leverage-stat-label">Position Size</div>
+                            <div class="leverage-stat-value" id="positionSizeDemo">$1,000</div>
+                        </div>
+                        <div class="leverage-stat">
+                            <div class="leverage-stat-label">Liquidation Price</div>
+                            <div class="leverage-stat-value" id="liquidationPriceDemo">$0.990</div>
+                        </div>
+                        <div class="leverage-stat">
+                            <div class="leverage-stat-label">Max Loss</div>
+                            <div class="leverage-stat-value" id="maxLossDemo">$1,000</div>
+                        </div>
+                    </div>
+                    <div class="risk-indicator">
+                        <div class="risk-level" id="riskLevel"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trading Flow Demo -->
+        <div class="feature-container" id="tradingDemo">
+            <div class="trading-demo">
+                <div class="verse-demo-header">Complete Trading Flow</div>
+                <div class="trading-flow">
+                    <div class="trading-step" id="step1">
+                        <div class="step-number">1</div>
+                        <h3>Select Market</h3>
+                        <p>Choose from verses</p>
+                        <div class="step-arrow">→</div>
+                    </div>
+                    <div class="trading-step" id="step2">
+                        <div class="step-number">2</div>
+                        <h3>Choose Order Type</h3>
+                        <p>Market, Limit, Stop</p>
+                        <div class="step-arrow">→</div>
+                    </div>
+                    <div class="trading-step" id="step3">
+                        <div class="step-number">3</div>
+                        <h3>Set Parameters</h3>
+                        <p>Amount & Leverage</p>
+                        <div class="step-arrow">→</div>
+                    </div>
+                    <div class="trading-step" id="step4">
+                        <div class="step-number">4</div>
+                        <h3>Execute Trade</h3>
+                        <p>Confirm & Submit</p>
+                    </div>
+                </div>
+                <div class="order-preview">
+                    <h3 style="margin-bottom: 15px;">Order Preview</h3>
+                    <div class="order-details">
+                        <div class="order-detail">
+                            <span class="order-detail-label">Market:</span>
+                            <span class="order-detail-value" id="marketPreview">BTC $100k EOY</span>
+                        </div>
+                        <div class="order-detail">
+                            <span class="order-detail-label">Type:</span>
+                            <span class="order-detail-value" id="typePreview">Market Order</span>
+                        </div>
+                        <div class="order-detail">
+                            <span class="order-detail-label">Side:</span>
+                            <span class="order-detail-value" id="sidePreview">BUY YES</span>
+                        </div>
+                        <div class="order-detail">
+                            <span class="order-detail-label">Amount:</span>
+                            <span class="order-detail-value" id="amountPreview">$1,000</span>
+                        </div>
+                        <div class="order-detail">
+                            <span class="order-detail-label">Leverage:</span>
+                            <span class="order-detail-value" id="leveragePreview">10x</span>
+                        </div>
+                        <div class="order-detail">
+                            <span class="order-detail-label">MMT Reward:</span>
+                            <span class="order-detail-value" id="mmtPreview" style="color: #FFD60A;">+100 MMT</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MMT Demo -->
+        <div class="feature-container" id="mmtDemo">
+            <div class="mmt-demo">
+                <div class="verse-demo-header">MMT Token Rewards System</div>
+                <div class="mmt-visual">
+                    <div class="mmt-token">
+                        <div class="mmt-particles" id="mmtParticles"></div>
+                        MMT
+                    </div>
+                    <div class="mmt-counter" id="mmtCounter">0 MMT</div>
+                    <div class="mmt-actions">
+                        <div class="mmt-action-card">
+                            <div class="mmt-action-icon">📈</div>
+                            <div class="mmt-action-label">Trading Rewards</div>
+                            <div class="mmt-action-value">0.1 MMT/$</div>
+                        </div>
+                        <div class="mmt-action-card">
+                            <div class="mmt-action-icon">💎</div>
+                            <div class="mmt-action-label">Staking APY</div>
+                            <div class="mmt-action-value">18.7%</div>
+                        </div>
+                        <div class="mmt-action-card">
+                            <div class="mmt-action-icon">🎯</div>
+                            <div class="mmt-action-label">Fee Rebate</div>
+                            <div class="mmt-action-value">15%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Navigation -->
+    <div class="demo-nav">
+        <button class="demo-btn active" onclick="showDemo('verse')">Verses</button>
+        <button class="demo-btn" onclick="showDemo('quantum')">Quantum</button>
+        <button class="demo-btn" onclick="showDemo('leverage')">Leverage</button>
+        <button class="demo-btn" onclick="showDemo('trading')">Trading</button>
+        <button class="demo-btn" onclick="showDemo('mmt')">MMT Tokens</button>
+        <button class="play-btn" onclick="playFullDemo()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M4 2L18 10L4 18V2Z" fill="black"/>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        // Demo Controller
+        class VisualDemoController {
+            constructor() {
+                this.currentDemo = 'verse';
+                this.verseCount = 1;
+                this.quantumStates = [];
+                this.leverageValue = 1;
+                this.mmtBalance = 0;
+                this.positions = 0;
+                this.isPlaying = false;
+            }
+
+            // Verse Demo Functions
+            addVerseWithAnimation() {
+                const treeDemo = document.getElementById('verseTreeDemo');
+                const addAnimation = document.getElementById('addAnimation');
+                
+                // Show add animation
+                addAnimation.style.display = 'block';
+                
+                setTimeout(() => {
+                    addAnimation.style.display = 'none';
+                    
+                    // Add new verses with hierarchy
+                    const newVerses = [
+                        { name: 'Bitcoin', level: 2, path: 'Root › Crypto › Bitcoin', markets: 120, volume: '$45M', icon: '₿' },
+                        { name: 'Price Prediction', level: 3, path: 'Root › Crypto › Bitcoin › Price Prediction', markets: 35, volume: '$15M', icon: '📊' },
+                        { name: '$100k EOY', level: 4, path: 'Root › Crypto › Bitcoin › Price Prediction › $100k EOY', markets: 1, volume: '$2.4M', icon: '🎯' }
+                    ];
+                    
+                    newVerses.forEach((verse, index) => {
+                        setTimeout(() => {
+                            const verseNode = document.createElement('div');
+                            verseNode.className = 'verse-node-demo new';
+                            verseNode.setAttribute('data-level', verse.level);
+                            verseNode.innerHTML = `
+                                <div class="verse-info">
+                                    <div class="verse-icon">${verse.icon}</div>
+                                    <div class="verse-details">
+                                        <div class="verse-name">${verse.name}</div>
+                                        <div class="verse-path">${verse.path}</div>
+                                    </div>
+                                </div>
+                                <div class="verse-stats">
+                                    <span>${verse.markets} markets</span>
+                                    <span>${verse.volume}</span>
+                                </div>
+                            `;
+                            
+                            treeDemo.appendChild(verseNode);
+                            this.verseCount++;
+                            document.getElementById('versesStatus').textContent = this.verseCount;
+                            
+                            // Make draggable
+                            this.makeDraggable(verseNode);
+                        }, index * 500);
+                    });
+                }, 1000);
+            }
+
+            makeDraggable(element) {
+                let isDragging = false;
+                let currentX;
+                let currentY;
+                let initialX;
+                let initialY;
+                let xOffset = 0;
+                let yOffset = 0;
+
+                element.addEventListener('mousedown', dragStart);
+                element.addEventListener('mouseup', dragEnd);
+                element.addEventListener('mousemove', drag);
+
+                function dragStart(e) {
+                    initialX = e.clientX - xOffset;
+                    initialY = e.clientY - yOffset;
+                    if (e.target.closest('.verse-node-demo')) {
+                        isDragging = true;
+                        element.classList.add('dragging');
+                    }
+                }
+
+                function drag(e) {
+                    if (isDragging) {
+                        e.preventDefault();
+                        currentX = e.clientX - initialX;
+                        currentY = e.clientY - initialY;
+                        xOffset = currentX;
+                        yOffset = currentY;
+                        element.style.transform = `translate(${currentX}px, ${currentY}px)`;
+                    }
+                }
+
+                function dragEnd() {
+                    isDragging = false;
+                    element.classList.remove('dragging');
+                    // Snap back
+                    setTimeout(() => {
+                        element.style.transform = 'translate(0, 0)';
+                        xOffset = 0;
+                        yOffset = 0;
+                    }, 300);
+                }
+            }
+
+            // Quantum Demo Functions
+            createQuantumStates() {
+                const visualization = document.querySelector('.quantum-visualization');
+                
+                // Clear existing states
+                document.querySelectorAll('.quantum-state-demo, .entanglement-line').forEach(el => el.remove());
+                
+                const states = [
+                    { angle: 0, probability: 0.73, label: 'YES' },
+                    { angle: 90, probability: 0.27, label: 'NO' },
+                    { angle: 180, probability: 0.45, label: 'SUPER' },
+                    { angle: 270, probability: 0.82, label: 'META' }
+                ];
+                
+                states.forEach((state, index) => {
+                    const radius = 200;
+                    const angleRad = (state.angle * Math.PI) / 180;
+                    const x = Math.cos(angleRad) * radius + 450 - 60; // Center + offset
+                    const y = Math.sin(angleRad) * radius + 200 - 60;
+                    
+                    const stateEl = document.createElement('div');
+                    stateEl.className = 'quantum-state-demo';
+                    stateEl.style.left = `${x}px`;
+                    stateEl.style.top = `${y}px`;
+                    stateEl.innerHTML = `
+                        <div class="quantum-probability">${state.probability}</div>
+                        <div class="quantum-label">${state.label}</div>
+                    `;
+                    
+                    stateEl.addEventListener('click', () => this.collapseState(stateEl, index));
+                    visualization.appendChild(stateEl);
+                    
+                    // Add entanglement lines
+                    if (index > 0) {
+                        const line = document.createElement('div');
+                        line.className = 'entanglement-line';
+                        line.style.width = `${radius * 2}px`;
+                        line.style.left = '350px';
+                        line.style.top = '200px';
+                        line.style.transform = `rotate(${state.angle}deg)`;
+                        visualization.appendChild(line);
+                    }
+                });
+                
+                this.quantumStates = states;
+            }
+
+            collapseState(element, index) {
+                element.classList.add('collapsed');
+                
+                // Update market prices based on collapse
+                setTimeout(() => {
+                    const impact = this.quantumStates[index].probability;
+                    this.showNotification(`Quantum state collapsed! Market impact: ${(impact * 100).toFixed(0)}%`);
+                }, 800);
+            }
+
+            // Leverage Demo Functions
+            animateLeverage() {
+                let targetLeverage = 50;
+                let currentLeverage = this.leverageValue;
+                
+                const animate = setInterval(() => {
+                    currentLeverage = Math.min(currentLeverage + 1, targetLeverage);
+                    this.updateLeverage(currentLeverage);
+                    
+                    if (currentLeverage >= targetLeverage) {
+                        clearInterval(animate);
+                        
+                        // Animate back down
+                        setTimeout(() => {
+                            const animateDown = setInterval(() => {
+                                currentLeverage = Math.max(currentLeverage - 2, 1);
+                                this.updateLeverage(currentLeverage);
+                                
+                                if (currentLeverage <= 1) {
+                                    clearInterval(animateDown);
+                                }
+                            }, 50);
+                        }, 1000);
+                    }
+                }, 50);
+            }
+
+            updateLeverage(value) {
+                this.leverageValue = value;
+                
+                // Update display
+                document.getElementById('leverageDisplayLarge').textContent = `${value}x`;
+                
+                // Update needle rotation (-90 to 90 degrees)
+                const rotation = -90 + (value / 100) * 180;
+                document.getElementById('leverageNeedle').style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+                
+                // Update stats
+                const positionSize = 1000 * value;
+                document.getElementById('positionSizeDemo').textContent = `$${positionSize.toLocaleString()}`;
+                
+                const liquidationPrice = 1 - (0.9 / value);
+                document.getElementById('liquidationPriceDemo').textContent = `$${liquidationPrice.toFixed(3)}`;
+                
+                document.getElementById('maxLossDemo').textContent = `$1,000`;
+                
+                // Update risk level
+                const riskPercentage = Math.min((value / 100) * 100, 100);
+                document.getElementById('riskLevel').style.width = `${riskPercentage}%`;
+            }
+
+            // Trading Demo Functions
+            demonstrateTradingFlow() {
+                const steps = ['step1', 'step2', 'step3', 'step4'];
+                let currentStep = 0;
+                
+                const animateStep = () => {
+                    // Reset all steps
+                    steps.forEach(step => {
+                        document.getElementById(step).classList.remove('active');
+                    });
+                    
+                    // Activate current step
+                    document.getElementById(steps[currentStep]).classList.add('active');
+                    
+                    // Update preview based on step
+                    this.updateOrderPreview(currentStep);
+                    
+                    currentStep++;
+                    if (currentStep < steps.length) {
+                        setTimeout(animateStep, 1500);
+                    } else {
+                        // Execute trade
+                        setTimeout(() => {
+                            this.executeTrade();
+                        }, 1000);
+                    }
+                };
+                
+                animateStep();
+            }
+
+            updateOrderPreview(step) {
+                const updates = [
+                    { market: 'BTC $100k EOY' },
+                    { type: 'Limit Order' },
+                    { amount: '$5,000', leverage: '25x' },
+                    { mmtReward: '+500 MMT' }
+                ];
+                
+                if (step < updates.length) {
+                    Object.entries(updates[step]).forEach(([key, value]) => {
+                        const element = document.getElementById(key + 'Preview');
+                        if (element) {
+                            element.textContent = value;
+                            element.classList.add('pulse');
+                            setTimeout(() => element.classList.remove('pulse'), 500);
+                        }
+                    });
+                }
+            }
+
+            executeTrade() {
+                this.positions++;
+                document.getElementById('positionsStatus').textContent = this.positions;
+                
+                // Update balance
+                const currentBalance = parseFloat(document.getElementById('balanceStatus').textContent.replace('$', '').replace(',', ''));
+                const newBalance = currentBalance - 5000;
+                document.getElementById('balanceStatus').textContent = `$${newBalance.toLocaleString()}`;
+                
+                // Award MMT
+                this.mmtBalance += 500;
+                document.getElementById('mmtStatus').textContent = this.mmtBalance.toLocaleString();
+                
+                this.showNotification('Trade executed! Position opened and 500 MMT earned.');
+            }
+
+            // MMT Demo Functions
+            animateMMTRewards() {
+                let mmtCount = 0;
+                const targetMMT = 2500;
+                const particles = document.getElementById('mmtParticles');
+                
+                // Clear existing particles
+                particles.innerHTML = '';
+                
+                const animate = setInterval(() => {
+                    mmtCount += 25;
+                    document.getElementById('mmtCounter').textContent = `${mmtCount} MMT`;
+                    
+                    // Create particle effect
+                    if (mmtCount % 100 === 0) {
+                        for (let i = 0; i < 8; i++) {
+                            const particle = document.createElement('div');
+                            particle.className = 'mmt-particle';
+                            particle.style.setProperty('--x', `${(Math.random() - 0.5) * 200}px`);
+                            particle.style.setProperty('--y', `${(Math.random() - 0.5) * 200}px`);
+                            particle.style.left = '70px';
+                            particle.style.top = '70px';
+                            particle.style.animationDelay = `${i * 0.1}s`;
+                            particles.appendChild(particle);
+                            
+                            setTimeout(() => particle.remove(), 2000);
+                        }
+                    }
+                    
+                    if (mmtCount >= targetMMT) {
+                        clearInterval(animate);
+                        
+                        // Update global MMT balance
+                        this.mmtBalance += targetMMT;
+                        document.getElementById('mmtStatus').textContent = this.mmtBalance.toLocaleString();
+                        
+                        this.showNotification('MMT milestone reached! 2,500 MMT earned from trading activity.');
+                    }
+                }, 30);
+            }
+
+            // Utility Functions
+            showNotification(message) {
+                // Could implement a toast notification system here
+                console.log(message);
+            }
+
+            showDemo(type) {
+                // Hide all demos
+                document.querySelectorAll('.feature-container').forEach(container => {
+                    container.classList.remove('active');
+                });
+                
+                // Show selected demo
+                document.getElementById(type + 'Demo').classList.add('active');
+                
+                // Update nav buttons
+                document.querySelectorAll('.demo-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                
+                this.currentDemo = type;
+                
+                // Initialize demo
+                switch(type) {
+                    case 'verse':
+                        setTimeout(() => this.addVerseWithAnimation(), 500);
+                        break;
+                    case 'quantum':
+                        setTimeout(() => this.createQuantumStates(), 500);
+                        break;
+                    case 'leverage':
+                        setTimeout(() => this.animateLeverage(), 500);
+                        break;
+                    case 'trading':
+                        setTimeout(() => this.demonstrateTradingFlow(), 500);
+                        break;
+                    case 'mmt':
+                        setTimeout(() => this.animateMMTRewards(), 500);
+                        break;
+                }
+            }
+
+            playFullDemo() {
+                const demos = ['verse', 'quantum', 'leverage', 'trading', 'mmt'];
+                let currentIndex = 0;
+                
+                const playNext = () => {
+                    if (currentIndex < demos.length) {
+                        // Click the demo button
+                        const btn = document.querySelector(`.demo-btn:nth-child(${currentIndex + 1})`);
+                        btn.click();
+                        
+                        currentIndex++;
+                        setTimeout(playNext, 5000); // 5 seconds per demo
+                    }
+                };
+                
+                playNext();
+            }
+        }
+
+        // Initialize
+        const demoController = new VisualDemoController();
+
+        // Global functions
+        function showDemo(type) {
+            demoController.showDemo(type);
+        }
+
+        function playFullDemo() {
+            demoController.playFullDemo();
+        }
+
+        // Start with verse demo
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                demoController.addVerseWithAnimation();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

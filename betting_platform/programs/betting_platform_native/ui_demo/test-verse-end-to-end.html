@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>End-to-End Verse Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #000; color: #fff; padding: 20px; font-family: sans-serif; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        /* Search UI */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+        }
+        .search-button {
+            padding: 12px 24px;
+            background: #FFD60A;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        /* Market results */
+        .search-results {
+            margin: 20px 0;
+        }
+        .market-result {
+            background: #1a1a1a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .market-result:hover {
+            background: #222;
+        }
+        
+        /* Selected market */
+        .selected-market {
+            background: #111;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        /* Verse display fix */
+        #versesSection {
+            margin-top: 30px;
+        }
+        
+        .verse-flow-container {
+            background: #0a0a0a;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            min-height: 300px;
+        }
+        
+        .verse-levels {
+            display: flex;
+            gap: 30px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .verse-level {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .verse-level-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        
+        .verse-card {
+            background: #1a1a1a;
+            border: 2px solid #FFD60A;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .verse-card:hover {
+            background: #222;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 214, 10, 0.3);
+        }
+        
+        .verse-card.selected {
+            background: #FFD60A;
+            color: #000;
+        }
+        
+        .verse-multiplier {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD60A;
+            margin-bottom: 5px;
+        }
+        
+        .verse-card.selected .verse-multiplier {
+            color: #000;
+        }
+        
+        .verse-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .verse-description {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        /* SVG connections */
+        .verse-connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .verse-arrow {
+            fill: #FFD60A;
+            opacity: 0.5;
+        }
+        
+        .verse-arrow.active {
+            opacity: 1;
+        }
+        
+        /* Status messages */
+        .status {
+            background: #111;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        .info { color: #FFD60A; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>End-to-End Verse Test</h1>
+        
+        <div class="status" id="status">Ready to test verse display...</div>
+        
+        <!-- Search -->
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search markets..." value="ethereum">
+            <button class="search-button" onclick="searchMarkets()">Search</button>
+        </div>
+        
+        <!-- Search Results -->
+        <div class="search-results" id="searchResults"></div>
+        
+        <!-- Selected Market -->
+        <div class="selected-market" id="selectedMarket" style="display: none;">
+            <h2 id="marketTitle"></h2>
+            <p id="marketDescription"></p>
+        </div>
+        
+        <!-- Verses Section -->
+        <div class="verses-section" id="versesSection" style="display: none;">
+            <div class="section-title">Related Stages - Chain Your Leverage</div>
+            <div class="verse-flow-container" id="verseFlowContainer">
+                <svg class="verse-connections" id="verseConnections">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" 
+                                refX="9" refY="5" orient="auto">
+                            <polygon points="0 0, 10 5, 0 10" class="verse-arrow" />
+                        </marker>
+                        <marker id="arrowhead-active" markerWidth="10" markerHeight="10" 
+                                refX="9" refY="5" orient="auto">
+                            <polygon points="0 0, 10 5, 0 10" class="verse-arrow active" />
+                        </marker>
+                    </defs>
+                </svg>
+                <div class="verse-levels" id="verseLevels">
+                    <!-- Dynamic verse levels -->
+                </div>
+            </div>
+            <div class="verse-grid" id="verseGrid" style="display: none;">
+                <!-- Dynamic verses for mobile -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="platform_main.js"></script>
+    <script>
+        // Initialize platform state
+        window.platformState = {
+            markets: new Map(),
+            selectedMarket: null,
+            selectedOutcome: null,
+            selectedVerses: [],
+            activePositions: []
+        };
+        
+        const status = document.getElementById('status');
+        
+        async function searchMarkets() {
+            const query = document.getElementById('searchInput').value;
+            status.innerHTML = '<p class="info">Searching for markets...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                
+                // Filter markets by query
+                const filtered = markets.filter(m => 
+                    (m.title || m.question || '').toLowerCase().includes(query.toLowerCase())
+                );
+                
+                status.innerHTML = `<p class="success">✓ Found ${filtered.length} markets matching "${query}"</p>`;
+                
+                // Display results
+                const resultsDiv = document.getElementById('searchResults');
+                resultsDiv.innerHTML = '';
+                
+                filtered.slice(0, 5).forEach(market => {
+                    // Store in platformState
+                    window.platformState.markets.set(market.id, market);
+                    
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = 'market-result';
+                    resultDiv.innerHTML = `
+                        <h3>${market.title || market.question}</h3>
+                        <p>Volume: $${((market.volume24hr || 0) / 1000000).toFixed(2)}M</p>
+                        <p>${market.verses ? `${market.verses.length} verses available` : 'No verses'}</p>
+                    `;
+                    resultDiv.onclick = () => selectMarket(market.id);
+                    resultsDiv.appendChild(resultDiv);
+                });
+                
+            } catch (error) {
+                status.innerHTML = `<p class="error">✗ Error: ${error.message}</p>`;
+            }
+        }
+        
+        function selectMarket(marketId) {
+            console.log('Selecting market:', marketId);
+            const market = window.platformState.markets.get(marketId);
+            
+            if (!market) {
+                status.innerHTML = '<p class="error">✗ Market not found</p>';
+                return;
+            }
+            
+            // Update selected market display
+            document.getElementById('selectedMarket').style.display = 'block';
+            document.getElementById('marketTitle').textContent = market.title || market.question;
+            document.getElementById('marketDescription').textContent = market.description || '';
+            
+            // Show verses section
+            document.getElementById('versesSection').style.display = 'block';
+            
+            // Display verses
+            if (market.verses && market.verses.length > 0) {
+                console.log('Displaying verses:', market.verses);
+                status.innerHTML = `<p class="success">✓ Displaying ${market.verses.length} verses</p>`;
+                
+                // Call the verse update function
+                if (window.updateAvailableVerses) {
+                    window.updateAvailableVerses(market.verses);
+                    
+                    // Check results after a delay
+                    setTimeout(() => {
+                        const verseCards = document.querySelectorAll('.verse-card');
+                        const levels = document.querySelectorAll('.verse-level');
+                        status.innerHTML += `<p>✓ Created ${verseCards.length} verse cards in ${levels.length} levels</p>`;
+                    }, 200);
+                } else {
+                    status.innerHTML = '<p class="error">✗ updateAvailableVerses not found</p>';
+                }
+            } else {
+                status.innerHTML = '<p class="error">✗ No verses available for this market</p>';
+                document.getElementById('verseLevels').innerHTML = '<p style="color: #666;">No verses available</p>';
+            }
+        }
+        
+        // Auto-search on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                searchMarkets();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

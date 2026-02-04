@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiverse Platform - Automated Demo</title>
+    
+    <style>
+        /* John Ive Design System - From Original */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Main App Container */
+        .app-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 360px;
+            min-height: 100vh;
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Left Panel */
+        .left-panel {
+            background: #080808;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Wallet Section */
+        .wallet-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .wallet-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .wallet-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #FF3B30;
+            transition: all 0.3s;
+        }
+
+        .wallet-indicator.connected {
+            background: #4CD964;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .wallet-address {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 8px;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .balance-amount {
+            font-size: 24px;
+            font-weight: 300;
+            transition: all 0.3s;
+        }
+
+        /* Main Panel */
+        .main-panel {
+            background: #0A0A0A;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Market Header */
+        .market-header {
+            padding: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%);
+        }
+
+        .market-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        /* Right Panel - Positions */
+        .right-panel {
+            background: #080808;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Demo Narrator */
+        .demo-narrator {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 800px;
+            background: rgba(255, 214, 10, 0.95);
+            color: #000;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(255, 214, 10, 0.3);
+            z-index: 1000;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .narrator-step {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        .narrator-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .narrator-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .narrator-progress {
+            height: 4px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .narrator-progress-bar {
+            height: 100%;
+            background: #000;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        /* Highlight Effect */
+        .highlight {
+            position: relative;
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 214, 10, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 214, 10, 0.8); }
+        }
+
+        /* Flash Betting Timer */
+        .flash-timer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            display: none;
+        }
+
+        .flash-timer.active {
+            display: block;
+            animation: zoomIn 0.5s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .timer-circle {
+            fill: none;
+            stroke: #FFD60A;
+            stroke-width: 8;
+            stroke-dasharray: 565;
+            stroke-dashoffset: 0;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: 700;
+            color: #FFD60A;
+        }
+
+        /* Quantum Animation */
+        .quantum-visual {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            display: none;
+        }
+
+        .quantum-visual.active {
+            display: block;
+        }
+
+        .quantum-particle {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .particle-1 {
+            background: radial-gradient(circle, #FFD60A, transparent);
+            animation: orbit1 8s linear infinite;
+        }
+
+        .particle-2 {
+            background: radial-gradient(circle, #00D4FF, transparent);
+            animation: orbit2 6s linear infinite;
+        }
+
+        .particle-3 {
+            background: radial-gradient(circle, #7B3FF2, transparent);
+            animation: orbit3 10s linear infinite;
+        }
+
+        @keyframes orbit1 {
+            from { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+            to { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+        }
+
+        @keyframes orbit2 {
+            from { transform: rotate(120deg) translateX(120px) rotate(-120deg); }
+            to { transform: rotate(480deg) translateX(120px) rotate(-480deg); }
+        }
+
+        @keyframes orbit3 {
+            from { transform: rotate(240deg) translateX(80px) rotate(-240deg); }
+            to { transform: rotate(600deg) translateX(80px) rotate(-600deg); }
+        }
+
+        /* Leverage Meter */
+        .leverage-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: none;
+        }
+
+        .leverage-display.active {
+            display: block;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from { transform: translate(-50%, -50%) scale(0); }
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .leverage-number {
+            font-size: 120px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #4CD964 0%, #FFD60A 50%, #FF3B30 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+
+        .leverage-label {
+            font-size: 24px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Trading Cards */
+        .outcome-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .outcome-card.highlighted {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: #FFD60A;
+            transform: scale(1.02);
+        }
+
+        .outcome-price {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        /* Position List */
+        .position-item {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            opacity: 0;
+            transform: translateX(50px);
+            animation: slideInRight 0.5s forwards;
+        }
+
+        @keyframes slideInRight {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .position-pnl {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .position-pnl.positive {
+            color: #4CD964;
+        }
+
+        .position-pnl.negative {
+            color: #FF3B30;
+        }
+
+        /* Auto-scroll indicator */
+        .auto-scroll-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(255, 214, 10, 0.9);
+            color: #000;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Skip button */
+        .skip-demo {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .skip-demo:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Button -->
+    <button class="skip-demo" onclick="skipDemo()">Skip Demo</button>
+    
+    <!-- Auto Scroll Indicator -->
+    <div class="auto-scroll-indicator">🎬 DEMO RUNNING</div>
+
+    <!-- Main App -->
+    <div class="app-container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <div class="logo">Multiverse Platform</div>
+            </div>
+            
+            <div class="wallet-section" id="wallet-section">
+                <div class="wallet-card">
+                    <div class="wallet-status">
+                        <div class="wallet-indicator" id="wallet-indicator"></div>
+                        <span id="wallet-status-text">Disconnected</span>
+                    </div>
+                    <div class="wallet-address" id="wallet-address"></div>
+                    <div class="balance-display">
+                        <div class="balance-amount" id="balance">$0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market List -->
+            <div style="padding: 20px;">
+                <div class="section-title" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255, 255, 255, 0.4); margin-bottom: 16px;">LIVE MARKETS</div>
+                <div id="market-list"></div>
+            </div>
+        </div>
+
+        <!-- Main Panel -->
+        <div class="main-panel">
+            <div class="market-header">
+                <div class="market-title" id="market-title">Welcome to Multiverse</div>
+                <div id="market-info" style="margin-top: 16px;"></div>
+            </div>
+            
+            <div class="market-content" id="main-content">
+                <!-- Flash Timer -->
+                <div class="flash-timer" id="flash-timer">
+                    <svg width="200" height="200">
+                        <circle class="timer-circle" cx="100" cy="100" r="90" id="timer-circle"/>
+                    </svg>
+                    <div class="timer-text" id="timer-text">30</div>
+                </div>
+
+                <!-- Quantum Visual -->
+                <div class="quantum-visual" id="quantum-visual">
+                    <div class="quantum-particle particle-1"></div>
+                    <div class="quantum-particle particle-2"></div>
+                    <div class="quantum-particle particle-3"></div>
+                </div>
+
+                <!-- Leverage Display -->
+                <div class="leverage-display" id="leverage-display">
+                    <div class="leverage-number" id="leverage-number">1x</div>
+                    <div class="leverage-label">EFFECTIVE LEVERAGE</div>
+                </div>
+
+                <!-- Trading Cards -->
+                <div id="trading-cards"></div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Positions -->
+        <div class="right-panel">
+            <div class="panel-header">
+                <div style="font-size: 16px; font-weight: 600;">Portfolio</div>
+                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 4px;">Total P&L: <span id="total-pnl" style="color: #4CD964;">+$0</span></div>
+            </div>
+            
+            <div style="padding: 20px; overflow-y: auto;" id="positions-list">
+                <!-- Positions will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Narrator -->
+    <div class="demo-narrator" id="narrator">
+        <div class="narrator-step" id="narrator-step">STEP 1 OF 15</div>
+        <div class="narrator-title" id="narrator-title">Welcome to Multiverse Platform</div>
+        <div class="narrator-text" id="narrator-text">
+            The most advanced prediction market platform combining Polymarket liquidity, flash betting, quantum positions, and up to 500x leverage. Let me show you everything this platform can do.
+        </div>
+        <div class="narrator-progress">
+            <div class="narrator-progress-bar" id="progress-bar" style="width: 0%;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Demo Script
+        const demoSteps = [
+            {
+                step: 1,
+                title: "Welcome to Multiverse Platform",
+                text: "The most advanced prediction market platform combining Polymarket liquidity, flash betting, quantum positions, and up to 500x leverage. Let me show you everything this platform can do.",
+                duration: 5000,
+                action: () => {
+                    document.getElementById('market-title').textContent = 'Welcome to Multiverse';
+                }
+            },
+            {
+                step: 2,
+                title: "Connecting Your Wallet",
+                text: "First, let's connect your MetaMask wallet. The platform supports both Ethereum (for Polymarket) and Solana (for native features). Watch as we establish a secure connection...",
+                duration: 4000,
+                action: () => {
+                    document.getElementById('wallet-section').classList.add('highlight');
+                    setTimeout(() => {
+                        document.getElementById('wallet-indicator').classList.add('connected');
+                        document.getElementById('wallet-status-text').textContent = 'Connected';
+                        document.getElementById('wallet-address').textContent = '0x742d35Cc6634C0532925a3b844Bc8963';
+                        animateNumber('balance', 0, 25000, 2000);
+                    }, 2000);
+                }
+            },
+            {
+                step: 3,
+                title: "Polymarket Integration",
+                text: "Here's our first market from Polymarket: 'Will Bitcoin reach $150,000 by 2025?' Currently trading at 65.2% probability with over $1.2M in volume. Polymarket provides deep liquidity for long-term prediction markets.",
+                duration: 5000,
+                action: () => {
+                    document.getElementById('wallet-section').classList.remove('highlight');
+                    document.getElementById('market-title').textContent = 'Will Bitcoin reach $150,000 by 2025?';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: flex; gap: 24px;">
+                            <div><span style="font-size: 36px; font-weight: 300;">65.2%</span> <span style="color: #4CD964;">+2.5%</span></div>
+                            <div style="padding-top: 8px; color: rgba(255, 255, 255, 0.6);">Volume: $1.2M</div>
+                        </div>
+                    `;
+                    addMarketToList('BTC $150k by 2025', '65.2%', '+2.5%');
+                }
+            },
+            {
+                step: 4,
+                title: "Flash Betting - Ultra Fast Markets",
+                text: "Now entering Flash Mode! This soccer match has 30 seconds left. Will there be a goal? Flash markets resolve in 5-60 seconds using live data from DraftKings. Watch the countdown!",
+                duration: 6000,
+                action: () => {
+                    document.getElementById('market-title').textContent = '⚡ FLASH: Next Goal in 30 seconds?';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="color: #FFD60A;">Man City vs Liverpool - 89th minute</div>
+                    `;
+                    document.getElementById('flash-timer').classList.add('active');
+                    startFlashCountdown();
+                    addMarketToList('⚡ Goal in 30s', '28%', 'LIVE');
+                }
+            },
+            {
+                step: 5,
+                title: "Flash Market Resolution",
+                text: "GOAL SCORED! The market resolves instantly using ZK proofs. Winners receive immediate payouts. This entire process - from market creation to resolution - took just 30 seconds.",
+                duration: 4000,
+                action: () => {
+                    document.getElementById('timer-text').textContent = 'GOAL!';
+                    document.getElementById('timer-text').style.color = '#4CD964';
+                    setTimeout(() => {
+                        document.getElementById('flash-timer').classList.remove('active');
+                        addPosition('Flash: Goal Scored', 'YES', '$500', '+$180');
+                    }, 2000);
+                }
+            },
+            {
+                step: 6,
+                title: "Quantum Positions - Superposition Trading",
+                text: "Enter the quantum realm! Your position exists in multiple states simultaneously. Watch as these particles orbit - each represents a different outcome probability. The wavefunction collapses only upon market resolution.",
+                duration: 6000,
+                action: () => {
+                    document.getElementById('market-title').textContent = '🔮 Quantum Position: Election Outcomes';
+                    document.getElementById('market-info').innerHTML = `
+                        <div>Superposition across 3 correlated markets</div>
+                    `;
+                    document.getElementById('quantum-visual').classList.add('active');
+                    addMarketToList('Quantum: Elections', 'Ψ', 'SUPER');
+                }
+            },
+            {
+                step: 7,
+                title: "Wavefunction Collapse",
+                text: "The quantum state is collapsing! Your position crystallizes into the most profitable outcome. Quantum positions can achieve up to 1.5x additional returns through correlation bonuses.",
+                duration: 8000,
+                showTime: 5000,
+                action: () => {
+                    setTimeout(() => {
+                        document.getElementById('quantum-visual').classList.remove('active');
+                        addPosition('Quantum: Multi-State', 'COLLAPSED', '$1,000', '+$450');
+                    }, 2000);
+                }
+            },
+            {
+                step: 8,
+                title: "Leverage System - Base 100x",
+                text: "Now let's explore leverage. Starting with 100x base leverage - already extreme by traditional standards. Watch as the multiplier increases...",
+                duration: 8000,
+                showTime: 5000,
+                action: () => {
+                    document.getElementById('market-title').textContent = '📈 Leverage Trading Mode';
+                    document.getElementById('market-info').innerHTML = '';
+                    document.getElementById('leverage-display').classList.add('active');
+                    animateLeverage(1, 100, 3000);
+                }
+            },
+            {
+                step: 9,
+                title: "Leverage Chaining - Step 1: Borrow",
+                text: "Step 1 of the chain: BORROW. Use your position as collateral to borrow additional capital. This adds a 1.5x multiplier. We're now at 150x effective leverage.",
+                duration: 8000,
+                showTime: 5000,
+                action: () => {
+                    animateLeverage(100, 150, 2000);
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="color: #FFD60A;">Chain Step 1: Borrow Multiplier Applied (1.5x)</div>
+                    `;
+                }
+            },
+            {
+                step: 10,
+                title: "Leverage Chaining - Step 2: Liquidity",
+                text: "Step 2: PROVIDE LIQUIDITY. Supply to the AMM pool for fee generation. This adds another 1.2x multiplier. We're now at 180x effective leverage.",
+                duration: 8000,
+                showTime: 5000,
+                action: () => {
+                    animateLeverage(150, 180, 2000);
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="color: #00D4FF;">Chain Step 2: Liquidity Multiplier Applied (1.2x)</div>
+                    `;
+                }
+            },
+            {
+                step: 11,
+                title: "Leverage Chaining - Step 3: Hedge",
+                text: "Final step: HEDGE. Create offsetting positions in correlated markets for a 1.1x multiplier. Combined with flash market bonuses, we achieve 500x EFFECTIVE LEVERAGE!",
+                duration: 8000,
+                showTime: 5000,
+                action: () => {
+                    animateLeverage(180, 500, 3000);
+                    document.getElementById('leverage-number').style.color = '#FF3B30';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="color: #FF3B30;">⚠️ MAXIMUM LEVERAGE: 500x - Liquidation on 0.2% move!</div>
+                    `;
+                    addPosition('Leveraged: BTC', '500x', '$10,000', '+$8,250');
+                }
+            },
+            {
+                step: 12,
+                title: "Verse Hierarchy System",
+                text: "Markets are organized in 'verses' - hierarchical structures. Parent verses like 'Global Politics' contain child verses like 'US Election' which contain specific markets. Each level provides 10% leverage bonus.",
+                duration: 8000,
+                showTime: 5000,
+                action: () => {
+                    document.getElementById('leverage-display').classList.remove('active');
+                    document.getElementById('market-title').textContent = '🌳 Verse: Global Politics > US Election';
+                    document.getElementById('market-info').innerHTML = `
+                        <div>127 markets • $45M volume • 30% depth bonus active</div>
+                    `;
+                    addMarketToList('Global Politics', '48.5%', '127 mkts');
+                    addMarketToList('├─ US Election', '51.2%', '43 mkts');
+                    addMarketToList('└─ EU Elections', '62.8%', '31 mkts');
+                }
+            },
+            {
+                step: 13,
+                title: "Live Trading Demonstration",
+                text: "Let's place a real trade. Buying YES on 'ETH to flip BTC market cap' at 32.8% with 50x leverage. Position size: $5,000. Potential profit: $8,360.",
+                duration: 5000,
+                action: () => {
+                    document.getElementById('market-title').textContent = 'ETH to flip BTC market cap in 2024';
+                    document.getElementById('trading-cards').innerHTML = `
+                        <div class="outcome-card highlighted">
+                            <div style="font-size: 16px; margin-bottom: 8px;">YES - ETH Flips BTC</div>
+                            <div class="outcome-price">32.8%</div>
+                            <div style="color: #4CD964; font-size: 18px; margin-top: 8px;">EXECUTING TRADE...</div>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        addPosition('ETH Flippening', 'YES 50x', '$5,000', 'PENDING');
+                        document.getElementById('trading-cards').innerHTML = '';
+                    }, 3000);
+                }
+            },
+            {
+                step: 14,
+                title: "Portfolio Performance",
+                text: "Your portfolio is now live! 4 positions with total P&L of +$17,125. The platform provides real-time updates, advanced risk metrics, and one-click position management.",
+                duration: 8000,
+                showTime: 5000,
+                action: () => {
+                    document.getElementById('market-title').textContent = '💼 Portfolio Overview';
+                    document.getElementById('total-pnl').textContent = '+$17,125';
+                    document.getElementById('total-pnl').style.fontSize = '20px';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 16px;">
+                            <div>
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4);">WIN RATE</div>
+                                <div style="font-size: 20px;">87.5%</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4);">AVG LEVERAGE</div>
+                                <div style="font-size: 20px;">162x</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4);">SHARPE RATIO</div>
+                                <div style="font-size: 20px;">2.34</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4);">24H VOLUME</div>
+                                <div style="font-size: 20px;">$127K</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 15,
+                title: "Demo Complete - Start Trading!",
+                text: "You've seen it all: Polymarket integration, 30-second flash markets, quantum superposition, 500x leverage chains, and the verse hierarchy. The future of prediction markets is here. Ready to start trading?",
+                duration: 6000,
+                action: () => {
+                    document.getElementById('market-title').textContent = '🚀 Welcome to the Future of Trading';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="margin-top: 24px;">
+                            <button style="padding: 16px 32px; background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%); border: none; border-radius: 8px; color: #000; font-weight: 600; font-size: 16px; cursor: pointer;">Start Trading Now</button>
+                        </div>
+                    `;
+                    confetti();
+                }
+            }
+        ];
+
+        let currentStep = 0;
+        let demoInterval;
+        let skipRequested = false;
+        let stepTimeout;
+
+        // Start demo
+        function startDemo() {
+            console.log('Starting demo...');
+            runStep(0);
+        }
+
+        function runStep(stepIndex) {
+            if (skipRequested || stepIndex >= demoSteps.length) {
+                endDemo();
+                return;
+            }
+
+            const step = demoSteps[stepIndex];
+            currentStep = stepIndex;
+            
+            console.log(`Running step ${step.step}: ${step.title}`);
+            
+            // Update narrator
+            document.getElementById('narrator-step').textContent = `STEP ${step.step} OF ${demoSteps.length}`;
+            document.getElementById('narrator-title').textContent = step.title;
+            document.getElementById('narrator-text').textContent = step.text;
+            document.getElementById('progress-bar').style.width = `${(step.step / demoSteps.length) * 100}%`;
+            
+            // Run action
+            if (step.action) {
+                step.action();
+            }
+            
+            // Schedule next step with proper delay
+            stepTimeout = setTimeout(() => {
+                console.log(`Step ${step.step} complete, moving to next...`);
+                runStep(stepIndex + 1);
+            }, step.duration);
+        }
+
+        function skipDemo() {
+            skipRequested = true;
+            if (stepTimeout) {
+                clearTimeout(stepTimeout);
+            }
+            endDemo();
+        }
+
+        function endDemo() {
+            console.log('Demo ended');
+            document.getElementById('narrator').style.display = 'none';
+            document.querySelector('.auto-scroll-indicator').style.display = 'none';
+            document.querySelector('.skip-demo').style.display = 'none';
+            document.getElementById('market-title').textContent = 'Platform Ready';
+            document.getElementById('market-info').innerHTML = '<div>Demo complete. Explore the platform at your own pace.</div>';
+        }
+
+        // Helper functions
+        function animateNumber(elementId, start, end, duration) {
+            const element = document.getElementById(elementId);
+            const increment = (end - start) / (duration / 50);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = `$${current.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }, 50);
+        }
+
+        function animateLeverage(start, end, duration) {
+            const element = document.getElementById('leverage-number');
+            const increment = (end - start) / (duration / 50);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = `${Math.round(current)}x`;
+            }, 50);
+        }
+
+        function startFlashCountdown() {
+            let seconds = 30;
+            const timer = setInterval(() => {
+                seconds--;
+                document.getElementById('timer-text').textContent = seconds;
+                const offset = 565 - (565 * (30 - seconds) / 30);
+                document.getElementById('timer-circle').style.strokeDashoffset = offset;
+                
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                }
+            }, 100);
+        }
+
+        function addMarketToList(name, price, change) {
+            const marketList = document.getElementById('market-list');
+            const item = document.createElement('div');
+            item.className = 'outcome-card';
+            item.style.animationDelay = '0s';
+            item.innerHTML = `
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="font-size: 14px;">${name}</div>
+                    <div style="font-size: 14px; font-weight: 600;">${price}</div>
+                </div>
+                <div style="font-size: 12px; color: ${change.includes('+') ? '#4CD964' : change === 'LIVE' ? '#FFD60A' : '#FF3B30'}; margin-top: 4px;">${change}</div>
+            `;
+            marketList.appendChild(item);
+        }
+
+        function addPosition(market, side, size, pnl) {
+            const positionsList = document.getElementById('positions-list');
+            const item = document.createElement('div');
+            item.className = 'position-item';
+            item.innerHTML = `
+                <div style="font-size: 14px; font-weight: 500;">${market}</div>
+                <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                    <span style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">${side}</span>
+                    <span style="font-size: 12px;">${size}</span>
+                </div>
+                <div class="position-pnl ${pnl.includes('+') ? 'positive' : pnl.includes('-') ? 'negative' : ''}">${pnl}</div>
+            `;
+            positionsList.appendChild(item);
+        }
+
+        function confetti() {
+            // Simple confetti effect
+            for (let i = 0; i < 50; i++) {
+                const confetto = document.createElement('div');
+                confetto.style.position = 'fixed';
+                confetto.style.width = '10px';
+                confetto.style.height = '10px';
+                confetto.style.background = ['#FFD60A', '#4CD964', '#00D4FF', '#7B3FF2'][Math.floor(Math.random() * 4)];
+                confetto.style.left = Math.random() * window.innerWidth + 'px';
+                confetto.style.top = '-10px';
+                confetto.style.borderRadius = '50%';
+                confetto.style.zIndex = '10000';
+                document.body.appendChild(confetto);
+                
+                const duration = Math.random() * 3 + 2;
+                confetto.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], {
+                    duration: duration * 1000,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                });
+                
+                setTimeout(() => confetto.remove(), duration * 1000);
+            }
+        }
+
+        // Start demo on load
+        window.addEventListener('load', () => {
+            setTimeout(startDemo, 1000);
+        });
+    </script>
+</body>
+</html>

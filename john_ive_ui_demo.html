@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Betting - John Ive Inspired UI</title>
+    <style>
+        /* John Ive Inspired Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
+        }
+
+        /* Main Container */
+        .app {
+            height: 100vh;
+            display: flex;
+            background: #000000;
+        }
+
+        /* Left Sidebar - Markets */
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #999999 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-box {
+            margin: 20px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #FFFFFF;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 13px;
+            width: 16px;
+            height: 16px;
+            opacity: 0.5;
+        }
+
+        /* Verse Tree */
+        .verse-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .verse-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 12px;
+        }
+
+        .verse-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .verse-item {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .verse-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #FFFFFF;
+        }
+
+        .verse-item.active {
+            background: rgba(0, 122, 255, 0.15);
+            color: #007AFF;
+        }
+
+        .verse-item::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 4px;
+            background: currentColor;
+            border-radius: 50%;
+            opacity: 0.5;
+        }
+
+        /* Market List */
+        .market-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .market-item {
+            padding: 16px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .market-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .market-item.active {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: #007AFF;
+        }
+
+        .market-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #FFFFFF;
+        }
+
+        .market-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .market-price {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .market-change {
+            font-size: 12px;
+            color: #34C759;
+        }
+
+        .market-change.negative {
+            color: #FF3B30;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #000000;
+        }
+
+        /* Header */
+        .header {
+            height: 80px;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .market-info {
+            display: flex;
+            align-items: baseline;
+            gap: 24px;
+        }
+
+        .current-market {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .current-price {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 32px;
+            font-weight: 700;
+            color: #34C759;
+        }
+
+        .price-change {
+            font-size: 18px;
+            color: #34C759;
+        }
+
+        /* Trading Interface */
+        .trading-interface {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 32px;
+            padding: 32px;
+        }
+
+        /* Chart Area */
+        .chart-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .chart-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-placeholder {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 14px;
+        }
+
+        /* Order Book */
+        .order-book {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            height: 300px;
+        }
+
+        .order-book-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .order-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            padding: 8px 0;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .order-row.header {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .buy-order {
+            color: #34C759;
+        }
+
+        .sell-order {
+            color: #FF3B30;
+        }
+
+        /* Trading Panel */
+        .trading-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Order Entry */
+        .order-entry {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .order-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .order-tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .order-tab.active {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #FFFFFF;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #FFFFFF;
+            font-size: 16px;
+            font-family: 'SF Mono', Monaco, monospace;
+            transition: all 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #007AFF;
+        }
+
+        /* Leverage Slider */
+        .leverage-section {
+            margin: 24px 0;
+        }
+
+        .leverage-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .leverage-value {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFD60A;
+        }
+
+        .leverage-slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .leverage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #34C759 0%, #FFD60A 50%, #FF3B30 100%);
+            border-radius: 3px;
+            width: 20%;
+            transition: width 0.2s ease;
+        }
+
+        .leverage-thumb {
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            cursor: grab;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-buy {
+            background: #34C759;
+            color: #FFFFFF;
+        }
+
+        .btn-buy:hover {
+            background: #248A3D;
+            transform: translateY(-1px);
+        }
+
+        .btn-sell {
+            background: #FF3B30;
+            color: #FFFFFF;
+        }
+
+        .btn-sell:hover {
+            background: #D70015;
+            transform: translateY(-1px);
+        }
+
+        /* Positions */
+        .positions {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .positions-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .position-item {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .position-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .position-market {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .position-pnl {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-weight: 600;
+        }
+
+        .position-pnl.profit {
+            color: #34C759;
+        }
+
+        .position-pnl.loss {
+            color: #FF3B30;
+        }
+
+        .position-details {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Drag & Drop */
+        .draggable {
+            cursor: move;
+        }
+
+        .dragging {
+            opacity: 0.5;
+        }
+
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .drop-zone.active {
+            border-color: #007AFF;
+            background: rgba(0, 122, 255, 0.05);
+            color: #007AFF;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">Quantum</div>
+            </div>
+            
+            <div class="search-box">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" class="search-input" placeholder="Search markets...">
+            </div>
+
+            <!-- Verse Tree -->
+            <div class="verse-section">
+                <div class="verse-title">Verse Hierarchy</div>
+                <div class="verse-tree">
+                    <div class="verse-item active">Universe</div>
+                    <div class="verse-item" style="padding-left: 40px;">Crypto</div>
+                    <div class="verse-item" style="padding-left: 56px;">Bitcoin</div>
+                    <div class="verse-item" style="padding-left: 56px;">Ethereum</div>
+                    <div class="verse-item" style="padding-left: 40px;">Politics</div>
+                    <div class="verse-item" style="padding-left: 40px;">Sports</div>
+                </div>
+            </div>
+
+            <!-- Market List -->
+            <div class="market-list">
+                <div class="market-item active">
+                    <div class="market-title">Will BTC reach $150k by 2025?</div>
+                    <div class="market-stats">
+                        <span class="market-price">65.0%</span>
+                        <span class="market-change">+2.5%</span>
+                    </div>
+                </div>
+                
+                <div class="market-item">
+                    <div class="market-title">Will ETH flip BTC market cap?</div>
+                    <div class="market-stats">
+                        <span class="market-price">35.0%</span>
+                        <span class="market-change negative">-1.2%</span>
+                    </div>
+                </div>
+                
+                <div class="market-item">
+                    <div class="market-title">SpaceX Mars landing by 2030?</div>
+                    <div class="market-stats">
+                        <span class="market-price">78.5%</span>
+                        <span class="market-change">+0.8%</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Header -->
+            <header class="header">
+                <div class="market-info">
+                    <h1 class="current-market">Will BTC reach $150k by 2025?</h1>
+                    <span class="current-price">65.0%</span>
+                    <span class="price-change">+2.5%</span>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.2);">
+                        Connect Wallet
+                    </button>
+                </div>
+            </header>
+
+            <!-- Trading Interface -->
+            <div class="trading-interface">
+                <!-- Chart Section -->
+                <div class="chart-section">
+                    <div class="chart-container">
+                        <div class="chart-placeholder">
+                            Interactive Chart
+                        </div>
+                    </div>
+                    
+                    <!-- Order Book -->
+                    <div class="order-book">
+                        <h3 class="order-book-title">Order Book</h3>
+                        <div class="order-row header">
+                            <span>Price</span>
+                            <span>Size</span>
+                            <span>Total</span>
+                        </div>
+                        <div class="order-row sell-order">
+                            <span>66.5%</span>
+                            <span>1,234</span>
+                            <span>$82,056</span>
+                        </div>
+                        <div class="order-row sell-order">
+                            <span>66.0%</span>
+                            <span>2,456</span>
+                            <span>$162,096</span>
+                        </div>
+                        <div class="order-row sell-order">
+                            <span>65.5%</span>
+                            <span>3,789</span>
+                            <span>$248,284</span>
+                        </div>
+                        <div style="text-align: center; padding: 8px; color: #34C759; font-weight: 600;">
+                            65.0% SPREAD
+                        </div>
+                        <div class="order-row buy-order">
+                            <span>64.5%</span>
+                            <span>2,345</span>
+                            <span>$151,253</span>
+                        </div>
+                        <div class="order-row buy-order">
+                            <span>64.0%</span>
+                            <span>3,456</span>
+                            <span>$221,184</span>
+                        </div>
+                        <div class="order-row buy-order">
+                            <span>63.5%</span>
+                            <span>4,567</span>
+                            <span>$290,005</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trading Panel -->
+                <div class="trading-panel">
+                    <!-- Order Entry -->
+                    <div class="order-entry">
+                        <div class="order-tabs">
+                            <button class="order-tab active">Limit</button>
+                            <button class="order-tab">Market</button>
+                            <button class="order-tab">Stop</button>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Price</label>
+                            <input type="text" class="input-field" value="65.0">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Amount</label>
+                            <input type="text" class="input-field" value="1,000">
+                        </div>
+                        
+                        <div class="leverage-section">
+                            <div class="leverage-label">
+                                <span>Leverage</span>
+                                <span class="leverage-value">10x</span>
+                            </div>
+                            <div class="leverage-slider">
+                                <div class="leverage-fill"></div>
+                                <div class="leverage-thumb"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn btn-buy">Buy / Long</button>
+                            <button class="btn btn-sell">Sell / Short</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Positions -->
+                    <div class="positions">
+                        <h3 class="positions-title">Active Positions</h3>
+                        
+                        <div class="position-item">
+                            <div class="position-header">
+                                <span class="position-market">BTC > $150k</span>
+                                <span class="position-pnl profit">+$2,345 (+23.4%)</span>
+                            </div>
+                            <div class="position-details">
+                                <span>Size: $10,000</span>
+                                <span>Entry: 52.8%</span>
+                                <span>Leverage: 10x</span>
+                            </div>
+                        </div>
+                        
+                        <div class="position-item">
+                            <div class="position-header">
+                                <span class="position-market">ETH Flip</span>
+                                <span class="position-pnl loss">-$567 (-5.6%)</span>
+                            </div>
+                            <div class="position-details">
+                                <span>Size: $10,000</span>
+                                <span>Entry: 40.5%</span>
+                                <span>Leverage: 5x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Add interactivity
+        document.querySelectorAll('.market-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.market-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.order-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.order-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.verse-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.verse-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Drag and drop for verses
+        let draggedElement = null;
+
+        document.querySelectorAll('.verse-item').forEach(item => {
+            item.draggable = true;
+            
+            item.addEventListener('dragstart', function(e) {
+                draggedElement = this;
+                this.classList.add('dragging');
+            });
+            
+            item.addEventListener('dragend', function(e) {
+                this.classList.remove('dragging');
+            });
+            
+            item.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                const afterElement = getDragAfterElement(this.parentElement, e.clientY);
+                if (afterElement == null) {
+                    this.parentElement.appendChild(draggedElement);
+                } else {
+                    this.parentElement.insertBefore(draggedElement, afterElement);
+                }
+            });
+        });
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.verse-item:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // Leverage slider
+        const leverageSlider = document.querySelector('.leverage-slider');
+        const leverageThumb = document.querySelector('.leverage-thumb');
+        const leverageFill = document.querySelector('.leverage-fill');
+        const leverageValue = document.querySelector('.leverage-value');
+        
+        let isDragging = false;
+        
+        leverageThumb.addEventListener('mousedown', () => isDragging = true);
+        document.addEventListener('mouseup', () => isDragging = false);
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const rect = leverageSlider.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+            
+            leverageThumb.style.left = percentage + '%';
+            leverageFill.style.width = percentage + '%';
+            
+            const leverage = Math.round((percentage / 100) * 100);
+            leverageValue.textContent = leverage + 'x';
+            
+            if (leverage > 50) {
+                leverageValue.style.color = '#FF3B30';
+            } else if (leverage > 20) {
+                leverageValue.style.color = '#FFD60A';
+            } else {
+                leverageValue.style.color = '#34C759';
+            }
+        });
+    </script>
+</body>
+</html>

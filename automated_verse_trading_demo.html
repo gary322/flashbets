@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Betting - Automated Verse Trading Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Demo Stage */
+        .demo-stage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #0A0A0A 0%, #000000 100%);
+        }
+
+        /* Demo Navigation */
+        .demo-nav {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px 40px;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .demo-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .demo-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .demo-btn.active {
+            background: #FFD60A;
+            color: #000000;
+            border-color: #FFD60A;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #FFD60A;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.5);
+        }
+
+        .play-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Step Indicator */
+        .step-indicator {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px 40px;
+            backdrop-filter: blur(20px);
+            display: none;
+        }
+
+        .step-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #FFD60A;
+        }
+
+        /* Feature Containers */
+        .feature-container {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+            width: 100%;
+            max-width: 1400px;
+            padding: 40px;
+        }
+
+        .feature-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Market Selection */
+        .market-selection {
+            text-align: center;
+        }
+
+        .selection-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .markets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .market-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            transform: scale(1);
+        }
+
+        .market-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.05);
+            border-color: rgba(255, 214, 10, 0.5);
+        }
+
+        .market-card.selected {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.1);
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(255, 214, 10, 0.3);
+        }
+
+        .market-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .market-odds {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .odds-item {
+            text-align: center;
+        }
+
+        .odds-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 5px;
+        }
+
+        .odds-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFD60A;
+        }
+
+        /* Verse Selection */
+        .verse-selection {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px;
+        }
+
+        .verse-instructions {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .instruction-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #FFD60A;
+        }
+
+        .verse-tree {
+            position: relative;
+            min-height: 600px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .verse-node {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .verse-node.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .verse-node:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .verse-node.selected {
+            background: rgba(255, 214, 10, 0.2);
+            border-color: #FFD60A;
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.3);
+        }
+
+        .verse-node.main {
+            background: rgba(255, 214, 10, 0.3);
+            border-color: #FFD60A;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: default;
+        }
+
+        /* Trading Interface */
+        .trading-interface {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 30px;
+        }
+
+        .trading-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #FFD60A;
+        }
+
+        .leverage-meter {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .leverage-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 180deg,
+                #FFD60A 0deg,
+                #FFA500 90deg,
+                #FF6B6B 180deg,
+                rgba(255, 255, 255, 0.1) 180deg
+            );
+            position: relative;
+            transition: all 0.5s;
+        }
+
+        .leverage-inner {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .leverage-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: #FFD60A;
+        }
+
+        .order-types {
+            margin-top: 30px;
+        }
+
+        .order-btn {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #FFFFFF;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .order-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #FFD60A;
+            transform: translateY(-2px);
+        }
+
+        .order-btn.active {
+            background: rgba(255, 214, 10, 0.2);
+            border-color: #FFD60A;
+        }
+
+        .position-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: #FFFFFF;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .trade-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .trade-btn {
+            padding: 20px;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .buy-btn {
+            background: #4CD964;
+            color: #000000;
+        }
+
+        .buy-btn:hover {
+            background: #3AB851;
+            transform: scale(1.05);
+        }
+
+        .sell-btn {
+            background: #FF3B30;
+            color: #FFFFFF;
+        }
+
+        .sell-btn:hover {
+            background: #E6251A;
+            transform: scale(1.05);
+        }
+
+        /* Order Execution Animation */
+        .order-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #FFD60A;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            display: none;
+            z-index: 2000;
+        }
+
+        .order-animation.show {
+            display: block;
+            animation: orderPulse 0.5s ease-out;
+        }
+
+        @keyframes orderPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 3000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD60A 0%, #FFA500 100%);
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+
+        /* Animations */
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        .highlight {
+            animation: highlight 1s ease-out;
+        }
+
+        @keyframes highlight {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 214, 10, 0.8);
+            }
+            100% {
+                box-shadow: 0 0 0 20px rgba(255, 214, 10, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressBar"></div>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator" id="stepIndicator">
+        <div class="step-text" id="stepText">Step 1: Select a Market</div>
+    </div>
+
+    <!-- Demo Stage -->
+    <div class="demo-stage">
+        <!-- Market Selection -->
+        <div class="feature-container active" id="marketSelection">
+            <div class="market-selection">
+                <h1 class="selection-title">Select Your Market</h1>
+                <p style="font-size: 20px; color: rgba(255, 255, 255, 0.6); margin-bottom: 40px;">
+                    Choose from today's trending prediction markets
+                </p>
+                
+                <div class="markets-grid">
+                    <!-- Market 1 -->
+                    <div class="market-card" onclick="selectMarket(1)">
+                        <div class="market-title">Will Apple release AR glasses at WWDC 2025?</div>
+                        <p style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin: 15px 0;">
+                            After years of development, rumors suggest Apple's augmented reality glasses are finally ready for consumer release.
+                        </p>
+                        <div class="market-odds">
+                            <div class="odds-item">
+                                <div class="odds-label">YES</div>
+                                <div class="odds-value">62%</div>
+                            </div>
+                            <div class="odds-item">
+                                <div class="odds-label">NO</div>
+                                <div class="odds-value">38%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Market 2 -->
+                    <div class="market-card" onclick="selectMarket(2)">
+                        <div class="market-title">Will a quantum computer break RSA-2048 encryption in 2025?</div>
+                        <p style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin: 15px 0;">
+                            With IBM and Google racing toward quantum supremacy, cryptography faces its biggest threat yet.
+                        </p>
+                        <div class="market-odds">
+                            <div class="odds-item">
+                                <div class="odds-label">YES</div>
+                                <div class="odds-value">23%</div>
+                            </div>
+                            <div class="odds-item">
+                                <div class="odds-label">NO</div>
+                                <div class="odds-value">77%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Market 3 -->
+                    <div class="market-card" onclick="selectMarket(3)">
+                        <div class="market-title">Will fusion energy achieve net positive output in 2025?</div>
+                        <p style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin: 15px 0;">
+                            Following LLNL's breakthrough, multiple facilities are attempting sustained fusion reactions.
+                        </p>
+                        <div class="market-odds">
+                            <div class="odds-item">
+                                <div class="odds-label">YES</div>
+                                <div class="odds-value">41%</div>
+                            </div>
+                            <div class="odds-item">
+                                <div class="odds-label">NO</div>
+                                <div class="odds-value">59%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verse Selection -->
+        <div class="feature-container" id="verseSelection">
+            <div class="verse-selection">
+                <div class="verse-instructions">
+                    <h2 class="instruction-title">Build Your Leverage</h2>
+                    <p style="margin-bottom: 20px; line-height: 1.6;">
+                        Each verse represents a correlated factor that affects the outcome. 
+                        Select verses to multiply your leverage up to 100x.
+                    </p>
+                    
+                    <div style="margin-top: 30px;">
+                        <h3 style="margin-bottom: 15px; color: #FFD60A;">Current Leverage</h3>
+                        <div style="font-size: 48px; font-weight: 700; color: #FFD60A;" id="currentLeverage">1.0x</div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h3 style="margin-bottom: 15px;">Selected Verses</h3>
+                        <div id="selectedVersesList" style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">
+                            No verses selected yet
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="verse-tree" id="verseTree">
+                    <!-- Verses will be dynamically generated -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Trading Interface -->
+        <div class="feature-container" id="tradingInterface">
+            <div class="trading-interface">
+                <!-- Leverage Panel -->
+                <div class="trading-panel">
+                    <h3 class="panel-title">Your Leverage</h3>
+                    <div class="leverage-meter">
+                        <div class="leverage-circle" id="leverageCircle"></div>
+                        <div class="leverage-inner">
+                            <div class="leverage-value" id="finalLeverage">1.0x</div>
+                            <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Leverage</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; text-align: center;">
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Effective Exposure</div>
+                        <div style="font-size: 24px; font-weight: 600; color: #FFD60A;" id="effectiveExposure">$0</div>
+                    </div>
+                </div>
+
+                <!-- Main Trading Panel -->
+                <div class="trading-panel" style="text-align: center;">
+                    <h2 style="font-size: 28px; margin-bottom: 30px;" id="tradingMarketTitle">Market Title</h2>
+                    
+                    <input type="number" class="position-input" id="positionSize" placeholder="Position Size ($)" value="1000">
+                    
+                    <div class="order-types">
+                        <h3 style="margin-bottom: 15px; font-size: 18px;">Order Type</h3>
+                        <button class="order-btn active" onclick="selectOrderType('market')">Market Order</button>
+                        <button class="order-btn" onclick="selectOrderType('limit')">Limit Order</button>
+                        <button class="order-btn" onclick="selectOrderType('stop')">Stop Order</button>
+                    </div>
+                    
+                    <div id="limitPriceInput" style="display: none; margin-top: 20px;">
+                        <input type="number" class="position-input" id="limitPrice" placeholder="Limit Price" style="padding: 15px; font-size: 18px;">
+                    </div>
+                    
+                    <div class="trade-buttons">
+                        <button class="trade-btn buy-btn" onclick="executeTrade('buy')">BUY YES</button>
+                        <button class="trade-btn sell-btn" onclick="executeTrade('sell')">BUY NO</button>
+                    </div>
+                </div>
+
+                <!-- Order Book Panel -->
+                <div class="trading-panel">
+                    <h3 class="panel-title">Order Book</h3>
+                    <div id="orderBook" style="margin-top: 20px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <h4 style="color: #4CD964; margin-bottom: 10px;">Bids</h4>
+                                <div class="order-entry" style="padding: 10px; background: rgba(76, 217, 100, 0.1); border-radius: 8px; margin: 5px 0;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>0.618</span>
+                                        <span>$12.5K</span>
+                                    </div>
+                                </div>
+                                <div class="order-entry" style="padding: 10px; background: rgba(76, 217, 100, 0.1); border-radius: 8px; margin: 5px 0;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>0.615</span>
+                                        <span>$8.2K</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 style="color: #FF3B30; margin-bottom: 10px;">Asks</h4>
+                                <div class="order-entry" style="padding: 10px; background: rgba(255, 59, 48, 0.1); border-radius: 8px; margin: 5px 0;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>0.622</span>
+                                        <span>$15.3K</span>
+                                    </div>
+                                </div>
+                                <div class="order-entry" style="padding: 10px; background: rgba(255, 59, 48, 0.1); border-radius: 8px; margin: 5px 0;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>0.625</span>
+                                        <span>$9.7K</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Navigation -->
+    <div class="demo-nav">
+        <button class="demo-btn active" id="btn1" onclick="goToStep(1)">1. Market</button>
+        <button class="demo-btn" id="btn2" onclick="goToStep(2)">2. Verses</button>
+        <button class="demo-btn" id="btn3" onclick="goToStep(3)">3. Trade</button>
+        <button class="play-btn" id="playBtn" onclick="playDemo()">▶</button>
+    </div>
+
+    <!-- Order Animation -->
+    <div class="order-animation" id="orderAnimation">
+        <h2 style="font-size: 32px; margin-bottom: 20px; color: #FFD60A;">Order Executed!</h2>
+        <div id="orderDetails" style="font-size: 18px; line-height: 1.8;"></div>
+    </div>
+
+    <script>
+        // Market data
+        const markets = {
+            1: {
+                title: "Apple AR Glasses at WWDC 2025",
+                verses: [
+                    {
+                        id: 'supply-chain',
+                        name: 'Supply Chain Readiness',
+                        multiplier: 1.8,
+                        description: 'Component manufacturing at scale',
+                        level: 1,
+                        position: { x: 30, y: 20 }
+                    },
+                    {
+                        id: 'developer-sdk',
+                        name: 'ARKit 6.0 Features',
+                        multiplier: 1.5,
+                        description: 'Advanced SDK capabilities revealed',
+                        level: 1,
+                        position: { x: 70, y: 20 }
+                    },
+                    {
+                        id: 'patent-filings',
+                        name: 'Patent Activity',
+                        multiplier: 1.4,
+                        description: 'Display and sensor patents filed',
+                        level: 2,
+                        position: { x: 20, y: 50 }
+                    },
+                    {
+                        id: 'insider-leaks',
+                        name: 'Insider Reports',
+                        multiplier: 1.3,
+                        description: 'Employee testing confirmations',
+                        level: 2,
+                        position: { x: 50, y: 50 }
+                    },
+                    {
+                        id: 'competition',
+                        name: 'Meta/Google Pressure',
+                        multiplier: 1.6,
+                        description: 'Competitive market timing',
+                        level: 2,
+                        position: { x: 80, y: 50 }
+                    }
+                ]
+            },
+            2: {
+                title: "Quantum Computer Breaks RSA-2048",
+                verses: [
+                    {
+                        id: 'qubit-count',
+                        name: 'Qubit Scaling',
+                        multiplier: 2.0,
+                        description: '4000+ logical qubits achieved',
+                        level: 1,
+                        position: { x: 30, y: 20 }
+                    },
+                    {
+                        id: 'error-correction',
+                        name: 'Error Correction',
+                        multiplier: 1.9,
+                        description: 'Sub-threshold error rates',
+                        level: 1,
+                        position: { x: 70, y: 20 }
+                    },
+                    {
+                        id: 'shor-optimization',
+                        name: "Shor's Algorithm Optimization",
+                        multiplier: 1.5,
+                        description: 'Runtime improvements published',
+                        level: 2,
+                        position: { x: 20, y: 50 }
+                    },
+                    {
+                        id: 'hardware-advance',
+                        name: 'Superconducting Chips',
+                        multiplier: 1.4,
+                        description: 'New architecture breakthroughs',
+                        level: 2,
+                        position: { x: 50, y: 50 }
+                    },
+                    {
+                        id: 'funding-surge',
+                        name: 'Government Funding',
+                        multiplier: 1.3,
+                        description: '$10B quantum initiative',
+                        level: 2,
+                        position: { x: 80, y: 50 }
+                    }
+                ]
+            },
+            3: {
+                title: "Fusion Energy Net Positive",
+                verses: [
+                    {
+                        id: 'ignition-repeat',
+                        name: 'Ignition Repeatability',
+                        multiplier: 2.1,
+                        description: 'Consistent Q>1 demonstrations',
+                        level: 1,
+                        position: { x: 30, y: 20 }
+                    },
+                    {
+                        id: 'containment-time',
+                        name: 'Plasma Containment',
+                        multiplier: 1.8,
+                        description: 'Sustained >10 second burns',
+                        level: 1,
+                        position: { x: 70, y: 20 }
+                    },
+                    {
+                        id: 'iter-progress',
+                        name: 'ITER Milestones',
+                        multiplier: 1.5,
+                        description: 'First plasma achieved',
+                        level: 2,
+                        position: { x: 20, y: 50 }
+                    },
+                    {
+                        id: 'private-fusion',
+                        name: 'Private Sector Progress',
+                        multiplier: 1.4,
+                        description: 'Commonwealth Fusion success',
+                        level: 2,
+                        position: { x: 50, y: 50 }
+                    },
+                    {
+                        id: 'material-science',
+                        name: 'Superconductor Advances',
+                        multiplier: 1.3,
+                        description: 'REBCO tape production scaled',
+                        level: 2,
+                        position: { x: 80, y: 50 }
+                    }
+                ]
+            }
+        };
+
+        let selectedMarket = null;
+        let selectedVerses = new Set();
+        let currentLeverage = 1.0;
+        let currentStep = 1;
+        let orderType = 'market';
+        let isPlaying = false;
+
+        function updateProgress(step) {
+            const progress = (step / 3) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function updateStepIndicator(text) {
+            const indicator = document.getElementById('stepIndicator');
+            const stepText = document.getElementById('stepText');
+            indicator.style.display = 'block';
+            stepText.textContent = text;
+        }
+
+        function selectMarket(marketId) {
+            selectedMarket = marketId;
+            
+            // Visual feedback
+            document.querySelectorAll('.market-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            event.currentTarget.classList.add('highlight');
+
+            // Auto-proceed after selection
+            setTimeout(() => {
+                goToStep(2);
+            }, 800);
+        }
+
+        function goToStep(step) {
+            currentStep = step;
+            
+            // Update navigation buttons
+            document.querySelectorAll('.demo-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn${step}`).classList.add('active');
+            
+            // Hide all containers
+            document.querySelectorAll('.feature-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            
+            // Show appropriate container
+            switch(step) {
+                case 1:
+                    document.getElementById('marketSelection').classList.add('active');
+                    updateStepIndicator('Step 1: Select a Market');
+                    break;
+                case 2:
+                    if (!selectedMarket) {
+                        alert('Please select a market first!');
+                        goToStep(1);
+                        return;
+                    }
+                    document.getElementById('verseSelection').classList.add('active');
+                    updateStepIndicator('Step 2: Select Verses to Build Leverage');
+                    buildVerseTree();
+                    break;
+                case 3:
+                    document.getElementById('tradingInterface').classList.add('active');
+                    updateStepIndicator('Step 3: Execute Your Trade');
+                    setupTrading();
+                    break;
+            }
+            
+            updateProgress(step);
+        }
+
+        function buildVerseTree() {
+            const tree = document.getElementById('verseTree');
+            tree.innerHTML = '';
+            
+            // Add main market node
+            const mainNode = document.createElement('div');
+            mainNode.className = 'verse-node main visible';
+            mainNode.style.left = '50%';
+            mainNode.style.top = '10%';
+            mainNode.style.transform = 'translateX(-50%)';
+            mainNode.innerHTML = `
+                <div style="font-size: 16px; font-weight: 600;">${markets[selectedMarket].title}</div>
+                <div style="font-size: 12px; margin-top: 5px; color: rgba(255, 255, 255, 0.6);">Base Market</div>
+            `;
+            tree.appendChild(mainNode);
+            
+            // Add verse nodes with delay
+            markets[selectedMarket].verses.forEach((verse, index) => {
+                setTimeout(() => {
+                    const node = document.createElement('div');
+                    node.className = 'verse-node';
+                    node.id = `verse-${verse.id}`;
+                    node.style.left = verse.position.x + '%';
+                    node.style.top = verse.position.y + '%';
+                    node.innerHTML = `
+                        <div style="font-weight: 600;">${verse.name}</div>
+                        <div style="font-size: 14px; color: #FFD60A; margin: 5px 0;">×${verse.multiplier}</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">${verse.description}</div>
+                    `;
+                    node.onclick = () => toggleVerse(verse);
+                    tree.appendChild(node);
+                    
+                    // Animate appearance
+                    setTimeout(() => {
+                        node.classList.add('visible');
+                    }, 50);
+                }, index * 200);
+            });
+        }
+
+        function toggleVerse(verse) {
+            const node = document.getElementById(`verse-${verse.id}`);
+            
+            if (selectedVerses.has(verse.id)) {
+                selectedVerses.delete(verse.id);
+                node.classList.remove('selected');
+            } else {
+                selectedVerses.add(verse.id);
+                node.classList.add('selected');
+                node.classList.add('pulse');
+            }
+            
+            updateLeverage();
+        }
+
+        function updateLeverage() {
+            currentLeverage = 1.0;
+            const versesList = document.getElementById('selectedVersesList');
+            versesList.innerHTML = '';
+            
+            if (selectedVerses.size === 0) {
+                versesList.innerHTML = 'No verses selected yet';
+            } else {
+                markets[selectedMarket].verses.forEach(verse => {
+                    if (selectedVerses.has(verse.id)) {
+                        currentLeverage *= verse.multiplier;
+                        versesList.innerHTML += `<div style="margin: 5px 0;">• ${verse.name} (×${verse.multiplier})</div>`;
+                    }
+                });
+            }
+            
+            // Cap at 100x
+            currentLeverage = Math.min(currentLeverage, 100);
+            
+            // Update displays
+            document.getElementById('currentLeverage').textContent = currentLeverage.toFixed(1) + 'x';
+            updateEffectiveExposure();
+        }
+
+        function setupTrading() {
+            document.getElementById('tradingMarketTitle').textContent = markets[selectedMarket].title;
+            document.getElementById('finalLeverage').textContent = currentLeverage.toFixed(1) + 'x';
+            
+            // Update leverage visualization
+            const rotation = (currentLeverage / 100) * 180;
+            document.getElementById('leverageCircle').style.background = `conic-gradient(
+                from 180deg,
+                #FFD60A 0deg,
+                #FFA500 ${rotation}deg,
+                rgba(255, 255, 255, 0.1) ${rotation}deg
+            )`;
+            
+            updateEffectiveExposure();
+        }
+
+        function updateEffectiveExposure() {
+            const positionSize = parseFloat(document.getElementById('positionSize').value) || 0;
+            const exposure = positionSize * currentLeverage;
+            document.getElementById('effectiveExposure').textContent = '$' + exposure.toLocaleString();
+        }
+
+        function selectOrderType(type) {
+            orderType = type;
+            
+            document.querySelectorAll('.order-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Show/hide limit price input
+            document.getElementById('limitPriceInput').style.display = 
+                type === 'limit' ? 'block' : 'none';
+        }
+
+        function executeTrade(side) {
+            const positionSize = parseFloat(document.getElementById('positionSize').value) || 0;
+            
+            if (positionSize <= 0) {
+                alert('Please enter a valid position size!');
+                return;
+            }
+            
+            const exposure = positionSize * currentLeverage;
+            const animation = document.getElementById('orderAnimation');
+            const details = document.getElementById('orderDetails');
+            
+            details.innerHTML = `
+                <div>Side: <span style="color: ${side === 'buy' ? '#4CD964' : '#FF3B30'}">
+                    ${side === 'buy' ? 'BUY YES' : 'BUY NO'}</span></div>
+                <div>Position: $${positionSize.toLocaleString()}</div>
+                <div>Leverage: ${currentLeverage.toFixed(1)}x</div>
+                <div>Effective Exposure: <span style="color: #FFD60A">$${exposure.toLocaleString()}</span></div>
+                <div>Order Type: ${orderType.toUpperCase()}</div>
+                <div style="margin-top: 20px; color: #4CD964;">✓ Order Filled Successfully</div>
+            `;
+            
+            animation.classList.add('show');
+            
+            setTimeout(() => {
+                animation.classList.remove('show');
+            }, 3000);
+        }
+
+        async function playDemo() {
+            if (isPlaying) return;
+            
+            isPlaying = true;
+            document.getElementById('playBtn').disabled = true;
+            
+            // Reset demo
+            selectedMarket = null;
+            selectedVerses.clear();
+            currentLeverage = 1.0;
+            goToStep(1);
+            
+            // Step 1: Select market
+            await delay(1000);
+            document.querySelectorAll('.market-card')[1].click();
+            
+            // Step 2: Select verses
+            await delay(2000);
+            const versesToSelect = ['qubit-count', 'error-correction', 'shor-optimization'];
+            for (let verseId of versesToSelect) {
+                await delay(800);
+                const verse = markets[2].verses.find(v => v.id === verseId);
+                if (verse) toggleVerse(verse);
+            }
+            
+            // Step 3: Trading
+            await delay(2000);
+            goToStep(3);
+            
+            // Enter position size
+            await delay(1000);
+            animateNumberInput('positionSize', 5000);
+            
+            // Select limit order
+            await delay(1000);
+            document.querySelectorAll('.order-btn')[1].click();
+            
+            // Enter limit price
+            await delay(500);
+            animateNumberInput('limitPrice', 0.24);
+            
+            // Execute trade
+            await delay(1500);
+            document.querySelector('.buy-btn').click();
+            
+            // Reset
+            setTimeout(() => {
+                isPlaying = false;
+                document.getElementById('playBtn').disabled = false;
+            }, 5000);
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function animateNumberInput(inputId, targetValue) {
+            const input = document.getElementById(inputId);
+            input.value = '';
+            const digits = targetValue.toString();
+            let index = 0;
+            
+            const interval = setInterval(() => {
+                if (index < digits.length) {
+                    input.value += digits[index];
+                    index++;
+                    updateEffectiveExposure();
+                } else {
+                    clearInterval(interval);
+                }
+            }, 100);
+        }
+
+        // Event listeners
+        document.getElementById('positionSize').addEventListener('input', updateEffectiveExposure);
+        
+        // Initialize
+        updateProgress(1);
+        updateStepIndicator('Step 1: Select a Market');
+    </script>
+</body>
+</html>

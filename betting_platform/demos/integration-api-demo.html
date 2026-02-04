@@ -1,0 +1,2277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM - Integration & API Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 20px;
+            color: #888;
+            -webkit-text-fill-color: #888;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFA500, #FFD700);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .main-content {
+            display: grid;
+            gap: 30px;
+        }
+
+        .api-console {
+            background: #000;
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            font-family: 'Courier New', monospace;
+        }
+
+        .console-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .console-title {
+            color: #4CAF50;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .console-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .console-btn {
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid rgba(255, 165, 0, 0.4);
+            border-radius: 5px;
+            padding: 5px 15px;
+            color: #FFA500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .console-btn:hover {
+            background: rgba(255, 165, 0, 0.3);
+        }
+
+        .console-btn.active {
+            background: #FFA500;
+            color: #000;
+        }
+
+        .code-block {
+            background: #0a0a0a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .code-comment {
+            color: #4CAF50;
+        }
+
+        .code-keyword {
+            color: #FF6B6B;
+        }
+
+        .code-string {
+            color: #FFD700;
+        }
+
+        .code-number {
+            color: #4ECDC4;
+        }
+
+        .code-function {
+            color: #95E1D3;
+        }
+
+        .response-block {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 3px solid #4CAF50;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .error-block {
+            background: rgba(255, 68, 68, 0.1);
+            border-left: 3px solid #FF4444;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .endpoints-grid {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .endpoint-category {
+            margin-bottom: 30px;
+        }
+
+        .category-title {
+            color: #FFA500;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .endpoint-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .endpoint-item:hover {
+            background: rgba(255, 165, 0, 0.1);
+            transform: translateX(5px);
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .method-get { background: #4CAF50; color: white; }
+        .method-post { background: #2196F3; color: white; }
+        .method-put { background: #FF9800; color: white; }
+        .method-delete { background: #F44336; color: white; }
+
+        .endpoint-path {
+            flex: 1;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+        }
+
+        .endpoint-description {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .integration-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .integration-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .integration-card:hover {
+            transform: translateY(-5px);
+            border-color: #FFA500;
+            box-shadow: 0 10px 30px rgba(255, 165, 0, 0.2);
+        }
+
+        .integration-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .integration-title {
+            color: #FFA500;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .integration-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .status-pending {
+            background: rgba(255, 165, 0, 0.2);
+            color: #FFA500;
+        }
+
+        .websocket-terminal {
+            background: #000;
+            border-radius: 15px;
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .ws-message {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        .ws-sent {
+            color: #4ECDC4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .ws-received {
+            color: #FFD700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .ws-system {
+            color: #888;
+            font-style: italic;
+        }
+
+        .sdk-examples {
+            background: rgba(138, 43, 226, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .sdk-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sdk-tab {
+            background: rgba(138, 43, 226, 0.2);
+            border: 1px solid rgba(138, 43, 226, 0.4);
+            border-radius: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sdk-tab.active {
+            background: linear-gradient(135deg, #8A2BE2, #FFA500);
+            color: white;
+            font-weight: bold;
+        }
+
+        .rate-limit-meter {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .rate-bar {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .rate-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #FFD700);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 165, 0, 0.3);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .step-indicator {
+            background: rgba(255, 165, 0, 0.2);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .narrator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #FFA500;
+            border-radius: 20px;
+            padding: 30px 40px;
+            max-width: 600px;
+            z-index: 2000;
+            display: none;
+        }
+
+        .narrator.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .narrator-title {
+            font-size: 24px;
+            color: #FFA500;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .narrator-content {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #fff;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -45%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .highlight {
+            animation: pulse 1.5s ease infinite;
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        .typing-effect {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 2s steps(40, end);
+        }
+
+        .api-key-display {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .api-key-value {
+            font-family: 'Courier New', monospace;
+            color: #FFD700;
+            letter-spacing: 1px;
+        }
+
+        .copy-btn {
+            background: #FFA500;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            color: #1a1a2e;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="header">
+            <h1>🔌 BOOM Integration & API Demo</h1>
+            <p>Developer Tools, API Access & Platform Integrations</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div class="main-content">
+            <!-- API Console -->
+            <div class="api-console" id="apiConsole">
+                <div class="console-header">
+                    <div class="console-title">// BOOM API Console v2.0</div>
+                    <div class="console-controls">
+                        <button class="console-btn active">REST</button>
+                        <button class="console-btn">WebSocket</button>
+                        <button class="console-btn">GraphQL</button>
+                    </div>
+                </div>
+                <div id="consoleContent"></div>
+            </div>
+
+            <!-- Available Endpoints -->
+            <div class="endpoints-grid" id="endpointsGrid">
+                <h3 style="color: #FFA500; margin-bottom: 20px;">📡 Available API Endpoints</h3>
+                <div id="endpointsList"></div>
+            </div>
+
+            <!-- Integration Partners -->
+            <div class="integration-cards" id="integrationCards"></div>
+
+            <!-- SDK Examples -->
+            <div class="sdk-examples" id="sdkExamples">
+                <h3 style="color: #8A2BE2; margin-bottom: 20px;">💻 SDK Examples</h3>
+                <div class="sdk-tabs">
+                    <div class="sdk-tab active" data-lang="javascript">JavaScript</div>
+                    <div class="sdk-tab" data-lang="python">Python</div>
+                    <div class="sdk-tab" data-lang="rust">Rust</div>
+                    <div class="sdk-tab" data-lang="go">Go</div>
+                </div>
+                <div id="sdkContent"></div>
+            </div>
+
+            <!-- WebSocket Terminal -->
+            <div id="websocketSection" style="display: none;">
+                <h3 style="color: #FFA500; margin-bottom: 20px;">🔄 WebSocket Live Connection</h3>
+                <div class="websocket-terminal" id="wsTerminal"></div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="control-btn" id="prevBtn" disabled>Previous</button>
+            <div class="step-indicator">
+                <span>Step</span>
+                <span id="currentStep">1</span>
+                <span>/</span>
+                <span id="totalSteps">70</span>
+            </div>
+            <button class="control-btn" id="nextBtn">Next</button>
+            <button class="control-btn" id="playBtn">Auto Play</button>
+            <div class="speed-control">
+                <label>Speed:</label>
+                <select id="speedSelect">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Narrator -->
+        <div class="narrator" id="narrator">
+            <div class="narrator-title" id="narratorTitle"></div>
+            <div class="narrator-content" id="narratorContent"></div>
+        </div>
+    </div>
+
+    <script>
+        class IntegrationAPIDemo {
+            constructor() {
+                this.currentStep = 1;
+                this.totalSteps = 70;
+                this.isPlaying = false;
+                this.speed = 1;
+                this.playInterval = null;
+                this.narratorTimer = null;
+                
+                this.init();
+            }
+
+            init() {
+                this.setupControls();
+                this.setupSDKTabs();
+                this.showStep(1);
+            }
+
+            setupControls() {
+                document.getElementById('nextBtn').addEventListener('click', () => this.nextStep());
+                document.getElementById('prevBtn').addEventListener('click', () => this.prevStep());
+                document.getElementById('playBtn').addEventListener('click', () => this.togglePlay());
+                document.getElementById('speedSelect').addEventListener('change', (e) => {
+                    this.speed = parseFloat(e.target.value);
+                });
+
+                // Setup console buttons
+                document.querySelectorAll('.console-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.console-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    });
+                });
+            }
+
+            setupSDKTabs() {
+                document.querySelectorAll('.sdk-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        document.querySelectorAll('.sdk-tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                    });
+                });
+            }
+
+            showNarrator(title, content) {
+                const narrator = document.getElementById('narrator');
+                document.getElementById('narratorTitle').textContent = title;
+                document.getElementById('narratorContent').textContent = content;
+                narrator.classList.add('active');
+
+                clearTimeout(this.narratorTimer);
+                this.narratorTimer = setTimeout(() => {
+                    this.hideNarrator();
+                }, 5000 / this.speed);
+            }
+
+            hideNarrator() {
+                const narrator = document.getElementById('narrator');
+                narrator.classList.remove('active');
+                
+                if (this.isPlaying) {
+                    setTimeout(() => this.nextStep(), 3000 / this.speed);
+                }
+            }
+
+            addConsoleCode(code, response = null, error = null) {
+                const content = document.getElementById('consoleContent');
+                const codeBlock = document.createElement('div');
+                codeBlock.className = 'code-block';
+                codeBlock.innerHTML = code;
+                content.appendChild(codeBlock);
+
+                if (response) {
+                    const responseBlock = document.createElement('div');
+                    responseBlock.className = 'response-block';
+                    responseBlock.innerHTML = response;
+                    content.appendChild(responseBlock);
+                }
+
+                if (error) {
+                    const errorBlock = document.createElement('div');
+                    errorBlock.className = 'error-block';
+                    errorBlock.innerHTML = error;
+                    content.appendChild(errorBlock);
+                }
+
+                content.scrollTop = content.scrollHeight;
+            }
+
+            addWebSocketMessage(message, type = 'system') {
+                const terminal = document.getElementById('wsTerminal');
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `ws-message ws-${type}`;
+                msgDiv.textContent = message;
+                terminal.appendChild(msgDiv);
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+
+            showStep(step) {
+                this.currentStep = step;
+                this.updateProgress();
+                this.updateControls();
+
+                // Clear highlights
+                document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+
+                switch(step) {
+                    case 1:
+                        this.showNarrator("Welcome to BOOM API & Integration", 
+                            "Let's explore BOOM's comprehensive API system and integration capabilities for developers!");
+                        break;
+
+                    case 2:
+                        this.showNarrator("API Console", 
+                            "BOOM provides a powerful API console for testing and development");
+                        document.getElementById('apiConsole').classList.add('highlight');
+                        break;
+
+                    case 3:
+                        this.showNarrator("API Authentication", 
+                            "First, let's authenticate with your API key to access BOOM's endpoints");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Authentication with API Key</span>
+                            <span class="code-keyword">const</span> <span class="code-function">headers</span> = {
+                                <span class="code-string">'X-API-Key'</span>: <span class="code-string">'boom_live_abc123xyz789...'</span>,
+                                <span class="code-string">'Content-Type'</span>: <span class="code-string">'application/json'</span>
+                            };
+                        `);
+                        break;
+
+                    case 4:
+                        this.showNarrator("API Key Generation", 
+                            "Generate and manage API keys from your developer dashboard");
+                        const apiKeyDisplay = document.createElement('div');
+                        apiKeyDisplay.className = 'api-key-display';
+                        apiKeyDisplay.innerHTML = `
+                            <div>
+                                <div style="color: #888; font-size: 14px; margin-bottom: 5px;">Your API Key</div>
+                                <div class="api-key-value">boom_live_sk_1a2b3c4d5e6f7g8h9i0j</div>
+                            </div>
+                            <button class="copy-btn">Copy</button>
+                        `;
+                        document.getElementById('apiConsole').appendChild(apiKeyDisplay);
+                        break;
+
+                    case 5:
+                        this.showNarrator("First API Call", 
+                            "Let's make our first API call to get account information");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// GET Account Information</span>
+                            <span class="code-keyword">fetch</span>(<span class="code-string">'https://api.boom.market/v2/account'</span>, {
+                                <span class="code-function">headers</span>: headers
+                            })
+                            .<span class="code-function">then</span>(<span class="code-function">response</span> => response.<span class="code-function">json</span>())
+                            .<span class="code-function">then</span>(<span class="code-function">data</span> => console.<span class="code-function">log</span>(data));
+                        `, `
+                            {
+                                "account_id": "usr_8h3j4k5l6m",
+                                "balance": 10000.00,
+                                "currency": "USD",
+                                "verified": true,
+                                "api_calls_today": 245,
+                                "rate_limit": 1000
+                            }
+                        `);
+                        break;
+
+                    case 6:
+                        this.showNarrator("Available Endpoints", 
+                            "BOOM offers comprehensive REST API endpoints for all features");
+                        const endpointsList = document.getElementById('endpointsList');
+                        endpointsList.innerHTML = `
+                            <div class="endpoint-category">
+                                <div class="category-title">
+                                    <span>🔍</span>
+                                    <span>Market Operations</span>
+                                </div>
+                                <div class="endpoint-item">
+                                    <div>
+                                        <span class="endpoint-method method-get">GET</span>
+                                        <span class="endpoint-path">/markets/search</span>
+                                    </div>
+                                    <span class="endpoint-description">Search markets across platforms</span>
+                                </div>
+                                <div class="endpoint-item">
+                                    <div>
+                                        <span class="endpoint-method method-get">GET</span>
+                                        <span class="endpoint-path">/markets/{id}</span>
+                                    </div>
+                                    <span class="endpoint-description">Get specific market details</span>
+                                </div>
+                                <div class="endpoint-item">
+                                    <div>
+                                        <span class="endpoint-method method-post">POST</span>
+                                        <span class="endpoint-path">/markets/{id}/bet</span>
+                                    </div>
+                                    <span class="endpoint-description">Place a bet on market</span>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 7:
+                        this.showNarrator("Search Markets API", 
+                            "Search for markets programmatically with filters");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Search for Bitcoin markets</span>
+                            <span class="code-keyword">const</span> <span class="code-function">searchParams</span> = {
+                                <span class="code-string">q</span>: <span class="code-string">'bitcoin'</span>,
+                                <span class="code-string">platform</span>: <span class="code-string">'all'</span>,
+                                <span class="code-string">min_volume</span>: <span class="code-number">100000</span>,
+                                <span class="code-string">sort</span>: <span class="code-string">'volume_desc'</span>
+                            };
+
+                            <span class="code-keyword">fetch</span>(<span class="code-string">'https://api.boom.market/v2/markets/search?'</span> + 
+                                <span class="code-keyword">new</span> URLSearchParams(searchParams), {
+                                <span class="code-function">headers</span>: headers
+                            });
+                        `, `
+                            {
+                                "results": [
+                                    {
+                                        "id": "mkt_btc100k",
+                                        "title": "Bitcoin to reach $100K by EOY",
+                                        "platform": "polymarket",
+                                        "volume": 5420000,
+                                        "yes_odds": 0.35,
+                                        "no_odds": 0.65
+                                    }
+                                ],
+                                "total": 42,
+                                "page": 1
+                            }
+                        `);
+                        break;
+
+                    case 8:
+                        this.showNarrator("Place Bet API", 
+                            "Place bets programmatically with order types and options");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Place a limit order bet</span>
+                            <span class="code-keyword">const</span> <span class="code-function">betData</span> = {
+                                <span class="code-string">market_id</span>: <span class="code-string">'mkt_btc100k'</span>,
+                                <span class="code-string">side</span>: <span class="code-string">'yes'</span>,
+                                <span class="code-string">amount</span>: <span class="code-number">1000</span>,
+                                <span class="code-string">order_type</span>: <span class="code-string">'limit'</span>,
+                                <span class="code-string">limit_price</span>: <span class="code-number">0.40</span>,
+                                <span class="code-string">leverage</span>: <span class="code-number">1</span>
+                            };
+
+                            <span class="code-keyword">fetch</span>(<span class="code-string">'https://api.boom.market/v2/markets/mkt_btc100k/bet'</span>, {
+                                <span class="code-function">method</span>: <span class="code-string">'POST'</span>,
+                                <span class="code-function">headers</span>: headers,
+                                <span class="code-function">body</span>: JSON.<span class="code-function">stringify</span>(betData)
+                            });
+                        `, `
+                            {
+                                "order_id": "ord_xyz789",
+                                "status": "pending",
+                                "market_id": "mkt_btc100k",
+                                "side": "yes",
+                                "amount": 1000,
+                                "estimated_payout": 2500,
+                                "created_at": "2024-01-15T10:30:00Z"
+                            }
+                        `);
+                        break;
+
+                    case 9:
+                        this.showNarrator("Portfolio Endpoints", 
+                            "Access complete portfolio data and analytics");
+                        endpointsList.innerHTML += `
+                            <div class="endpoint-category">
+                                <div class="category-title">
+                                    <span>📊</span>
+                                    <span>Portfolio Management</span>
+                                </div>
+                                <div class="endpoint-item">
+                                    <div>
+                                        <span class="endpoint-method method-get">GET</span>
+                                        <span class="endpoint-path">/portfolio/summary</span>
+                                    </div>
+                                    <span class="endpoint-description">Get portfolio overview</span>
+                                </div>
+                                <div class="endpoint-item">
+                                    <div>
+                                        <span class="endpoint-method method-get">GET</span>
+                                        <span class="endpoint-path">/portfolio/positions</span>
+                                    </div>
+                                    <span class="endpoint-description">List all positions</span>
+                                </div>
+                                <div class="endpoint-item">
+                                    <div>
+                                        <span class="endpoint-method method-post">POST</span>
+                                        <span class="endpoint-path">/portfolio/rebalance</span>
+                                    </div>
+                                    <span class="endpoint-description">Auto-rebalance portfolio</span>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 10:
+                        this.showNarrator("WebSocket Connection", 
+                            "Real-time data streaming via WebSocket for live updates");
+                        document.querySelector('[data-lang="javascript"]').click();
+                        document.querySelector('.console-btn:nth-child(2)').click();
+                        document.getElementById('websocketSection').style.display = 'block';
+                        this.addWebSocketMessage('Connecting to wss://stream.boom.market/v2...');
+                        break;
+
+                    case 11:
+                        this.showNarrator("WebSocket Authentication", 
+                            "Authenticate WebSocket connection for private channels");
+                        this.addWebSocketMessage('Connected successfully', 'system');
+                        this.addWebSocketMessage('{"action": "auth", "key": "boom_live_sk_1a2b3c4d5e6f7g8h9i0j"}', 'sent');
+                        this.addWebSocketMessage('{"status": "authenticated", "user": "usr_8h3j4k5l6m"}', 'received');
+                        break;
+
+                    case 12:
+                        this.showNarrator("Subscribe to Market Updates", 
+                            "Subscribe to real-time market price updates");
+                        this.addWebSocketMessage('{"action": "subscribe", "channel": "market:mkt_btc100k"}', 'sent');
+                        this.addWebSocketMessage('{"type": "subscribed", "channel": "market:mkt_btc100k"}', 'received');
+                        break;
+
+                    case 13:
+                        this.showNarrator("Real-Time Price Updates", 
+                            "Receive live price updates as markets move");
+                        this.addWebSocketMessage('{"type": "price_update", "market": "mkt_btc100k", "yes": 0.36, "no": 0.64, "volume": 5421250}', 'received');
+                        setTimeout(() => {
+                            this.addWebSocketMessage('{"type": "price_update", "market": "mkt_btc100k", "yes": 0.37, "no": 0.63, "volume": 5422100}', 'received');
+                        }, 1000 / this.speed);
+                        break;
+
+                    case 14:
+                        this.showNarrator("GraphQL API", 
+                            "Query exactly the data you need with GraphQL");
+                        document.querySelector('.console-btn:nth-child(3)').click();
+                        document.getElementById('consoleContent').innerHTML = '';
+                        this.addConsoleCode(`
+                            <span class="code-comment">// GraphQL Query for Complex Data</span>
+                            <span class="code-keyword">query</span> <span class="code-function">GetMarketWithPositions</span> {
+                                <span class="code-function">market</span>(id: <span class="code-string">"mkt_btc100k"</span>) {
+                                    title
+                                    volume
+                                    odds {
+                                        yes
+                                        no
+                                    }
+                                    <span class="code-function">myPosition</span> {
+                                        side
+                                        amount
+                                        currentValue
+                                        profit
+                                    }
+                                }
+                            }
+                        `, `
+                            {
+                                "data": {
+                                    "market": {
+                                        "title": "Bitcoin to reach $100K by EOY",
+                                        "volume": 5422100,
+                                        "odds": {
+                                            "yes": 0.37,
+                                            "no": 0.63
+                                        },
+                                        "myPosition": {
+                                            "side": "yes",
+                                            "amount": 1000,
+                                            "currentValue": 1080,
+                                            "profit": 80
+                                        }
+                                    }
+                                }
+                            }
+                        `);
+                        break;
+
+                    case 15:
+                        this.showNarrator("Verse System API", 
+                            "Access verse hierarchy and create verse-based positions");
+                        endpointsList.innerHTML += `
+                            <div class="endpoint-category">
+                                <div class="category-title">
+                                    <span>🌳</span>
+                                    <span>Verse System</span>
+                                </div>
+                                <div class="endpoint-item">
+                                    <div>
+                                        <span class="endpoint-method method-get">GET</span>
+                                        <span class="endpoint-path">/verses/tree</span>
+                                    </div>
+                                    <span class="endpoint-description">Get verse hierarchy</span>
+                                </div>
+                                <div class="endpoint-item">
+                                    <div>
+                                        <span class="endpoint-method method-post">POST</span>
+                                        <span class="endpoint-path">/verses/create</span>
+                                    </div>
+                                    <span class="endpoint-description">Create new verse</span>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 16:
+                        this.showNarrator("Quantum Positions API", 
+                            "Create and manage quantum superposition bundles");
+                        endpointsList.innerHTML += `
+                            <div class="endpoint-category">
+                                <div class="category-title">
+                                    <span>⚛️</span>
+                                    <span>Quantum Positions</span>
+                                </div>
+                                <div class="endpoint-item">
+                                    <div>
+                                        <span class="endpoint-method method-post">POST</span>
+                                        <span class="endpoint-path">/quantum/create</span>
+                                    </div>
+                                    <span class="endpoint-description">Create quantum bundle</span>
+                                </div>
+                                <div class="endpoint-item">
+                                    <div>
+                                        <span class="endpoint-method method-post">POST</span>
+                                        <span class="endpoint-path">/quantum/{id}/rebalance</span>
+                                    </div>
+                                    <span class="endpoint-description">Rebalance quantum position</span>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 17:
+                        this.showNarrator("Flash Betting API", 
+                            "Access ultra-fast flash markets programmatically");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Subscribe to flash market feed</span>
+                            <span class="code-keyword">const</span> <span class="code-function">flashStream</span> = <span class="code-keyword">new</span> EventSource(
+                                <span class="code-string">'https://api.boom.market/v2/flash/stream'</span>,
+                                { <span class="code-function">headers</span>: headers }
+                            );
+
+                            flashStream.<span class="code-function">onmessage</span> = (<span class="code-function">event</span>) => {
+                                <span class="code-keyword">const</span> market = JSON.<span class="code-function">parse</span>(event.data);
+                                console.<span class="code-function">log</span>(<span class="code-string">'New flash market:'</span>, market);
+                            };
+                        `);
+                        break;
+
+                    case 18:
+                        this.showNarrator("SDK Installation", 
+                            "Install BOOM SDK in your preferred programming language");
+                        const sdkContent = document.getElementById('sdkContent');
+                        sdkContent.innerHTML = `
+                            <div class="code-block">
+                                <span class="code-comment">// Install via npm</span>
+                                npm install @boom/sdk
+
+                                <span class="code-comment">// Or via yarn</span>
+                                yarn add @boom/sdk
+
+                                <span class="code-comment">// Import in your project</span>
+                                <span class="code-keyword">import</span> { BoomClient } <span class="code-keyword">from</span> <span class="code-string">'@boom/sdk'</span>;
+                            </div>
+                        `;
+                        break;
+
+                    case 19:
+                        this.showNarrator("JavaScript SDK Example", 
+                            "Complete example using BOOM JavaScript SDK");
+                        sdkContent.innerHTML = `
+                            <div class="code-block">
+                                <span class="code-keyword">import</span> { BoomClient } <span class="code-keyword">from</span> <span class="code-string">'@boom/sdk'</span>;
+
+                                <span class="code-comment">// Initialize client</span>
+                                <span class="code-keyword">const</span> boom = <span class="code-keyword">new</span> <span class="code-function">BoomClient</span>({
+                                    apiKey: <span class="code-string">'boom_live_sk_...'</span>,
+                                    environment: <span class="code-string">'production'</span>
+                                });
+
+                                <span class="code-comment">// Search markets</span>
+                                <span class="code-keyword">const</span> markets = <span class="code-keyword">await</span> boom.markets.<span class="code-function">search</span>({
+                                    query: <span class="code-string">'election'</span>,
+                                    minVolume: <span class="code-number">100000</span>
+                                });
+
+                                <span class="code-comment">// Place a bet</span>
+                                <span class="code-keyword">const</span> order = <span class="code-keyword">await</span> boom.orders.<span class="code-function">create</span>({
+                                    marketId: markets[<span class="code-number">0</span>].id,
+                                    side: <span class="code-string">'yes'</span>,
+                                    amount: <span class="code-number">500</span>
+                                });
+                            </div>
+                        `;
+                        break;
+
+                    case 20:
+                        this.showNarrator("Python SDK", 
+                            "BOOM SDK is available for Python developers");
+                        document.querySelector('[data-lang="python"]').click();
+                        sdkContent.innerHTML = `
+                            <div class="code-block">
+                                <span class="code-comment"># Install via pip</span>
+                                pip install boom-sdk
+
+                                <span class="code-comment"># Import and initialize</span>
+                                <span class="code-keyword">from</span> boom_sdk <span class="code-keyword">import</span> BoomClient
+
+                                client = BoomClient(
+                                    api_key=<span class="code-string">'boom_live_sk_...'</span>
+                                )
+
+                                <span class="code-comment"># Search markets</span>
+                                markets = client.markets.search(
+                                    query=<span class="code-string">'bitcoin'</span>,
+                                    min_volume=<span class="code-number">100000</span>
+                                )
+
+                                <span class="code-comment"># Get portfolio</span>
+                                portfolio = client.portfolio.get_summary()
+                                <span class="code-keyword">print</span>(f<span class="code-string">'Balance: {portfolio.balance}'</span>)
+                            </div>
+                        `;
+                        break;
+
+                    case 21:
+                        this.showNarrator("Rust SDK", 
+                            "High-performance Rust SDK for system programming");
+                        document.querySelector('[data-lang="rust"]').click();
+                        sdkContent.innerHTML = `
+                            <div class="code-block">
+                                <span class="code-comment">// Add to Cargo.toml</span>
+                                [dependencies]
+                                boom-sdk = <span class="code-string">"0.2.0"</span>
+
+                                <span class="code-comment">// Use in your code</span>
+                                <span class="code-keyword">use</span> boom_sdk::BoomClient;
+
+                                <span class="code-keyword">async fn</span> <span class="code-function">main</span>() {
+                                    <span class="code-keyword">let</span> client = BoomClient::<span class="code-function">new</span>(
+                                        <span class="code-string">"boom_live_sk_..."</span>
+                                    );
+
+                                    <span class="code-keyword">let</span> markets = client
+                                        .search_markets(<span class="code-string">"election"</span>)
+                                        .<span class="code-keyword">await</span>
+                                        .<span class="code-function">unwrap</span>();
+                                }
+                            </div>
+                        `;
+                        break;
+
+                    case 22:
+                        this.showNarrator("Rate Limiting", 
+                            "BOOM API includes smart rate limiting with clear headers");
+                        const rateLimitInfo = document.createElement('div');
+                        rateLimitInfo.className = 'rate-limit-meter';
+                        rateLimitInfo.innerHTML = `
+                            <div style="color: #FFA500; font-weight: bold; margin-bottom: 10px;">API Rate Limits</div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>Requests Used</span>
+                                <span>245 / 1000</span>
+                            </div>
+                            <div class="rate-bar">
+                                <div class="rate-fill" style="width: 24.5%;"></div>
+                            </div>
+                            <div style="color: #888; font-size: 14px; margin-top: 10px;">
+                                Resets in 42 minutes | Burst: 100/min | Headers: X-RateLimit-*
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(rateLimitInfo);
+                        break;
+
+                    case 23:
+                        this.showNarrator("Webhook Configuration", 
+                            "Set up webhooks to receive real-time events");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Configure webhook endpoint</span>
+                            <span class="code-keyword">const</span> <span class="code-function">webhookConfig</span> = {
+                                <span class="code-string">url</span>: <span class="code-string">'https://your-app.com/webhooks/boom'</span>,
+                                <span class="code-string">events</span>: [
+                                    <span class="code-string">'order.filled'</span>,
+                                    <span class="code-string">'position.liquidated'</span>,
+                                    <span class="code-string">'market.resolved'</span>
+                                ],
+                                <span class="code-string">secret</span>: <span class="code-string">'whsec_abc123...'</span>
+                            };
+
+                            <span class="code-keyword">fetch</span>(<span class="code-string">'https://api.boom.market/v2/webhooks'</span>, {
+                                <span class="code-function">method</span>: <span class="code-string">'POST'</span>,
+                                <span class="code-function">headers</span>: headers,
+                                <span class="code-function">body</span>: JSON.<span class="code-function">stringify</span>(webhookConfig)
+                            });
+                        `);
+                        break;
+
+                    case 24:
+                        this.showNarrator("Webhook Events", 
+                            "Receive instant notifications for important events");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Example webhook payload</span>
+                            {
+                                <span class="code-string">"event"</span>: <span class="code-string">"order.filled"</span>,
+                                <span class="code-string">"timestamp"</span>: <span class="code-string">"2024-01-15T10:45:00Z"</span>,
+                                <span class="code-string">"data"</span>: {
+                                    <span class="code-string">"order_id"</span>: <span class="code-string">"ord_xyz789"</span>,
+                                    <span class="code-string">"market_id"</span>: <span class="code-string">"mkt_btc100k"</span>,
+                                    <span class="code-string">"side"</span>: <span class="code-string">"yes"</span>,
+                                    <span class="code-string">"amount"</span>: <span class="code-number">1000</span>,
+                                    <span class="code-string">"fill_price"</span>: <span class="code-number">0.38</span>,
+                                    <span class="code-string">"status"</span>: <span class="code-string">"filled"</span>
+                                }
+                            }
+                        `);
+                        break;
+
+                    case 25:
+                        this.showNarrator("Platform Integrations", 
+                            "BOOM integrates with major platforms and services");
+                        const integrationCards = document.getElementById('integrationCards');
+                        integrationCards.innerHTML = `
+                            <div class="integration-card">
+                                <div class="integration-icon">🔗</div>
+                                <div class="integration-title">Polymarket</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Direct integration for all Polymarket markets with real-time sync
+                                </div>
+                            </div>
+                            <div class="integration-card">
+                                <div class="integration-icon">🎮</div>
+                                <div class="integration-title">DraftKings</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Sports betting and daily fantasy integration
+                                </div>
+                            </div>
+                            <div class="integration-card">
+                                <div class="integration-icon">⚡</div>
+                                <div class="integration-title">FanDuel</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Live sports and flash betting markets
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 26:
+                        this.showNarrator("Blockchain Integration", 
+                            "Direct blockchain integrations for on-chain betting");
+                        integrationCards.innerHTML += `
+                            <div class="integration-card">
+                                <div class="integration-icon">⛓️</div>
+                                <div class="integration-title">Solana</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Native Solana program for high-speed transactions
+                                </div>
+                            </div>
+                            <div class="integration-card">
+                                <div class="integration-icon">🔷</div>
+                                <div class="integration-title">Polygon</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Cross-chain bridge via Wormhole
+                                </div>
+                            </div>
+                            <div class="integration-card">
+                                <div class="integration-icon">🌐</div>
+                                <div class="integration-title">Ethereum</div>
+                                <div class="integration-status status-pending">Coming Soon</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Ethereum mainnet integration Q2 2024
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 27:
+                        this.showNarrator("Trading View Integration", 
+                            "Embed BOOM charts in TradingView with custom indicators");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// TradingView Widget Integration</span>
+                            <span class="code-keyword">const</span> widget = <span class="code-keyword">new</span> TradingView.<span class="code-function">widget</span>({
+                                <span class="code-string">"symbol"</span>: <span class="code-string">"BOOM:BTCUSD100K"</span>,
+                                <span class="code-string">"interval"</span>: <span class="code-string">"D"</span>,
+                                <span class="code-string">"theme"</span>: <span class="code-string">"dark"</span>,
+                                <span class="code-string">"style"</span>: <span class="code-string">"1"</span>,
+                                <span class="code-string">"locale"</span>: <span class="code-string">"en"</span>,
+                                <span class="code-string">"toolbar_bg"</span>: <span class="code-string">"#1a1a2e"</span>,
+                                <span class="code-string">"enable_publishing"</span>: <span class="code-keyword">false</span>,
+                                <span class="code-string">"container_id"</span>: <span class="code-string">"tradingview_chart"</span>
+                            });
+                        `);
+                        break;
+
+                    case 28:
+                        this.showNarrator("Discord Bot Integration", 
+                            "BOOM Discord bot for community betting");
+                        integrationCards.innerHTML += `
+                            <div class="integration-card">
+                                <div class="integration-icon">💬</div>
+                                <div class="integration-title">Discord Bot</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    /boom search, /boom bet, /boom portfolio commands
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 29:
+                        this.showNarrator("Telegram Integration", 
+                            "Telegram bot and mini-app for mobile betting");
+                        integrationCards.innerHTML += `
+                            <div class="integration-card">
+                                <div class="integration-icon">✈️</div>
+                                <div class="integration-title">Telegram</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    @BoomBetBot - Full betting via Telegram
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 30:
+                        this.showNarrator("OAuth 2.0", 
+                            "Secure third-party authentication via OAuth");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// OAuth 2.0 Authorization Flow</span>
+                            <span class="code-keyword">const</span> <span class="code-function">authUrl</span> = <span class="code-string">'https://auth.boom.market/oauth/authorize?'</span> +
+                                <span class="code-string">'client_id=your_client_id&'</span> +
+                                <span class="code-string">'redirect_uri=https://your-app.com/callback&'</span> +
+                                <span class="code-string">'response_type=code&'</span> +
+                                <span class="code-string">'scope=read:markets write:orders read:portfolio'</span>;
+
+                            <span class="code-comment">// Redirect user to authorization</span>
+                            window.location.<span class="code-function">href</span> = authUrl;
+                        `);
+                        break;
+
+                    case 31:
+                        this.showNarrator("API Scopes", 
+                            "Granular permission control with OAuth scopes");
+                        const scopesTable = document.createElement('div');
+                        scopesTable.innerHTML = `
+                            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #FFA500; margin-bottom: 15px;">Available OAuth Scopes</h4>
+                                <div style="display: grid; gap: 10px;">
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px;">
+                                        <span style="font-family: monospace;">read:markets</span>
+                                        <span style="color: #888;">View market data</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px;">
+                                        <span style="font-family: monospace;">write:orders</span>
+                                        <span style="color: #888;">Place and manage orders</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px;">
+                                        <span style="font-family: monospace;">read:portfolio</span>
+                                        <span style="color: #888;">View portfolio data</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px;">
+                                        <span style="font-family: monospace;">write:portfolio</span>
+                                        <span style="color: #888;">Modify portfolio settings</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(scopesTable);
+                        break;
+
+                    case 32:
+                        this.showNarrator("Historical Data API", 
+                            "Access historical market data for analysis");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Get historical price data</span>
+                            <span class="code-keyword">fetch</span>(<span class="code-string">'https://api.boom.market/v2/markets/mkt_btc100k/history?'</span> +
+                                <span class="code-string">'interval=1h&'</span> +
+                                <span class="code-string">'start=2024-01-01&'</span> +
+                                <span class="code-string">'end=2024-01-15'</span>, {
+                                <span class="code-function">headers</span>: headers
+                            })
+                            .<span class="code-function">then</span>(<span class="code-function">response</span> => response.<span class="code-function">json</span>())
+                            .<span class="code-function">then</span>(<span class="code-function">data</span> => {
+                                <span class="code-comment">// Process historical data</span>
+                                data.candles.<span class="code-function">forEach</span>(<span class="code-function">candle</span> => {
+                                    console.<span class="code-function">log</span>(candle.timestamp, candle.yes_price);
+                                });
+                            });
+                        `);
+                        break;
+
+                    case 33:
+                        this.showNarrator("Bulk Operations", 
+                            "Execute multiple operations in a single API call");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Bulk order placement</span>
+                            <span class="code-keyword">const</span> <span class="code-function">bulkOrders</span> = [
+                                { market: <span class="code-string">'mkt_btc100k'</span>, side: <span class="code-string">'yes'</span>, amount: <span class="code-number">500</span> },
+                                { market: <span class="code-string">'mkt_eth5k'</span>, side: <span class="code-string">'no'</span>, amount: <span class="code-number">300</span> },
+                                { market: <span class="code-string">'mkt_election'</span>, side: <span class="code-string">'yes'</span>, amount: <span class="code-number">1000</span> }
+                            ];
+
+                            <span class="code-keyword">fetch</span>(<span class="code-string">'https://api.boom.market/v2/orders/bulk'</span>, {
+                                <span class="code-function">method</span>: <span class="code-string">'POST'</span>,
+                                <span class="code-function">headers</span>: headers,
+                                <span class="code-function">body</span>: JSON.<span class="code-function">stringify</span>({ orders: bulkOrders })
+                            });
+                        `, `
+                            {
+                                "success": 3,
+                                "failed": 0,
+                                "orders": [
+                                    {"id": "ord_001", "status": "filled"},
+                                    {"id": "ord_002", "status": "pending"},
+                                    {"id": "ord_003", "status": "filled"}
+                                ]
+                            }
+                        `);
+                        break;
+
+                    case 34:
+                        this.showNarrator("API Sandbox", 
+                            "Test your integration in a safe sandbox environment");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Switch to sandbox environment</span>
+                            <span class="code-keyword">const</span> sandboxClient = <span class="code-keyword">new</span> <span class="code-function">BoomClient</span>({
+                                apiKey: <span class="code-string">'boom_test_sk_...'</span>,
+                                environment: <span class="code-string">'sandbox'</span>,
+                                baseUrl: <span class="code-string">'https://sandbox.api.boom.market/v2'</span>
+                            });
+
+                            <span class="code-comment">// Sandbox provides:</span>
+                            <span class="code-comment">// - Unlimited test funds</span>
+                            <span class="code-comment">// - Simulated market movements</span>
+                            <span class="code-comment">// - No rate limits</span>
+                            <span class="code-comment">// - Reset on demand</span>
+                        `);
+                        break;
+
+                    case 35:
+                        this.showNarrator("Error Handling", 
+                            "Comprehensive error codes and messages for debugging");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Proper error handling</span>
+                            <span class="code-keyword">try</span> {
+                                <span class="code-keyword">const</span> order = <span class="code-keyword">await</span> boom.orders.<span class="code-function">create</span>(orderData);
+                            } <span class="code-keyword">catch</span> (error) {
+                                <span class="code-keyword">switch</span> (error.code) {
+                                    <span class="code-keyword">case</span> <span class="code-string">'INSUFFICIENT_FUNDS'</span>:
+                                        console.<span class="code-function">error</span>(<span class="code-string">'Not enough balance'</span>);
+                                        <span class="code-keyword">break</span>;
+                                    <span class="code-keyword">case</span> <span class="code-string">'MARKET_CLOSED'</span>:
+                                        console.<span class="code-function">error</span>(<span class="code-string">'Market has closed'</span>);
+                                        <span class="code-keyword">break</span>;
+                                    <span class="code-keyword">case</span> <span class="code-string">'RATE_LIMITED'</span>:
+                                        console.<span class="code-function">error</span>(<span class="code-string">'Too many requests'</span>);
+                                        <span class="code-keyword">break</span>;
+                                }
+                            }
+                        `, null, `
+                            {
+                                "error": {
+                                    "code": "INSUFFICIENT_FUNDS",
+                                    "message": "Account balance too low",
+                                    "required": 1000,
+                                    "available": 450
+                                }
+                            }
+                        `);
+                        break;
+
+                    case 36:
+                        this.showNarrator("API Versioning", 
+                            "BOOM API uses semantic versioning for stability");
+                        const versionInfo = document.createElement('div');
+                        versionInfo.innerHTML = `
+                            <div style="background: rgba(76,175,80,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #4CAF50; margin-bottom: 15px;">API Version Information</h4>
+                                <div style="display: grid; gap: 10px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Current Version:</span>
+                                        <span style="color: #FFD700; font-weight: bold;">v2.3.1</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Deprecated:</span>
+                                        <span style="color: #FF4444;">v1.x (EOL: March 2024)</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Beta:</span>
+                                        <span style="color: #FFA500;">v3.0.0-beta</span>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 15px; color: #888; font-size: 14px;">
+                                    ℹ️ Version specified in header: X-API-Version
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(versionInfo);
+                        break;
+
+                    case 37:
+                        this.showNarrator("Postman Collection", 
+                            "Import BOOM API collection directly into Postman");
+                        const postmanBtn = document.createElement('button');
+                        postmanBtn.style.cssText = 'background: #FF6C37; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px;';
+                        postmanBtn.innerHTML = '📮 Run in Postman';
+                        document.getElementById('apiConsole').appendChild(postmanBtn);
+                        break;
+
+                    case 38:
+                        this.showNarrator("OpenAPI Specification", 
+                            "Complete OpenAPI 3.0 specification available");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Download OpenAPI spec</span>
+                            <span class="code-keyword">fetch</span>(<span class="code-string">'https://api.boom.market/v2/openapi.json'</span>)
+                            .<span class="code-function">then</span>(<span class="code-function">response</span> => response.<span class="code-function">json</span>())
+                            .<span class="code-function">then</span>(<span class="code-function">spec</span> => {
+                                <span class="code-comment">// Use for code generation</span>
+                                <span class="code-comment">// Import into API tools</span>
+                                <span class="code-comment">// Generate client libraries</span>
+                                console.<span class="code-function">log</span>(<span class="code-string">'OpenAPI version:'</span>, spec.openapi);
+                                console.<span class="code-function">log</span>(<span class="code-string">'Endpoints:'</span>, Object.<span class="code-function">keys</span>(spec.paths));
+                            });
+                        `);
+                        break;
+
+                    case 39:
+                        this.showNarrator("Monitoring & Analytics", 
+                            "API usage analytics and monitoring dashboard");
+                        const analytics = document.createElement('div');
+                        analytics.innerHTML = `
+                            <div style="background: rgba(138,43,226,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #8A2BE2; margin-bottom: 15px;">📊 API Analytics (Last 24h)</h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                    <div>
+                                        <div style="color: #888; font-size: 14px;">Total Requests</div>
+                                        <div style="color: #FFD700; font-size: 28px; font-weight: bold;">12,847</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #888; font-size: 14px;">Success Rate</div>
+                                        <div style="color: #4CAF50; font-size: 28px; font-weight: bold;">99.7%</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #888; font-size: 14px;">Avg Latency</div>
+                                        <div style="color: #FFA500; font-size: 28px; font-weight: bold;">42ms</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #888; font-size: 14px;">Peak TPS</div>
+                                        <div style="color: #4ECDC4; font-size: 28px; font-weight: bold;">847</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(analytics);
+                        break;
+
+                    case 40:
+                        this.showNarrator("Mobile SDK", 
+                            "Native mobile SDKs for iOS and Android");
+                        integrationCards.innerHTML += `
+                            <div class="integration-card">
+                                <div class="integration-icon">📱</div>
+                                <div class="integration-title">iOS SDK</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Swift/SwiftUI SDK via CocoaPods
+                                </div>
+                            </div>
+                            <div class="integration-card">
+                                <div class="integration-icon">🤖</div>
+                                <div class="integration-title">Android SDK</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Kotlin SDK via Maven Central
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 41:
+                        this.showNarrator("React Components", 
+                            "Pre-built React components for quick integration");
+                        sdkContent.innerHTML = `
+                            <div class="code-block">
+                                <span class="code-comment">// Install BOOM React components</span>
+                                npm install @boom/react-components
+
+                                <span class="code-comment">// Use in your React app</span>
+                                <span class="code-keyword">import</span> { MarketCard, BetWidget, Portfolio } <span class="code-keyword">from</span> <span class="code-string">'@boom/react-components'</span>;
+
+                                <span class="code-keyword">function</span> <span class="code-function">App</span>() {
+                                    <span class="code-keyword">return</span> (
+                                        &lt;div&gt;
+                                            &lt;MarketCard marketId=<span class="code-string">"mkt_btc100k"</span> /&gt;
+                                            &lt;BetWidget 
+                                                onBetPlaced={handleBet}
+                                                maxAmount={<span class="code-number">1000</span>}
+                                            /&gt;
+                                            &lt;Portfolio userId={currentUser.id} /&gt;
+                                        &lt;/div&gt;
+                                    );
+                                }
+                            </div>
+                        `;
+                        break;
+
+                    case 42:
+                        this.showNarrator("Vue.js Integration", 
+                            "Vue.js components and composables available");
+                        sdkContent.innerHTML = `
+                            <div class="code-block">
+                                <span class="code-comment">// Install BOOM Vue components</span>
+                                npm install @boom/vue-components
+
+                                <span class="code-comment">// Use in Vue 3</span>
+                                <span class="code-keyword">import</span> { useBoomMarkets, BoomMarketCard } <span class="code-keyword">from</span> <span class="code-string">'@boom/vue-components'</span>;
+
+                                <span class="code-keyword">export default</span> {
+                                    <span class="code-function">setup</span>() {
+                                        <span class="code-keyword">const</span> { markets, loading, searchMarkets } = <span class="code-function">useBoomMarkets</span>();
+                                        
+                                        <span class="code-keyword">return</span> {
+                                            markets,
+                                            loading,
+                                            searchMarkets
+                                        };
+                                    }
+                                };
+                            </div>
+                        `;
+                        break;
+
+                    case 43:
+                        this.showNarrator("Database Sync", 
+                            "Sync BOOM data to your database via change streams");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Subscribe to database sync</span>
+                            <span class="code-keyword">const</span> sync = boom.sync.<span class="code-function">create</span>({
+                                <span class="code-string">destination</span>: <span class="code-string">'postgresql://user:pass@host/db'</span>,
+                                <span class="code-string">tables</span>: [<span class="code-string">'markets'</span>, <span class="code-string">'orders'</span>, <span class="code-string">'positions'</span>],
+                                <span class="code-string">frequency</span>: <span class="code-string">'realtime'</span>,
+                                <span class="code-string">includeHistory</span>: <span class="code-keyword">true</span>
+                            });
+
+                            sync.<span class="code-function">on</span>(<span class="code-string">'sync'</span>, (data) => {
+                                console.<span class="code-function">log</span>(<span class="code-string">'Synced:'</span>, data.records, <span class="code-string">'records'</span>);
+                            });
+                        `);
+                        break;
+
+                    case 44:
+                        this.showNarrator("Zapier Integration", 
+                            "Connect BOOM to 5000+ apps via Zapier");
+                        integrationCards.innerHTML += `
+                            <div class="integration-card">
+                                <div class="integration-icon">⚡</div>
+                                <div class="integration-title">Zapier</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Triggers: New Bet, Market Resolved, Position Changed
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 45:
+                        this.showNarrator("IFTTT Integration", 
+                            "Create automated workflows with IFTTT");
+                        integrationCards.innerHTML += `
+                            <div class="integration-card">
+                                <div class="integration-icon">🔄</div>
+                                <div class="integration-title">IFTTT</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    If market moves, then send notification
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 46:
+                        this.showNarrator("Excel Add-in", 
+                            "BOOM Excel add-in for spreadsheet analysis");
+                        integrationCards.innerHTML += `
+                            <div class="integration-card">
+                                <div class="integration-icon">📊</div>
+                                <div class="integration-title">Excel Add-in</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    =BOOM.MARKET("BTC100K") for live prices
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 47:
+                        this.showNarrator("Google Sheets", 
+                            "Google Sheets integration for portfolio tracking");
+                        integrationCards.innerHTML += `
+                            <div class="integration-card">
+                                <div class="integration-icon">📈</div>
+                                <div class="integration-title">Google Sheets</div>
+                                <div class="integration-status status-active">Active</div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Custom functions for live data import
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 48:
+                        this.showNarrator("CLI Tool", 
+                            "Command-line interface for power users");
+                        this.addConsoleCode(`
+                            <span class="code-comment"># Install BOOM CLI</span>
+                            npm install -g @boom/cli
+
+                            <span class="code-comment"># Search markets</span>
+                            boom search "election" --min-volume 100000
+
+                            <span class="code-comment"># Place a bet</span>
+                            boom bet mkt_btc100k --side yes --amount 500
+
+                            <span class="code-comment"># Check portfolio</span>
+                            boom portfolio --format table
+
+                            <span class="code-comment"># Watch live prices</span>
+                            boom watch mkt_btc100k --interval 1s
+                        `);
+                        break;
+
+                    case 49:
+                        this.showNarrator("GitHub Actions", 
+                            "GitHub Actions for automated trading strategies");
+                        this.addConsoleCode(`
+                            <span class="code-comment"># .github/workflows/trading-bot.yml</span>
+                            name: Trading Bot
+                            on:
+                              schedule:
+                                - cron: '*/5 * * * *'  <span class="code-comment"># Every 5 minutes</span>
+                            
+                            jobs:
+                              trade:
+                                runs-on: ubuntu-latest
+                                steps:
+                                  - uses: boom-market/trade-action@v1
+                                    with:
+                                      api-key: \${{ secrets.BOOM_API_KEY }}
+                                      strategy: mean-reversion
+                                      max-position: 1000
+                        `);
+                        break;
+
+                    case 50:
+                        this.showNarrator("Jupyter Notebooks", 
+                            "Python notebooks for data analysis and backtesting");
+                        sdkContent.innerHTML = `
+                            <div class="code-block">
+                                <span class="code-comment"># BOOM Jupyter Integration</span>
+                                <span class="code-keyword">import</span> boom_sdk <span class="code-keyword">as</span> boom
+                                <span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd
+                                <span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt
+
+                                <span class="code-comment"># Get historical data</span>
+                                df = boom.get_historical_data(
+                                    market=<span class="code-string">'mkt_btc100k'</span>,
+                                    interval=<span class="code-string">'1h'</span>,
+                                    start=<span class="code-string">'2024-01-01'</span>
+                                )
+
+                                <span class="code-comment"># Analyze and plot</span>
+                                df[<span class="code-string">'yes_price'</span>].plot(figsize=(<span class="code-number">12</span>, <span class="code-number">6</span>))
+                                plt.title(<span class="code-string">'Bitcoin $100K Probability Over Time'</span>)
+                                plt.show()
+                            </div>
+                        `;
+                        break;
+
+                    case 51:
+                        this.showNarrator("Backtesting Framework", 
+                            "Test strategies on historical data before going live");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Backtest a trading strategy</span>
+                            <span class="code-keyword">const</span> backtest = boom.backtest.<span class="code-function">run</span>({
+                                <span class="code-string">strategy</span>: <span class="code-string">'momentum'</span>,
+                                <span class="code-string">startDate</span>: <span class="code-string">'2023-01-01'</span>,
+                                <span class="code-string">endDate</span>: <span class="code-string">'2023-12-31'</span>,
+                                <span class="code-string">initialBalance</span>: <span class="code-number">10000</span>,
+                                <span class="code-string">params</span>: {
+                                    threshold: <span class="code-number">0.1</span>,
+                                    stopLoss: <span class="code-number">0.05</span>,
+                                    takeProfit: <span class="code-number">0.2</span>
+                                }
+                            });
+
+                            console.<span class="code-function">log</span>(<span class="code-string">'Total Return:'</span>, backtest.totalReturn);
+                            console.<span class="code-function">log</span>(<span class="code-string">'Sharpe Ratio:'</span>, backtest.sharpeRatio);
+                            console.<span class="code-function">log</span>(<span class="code-string">'Max Drawdown:'</span>, backtest.maxDrawdown);
+                        `);
+                        break;
+
+                    case 52:
+                        this.showNarrator("Paper Trading", 
+                            "Test strategies with simulated money before going live");
+                        const paperTrading = document.createElement('div');
+                        paperTrading.innerHTML = `
+                            <div style="background: rgba(255,165,0,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #FFA500; margin-bottom: 15px;">📝 Paper Trading Mode</h4>
+                                <div style="display: grid; gap: 10px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Virtual Balance:</span>
+                                        <span style="color: #FFD700;">$100,000</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>P&L Today:</span>
+                                        <span style="color: #4CAF50;">+$2,450 (+2.45%)</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Trades Today:</span>
+                                        <span>47</span>
+                                    </div>
+                                </div>
+                                <button style="width: 100%; background: #FFA500; border: none; padding: 10px; border-radius: 5px; color: #1a1a2e; font-weight: bold; margin-top: 15px;">Switch to Live Trading</button>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(paperTrading);
+                        break;
+
+                    case 53:
+                        this.showNarrator("Custom Indicators", 
+                            "Create custom technical indicators for markets");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Register custom indicator</span>
+                            boom.indicators.<span class="code-function">register</span>({
+                                <span class="code-string">name</span>: <span class="code-string">'BoomScore'</span>,
+                                <span class="code-string">calculate</span>: (marketData) => {
+                                    <span class="code-keyword">const</span> momentum = marketData.price - marketData.ma20;
+                                    <span class="code-keyword">const</span> volume = marketData.volume / marketData.avgVolume;
+                                    <span class="code-keyword">const</span> volatility = marketData.stdDev;
+                                    
+                                    <span class="code-keyword">return</span> (momentum * volume) / volatility;
+                                }
+                            });
+
+                            <span class="code-comment">// Use in strategy</span>
+                            <span class="code-keyword">if</span> (market.indicators.BoomScore > <span class="code-number">2.5</span>) {
+                                boom.orders.<span class="code-function">create</span>({ side: <span class="code-string">'yes'</span> });
+                            }
+                        `);
+                        break;
+
+                    case 54:
+                        this.showNarrator("Alert System", 
+                            "Set up custom alerts for market conditions");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Create price alert</span>
+                            boom.alerts.<span class="code-function">create</span>({
+                                <span class="code-string">market</span>: <span class="code-string">'mkt_btc100k'</span>,
+                                <span class="code-string">condition</span>: <span class="code-string">'yes_price > 0.5'</span>,
+                                <span class="code-string">notification</span>: {
+                                    email: <span class="code-keyword">true</span>,
+                                    sms: <span class="code-keyword">true</span>,
+                                    webhook: <span class="code-string">'https://your-app.com/alert'</span>
+                                },
+                                <span class="code-string">message</span>: <span class="code-string">'BTC $100K probability above 50%!'</span>
+                            });
+                        `);
+                        break;
+
+                    case 55:
+                        this.showNarrator("Multi-Account Support", 
+                            "Manage multiple accounts via single API connection");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Switch between accounts</span>
+                            <span class="code-keyword">const</span> accounts = boom.accounts.<span class="code-function">list</span>();
+
+                            <span class="code-comment">// Execute on specific account</span>
+                            boom.accounts.<span class="code-function">use</span>(<span class="code-string">'acc_secondary'</span>);
+                            boom.orders.<span class="code-function">create</span>({ ... });
+
+                            <span class="code-comment">// Execute on all accounts</span>
+                            boom.accounts.<span class="code-function">all</span>().<span class="code-function">forEach</span>(<span class="code-function">account</span> => {
+                                boom.accounts.<span class="code-function">use</span>(account.id);
+                                boom.portfolio.<span class="code-function">rebalance</span>();
+                            });
+                        `);
+                        break;
+
+                    case 56:
+                        this.showNarrator("IP Whitelisting", 
+                            "Secure your API access with IP restrictions");
+                        const security = document.createElement('div');
+                        security.innerHTML = `
+                            <div style="background: rgba(76,175,80,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #4CAF50; margin-bottom: 15px;">🔒 Security Settings</h4>
+                                <div style="display: grid; gap: 10px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>IP Whitelist:</span>
+                                        <span style="color: #4CAF50;">Enabled</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Allowed IPs:</span>
+                                        <span style="font-family: monospace;">192.168.1.1, 10.0.0.1</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>2FA Required:</span>
+                                        <span style="color: #4CAF50;">Yes</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Withdrawal Limit:</span>
+                                        <span>$10,000/day</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(security);
+                        break;
+
+                    case 57:
+                        this.showNarrator("Audit Logs", 
+                            "Complete audit trail of all API activities");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Get audit logs</span>
+                            <span class="code-keyword">const</span> logs = <span class="code-keyword">await</span> boom.audit.<span class="code-function">getLogs</span>({
+                                <span class="code-string">startDate</span>: <span class="code-string">'2024-01-01'</span>,
+                                <span class="code-string">endDate</span>: <span class="code-string">'2024-01-15'</span>,
+                                <span class="code-string">actions</span>: [<span class="code-string">'order.create'</span>, <span class="code-string">'order.cancel'</span>],
+                                <span class="code-string">limit</span>: <span class="code-number">100</span>
+                            });
+
+                            logs.<span class="code-function">forEach</span>(<span class="code-function">log</span> => {
+                                console.<span class="code-function">log</span>(
+                                    log.timestamp,
+                                    log.action,
+                                    log.details,
+                                    log.ip_address
+                                );
+                            });
+                        `);
+                        break;
+
+                    case 58:
+                        this.showNarrator("Performance Metrics", 
+                            "Track API performance and optimize your integration");
+                        const performance = document.createElement('div');
+                        performance.innerHTML = `
+                            <div style="background: rgba(138,43,226,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #8A2BE2; margin-bottom: 15px;">⚡ Performance Metrics</h4>
+                                <div style="display: grid; gap: 10px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Avg Response Time:</span>
+                                        <span style="color: #4CAF50;">42ms</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>P95 Latency:</span>
+                                        <span style="color: #FFA500;">127ms</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>P99 Latency:</span>
+                                        <span style="color: #FF4444;">245ms</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Uptime (30d):</span>
+                                        <span style="color: #4CAF50;">99.97%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(performance);
+                        break;
+
+                    case 59:
+                        this.showNarrator("Data Export", 
+                            "Export all your data for compliance or analysis");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Request full data export</span>
+                            <span class="code-keyword">const</span> exportRequest = <span class="code-keyword">await</span> boom.data.<span class="code-function">requestExport</span>({
+                                <span class="code-string">format</span>: <span class="code-string">'csv'</span>,  <span class="code-comment">// csv, json, parquet</span>
+                                <span class="code-string">include</span>: [
+                                    <span class="code-string">'orders'</span>,
+                                    <span class="code-string">'positions'</span>,
+                                    <span class="code-string">'transactions'</span>,
+                                    <span class="code-string">'audit_logs'</span>
+                                ],
+                                <span class="code-string">dateRange</span>: <span class="code-string">'all'</span>,
+                                <span class="code-string">encrypt</span>: <span class="code-keyword">true</span>
+                            });
+
+                            <span class="code-comment">// Download when ready</span>
+                            <span class="code-keyword">const</span> downloadUrl = exportRequest.downloadUrl;
+                        `);
+                        break;
+
+                    case 60:
+                        this.showNarrator("GDPR Compliance", 
+                            "Full GDPR compliance with data portability and deletion");
+                        const gdpr = document.createElement('div');
+                        gdpr.innerHTML = `
+                            <div style="background: rgba(76,175,80,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #4CAF50; margin-bottom: 15px;">🔐 GDPR Compliance</h4>
+                                <div style="display: grid; gap: 10px;">
+                                    <button style="background: rgba(255,165,0,0.2); border: 1px solid #FFA500; padding: 10px; border-radius: 5px; color: #FFA500; cursor: pointer;">📊 Export My Data</button>
+                                    <button style="background: rgba(255,165,0,0.2); border: 1px solid #FFA500; padding: 10px; border-radius: 5px; color: #FFA500; cursor: pointer;">🔍 View Data Usage</button>
+                                    <button style="background: rgba(255,165,0,0.2); border: 1px solid #FFA500; padding: 10px; border-radius: 5px; color: #FFA500; cursor: pointer;">✏️ Correct My Data</button>
+                                    <button style="background: rgba(255,68,68,0.2); border: 1px solid #FF4444; padding: 10px; border-radius: 5px; color: #FF4444; cursor: pointer;">🗑️ Delete My Account</button>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(gdpr);
+                        break;
+
+                    case 61:
+                        this.showNarrator("API Status Page", 
+                            "Real-time API status and incident updates");
+                        const statusPage = document.createElement('div');
+                        statusPage.innerHTML = `
+                            <div style="background: rgba(76,175,80,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #4CAF50; margin-bottom: 15px;">✅ System Status</h4>
+                                <div style="display: grid; gap: 10px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>API v2:</span>
+                                        <span style="color: #4CAF50;">● Operational</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>WebSocket:</span>
+                                        <span style="color: #4CAF50;">● Operational</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Polymarket:</span>
+                                        <span style="color: #4CAF50;">● Connected</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>DraftKings:</span>
+                                        <span style="color: #4CAF50;">● Connected</span>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 15px; text-align: center;">
+                                    <a href="#" style="color: #FFA500;">View Status Page →</a>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(statusPage);
+                        break;
+
+                    case 62:
+                        this.showNarrator("Developer Community", 
+                            "Join BOOM's developer community for support");
+                        const community = document.createElement('div');
+                        community.innerHTML = `
+                            <div style="background: linear-gradient(135deg, rgba(138,43,226,0.1), rgba(255,165,0,0.1)); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #8A2BE2; margin-bottom: 15px;">👥 Developer Community</h4>
+                                <div style="display: grid; gap: 10px;">
+                                    <a href="#" style="color: #FFA500; text-decoration: none;">💬 Discord Server (2.4k members)</a>
+                                    <a href="#" style="color: #FFA500; text-decoration: none;">📚 Documentation Portal</a>
+                                    <a href="#" style="color: #FFA500; text-decoration: none;">🎥 Video Tutorials</a>
+                                    <a href="#" style="color: #FFA500; text-decoration: none;">💡 Feature Requests</a>
+                                    <a href="#" style="color: #FFA500; text-decoration: none;">🐛 Bug Reports</a>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(community);
+                        break;
+
+                    case 63:
+                        this.showNarrator("API Changelog", 
+                            "Stay updated with latest API changes and features");
+                        const changelog = document.createElement('div');
+                        changelog.innerHTML = `
+                            <div style="background: rgba(255,165,0,0.05); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #FFA500; margin-bottom: 15px;">📝 Recent API Updates</h4>
+                                <div style="display: grid; gap: 15px;">
+                                    <div>
+                                        <div style="color: #4CAF50; font-weight: bold;">v2.3.1 - Jan 15, 2024</div>
+                                        <div style="color: #888; font-size: 14px;">• Added quantum position endpoints</div>
+                                        <div style="color: #888; font-size: 14px;">• Improved WebSocket reliability</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #FFA500; font-weight: bold;">v2.3.0 - Jan 1, 2024</div>
+                                        <div style="color: #888; font-size: 14px;">• Flash betting API released</div>
+                                        <div style="color: #888; font-size: 14px;">• GraphQL support added</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(changelog);
+                        break;
+
+                    case 64:
+                        this.showNarrator("Enterprise API", 
+                            "Enterprise-grade features for institutional clients");
+                        const enterprise = document.createElement('div');
+                        enterprise.innerHTML = `
+                            <div style="background: linear-gradient(135deg, #FFD700, #FFA500); padding: 2px; border-radius: 15px; margin-top: 20px;">
+                                <div style="background: #1a1a2e; padding: 20px; border-radius: 13px;">
+                                    <h4 style="color: #FFD700; margin-bottom: 15px;">🏢 Enterprise Features</h4>
+                                    <div style="display: grid; gap: 10px;">
+                                        <div style="color: #888;">• Dedicated infrastructure</div>
+                                        <div style="color: #888;">• 99.99% SLA guarantee</div>
+                                        <div style="color: #888;">• Custom rate limits</div>
+                                        <div style="color: #888;">• Priority support</div>
+                                        <div style="color: #888;">• Co-location options</div>
+                                        <div style="color: #888;">• FIX protocol support</div>
+                                    </div>
+                                    <button style="width: 100%; background: linear-gradient(135deg, #FFD700, #FFA500); border: none; padding: 10px; border-radius: 5px; color: #1a1a2e; font-weight: bold; margin-top: 15px;">Contact Sales</button>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(enterprise);
+                        break;
+
+                    case 65:
+                        this.showNarrator("API Playground", 
+                            "Interactive playground to test API calls in browser");
+                        const playground = document.createElement('div');
+                        playground.innerHTML = `
+                            <div style="background: rgba(138,43,226,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #8A2BE2; margin-bottom: 15px;">🎮 API Playground</h4>
+                                <div style="display: grid; gap: 10px;">
+                                    <select style="background: rgba(0,0,0,0.3); border: 1px solid #8A2BE2; padding: 10px; border-radius: 5px; color: #fff;">
+                                        <option>GET /markets/search</option>
+                                        <option>POST /orders/create</option>
+                                        <option>GET /portfolio/summary</option>
+                                    </select>
+                                    <textarea style="background: rgba(0,0,0,0.3); border: 1px solid #8A2BE2; padding: 10px; border-radius: 5px; color: #fff; height: 100px; font-family: monospace;" placeholder="Request body (JSON)"></textarea>
+                                    <button style="background: #8A2BE2; border: none; padding: 10px; border-radius: 5px; color: white; font-weight: bold;">Execute Request</button>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(playground);
+                        break;
+
+                    case 66:
+                        this.showNarrator("Load Testing", 
+                            "Tools for load testing your integration");
+                        this.addConsoleCode(`
+                            <span class="code-comment">// Load test configuration</span>
+                            boom.loadTest.<span class="code-function">run</span>({
+                                <span class="code-string">duration</span>: <span class="code-string">'5m'</span>,
+                                <span class="code-string">rps</span>: <span class="code-number">100</span>,  <span class="code-comment">// Requests per second</span>
+                                <span class="code-string">scenario</span>: [
+                                    { endpoint: <span class="code-string">'/markets/search'</span>, weight: <span class="code-number">40</span> },
+                                    { endpoint: <span class="code-string">'/portfolio'</span>, weight: <span class="code-number">30</span> },
+                                    { endpoint: <span class="code-string">'/orders'</span>, weight: <span class="code-number">30</span> }
+                                ],
+                                <span class="code-string">report</span>: <span class="code-string">'html'</span>
+                            });
+                        `);
+                        break;
+
+                    case 67:
+                        this.showNarrator("Mock Server", 
+                            "Local mock server for development and testing");
+                        this.addConsoleCode(`
+                            <span class="code-comment"># Start local mock server</span>
+                            npx @boom/mock-server --port 3000
+
+                            <span class="code-comment"># Mock server provides:</span>
+                            <span class="code-comment"># - Simulated market data</span>
+                            <span class="code-comment"># - Fake order execution</span>
+                            <span class="code-comment"># - Test webhooks</span>
+                            <span class="code-comment"># - Error simulation</span>
+
+                            <span class="code-comment"># Point SDK to mock server</span>
+                            <span class="code-keyword">const</span> boom = <span class="code-keyword">new</span> <span class="code-function">BoomClient</span>({
+                                baseUrl: <span class="code-string">'http://localhost:3000'</span>
+                            });
+                        `);
+                        break;
+
+                    case 68:
+                        this.showNarrator("Migration Guide", 
+                            "Comprehensive guide for migrating from other platforms");
+                        const migration = document.createElement('div');
+                        migration.innerHTML = `
+                            <div style="background: rgba(76,175,80,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #4CAF50; margin-bottom: 15px;">🔄 Migration Guides Available</h4>
+                                <div style="display: grid; gap: 10px;">
+                                    <a href="#" style="color: #FFA500; text-decoration: none;">📖 Migrating from Polymarket API</a>
+                                    <a href="#" style="color: #FFA500; text-decoration: none;">📖 Migrating from DraftKings API</a>
+                                    <a href="#" style="color: #FFA500; text-decoration: none;">📖 Migrating from Custom Solution</a>
+                                    <a href="#" style="color: #FFA500; text-decoration: none;">📖 Data Migration Tool</a>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(migration);
+                        break;
+
+                    case 69:
+                        this.showNarrator("Support & Resources", 
+                            "Comprehensive support for developers");
+                        const support = document.createElement('div');
+                        support.innerHTML = `
+                            <div style="background: linear-gradient(135deg, rgba(76,175,80,0.1), rgba(255,165,0,0.1)); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <h4 style="color: #4CAF50; margin-bottom: 15px;">💡 Developer Support</h4>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                    <div>
+                                        <div style="color: #FFA500; font-weight: bold;">Documentation</div>
+                                        <div style="color: #888; font-size: 14px;">Complete API reference</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #FFA500; font-weight: bold;">Support Tickets</div>
+                                        <div style="color: #888; font-size: 14px;">24/7 developer support</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #FFA500; font-weight: bold;">Office Hours</div>
+                                        <div style="color: #888; font-size: 14px;">Weekly Q&A sessions</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #FFA500; font-weight: bold;">Hackathons</div>
+                                        <div style="color: #888; font-size: 14px;">Monthly prizes</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('apiConsole').appendChild(support);
+                        break;
+
+                    case 70:
+                        this.showNarrator("Integration Demo Complete! 🔌", 
+                            "You've explored BOOM's comprehensive API and integration ecosystem! From REST APIs to WebSockets, SDKs to platform integrations - everything developers need to build on BOOM!");
+                        
+                        // Final summary
+                        const finalSummary = document.createElement('div');
+                        finalSummary.innerHTML = `
+                            <div style="background: linear-gradient(135deg, #FFA500, #FFD700); padding: 30px; border-radius: 20px; text-align: center; margin-top: 30px;">
+                                <div style="color: #1a1a2e; font-size: 32px; font-weight: bold; margin-bottom: 20px;">🔌 BOOM Integration Features</div>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; color: #1a1a2e; text-align: left;">
+                                    <div>✅ REST, WebSocket & GraphQL APIs</div>
+                                    <div>✅ SDKs for 10+ languages</div>
+                                    <div>✅ Real-time data streaming</div>
+                                    <div>✅ Webhook notifications</div>
+                                    <div>✅ OAuth 2.0 authentication</div>
+                                    <div>✅ Platform integrations</div>
+                                    <div>✅ Sandbox environment</div>
+                                    <div>✅ Comprehensive documentation</div>
+                                    <div>✅ Enterprise features</div>
+                                    <div>✅ 24/7 developer support</div>
+                                </div>
+                                <div style="margin-top: 20px; font-size: 20px; font-weight: 600;">Build Anything on BOOM! 🚀</div>
+                            </div>
+                        `;
+                        document.querySelector('.main-content').appendChild(finalSummary);
+                        break;
+                }
+            }
+
+            updateProgress() {
+                const progress = (this.currentStep / this.totalSteps) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+                document.getElementById('currentStep').textContent = this.currentStep;
+            }
+
+            updateControls() {
+                document.getElementById('prevBtn').disabled = this.currentStep === 1;
+                document.getElementById('nextBtn').disabled = this.currentStep === this.totalSteps;
+            }
+
+            nextStep() {
+                if (this.currentStep < this.totalSteps) {
+                    this.showStep(this.currentStep + 1);
+                }
+            }
+
+            prevStep() {
+                if (this.currentStep > 1) {
+                    this.showStep(this.currentStep - 1);
+                }
+            }
+
+            togglePlay() {
+                this.isPlaying = !this.isPlaying;
+                const playBtn = document.getElementById('playBtn');
+                
+                if (this.isPlaying) {
+                    playBtn.textContent = 'Pause';
+                    this.showStep(this.currentStep);
+                } else {
+                    playBtn.textContent = 'Auto Play';
+                    clearTimeout(this.narratorTimer);
+                }
+            }
+        }
+
+        // Initialize demo
+        new IntegrationAPIDemo();
+    </script>
+</body>
+</html>

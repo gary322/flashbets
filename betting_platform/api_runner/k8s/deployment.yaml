@@ -1,0 +1,151 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: betting-platform-api
+  namespace: betting-platform
+  labels:
+    app: betting-platform-api
+    version: v1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: betting-platform-api
+  template:
+    metadata:
+      labels:
+        app: betting-platform-api
+        version: v1
+    spec:
+      serviceAccountName: betting-platform-api
+      containers:
+      - name: api
+        image: your-registry/betting-platform-api:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: SERVER_HOST
+          value: "0.0.0.0"
+        - name: SERVER_PORT
+          value: "8080"
+        - name: LOG_LEVEL
+          value: "info"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: betting-platform-secrets
+              key: database-url
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: betting-platform-secrets
+              key: redis-url
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: betting-platform-secrets
+              key: jwt-secret
+        - name: POLYMARKET_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: betting-platform-secrets
+              key: polymarket-api-key
+              optional: true
+        - name: SOLANA_RPC_URL
+          valueFrom:
+            configMapKeyRef:
+              name: betting-platform-config
+              key: solana-rpc-url
+        - name: PROGRAM_ID
+          valueFrom:
+            configMapKeyRef:
+              name: betting-platform-config
+              key: program-id
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: betting-platform-config
+      imagePullSecrets:
+      - name: registry-credentials
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: betting-platform-api
+  namespace: betting-platform
+  labels:
+    app: betting-platform-api
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: betting-platform-api
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: betting-platform-api
+  namespace: betting-platform
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: betting-platform-config
+  namespace: betting-platform
+data:
+  solana-rpc-url: "https://api.mainnet-beta.solana.com"
+  program-id: "YourProgramID11111111111111111111111111111"
+  cors-origins: "https://app.yourdomain.com,https://www.yourdomain.com"
+  rate-limit-global-rps: "5000"
+  rate-limit-per-ip-rps: "100"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: betting-platform-secrets
+  namespace: betting-platform
+type: Opaque
+stringData:
+  database-url: "postgresql://user:pass@postgres:5432/betting_platform?sslmode=require"
+  redis-url: "redis://redis:6379/0"
+  jwt-secret: "your-production-jwt-secret-min-32-chars"
+  polymarket-api-key: "pk_live_your_api_key"
+  webhook-secret: "your-webhook-secret"

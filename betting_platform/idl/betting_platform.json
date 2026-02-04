@@ -1,0 +1,138 @@
+{
+  "version": "0.1.0",
+  "name": "betting_platform",
+  "programId": "BETnvnyeXz4Xz7bUQw9KqBwGkAHZydHJzf9nfEtVFuQ",
+  "instructions": [
+    {
+      "name": "initialize",
+      "accounts": [
+        {"name": "authority", "isMut": false, "isSigner": true},
+        {"name": "globalConfig", "isMut": true, "isSigner": false},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": []
+    },
+    {
+      "name": "createVerse",
+      "accounts": [
+        {"name": "authority", "isMut": false, "isSigner": true},
+        {"name": "verse", "isMut": true, "isSigner": false},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "title", "type": "string"},
+        {"name": "category", "type": "u8"},
+        {"name": "odds", "type": "u64"}
+      ]
+    },
+    {
+      "name": "placeBet",
+      "accounts": [
+        {"name": "user", "isMut": true, "isSigner": true},
+        {"name": "verse", "isMut": true, "isSigner": false},
+        {"name": "userBet", "isMut": true, "isSigner": false},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "amount", "type": "u64"},
+        {"name": "side", "type": "u8"}
+      ]
+    },
+    {
+      "name": "resolveVerse",
+      "accounts": [
+        {"name": "authority", "isMut": false, "isSigner": true},
+        {"name": "verse", "isMut": true, "isSigner": false}
+      ],
+      "args": [
+        {"name": "outcome", "type": "u8"}
+      ]
+    },
+    {
+      "name": "claimWinnings",
+      "accounts": [
+        {"name": "user", "isMut": true, "isSigner": true},
+        {"name": "verse", "isMut": false, "isSigner": false},
+        {"name": "userBet", "isMut": true, "isSigner": false}
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "GlobalConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "authority", "type": "publicKey"},
+          {"name": "totalVersesCreated", "type": "u64"},
+          {"name": "totalBetsPlaced", "type": "u64"},
+          {"name": "totalVolume", "type": "u64"},
+          {"name": "treasuryAddress", "type": "publicKey"},
+          {"name": "paused", "type": "bool"}
+        ]
+      }
+    },
+    {
+      "name": "VersePDA",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "id", "type": "u128"},
+          {"name": "creator", "type": "publicKey"},
+          {"name": "title", "type": "string"},
+          {"name": "category", "type": "u8"},
+          {"name": "totalStake", "type": "u64"},
+          {"name": "yesStake", "type": "u64"},
+          {"name": "noStake", "type": "u64"},
+          {"name": "resolved", "type": "bool"},
+          {"name": "outcome", "type": "u8"},
+          {"name": "createdAt", "type": "i64"},
+          {"name": "expiryTime", "type": "i64"},
+          {"name": "odds", "type": "u64"}
+        ]
+      }
+    },
+    {
+      "name": "UserBet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "user", "type": "publicKey"},
+          {"name": "verseId", "type": "u128"},
+          {"name": "amount", "type": "u64"},
+          {"name": "side", "type": "u8"},
+          {"name": "timestamp", "type": "i64"},
+          {"name": "claimed", "type": "bool"}
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized access"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidAmount",
+      "msg": "Invalid bet amount"
+    },
+    {
+      "code": 6002,
+      "name": "MarketResolved",
+      "msg": "Market already resolved"
+    },
+    {
+      "code": 6003,
+      "name": "MarketNotResolved",
+      "msg": "Market not yet resolved"
+    },
+    {
+      "code": 6004,
+      "name": "AlreadyClaimed",
+      "msg": "Winnings already claimed"
+    }
+  ]
+}

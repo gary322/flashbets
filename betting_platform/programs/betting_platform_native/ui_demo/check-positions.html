@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check Active Positions</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
+        button { background: #FFD60A; color: #000; border: none; padding: 10px 20px; cursor: pointer; margin: 5px; }
+        .log { margin: 10px 0; padding: 10px; background: #111; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Debug Active Positions</h1>
+    <button onclick="checkPositions()">Check Positions</button>
+    <button onclick="showPositionsBar()">Force Show Positions Bar</button>
+    <button onclick="addTestPosition()">Add Test Position</button>
+    <div id="logs"></div>
+    
+    <script>
+        function log(message) {
+            const div = document.createElement('div');
+            div.className = 'log';
+            div.textContent = message;
+            document.getElementById('logs').appendChild(div);
+        }
+        
+        function checkPositions() {
+            log('Checking positions...');
+            
+            // Check if platformState exists
+            if (window.opener && window.opener.platformState) {
+                const state = window.opener.platformState;
+                log('✓ Found platformState in parent window');
+                log('Active positions count: ' + (state.activePositions ? state.activePositions.length : 0));
+                
+                if (state.activePositions && state.activePositions.length > 0) {
+                    state.activePositions.forEach((pos, i) => {
+                        log(`Position ${i + 1}: ${pos.marketTitle} - ${pos.outcome} - ${pos.amount} SOL`);
+                    });
+                }
+            } else {
+                log('✗ platformState not found');
+            }
+            
+            // Check DOM elements
+            const bar = window.opener.document.getElementById('activePositionsBar');
+            const container = window.opener.document.getElementById('activePositionsContainer');
+            
+            log('Positions bar element: ' + (bar ? 'Found' : 'Not found'));
+            log('Positions bar display: ' + (bar ? bar.style.display : 'N/A'));
+            log('Container element: ' + (container ? 'Found' : 'Not found'));
+            log('Container children: ' + (container ? container.children.length : 0));
+        }
+        
+        function showPositionsBar() {
+            log('Forcing positions bar to show...');
+            
+            const bar = window.opener.document.getElementById('activePositionsBar');
+            if (bar) {
+                bar.style.display = 'block';
+                log('✓ Set display to block');
+                
+                // Try to update positions
+                if (window.opener.updateActivePositionsDisplay) {
+                    window.opener.updateActivePositionsDisplay();
+                    log('✓ Called updateActivePositionsDisplay');
+                }
+            } else {
+                log('✗ Positions bar not found');
+            }
+        }
+        
+        function addTestPosition() {
+            log('Adding test position...');
+            
+            if (window.opener && window.opener.platformState) {
+                if (!window.opener.platformState.activePositions) {
+                    window.opener.platformState.activePositions = [];
+                }
+                
+                window.opener.platformState.activePositions.push({
+                    id: Date.now().toString(),
+                    marketId: 'test-market',
+                    marketTitle: 'Test Market Position',
+                    outcome: 'Yes',
+                    amount: 25,
+                    leverage: 3.5,
+                    entryPrice: 0.50,
+                    timestamp: new Date()
+                });
+                
+                log('✓ Added test position');
+                
+                // Update display
+                if (window.opener.updateActivePositionsDisplay) {
+                    window.opener.updateActivePositionsDisplay();
+                    log('✓ Updated display');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

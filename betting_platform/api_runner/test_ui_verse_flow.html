@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test UI Verse Flow</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status { 
+            padding: 5px 10px; 
+            border-radius: 4px; 
+            display: inline-block;
+            margin: 5px 0;
+        }
+        .success { background: #4CAF50; color: white; }
+        .error { background: #f44336; color: white; }
+        .info { background: #2196F3; color: white; }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>UI Verse Flow Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Fetch Market with Verses</h2>
+        <button onclick="testMarketFetch()">Test Market Fetch</button>
+        <div id="market-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Simulate Market Selection</h2>
+        <button onclick="testMarketSelection()">Test Market Selection</button>
+        <div id="selection-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Test Verse Display Logic</h2>
+        <button onclick="testVerseDisplay()">Test Verse Display</button>
+        <div id="display-result"></div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8081';
+        
+        async function testMarketFetch() {
+            const resultDiv = document.getElementById('market-result');
+            resultDiv.innerHTML = '<div class="status info">Fetching markets...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/polymarket/markets`);
+                const markets = await response.json();
+                
+                const market = markets[0];
+                if (!market) {
+                    throw new Error('No markets returned');
+                }
+                
+                const hasVerses = market.verses && market.verses.length > 0;
+                
+                resultDiv.innerHTML = `
+                    <div class="status ${hasVerses ? 'success' : 'error'}">
+                        Market: ${market.title || market.question}
+                    </div>
+                    <div>Verses: ${hasVerses ? market.verses.length : 'NONE'}</div>
+                    ${hasVerses ? `<pre>${JSON.stringify(market.verses[0], null, 2)}</pre>` : ''}
+                `;
+                
+                // Store for next test
+                window.testMarket = market;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="status error">Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testMarketSelection() {
+            const resultDiv = document.getElementById('selection-result');
+            
+            if (!window.testMarket) {
+                resultDiv.innerHTML = '<div class="status error">Please run market fetch test first</div>';
+                return;
+            }
+            
+            // Simulate what happens in selectSearchResult
+            const market = window.testMarket;
+            const marketData = {
+                id: market.id,
+                title: market.title || market.question,
+                description: market.description || '',
+                category: market.groupItemTitle || 'General',
+                outcomes: market.outcomes ? JSON.parse(market.outcomes) : ['Yes', 'No'],
+                volume: market.volume24hr || market.volume || 0,
+                liquidity: market.liquidityNum || market.liquidity || 0,
+                endDate: market.endDate,
+                active: market.active,
+                source: 'polymarket',
+                verses: market.verses || [] // This is the critical line
+            };
+            
+            const versesPreserved = marketData.verses && marketData.verses.length > 0;
+            
+            resultDiv.innerHTML = `
+                <div class="status ${versesPreserved ? 'success' : 'error'}">
+                    ${versesPreserved ? 'Verses preserved during selection' : 'Verses LOST during selection'}
+                </div>
+                <div>Original verses: ${market.verses ? market.verses.length : 0}</div>
+                <div>After conversion: ${marketData.verses ? marketData.verses.length : 0}</div>
+            `;
+            
+            window.selectedMarketData = marketData;
+        }
+        
+        async function testVerseDisplay() {
+            const resultDiv = document.getElementById('display-result');
+            
+            if (!window.selectedMarketData) {
+                resultDiv.innerHTML = '<div class="status error">Please run selection test first</div>';
+                return;
+            }
+            
+            const market = window.selectedMarketData;
+            
+            // Simulate getVersesForMarket logic
+            let verses = [];
+            let source = 'none';
+            
+            if (market.verses && market.verses.length > 0) {
+                verses = market.verses;
+                source = 'API verses';
+            } else {
+                // Would fall back to generated verses
+                source = 'Generated verses (fallback)';
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="status ${verses.length > 0 ? 'success' : 'error'}">
+                    Verse source: ${source}
+                </div>
+                <div>Verses available for display: ${verses.length}</div>
+                ${verses.length > 0 ? `
+                    <div style="margin-top: 10px;">
+                        <strong>Verse levels:</strong>
+                        ${[1,2,3,4].map(level => {
+                            const count = verses.filter(v => v.level === level).length;
+                            return `L${level}: ${count}`;
+                        }).join(', ')}
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <strong>Multiplier range:</strong>
+                        ${Math.min(...verses.map(v => v.multiplier))}x - 
+                        ${Math.max(...verses.map(v => v.multiplier))}x
+                    </div>
+                ` : ''}
+            `;
+        }
+    </script>
+</body>
+</html>

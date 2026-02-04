@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test UI Verses</title>
+</head>
+<body>
+    <h1>Testing Verse Display from API</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testVerses() {
+            const results = document.getElementById('results');
+            
+            try {
+                // Fetch markets from API
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                
+                results.innerHTML += `<p>✅ Fetched ${markets.length} markets from API</p>`;
+                
+                // Check first 5 markets for verses
+                for (let i = 0; i < Math.min(5, markets.length); i++) {
+                    const market = markets[i];
+                    const title = market.question || market.title || 'Unknown';
+                    const verses = market.verses || [];
+                    
+                    results.innerHTML += `<h3>Market ${i + 1}: ${title}</h3>`;
+                    results.innerHTML += `<p>Verses count: ${verses.length}</p>`;
+                    
+                    if (verses.length > 0) {
+                        results.innerHTML += '<ul>';
+                        verses.forEach(verse => {
+                            results.innerHTML += `<li>${verse.name} - Level ${verse.level} (${verse.multiplier}x)</li>`;
+                        });
+                        results.innerHTML += '</ul>';
+                    }
+                }
+                
+                // Test the Debug button behavior
+                results.innerHTML += '<h2>Debug Button Test</h2>';
+                
+                // Simulate selecting a market
+                if (markets.length > 0) {
+                    window.platformState = {
+                        selectedMarket: markets[0]
+                    };
+                    
+                    results.innerHTML += `<p>Selected market: ${markets[0].question || markets[0].title}</p>`;
+                    results.innerHTML += `<p>Market has ${markets[0].verses ? markets[0].verses.length : 0} verses</p>`;
+                    
+                    // Define the update function
+                    window.updateAvailableVerses = function(verses) {
+                        results.innerHTML += '<p>✅ updateAvailableVerses called with real verses!</p>';
+                        results.innerHTML += `<p>Verses received: ${verses.length}</p>`;
+                        verses.forEach(verse => {
+                            results.innerHTML += `<p>- ${verse.name} (${verse.multiplier}x)</p>`;
+                        });
+                    };
+                }
+                
+            } catch (error) {
+                results.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Run test
+        testVerses();
+    </script>
+</body>
+</html>

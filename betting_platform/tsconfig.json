@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "types": ["mocha", "chai", "jest", "node"],
+    "typeRoots": ["./node_modules/@types"],
+    "lib": ["es2020", "dom", "dom.iterable"],
+    "module": "esnext",
+    "target": "es2020",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "declaration": false,
+    "declarationMap": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./app/src/*"],
+      "@/components/*": ["./app/src/ui/components/*"],
+      "@/utils/*": ["./app/src/utils/*"],
+      "@/config/*": ["./app/src/config/*"]
+    }
+  },
+  "include": [
+    "app/**/*",
+    "tests/**/*",
+    "scripts/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    ".next",
+    "programs/betting_platform_native/target",
+    "tests/load-testing/**/*",
+    "tests/user_journey_simulations.ts",
+    "tests/betting_platform.ts"
+  ]
+}

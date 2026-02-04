@@ -1,0 +1,45 @@
+[
+  {
+    "inputs": [
+      {"name": "recipient", "type": "address"},
+      {"name": "conditionId", "type": "bytes32"},
+      {"name": "amount", "type": "uint256"}
+    ],
+    "name": "splitPosition",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"name": "recipient", "type": "address"},
+      {"name": "conditionId", "type": "bytes32"},
+      {"name": "amount", "type": "uint256"}
+    ],
+    "name": "mergePositions",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"name": "conditionId", "type": "bytes32"},
+      {"name": "payouts", "type": "uint256[]"}
+    ],
+    "name": "reportPayouts",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {"name": "recipient", "type": "address"},
+      {"name": "conditionId", "type": "bytes32"},
+      {"name": "indexSets", "type": "uint256[]"}
+    ],
+    "name": "redeemPositions",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

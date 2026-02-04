@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM - Quantum Positions Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .header {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 2px solid #FFD60A;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Bungee', cursive;
+            font-size: 36px;
+            background: linear-gradient(45deg, #FFD60A, #FFA500, #FF6B35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            padding: 8px 16px;
+            background: rgba(255, 214, 10, 0.1);
+            border: 1px solid #FFD60A;
+            color: #FFD60A;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 214, 10, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .speed-selector {
+            display: flex;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .speed-btn {
+            padding: 4px 8px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .speed-btn.active {
+            background: #FFD60A;
+            color: #0a0a0a;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 999;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD60A, #FFA500);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(255, 214, 10, 0.5);
+        }
+
+        .step-indicator {
+            position: fixed;
+            top: 90px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            font-size: 14px;
+            z-index: 998;
+        }
+
+        .main-content {
+            margin-top: 100px;
+            padding: 20px;
+            min-height: calc(100vh - 100px);
+            position: relative;
+        }
+
+        .narrator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(255, 214, 10, 0.95), rgba(255, 165, 0, 0.95));
+            color: #0a0a0a;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(255, 214, 10, 0.3);
+            z-index: 2000;
+            animation: slideIn 0.5s ease;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .narrator.hidden {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+            pointer-events: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .narrator-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .narrator-content {
+            font-size: 16px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .narrator-timer {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Quantum specific styles */
+        .quantum-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .quantum-visualization {
+            position: relative;
+            height: 500px;
+            background: radial-gradient(circle at center, rgba(156, 39, 176, 0.1), transparent);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .quantum-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #9C27B0, #E91E63);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            box-shadow: 0 0 60px rgba(156, 39, 176, 0.6);
+            z-index: 10;
+            animation: quantumPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes quantumPulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 60px rgba(156, 39, 176, 0.6);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                box-shadow: 0 0 80px rgba(156, 39, 176, 0.8);
+            }
+        }
+
+        .quantum-center-text {
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .quantum-center-value {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .quantum-node {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .quantum-node:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #FFD60A;
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.5);
+        }
+
+        .quantum-node.active {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.1));
+            border-color: #4CAF50;
+            animation: nodeGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes nodeGlow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(76, 175, 80, 0.8);
+            }
+        }
+
+        .quantum-node-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .quantum-node-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FFD60A;
+        }
+
+        .quantum-connection {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(156, 39, 176, 0.6), transparent);
+            height: 2px;
+            transform-origin: center;
+            animation: connectionFlow 3s linear infinite;
+        }
+
+        @keyframes connectionFlow {
+            0% {
+                opacity: 0.3;
+                background-position: -100% 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.3;
+                background-position: 100% 0;
+            }
+        }
+
+        .quantum-wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 2px solid rgba(156, 39, 176, 0.3);
+            border-radius: 50%;
+            animation: waveExpand 3s ease-out infinite;
+        }
+
+        @keyframes waveExpand {
+            0% {
+                width: 200px;
+                height: 200px;
+                opacity: 1;
+            }
+            100% {
+                width: 600px;
+                height: 600px;
+                opacity: 0;
+            }
+        }
+
+        .quantum-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFD60A;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .correlation-matrix {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 120px repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .matrix-cell {
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .matrix-header {
+            background: rgba(255, 214, 10, 0.1);
+            font-weight: 600;
+            color: #FFD60A;
+        }
+
+        .matrix-value {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .matrix-high {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .matrix-medium {
+            background: rgba(255, 193, 7, 0.2);
+            color: #FFC107;
+        }
+
+        .matrix-low {
+            background: rgba(255, 82, 82, 0.2);
+            color: #FF5252;
+        }
+
+        .weight-distribution {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .weight-bar {
+            flex: 1;
+            height: 40px;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A, #FFC107, #FF9800, #FF5252);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .weight-segment {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .quantum-collapse {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.05));
+            border: 2px solid #4CAF50;
+            border-radius: 16px;
+            margin: 30px 0;
+        }
+
+        .collapse-animation {
+            animation: collapse 1s ease-in-out;
+        }
+
+        @keyframes collapse {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2) rotate(180deg);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(1) rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        .quantum-example {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .example-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFD60A;
+            margin-bottom: 15px;
+        }
+
+        .example-markets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .market-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        .market-card:hover {
+            transform: translateY(-2px);
+            border-color: #FFD60A;
+        }
+
+        .market-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .market-probability {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .prob-yes {
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .prob-no {
+            color: #FF5252;
+            font-weight: 600;
+        }
+
+        .rebalance-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #FFC107;
+            border-radius: 20px;
+            color: #FFC107;
+            font-size: 12px;
+            font-weight: 600;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .quantum-visualization {
+                height: 400px;
+            }
+
+            .quantum-node {
+                width: 80px;
+                height: 80px;
+            }
+
+            .matrix-grid {
+                grid-template-columns: 80px repeat(4, 1fr);
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">BOOM</div>
+        <div class="controls">
+            <button class="control-btn" id="playPauseBtn">⏸ Pause</button>
+            <button class="control-btn" id="restartBtn">↺ Restart</button>
+            <div class="speed-selector">
+                <button class="speed-btn" data-speed="0.5">0.5x</button>
+                <button class="speed-btn active" data-speed="1">1x</button>
+                <button class="speed-btn" data-speed="2">2x</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+        <span id="stepIndicator">Step 1 of 70</span>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="quantum-container" id="quantumContainer">
+            <!-- Dynamic content will be inserted here -->
+        </div>
+    </div>
+
+    <!-- Narrator -->
+    <div class="narrator hidden" id="narrator">
+        <div class="narrator-timer" id="narratorTimer">5s</div>
+        <div class="narrator-title">
+            <span>⚛️</span>
+            <span id="narratorTitle">Quantum Positions</span>
+        </div>
+        <div class="narrator-content" id="narratorContent">
+            Understanding superposition betting across correlated markets.
+        </div>
+    </div>
+
+    <script>
+        // Quantum Positions Demo Implementation
+        class QuantumPositionsDemo {
+            constructor() {
+                this.currentStep = 0;
+                this.isPlaying = true;
+                this.speed = 1;
+                this.totalSteps = 70;
+                this.stepTimer = null;
+                this.narratorTimer = null;
+
+                // Quantum examples data
+                this.quantumExamples = {
+                    economic: {
+                        title: 'Economic Crisis Bundle',
+                        markets: [
+                            { id: 'recession', title: 'US Recession Q4 2025', probability: 0.42, weight: 0.35 },
+                            { id: 'fed-rates', title: 'Fed Cuts Rates >2%', probability: 0.68, weight: 0.30 },
+                            { id: 'unemployment', title: 'Unemployment >5%', probability: 0.45, weight: 0.20 },
+                            { id: 'sp500', title: 'S&P 500 <4000', probability: 0.38, weight: 0.15 }
+                        ],
+                        correlation: 0.82
+                    },
+                    tech: {
+                        title: 'AI Revolution Bundle',
+                        markets: [
+                            { id: 'ai-cap', title: 'AI Market Cap >$10T', probability: 0.78, weight: 0.40 },
+                            { id: 'nvidia', title: 'NVIDIA >$1T Cap', probability: 0.65, weight: 0.25 },
+                            { id: 'openai-ipo', title: 'OpenAI IPO 2025', probability: 0.55, weight: 0.20 },
+                            { id: 'agi', title: 'AGI Achieved 2025', probability: 0.22, weight: 0.15 }
+                        ],
+                        correlation: 0.75
+                    }
+                };
+
+                this.initialize();
+            }
+
+            initialize() {
+                this.bindControls();
+                this.start();
+            }
+
+            bindControls() {
+                document.getElementById('playPauseBtn').addEventListener('click', () => this.togglePlayPause());
+                document.getElementById('restartBtn').addEventListener('click', () => this.restart());
+
+                document.querySelectorAll('.speed-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.speed = parseFloat(e.target.dataset.speed);
+                    });
+                });
+            }
+
+            start() {
+                this.currentStep = 0;
+                this.runStep();
+            }
+
+            runStep() {
+                if (this.currentStep >= this.totalSteps) {
+                    this.complete();
+                    return;
+                }
+
+                this.updateProgress();
+                this.updateStepIndicator();
+
+                // Execute current step
+                const steps = [
+                    // Introduction (5 steps)
+                    () => this.introductionStep(),
+                    () => this.explainQuantumConcept(),
+                    () => this.showSuperpositionAnalogy(),
+                    () => this.explainBenefits(),
+                    () => this.showQuantumMechanics(),
+                    
+                    // Example 1: Economic Bundle (20 steps)
+                    () => this.startEconomicExample(),
+                    () => this.showEconomicMarkets(),
+                    () => this.analyzeEconomicCorrelation(),
+                    () => this.createEconomicQuantum(),
+                    () => this.showWeightDistribution(),
+                    () => this.optimizeWeights(),
+                    () => this.placeEconomicBet(),
+                    () => this.showPositionSuperposition(),
+                    () => this.demonstrateRebalancing(),
+                    () => this.triggerRebalance(),
+                    () => this.showRebalanceEffect(),
+                    () => this.marketMovement(),
+                    () => this.trackPerformance(),
+                    () => this.partialCollapse(),
+                    () => this.showPartialPayout(),
+                    () => this.fullResolution(),
+                    () => this.collapseQuantum(),
+                    () => this.calculatePayout(),
+                    () => this.showEconomicResults(),
+                    () => this.completeEconomicExample(),
+                    
+                    // Example 2: Tech AI Bundle (20 steps)
+                    () => this.startTechExample(),
+                    () => this.showTechMarkets(),
+                    () => this.analyzeTechCorrelation(),
+                    () => this.createTechQuantum(),
+                    () => this.showTechWeights(),
+                    () => this.optimizeTechWeights(),
+                    () => this.placeTechBet(),
+                    () => this.showTechSuperposition(),
+                    () => this.demonstrateTechRebalancing(),
+                    () => this.techMarketShift(),
+                    () => this.rebalanceTech(),
+                    () => this.showTechPerformance(),
+                    () => this.techNewsImpact(),
+                    () => this.cascadeEffect(),
+                    () => this.partialTechCollapse(),
+                    () => this.continueTechPosition(),
+                    () => this.finalTechResolution(),
+                    () => this.collapseTechQuantum(),
+                    () => this.calculateTechPayout(),
+                    () => this.completeTechExample(),
+                    
+                    // Quantum Creation (10 steps)
+                    () => this.startQuantumCreation(),
+                    () => this.selectMarkets(),
+                    () => this.analyzeCorrelations(),
+                    () => this.setInitialWeights(),
+                    () => this.optimizeAllocation(),
+                    () => this.previewQuantum(),
+                    () => this.confirmCreation(),
+                    () => this.activateQuantum(),
+                    () => this.showLiveQuantum(),
+                    () => this.completeCreation(),
+                    
+                    // Advanced Features (10 steps)
+                    () => this.showAutoRebalancing(),
+                    () => this.demonstrateAutoRebalance(),
+                    () => this.showRiskHedging(),
+                    () => this.demonstrateHedging(),
+                    () => this.showQuantumSplitting(),
+                    () => this.demonstrateSplitting(),
+                    () => this.showQuantumMerging(),
+                    () => this.demonstrateMerging(),
+                    () => this.showQuantumAnalytics(),
+                    () => this.completeAdvanced(),
+                    
+                    // Summary (5 steps)
+                    () => this.startSummary(),
+                    () => this.recapSuperposition(),
+                    () => this.recapRebalancing(),
+                    () => this.recapStrategies(),
+                    () => this.finalConclusion()
+                ];
+
+                if (steps[this.currentStep]) {
+                    steps[this.currentStep]();
+                }
+
+                if (this.isPlaying) {
+                    this.stepTimer = setTimeout(() => {
+                        this.currentStep++;
+                        this.runStep();
+                    }, 8000 / this.speed);
+                }
+            }
+
+            // Step implementations
+            introductionStep() {
+                this.showNarrator('Welcome to Quantum Positions', 
+                    'Bet on multiple correlated markets simultaneously, like quantum superposition in physics.');
+                
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div style="text-align: center; padding: 100px 20px;">
+                        <h1 style="font-size: 48px; margin-bottom: 30px; color: #FFD60A;">Quantum Positions</h1>
+                        <p style="font-size: 20px; color: #888; margin-bottom: 40px;">
+                            Superposition Betting Across Correlated Markets
+                        </p>
+                        <div class="quantum-stats">
+                            <div class="stat-card">
+                                <div class="stat-value">∞</div>
+                                <div class="stat-label">Positions</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">Auto</div>
+                                <div class="stat-label">Rebalancing</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">Smart</div>
+                                <div class="stat-label">Collapse</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">Optimal</div>
+                                <div class="stat-label">Weighting</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            explainQuantumConcept() {
+                this.showNarrator('Quantum Betting Concept', 
+                    'Like quantum particles existing in multiple states, your bet exists across multiple correlated markets.');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h2 style="text-align: center; color: #FFD60A; margin-bottom: 40px;">
+                            What Are Quantum Positions?
+                        </h2>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="quantum-example">
+                                <div class="example-title">📊 Multiple Markets</div>
+                                <div style="color: #ccc; font-size: 14px; line-height: 1.6;">
+                                    Single bet spreads across multiple related markets automatically.
+                                </div>
+                            </div>
+                            <div class="quantum-example">
+                                <div class="example-title">🔄 Auto-Rebalancing</div>
+                                <div style="color: #ccc; font-size: 14px; line-height: 1.6;">
+                                    Weights adjust dynamically as probabilities change.
+                                </div>
+                            </div>
+                            <div class="quantum-example">
+                                <div class="example-title">🎯 Smart Collapse</div>
+                                <div style="color: #ccc; font-size: 14px; line-height: 1.6;">
+                                    When one market resolves, position adjusts across others.
+                                </div>
+                            </div>
+                            <div class="quantum-example">
+                                <div class="example-title">📈 Risk Optimization</div>
+                                <div style="color: #ccc; font-size: 14px; line-height: 1.6;">
+                                    Correlated markets hedge each other for balanced risk.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showSuperpositionAnalogy() {
+                this.showNarrator('Superposition Explained', 
+                    'Just as Schrödinger\'s cat is both alive and dead until observed, your position wins and loses until markets resolve.');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div class="quantum-visualization">
+                        <div class="quantum-wave"></div>
+                        <div class="quantum-center">
+                            <div class="quantum-center-text">QUANTUM</div>
+                            <div class="quantum-center-value">$1,000</div>
+                        </div>
+                        
+                        <div class="quantum-node" style="top: 100px; left: 50%; transform: translateX(-50%);">
+                            <div class="quantum-node-title">Market A</div>
+                            <div class="quantum-node-value">25%</div>
+                        </div>
+                        
+                        <div class="quantum-node" style="top: 50%; right: 100px;">
+                            <div class="quantum-node-title">Market B</div>
+                            <div class="quantum-node-value">25%</div>
+                        </div>
+                        
+                        <div class="quantum-node" style="bottom: 100px; left: 50%; transform: translateX(-50%);">
+                            <div class="quantum-node-title">Market C</div>
+                            <div class="quantum-node-value">25%</div>
+                        </div>
+                        
+                        <div class="quantum-node" style="top: 50%; left: 100px;">
+                            <div class="quantum-node-title">Market D</div>
+                            <div class="quantum-node-value">25%</div>
+                        </div>
+                        
+                        <!-- Connections -->
+                        <div class="quantum-connection" style="top: 50%; left: 50%; width: 150px; transform: translate(-50%, -50%) rotate(0deg);"></div>
+                        <div class="quantum-connection" style="top: 50%; left: 50%; width: 150px; transform: translate(-50%, -50%) rotate(45deg);"></div>
+                        <div class="quantum-connection" style="top: 50%; left: 50%; width: 150px; transform: translate(-50%, -50%) rotate(90deg);"></div>
+                        <div class="quantum-connection" style="top: 50%; left: 50%; width: 150px; transform: translate(-50%, -50%) rotate(135deg);"></div>
+                    </div>
+                `;
+            }
+
+            explainBenefits() {
+                this.showNarrator('Quantum Benefits', 
+                    'Diversification, correlation hedging, and automatic optimization maximize returns while minimizing risk.');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                            Why Use Quantum Positions?
+                        </h3>
+                        <div style="max-width: 800px; margin: 0 auto;">
+                            <div style="display: flex; align-items: center; margin-bottom: 25px;">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #4CAF50, #8BC34A); 
+                                     border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                                     color: white; font-size: 24px; margin-right: 20px;">📊</div>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Diversification</div>
+                                    <div style="color: #888;">Spread risk across multiple correlated markets automatically.</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 25px;">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #FFD60A, #FFA500); 
+                                     border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                                     color: white; font-size: 24px; margin-right: 20px;">🎯</div>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Correlation Capture</div>
+                                    <div style="color: #888;">Profit from relationships between markets others miss.</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 25px;">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #03A9F4, #00BCD4); 
+                                     border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                                     color: white; font-size: 24px; margin-right: 20px;">🔄</div>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Dynamic Rebalancing</div>
+                                    <div style="color: #888;">Weights adjust as market conditions change in real-time.</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #9C27B0, #E91E63); 
+                                     border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                                     color: white; font-size: 24px; margin-right: 20px;">💎</div>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Optimal Returns</div>
+                                    <div style="color: #888;">AI optimization ensures best possible risk-adjusted returns.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showQuantumMechanics() {
+                this.showNarrator('Quantum Mechanics', 
+                    'Positions exist in superposition until markets resolve, then collapse to definite outcomes.');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                            How Quantum Positions Work
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1000px; margin: 0 auto;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">1️⃣</div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Create Bundle</div>
+                                <div style="color: #888; font-size: 14px;">Select correlated markets</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">2️⃣</div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Set Weights</div>
+                                <div style="color: #888; font-size: 14px;">Allocate funds optimally</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">3️⃣</div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Auto-Rebalance</div>
+                                <div style="color: #888; font-size: 14px;">Adjust as markets move</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">4️⃣</div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Collapse & Win</div>
+                                <div style="color: #888; font-size: 14px;">Resolve to profits</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            startEconomicExample() {
+                this.showNarrator('Example 1: Economic Crisis', 
+                    'Let\'s create a quantum position for an economic downturn scenario with 4 correlated markets.');
+
+                this.renderQuantumVisualization('economic');
+            }
+
+            showEconomicMarkets() {
+                this.showNarrator('Economic Markets', 
+                    'Recession, Fed rates, unemployment, and S&P 500 are all correlated in economic crisis.');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div class="quantum-example">
+                        <div class="example-title">Economic Crisis Bundle</div>
+                        <div class="example-markets">
+                            <div class="market-card">
+                                <div class="market-title">US Recession Q4 2025</div>
+                                <div style="color: #888; font-size: 12px;">Will US enter recession?</div>
+                                <div class="market-probability">
+                                    <span class="prob-yes">YES: 42%</span>
+                                    <span class="prob-no">NO: 58%</span>
+                                </div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-title">Fed Cuts Rates >2%</div>
+                                <div style="color: #888; font-size: 12px;">Emergency rate cuts?</div>
+                                <div class="market-probability">
+                                    <span class="prob-yes">YES: 68%</span>
+                                    <span class="prob-no">NO: 32%</span>
+                                </div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-title">Unemployment >5%</div>
+                                <div style="color: #888; font-size: 12px;">Job market collapse?</div>
+                                <div class="market-probability">
+                                    <span class="prob-yes">YES: 45%</span>
+                                    <span class="prob-no">NO: 55%</span>
+                                </div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-title">S&P 500 <4000</div>
+                                <div style="color: #888; font-size: 12px;">Market crash?</div>
+                                <div class="market-probability">
+                                    <span class="prob-yes">YES: 38%</span>
+                                    <span class="prob-no">NO: 62%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            analyzeEconomicCorrelation() {
+                this.showNarrator('Correlation Analysis', 
+                    'These markets have 82% correlation. When one moves, others likely follow.');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div class="correlation-matrix">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 20px;">
+                            Correlation Matrix
+                        </h3>
+                        <div class="matrix-grid">
+                            <div class="matrix-cell matrix-header"></div>
+                            <div class="matrix-cell matrix-header">Recession</div>
+                            <div class="matrix-cell matrix-header">Fed Rates</div>
+                            <div class="matrix-cell matrix-header">Unemploy</div>
+                            <div class="matrix-cell matrix-header">S&P 500</div>
+                            
+                            <div class="matrix-cell matrix-header">Recession</div>
+                            <div class="matrix-cell matrix-value">1.00</div>
+                            <div class="matrix-cell matrix-high">0.85</div>
+                            <div class="matrix-cell matrix-high">0.78</div>
+                            <div class="matrix-cell matrix-high">0.82</div>
+                            
+                            <div class="matrix-cell matrix-header">Fed Rates</div>
+                            <div class="matrix-cell matrix-high">0.85</div>
+                            <div class="matrix-cell matrix-value">1.00</div>
+                            <div class="matrix-cell matrix-medium">0.72</div>
+                            <div class="matrix-cell matrix-high">0.76</div>
+                            
+                            <div class="matrix-cell matrix-header">Unemploy</div>
+                            <div class="matrix-cell matrix-high">0.78</div>
+                            <div class="matrix-cell matrix-medium">0.72</div>
+                            <div class="matrix-cell matrix-value">1.00</div>
+                            <div class="matrix-cell matrix-high">0.80</div>
+                            
+                            <div class="matrix-cell matrix-header">S&P 500</div>
+                            <div class="matrix-cell matrix-high">0.82</div>
+                            <div class="matrix-cell matrix-high">0.76</div>
+                            <div class="matrix-cell matrix-high">0.80</div>
+                            <div class="matrix-cell matrix-value">1.00</div>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px; padding: 15px; 
+                             background: rgba(76, 175, 80, 0.1); border-radius: 12px;">
+                            <div style="font-size: 24px; color: #4CAF50; font-weight: 700;">
+                                Average Correlation: 82%
+                            </div>
+                            <div style="color: #888; margin-top: 5px;">Highly correlated bundle - ideal for quantum position</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            createEconomicQuantum() {
+                this.showNarrator('Create Quantum Position', 
+                    'Combining these 4 markets into a single quantum position with $2,000 investment.');
+            }
+
+            showWeightDistribution() {
+                this.showNarrator('Weight Distribution', 
+                    'Initial weights based on conviction and probability: 35% Recession, 30% Fed, 20% Unemployment, 15% S&P.');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                            Quantum Weight Distribution
+                        </h3>
+                        <div class="weight-distribution">
+                            <div style="flex: 0 0 100px; text-align: right; padding-right: 20px;">$2,000</div>
+                            <div class="weight-bar">
+                                <div class="weight-segment" style="left: 0; width: 35%; background: #4CAF50;">
+                                    Recession<br>$700 (35%)
+                                </div>
+                                <div class="weight-segment" style="left: 35%; width: 30%; background: #8BC34A;">
+                                    Fed Rates<br>$600 (30%)
+                                </div>
+                                <div class="weight-segment" style="left: 65%; width: 20%; background: #FFC107;">
+                                    Unemploy<br>$400 (20%)
+                                </div>
+                                <div class="weight-segment" style="left: 85%; width: 15%; background: #FF9800;">
+                                    S&P 500<br>$300 (15%)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            optimizeWeights() {
+                this.showNarrator('AI Optimization', 
+                    'AI adjusts weights for optimal risk/return: 32% Recession, 33% Fed, 22% Unemployment, 13% S&P.');
+            }
+
+            placeEconomicBet() {
+                this.showNarrator('Place Quantum Bet', 
+                    '$2,000 splits across all 4 markets simultaneously. You\'re now in superposition!');
+            }
+
+            showPositionSuperposition() {
+                this.showNarrator('Superposition Active', 
+                    'Your position exists across all markets. Each can win or lose independently.');
+
+                this.renderQuantumVisualization('economic', true);
+            }
+
+            demonstrateRebalancing() {
+                this.showNarrator('Market Movement', 
+                    'Fed announces emergency meeting! Rate cut probability jumps from 68% to 85%.');
+            }
+
+            triggerRebalance() {
+                this.showNarrator('Auto-Rebalancing', 
+                    'Quantum position automatically rebalances, increasing Fed Rates weight to 38%.');
+
+                document.getElementById('quantumContainer').innerHTML += `
+                    <div style="text-align: center; margin-top: 20px;">
+                        <span class="rebalance-indicator">⚡ REBALANCING IN PROGRESS</span>
+                    </div>
+                `;
+            }
+
+            showRebalanceEffect() {
+                this.showNarrator('Rebalance Complete', 
+                    'New weights: Recession 30%, Fed 38%, Unemployment 20%, S&P 12%. Position optimized!');
+            }
+
+            marketMovement() {
+                this.showNarrator('Markets Moving', 
+                    'Economic data releases. Unemployment rises to 4.8%. Markets updating...');
+            }
+
+            trackPerformance() {
+                this.showNarrator('Performance Tracking', 
+                    'Quantum position up +12% overall. Individual: Recession +8%, Fed +22%, Unemployment +15%, S&P -5%.');
+            }
+
+            partialCollapse() {
+                this.showNarrator('Partial Collapse', 
+                    'Fed cuts rates by 2.5%! That market resolves YES. Quantum partially collapses.');
+            }
+
+            showPartialPayout() {
+                this.showNarrator('Partial Payout', 
+                    'Fed Rates wins! $760 payout (was $600 bet). Remaining positions adjust weights.');
+            }
+
+            fullResolution() {
+                this.showNarrator('Markets Resolving', 
+                    'Q4 ends. All economic markets reaching resolution...');
+            }
+
+            collapseQuantum() {
+                this.showNarrator('Quantum Collapse!', 
+                    'All markets resolved! Quantum position collapses to definite outcomes.');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div class="quantum-collapse collapse-animation">
+                        <div style="font-size: 48px; margin-bottom: 20px;">⚛️</div>
+                        <h2 style="color: #4CAF50; margin-bottom: 20px;">Quantum Collapsed!</h2>
+                        <div style="font-size: 20px; color: #888;">Position resolved to final state</div>
+                    </div>
+                `;
+            }
+
+            calculatePayout() {
+                this.showNarrator('Calculate Winnings', 
+                    'Results: Recession YES ✓, Fed Rates YES ✓, Unemployment NO ✗, S&P NO ✗. Calculating...');
+            }
+
+            showEconomicResults() {
+                this.showNarrator('Economic Results', 
+                    'Total payout: $2,840 on $2,000 bet. 42% profit from quantum position!');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                            Economic Quantum Results
+                        </h3>
+                        <div style="max-width: 600px; margin: 0 auto; background: rgba(255, 255, 255, 0.02); 
+                             border: 2px solid #4CAF50; border-radius: 16px; padding: 30px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                                <div>
+                                    <div style="color: #888; font-size: 14px;">Invested</div>
+                                    <div style="font-size: 32px; font-weight: 700;">$2,000</div>
+                                </div>
+                                <div>
+                                    <div style="color: #888; font-size: 14px;">Returned</div>
+                                    <div style="font-size: 32px; font-weight: 700; color: #4CAF50;">$2,840</div>
+                                </div>
+                            </div>
+                            <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <span>Recession (YES ✓)</span>
+                                    <span style="color: #4CAF50;">+$980</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <span>Fed Rates (YES ✓)</span>
+                                    <span style="color: #4CAF50;">+$760</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <span>Unemployment (NO ✗)</span>
+                                    <span style="color: #FF5252;">-$400</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                                    <span>S&P 500 (NO ✗)</span>
+                                    <span style="color: #FF5252;">-$300</span>
+                                </div>
+                                <div style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 15px; 
+                                     display: flex; justify-content: space-between; font-size: 20px; font-weight: 600;">
+                                    <span>Net Profit</span>
+                                    <span style="color: #4CAF50;">+$840 (+42%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            completeEconomicExample() {
+                this.showNarrator('Economic Example Complete', 
+                    'Quantum position captured correlated economic movements for 42% profit!');
+            }
+
+            startTechExample() {
+                this.showNarrator('Example 2: AI Revolution', 
+                    'Now let\'s create a quantum position for the AI technology boom scenario.');
+
+                this.renderQuantumVisualization('tech');
+            }
+
+            showTechMarkets() {
+                this.showNarrator('Tech AI Markets', 
+                    'AI market cap, NVIDIA, OpenAI IPO, and AGI achievement are all correlated in AI revolution.');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div class="quantum-example">
+                        <div class="example-title">AI Revolution Bundle</div>
+                        <div class="example-markets">
+                            <div class="market-card">
+                                <div class="market-title">AI Market Cap >$10T</div>
+                                <div style="color: #888; font-size: 12px;">Total AI market value</div>
+                                <div class="market-probability">
+                                    <span class="prob-yes">YES: 78%</span>
+                                    <span class="prob-no">NO: 22%</span>
+                                </div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-title">NVIDIA >$1T Cap</div>
+                                <div style="color: #888; font-size: 12px;">NVIDIA valuation</div>
+                                <div class="market-probability">
+                                    <span class="prob-yes">YES: 65%</span>
+                                    <span class="prob-no">NO: 35%</span>
+                                </div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-title">OpenAI IPO 2025</div>
+                                <div style="color: #888; font-size: 12px;">Public offering</div>
+                                <div class="market-probability">
+                                    <span class="prob-yes">YES: 55%</span>
+                                    <span class="prob-no">NO: 45%</span>
+                                </div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-title">AGI Achieved 2025</div>
+                                <div style="color: #888; font-size: 12px;">Artificial General Intelligence</div>
+                                <div class="market-probability">
+                                    <span class="prob-yes">YES: 22%</span>
+                                    <span class="prob-no">NO: 78%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            analyzeTechCorrelation() {
+                this.showNarrator('Tech Correlation', 
+                    '75% correlation between these AI markets. Success in one drives others.');
+            }
+
+            createTechQuantum() {
+                this.showNarrator('Create Tech Quantum', 
+                    'Investing $5,000 in AI revolution quantum position. Higher conviction, bigger bet.');
+            }
+
+            showTechWeights() {
+                this.showNarrator('Tech Weights', 
+                    'Weights: 40% AI Cap, 25% NVIDIA, 20% OpenAI, 15% AGI. Focused on likely winners.');
+            }
+
+            optimizeTechWeights() {
+                this.showNarrator('Optimize Tech', 
+                    'AI optimization suggests: 42% AI Cap, 28% NVIDIA, 22% OpenAI, 8% AGI. Less on moonshot.');
+            }
+
+            placeTechBet() {
+                this.showNarrator('Place Tech Bet', 
+                    '$5,000 quantum position created across AI markets. You\'re betting on the AI revolution!');
+            }
+
+            showTechSuperposition() {
+                this.showNarrator('Tech Superposition', 
+                    'Position exists across all AI markets simultaneously. Each influences the others.');
+            }
+
+            demonstrateTechRebalancing() {
+                this.showNarrator('Tech News', 
+                    'Breaking: OpenAI announces revolutionary GPT-5! Market reacts instantly.');
+            }
+
+            techMarketShift() {
+                this.showNarrator('Market Shift', 
+                    'OpenAI IPO probability jumps to 75%! AI Cap probability rises to 85%!');
+            }
+
+            rebalanceTech() {
+                this.showNarrator('Tech Rebalance', 
+                    'Quantum automatically rebalances: AI Cap 45%, NVIDIA 25%, OpenAI 25%, AGI 5%.');
+            }
+
+            showTechPerformance() {
+                this.showNarrator('Tech Performance', 
+                    'Quantum position up +28% in 2 weeks! Individual performance varies by market.');
+            }
+
+            techNewsImpact() {
+                this.showNarrator('AGI Breakthrough', 
+                    'Unexpected: Research lab claims AGI breakthrough! AGI market spikes from 22% to 45%!');
+            }
+
+            cascadeEffect() {
+                this.showNarrator('Cascade Effect', 
+                    'AGI news cascades: All AI markets surge. Your quantum position captures the entire move!');
+            }
+
+            partialTechCollapse() {
+                this.showNarrator('NVIDIA Resolves', 
+                    'NVIDIA hits $1T market cap! That portion of quantum collapses to winning state.');
+            }
+
+            continueTechPosition() {
+                this.showNarrator('Continue Position', 
+                    'NVIDIA wins pay out $1,750. Remaining quantum position continues with 3 markets.');
+            }
+
+            finalTechResolution() {
+                this.showNarrator('Final Resolution', 
+                    'Year ends. All AI markets resolve. Time for final quantum collapse!');
+            }
+
+            collapseTechQuantum() {
+                this.showNarrator('Tech Collapse', 
+                    'Quantum collapses: AI Cap YES ✓, NVIDIA YES ✓, OpenAI YES ✓, AGI NO ✗.');
+            }
+
+            calculateTechPayout() {
+                this.showNarrator('Tech Payout', 
+                    'Total return: $8,250 on $5,000 investment. 65% profit from AI quantum position!');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                            AI Quantum Results
+                        </h3>
+                        <div style="max-width: 600px; margin: 0 auto; background: rgba(255, 255, 255, 0.02); 
+                             border: 2px solid #4CAF50; border-radius: 16px; padding: 30px;">
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <div style="font-size: 48px; font-weight: 700; color: #4CAF50;">+65%</div>
+                                <div style="color: #888;">Return on Investment</div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: center;">
+                                <div>
+                                    <div style="color: #888; font-size: 12px;">Invested</div>
+                                    <div style="font-size: 24px; font-weight: 600;">$5,000</div>
+                                </div>
+                                <div>
+                                    <div style="color: #888; font-size: 12px;">Returned</div>
+                                    <div style="font-size: 24px; font-weight: 600; color: #4CAF50;">$8,250</div>
+                                </div>
+                                <div>
+                                    <div style="color: #888; font-size: 12px;">Profit</div>
+                                    <div style="font-size: 24px; font-weight: 600; color: #FFD60A;">$3,250</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            completeTechExample() {
+                this.showNarrator('Tech Example Complete', 
+                    'AI quantum position captured the entire technology boom for massive profits!');
+            }
+
+            startQuantumCreation() {
+                this.showNarrator('Create Your Quantum', 
+                    'Let\'s create a custom quantum position step by step.');
+            }
+
+            selectMarkets() {
+                this.showNarrator('Select Markets', 
+                    'Choose 3-8 correlated markets for your quantum bundle. More markets = more diversification.');
+            }
+
+            analyzeCorrelations() {
+                this.showNarrator('Analyze Correlations', 
+                    'System calculates correlations between selected markets. Minimum 60% recommended.');
+            }
+
+            setInitialWeights() {
+                this.showNarrator('Set Initial Weights', 
+                    'Assign weight to each market based on conviction. Can be equal or custom.');
+            }
+
+            optimizeAllocation() {
+                this.showNarrator('Optimize Allocation', 
+                    'AI optimizer suggests optimal weights based on risk/return profile.');
+            }
+
+            previewQuantum() {
+                this.showNarrator('Preview Quantum', 
+                    'Review your quantum position before confirming. Check weights and correlations.');
+            }
+
+            confirmCreation() {
+                this.showNarrator('Confirm Creation', 
+                    'Confirm to create quantum position. Funds split across markets instantly.');
+            }
+
+            activateQuantum() {
+                this.showNarrator('Quantum Active', 
+                    'Your quantum position is live! Auto-rebalancing enabled.');
+            }
+
+            showLiveQuantum() {
+                this.showNarrator('Monitor Quantum', 
+                    'Track performance in real-time. See individual markets and overall position.');
+            }
+
+            completeCreation() {
+                this.showNarrator('Creation Complete', 
+                    'You\'ve created a custom quantum position! It will rebalance automatically.');
+            }
+
+            showAutoRebalancing() {
+                this.showNarrator('Auto-Rebalancing', 
+                    'Quantum positions rebalance when market probabilities shift significantly.');
+            }
+
+            demonstrateAutoRebalance() {
+                this.showNarrator('Rebalance Demo', 
+                    'When one market moves 10%+, weights adjust to maintain optimal allocation.');
+            }
+
+            showRiskHedging() {
+                this.showNarrator('Risk Hedging', 
+                    'Quantum positions naturally hedge risk through negative correlations.');
+            }
+
+            demonstrateHedging() {
+                this.showNarrator('Hedging Example', 
+                    'If "Recession YES" rises, "S&P >5000" falls. Natural hedge protects capital.');
+            }
+
+            showQuantumSplitting() {
+                this.showNarrator('Quantum Splitting', 
+                    'Split one quantum into multiple smaller quantums for granular control.');
+            }
+
+            demonstrateSplitting() {
+                this.showNarrator('Split Demo', 
+                    '$10k quantum splits into 2x $5k quantums with different strategies.');
+            }
+
+            showQuantumMerging() {
+                this.showNarrator('Quantum Merging', 
+                    'Merge multiple quantums into one mega-position for simplified management.');
+            }
+
+            demonstrateMerging() {
+                this.showNarrator('Merge Demo', 
+                    '3 small quantums merge into 1 large diversified quantum position.');
+            }
+
+            showQuantumAnalytics() {
+                this.showNarrator('Quantum Analytics', 
+                    'Advanced analytics show correlation changes, rebalance history, and optimization suggestions.');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                            Quantum Analytics Dashboard
+                        </h3>
+                        <div class="quantum-stats">
+                            <div class="stat-card">
+                                <div class="stat-value">127</div>
+                                <div class="stat-label">Active Quantums</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">$2.4M</div>
+                                <div class="stat-label">Total Value</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">+31%</div>
+                                <div class="stat-label">Avg Return</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">73%</div>
+                                <div class="stat-label">Win Rate</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">4.2</div>
+                                <div class="stat-label">Avg Markets</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">82ms</div>
+                                <div class="stat-label">Rebalance Speed</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            completeAdvanced() {
+                this.showNarrator('Advanced Features Complete', 
+                    'You\'ve learned auto-rebalancing, hedging, splitting, merging, and analytics.');
+            }
+
+            startSummary() {
+                this.showNarrator('Quantum Summary', 
+                    'Let\'s recap the power of quantum positions.');
+            }
+
+            recapSuperposition() {
+                this.showNarrator('Superposition Recap', 
+                    'Bet on multiple correlated markets simultaneously, like quantum physics.');
+            }
+
+            recapRebalancing() {
+                this.showNarrator('Rebalancing Recap', 
+                    'Automatic weight adjustments optimize returns as markets evolve.');
+            }
+
+            recapStrategies() {
+                this.showNarrator('Strategy Recap', 
+                    'Use quantum positions for diversification, correlation capture, and risk management.');
+            }
+
+            finalConclusion() {
+                this.showNarrator('Quantum Mastery!', 
+                    'You understand quantum positions: superposition betting for optimal returns!');
+
+                document.getElementById('quantumContainer').innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <h1 style="font-size: 48px; margin-bottom: 30px; color: #FFD60A;">
+                            Quantum Positions Mastered! ⚛️
+                        </h1>
+                        <p style="font-size: 20px; color: #888; margin-bottom: 40px;">
+                            Superposition betting across correlated markets on BOOM
+                        </p>
+                        <div class="quantum-stats">
+                            <div class="stat-card">
+                                <div class="stat-value">✓</div>
+                                <div class="stat-label">Correlation</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">✓</div>
+                                <div class="stat-label">Rebalancing</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">✓</div>
+                                <div class="stat-label">Optimization</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">✓</div>
+                                <div class="stat-label">Collapse</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 40px;">
+                            <button onclick="location.reload()" style="padding: 15px 30px; 
+                                 background: linear-gradient(135deg, #FFD60A, #FFA500); 
+                                 color: #0a0a0a; border: none; border-radius: 12px; 
+                                 font-size: 18px; font-weight: 600; cursor: pointer;">
+                                REPLAY DEMO
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Helper methods
+            showNarrator(title, content) {
+                const narrator = document.getElementById('narrator');
+                const narratorTitle = document.getElementById('narratorTitle');
+                const narratorContent = document.getElementById('narratorContent');
+                const narratorTimer = document.getElementById('narratorTimer');
+
+                narratorTitle.textContent = title;
+                narratorContent.innerHTML = content;
+                narrator.classList.remove('hidden');
+
+                let timeLeft = Math.floor(5000 / this.speed / 1000);
+                narratorTimer.textContent = `${timeLeft}s`;
+                
+                const updateTimer = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeft > 0) {
+                        narratorTimer.textContent = `${timeLeft}s`;
+                    } else {
+                        clearInterval(updateTimer);
+                    }
+                }, 1000);
+
+                clearTimeout(this.narratorTimer);
+                this.narratorTimer = setTimeout(() => {
+                    narrator.classList.add('hidden');
+                    clearInterval(updateTimer);
+                    
+                    setTimeout(() => {
+                        if (this.isPlaying) {
+                            narrator.classList.remove('hidden');
+                        }
+                    }, 3000 / this.speed);
+                }, 5000 / this.speed);
+            }
+
+            renderQuantumVisualization(type, active = false) {
+                const example = this.quantumExamples[type];
+                const container = document.getElementById('quantumContainer');
+                
+                container.innerHTML = `
+                    <div class="quantum-visualization">
+                        <div class="quantum-wave"></div>
+                        <div class="quantum-center ${active ? 'active' : ''}">
+                            <div class="quantum-center-text">QUANTUM</div>
+                            <div class="quantum-center-value">
+                                ${type === 'economic' ? '$2,000' : '$5,000'}
+                            </div>
+                        </div>
+                        
+                        ${example.markets.map((market, index) => {
+                            const angle = (360 / example.markets.length) * index;
+                            const radius = 180;
+                            const x = 50 + radius * Math.cos(angle * Math.PI / 180) / 2;
+                            const y = 50 + radius * Math.sin(angle * Math.PI / 180) / 2;
+                            
+                            return `
+                                <div class="quantum-node ${active ? 'active' : ''}" 
+                                     style="top: ${y}%; left: ${x}%; transform: translate(-50%, -50%);">
+                                    <div class="quantum-node-title">${market.title.split(' ')[0]}</div>
+                                    <div class="quantum-node-value">${Math.round(market.weight * 100)}%</div>
+                                </div>
+                                <div class="quantum-connection" 
+                                     style="top: 50%; left: 50%; width: ${radius / 2}px; 
+                                            transform: translate(-50%, -50%) rotate(${angle}deg);"></div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+
+            updateProgress() {
+                const progress = ((this.currentStep + 1) / this.totalSteps) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+            }
+
+            updateStepIndicator() {
+                document.getElementById('stepIndicator').textContent = 
+                    `Step ${this.currentStep + 1} of ${this.totalSteps}`;
+            }
+
+            togglePlayPause() {
+                this.isPlaying = !this.isPlaying;
+                document.getElementById('playPauseBtn').innerHTML = this.isPlaying ? '⏸ Pause' : '▶ Play';
+                
+                if (this.isPlaying) {
+                    this.runStep();
+                } else {
+                    clearTimeout(this.stepTimer);
+                    clearTimeout(this.narratorTimer);
+                }
+            }
+
+            restart() {
+                clearTimeout(this.stepTimer);
+                clearTimeout(this.narratorTimer);
+                this.currentStep = 0;
+                this.isPlaying = true;
+                document.getElementById('playPauseBtn').innerHTML = '⏸ Pause';
+                this.runStep();
+            }
+
+            complete() {
+                this.showNarrator('Demo Complete!', 
+                    'You\'ve mastered quantum positions. Use superposition betting for optimal returns!');
+                this.isPlaying = false;
+                document.getElementById('playPauseBtn').innerHTML = '▶ Play';
+            }
+        }
+
+        // Initialize demo
+        const demo = new QuantumPositionsDemo();
+    </script>
+</body>
+</html>

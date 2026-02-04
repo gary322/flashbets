@@ -1,0 +1,24 @@
+[package]
+name = "leverage-safety"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "leverage_safety"
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+solana-program = "1.17"
+borsh = "0.10"
+borsh-derive = "0.10"
+thiserror = "1.0"
+spl-token = "4.0"
+bytemuck = "1.13"
+
+[dev-dependencies]
+solana-program-test = "1.17"
+solana-sdk = "1.17"
+tokio = { version = "1", features = ["full"] }
+
+[features]
+no-entrypoint = []

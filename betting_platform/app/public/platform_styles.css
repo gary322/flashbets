@@ -1,0 +1,29 @@
+/* Platform Styles - Additional styles if needed */
+
+/* All styles are currently inline in platform_ui.html */
+/* This file exists to prevent 404 error when loading the page */
+
+/* Additional utility classes can be added here if needed */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-red {
+    color: #FF3B30;
+}
+
+.text-green {
+    color: #4CD964;
+}
+
+.text-yellow {
+    color: #FFD60A;
+}

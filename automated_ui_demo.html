@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Betting Platform - Automated Demo</title>
+    <style>
+        /* John Ive Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Demo Overlay */
+        .demo-overlay {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px 24px;
+            backdrop-filter: blur(20px);
+            z-index: 10000;
+            max-width: 300px;
+        }
+
+        .demo-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #FFD60A;
+        }
+
+        .demo-step {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.4;
+        }
+
+        .demo-progress {
+            margin-top: 12px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .demo-progress-bar {
+            height: 100%;
+            background: #FFD60A;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Main Layout */
+        .app-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 360px;
+            height: 100vh;
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Left Panel - Verses & Markets */
+        .left-panel {
+            background: #080808;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #666666 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Verse Hierarchy */
+        .verse-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .verse-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .verse-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .verse-add-btn {
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .verse-add-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #FFFFFF;
+        }
+
+        /* Verse Tree */
+        .verse-tree {
+            font-size: 13px;
+        }
+
+        .verse-node {
+            padding: 8px 12px;
+            margin: 2px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            user-select: none;
+        }
+
+        .verse-node:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .verse-node.selected {
+            background: rgba(255, 214, 10, 0.1);
+            border: 1px solid rgba(255, 214, 10, 0.3);
+        }
+
+        .verse-node.dragging {
+            opacity: 0.5;
+        }
+
+        .verse-node.drag-over {
+            background: rgba(255, 214, 10, 0.2);
+            border: 1px solid rgba(255, 214, 10, 0.5);
+        }
+
+        .verse-node[data-level="1"] { margin-left: 0px; }
+        .verse-node[data-level="2"] { margin-left: 20px; }
+        .verse-node[data-level="3"] { margin-left: 40px; }
+        .verse-node[data-level="4"] { margin-left: 60px; }
+        .verse-node[data-level="5"] { margin-left: 80px; }
+
+        .verse-expand {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            text-align: center;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+        }
+
+        .verse-name {
+            display: inline-block;
+        }
+
+        .verse-count {
+            float: right;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Center Panel - Trading */
+        .center-panel {
+            background: #0A0A0A;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .market-header {
+            padding: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .market-title {
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .market-meta {
+            display: flex;
+            gap: 24px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .market-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .meta-label {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Quantum States */
+        .quantum-state-container {
+            padding: 24px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 214, 10, 0.02);
+        }
+
+        .quantum-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 214, 10, 0.8);
+            margin-bottom: 12px;
+        }
+
+        .quantum-states {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quantum-state {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-state::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255, 214, 10, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .quantum-state:hover::before {
+            opacity: 1;
+        }
+
+        .quantum-state.collapsed {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: rgba(255, 214, 10, 0.3);
+            animation: quantumCollapse 0.5s ease;
+        }
+
+        @keyframes quantumCollapse {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2) rotate(180deg);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(1) rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        .quantum-probability {
+            font-size: 20px;
+            font-weight: 200;
+            margin-bottom: 4px;
+        }
+
+        .quantum-outcome {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .quantum-entangle-btn {
+            margin-top: 16px;
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            color: rgba(255, 214, 10, 0.8);
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quantum-entangle-btn:hover {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: rgba(255, 214, 10, 0.5);
+            color: #FFD60A;
+        }
+
+        /* Trading Interface */
+        .trading-panel {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .outcome-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .outcome-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .outcome-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .outcome-card.selected {
+            background: rgba(255, 214, 10, 0.05);
+            border-color: rgba(255, 214, 10, 0.3);
+        }
+
+        .outcome-name {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .outcome-price {
+            font-size: 32px;
+            font-weight: 200;
+            margin-bottom: 12px;
+        }
+
+        .outcome-change {
+            font-size: 13px;
+            color: #00D632;
+        }
+
+        .outcome-change.negative {
+            color: #FF3B30;
+        }
+
+        /* Leverage Slider */
+        .leverage-container {
+            margin-bottom: 32px;
+        }
+
+        .leverage-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 12px;
+        }
+
+        .leverage-display {
+            font-size: 48px;
+            font-weight: 100;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFD60A 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .leverage-slider {
+            width: 100%;
+            height: 40px;
+            -webkit-appearance: none;
+            background: transparent;
+            outline: none;
+        }
+
+        .leverage-slider::-webkit-slider-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .leverage-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Trade Buttons */
+        .trade-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .trade-btn {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .trade-btn.buy {
+            background: #00D632;
+            color: #000000;
+        }
+
+        .trade-btn.buy:hover {
+            background: #00FF3C;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 214, 50, 0.3);
+        }
+
+        .trade-btn.sell {
+            background: #FF3B30;
+            color: #FFFFFF;
+        }
+
+        .trade-btn.sell:hover {
+            background: #FF5C52;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 59, 48, 0.3);
+        }
+
+        /* Right Panel - Portfolio */
+        .right-panel {
+            background: #080808;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .portfolio-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .portfolio-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .portfolio-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 300;
+        }
+
+        .stat-value.positive {
+            color: #00D632;
+        }
+
+        .stat-value.negative {
+            color: #FF3B30;
+        }
+
+        /* Positions List */
+        .positions-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .position-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .position-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .position-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .position-market {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .position-pnl {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .position-pnl.positive {
+            color: #00D632;
+        }
+
+        .position-pnl.negative {
+            color: #FF3B30;
+        }
+
+        .position-details {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Animations */
+        @keyframes highlight {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 214, 10, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(255, 214, 10, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 214, 10, 0);
+            }
+        }
+
+        .highlight-animation {
+            animation: highlight 1.5s ease-out;
+        }
+
+        /* Pulse Animation for Demo */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pulse-animation {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Overlay -->
+    <div class="demo-overlay" id="demoOverlay">
+        <div class="demo-title">Automated Demo</div>
+        <div class="demo-step" id="demoStep">Initializing...</div>
+        <div class="demo-progress">
+            <div class="demo-progress-bar" id="demoProgress"></div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-container">
+        <!-- Left Panel - Verses -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <div class="logo">Quantum Markets</div>
+            </div>
+            <div class="verse-container">
+                <div class="verse-header">
+                    <div class="verse-title">VERSE HIERARCHY</div>
+                    <button class="verse-add-btn" id="addVerseBtn">+</button>
+                </div>
+                <div class="verse-tree" id="verseTree">
+                    <!-- Verses will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Panel - Trading -->
+        <div class="center-panel">
+            <div class="market-header">
+                <div class="market-title" id="marketTitle">Will BTC reach $100k by EOY 2024?</div>
+                <div class="market-meta">
+                    <div class="market-meta-item">
+                        <span class="meta-label">Volume:</span>
+                        <span id="marketVolume">$2.4M</span>
+                    </div>
+                    <div class="market-meta-item">
+                        <span class="meta-label">Liquidity:</span>
+                        <span id="marketLiquidity">$890K</span>
+                    </div>
+                    <div class="market-meta-item">
+                        <span class="meta-label">Ends:</span>
+                        <span id="marketEnds">Dec 31, 2024</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quantum States Section -->
+            <div class="quantum-state-container">
+                <div class="quantum-label">QUANTUM SUPERPOSITION STATES</div>
+                <div class="quantum-states" id="quantumStates">
+                    <!-- Quantum states will be added here -->
+                </div>
+                <button class="quantum-entangle-btn" id="entangleBtn">Entangle Markets</button>
+            </div>
+
+            <!-- Trading Panel -->
+            <div class="trading-panel">
+                <!-- Outcome Selection -->
+                <div class="outcome-grid">
+                    <div class="outcome-card selected" id="yesOutcome">
+                        <div class="outcome-name">YES</div>
+                        <div class="outcome-price" id="yesPrice">$0.73</div>
+                        <div class="outcome-change positive">+5.8%</div>
+                    </div>
+                    <div class="outcome-card" id="noOutcome">
+                        <div class="outcome-name">NO</div>
+                        <div class="outcome-price" id="noPrice">$0.27</div>
+                        <div class="outcome-change negative">-5.8%</div>
+                    </div>
+                </div>
+
+                <!-- Leverage Control -->
+                <div class="leverage-container">
+                    <div class="leverage-label">LEVERAGE</div>
+                    <div class="leverage-display" id="leverageDisplay">10x</div>
+                    <input type="range" class="leverage-slider" id="leverageSlider" 
+                           min="1" max="100" value="10">
+                </div>
+
+                <!-- Trade Actions -->
+                <div class="trade-actions">
+                    <button class="trade-btn buy" id="buyBtn">BUY</button>
+                    <button class="trade-btn sell" id="sellBtn">SELL</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Portfolio -->
+        <div class="right-panel">
+            <div class="portfolio-header">
+                <div class="portfolio-title">Portfolio</div>
+                <div class="portfolio-stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Total P&L</div>
+                        <div class="stat-value positive" id="totalPnl">+$12,450</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Win Rate</div>
+                        <div class="stat-value" id="winRate">78%</div>
+                    </div>
+                </div>
+            </div>
+            <div class="positions-container" id="positionsContainer">
+                <!-- Positions will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo Automation Script
+        class DemoAutomation {
+            constructor() {
+                this.currentStep = 0;
+                this.steps = [
+                    { name: "Welcome", action: this.showWelcome, duration: 2000 },
+                    { name: "Creating Verse Hierarchy", action: this.createVerses, duration: 3000 },
+                    { name: "Demonstrating Drag & Drop", action: this.dragAndDropDemo, duration: 3000 },
+                    { name: "Showing Quantum States", action: this.showQuantumStates, duration: 3000 },
+                    { name: "Collapsing Quantum State", action: this.collapseQuantumState, duration: 2000 },
+                    { name: "Adjusting Leverage", action: this.adjustLeverage, duration: 3000 },
+                    { name: "Executing Trade", action: this.executeTrade, duration: 2000 },
+                    { name: "Showing Price Updates", action: this.updatePrices, duration: 3000 },
+                    { name: "Adding Positions", action: this.addPositions, duration: 2000 },
+                    { name: "Demonstrating P&L", action: this.updatePnL, duration: 2000 },
+                    { name: "Market Entanglement", action: this.entangleMarkets, duration: 3000 },
+                    { name: "Demo Complete", action: this.complete, duration: 2000 }
+                ];
+                
+                this.verseData = [
+                    { name: "Crypto", level: 1, children: [
+                        { name: "Bitcoin", level: 2, children: [
+                            { name: "Price Prediction", level: 3, children: [
+                                { name: "$100k EOY", level: 4 },
+                                { name: "$150k EOY", level: 4 }
+                            ]},
+                            { name: "Halving Effects", level: 3 }
+                        ]},
+                        { name: "Ethereum", level: 2, children: [
+                            { name: "ETH 2.0", level: 3 },
+                            { name: "L2 Adoption", level: 3 }
+                        ]}
+                    ]},
+                    { name: "Politics", level: 1, children: [
+                        { name: "US Election", level: 2 },
+                        { name: "EU Regulations", level: 2 }
+                    ]},
+                    { name: "Sports", level: 1 }
+                ];
+                
+                this.positions = [];
+                this.draggedElement = null;
+            }
+
+            start() {
+                this.runStep();
+            }
+
+            runStep() {
+                if (this.currentStep >= this.steps.length) {
+                    return;
+                }
+
+                const step = this.steps[this.currentStep];
+                this.updateOverlay(step.name);
+                
+                step.action.call(this);
+                
+                setTimeout(() => {
+                    this.currentStep++;
+                    this.runStep();
+                }, step.duration);
+            }
+
+            updateOverlay(stepName) {
+                const stepElement = document.getElementById('demoStep');
+                const progressBar = document.getElementById('demoProgress');
+                
+                stepElement.textContent = stepName;
+                const progress = ((this.currentStep + 1) / this.steps.length) * 100;
+                progressBar.style.width = progress + '%';
+            }
+
+            showWelcome() {
+                // Highlight the logo
+                document.querySelector('.logo').classList.add('pulse-animation');
+            }
+
+            createVerses() {
+                const verseTree = document.getElementById('verseTree');
+                verseTree.innerHTML = '';
+                
+                const createVerseNode = (verse, parent) => {
+                    const node = document.createElement('div');
+                    node.className = 'verse-node';
+                    node.setAttribute('data-level', verse.level);
+                    node.setAttribute('draggable', true);
+                    node.innerHTML = `
+                        <span class="verse-expand">${verse.children ? '▼' : '•'}</span>
+                        <span class="verse-name">${verse.name}</span>
+                        <span class="verse-count">${Math.floor(Math.random() * 100) + 10}</span>
+                    `;
+                    
+                    // Add with animation
+                    setTimeout(() => {
+                        parent.appendChild(node);
+                        node.classList.add('highlight-animation');
+                        
+                        if (verse.children) {
+                            verse.children.forEach(child => {
+                                setTimeout(() => createVerseNode(child, parent), 200);
+                            });
+                        }
+                    }, verse.level * 100);
+                };
+                
+                this.verseData.forEach(verse => createVerseNode(verse, verseTree));
+                
+                // Setup drag and drop
+                this.setupDragAndDrop();
+            }
+
+            setupDragAndDrop() {
+                document.addEventListener('dragstart', (e) => {
+                    if (e.target.classList.contains('verse-node')) {
+                        this.draggedElement = e.target;
+                        e.target.classList.add('dragging');
+                    }
+                });
+
+                document.addEventListener('dragend', (e) => {
+                    if (e.target.classList.contains('verse-node')) {
+                        e.target.classList.remove('dragging');
+                    }
+                });
+
+                document.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    const afterElement = this.getDragAfterElement(e.clientY);
+                    const draggable = document.querySelector('.dragging');
+                    const container = document.getElementById('verseTree');
+                    
+                    if (afterElement == null) {
+                        container.appendChild(draggable);
+                    } else {
+                        container.insertBefore(draggable, afterElement);
+                    }
+                });
+
+                document.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('.verse-node').forEach(node => {
+                        node.classList.remove('drag-over');
+                    });
+                });
+            }
+
+            getDragAfterElement(y) {
+                const draggableElements = [...document.querySelectorAll('.verse-node:not(.dragging)')];
+                
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+                    
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+
+            dragAndDropDemo() {
+                const nodes = document.querySelectorAll('.verse-node');
+                if (nodes.length > 2) {
+                    const sourceNode = nodes[1];
+                    const targetNode = nodes[nodes.length - 1];
+                    
+                    // Simulate drag
+                    sourceNode.classList.add('dragging');
+                    sourceNode.classList.add('highlight-animation');
+                    
+                    setTimeout(() => {
+                        // Simulate drop
+                        targetNode.parentNode.insertBefore(sourceNode, targetNode.nextSibling);
+                        sourceNode.classList.remove('dragging');
+                    }, 1500);
+                }
+            }
+
+            showQuantumStates() {
+                const container = document.getElementById('quantumStates');
+                container.innerHTML = '';
+                
+                const states = [
+                    { probability: 0.73, outcome: 'YES' },
+                    { probability: 0.27, outcome: 'NO' },
+                    { probability: 0.45, outcome: 'SUPERPOSITION' },
+                    { probability: 0.82, outcome: 'ENTANGLED' }
+                ];
+                
+                states.forEach((state, i) => {
+                    setTimeout(() => {
+                        const stateElement = document.createElement('div');
+                        stateElement.className = 'quantum-state';
+                        stateElement.innerHTML = `
+                            <div class="quantum-probability">${state.probability}</div>
+                            <div class="quantum-outcome">${state.outcome}</div>
+                        `;
+                        stateElement.onclick = () => this.collapseState(i);
+                        container.appendChild(stateElement);
+                        stateElement.classList.add('highlight-animation');
+                    }, i * 200);
+                });
+            }
+
+            collapseState(index) {
+                const states = document.querySelectorAll('.quantum-state');
+                if (states[index]) {
+                    states[index].classList.add('collapsed');
+                    
+                    // Update market prices based on collapse
+                    setTimeout(() => {
+                        const yesPrice = document.getElementById('yesPrice');
+                        const noPrice = document.getElementById('noPrice');
+                        
+                        const newYesPrice = (Math.random() * 0.3 + 0.6).toFixed(2);
+                        const newNoPrice = (1 - parseFloat(newYesPrice)).toFixed(2);
+                        
+                        yesPrice.textContent = `$${newYesPrice}`;
+                        noPrice.textContent = `$${newNoPrice}`;
+                        
+                        yesPrice.classList.add('pulse-animation');
+                        noPrice.classList.add('pulse-animation');
+                    }, 300);
+                }
+            }
+
+            collapseQuantumState() {
+                this.collapseState(2); // Collapse the superposition state
+            }
+
+            adjustLeverage() {
+                const slider = document.getElementById('leverageSlider');
+                const display = document.getElementById('leverageDisplay');
+                
+                // Animate leverage from 10x to 50x
+                let currentLeverage = 10;
+                const targetLeverage = 50;
+                const increment = 2;
+                
+                const animateLeverage = setInterval(() => {
+                    currentLeverage += increment;
+                    if (currentLeverage >= targetLeverage) {
+                        currentLeverage = targetLeverage;
+                        clearInterval(animateLeverage);
+                    }
+                    
+                    slider.value = currentLeverage;
+                    display.textContent = `${currentLeverage}x`;
+                    display.classList.add('pulse-animation');
+                }, 50);
+            }
+
+            executeTrade() {
+                const buyBtn = document.getElementById('buyBtn');
+                buyBtn.classList.add('highlight-animation');
+                
+                // Simulate trade execution
+                setTimeout(() => {
+                    this.addPosition({
+                        market: "BTC $100k EOY",
+                        side: "LONG",
+                        leverage: "50x",
+                        entry: "$0.73",
+                        pnl: "+$2,450",
+                        positive: true
+                    });
+                }, 500);
+            }
+
+            updatePrices() {
+                const updatePrice = () => {
+                    const yesPrice = document.getElementById('yesPrice');
+                    const noPrice = document.getElementById('noPrice');
+                    
+                    const currentYes = parseFloat(yesPrice.textContent.replace('$', ''));
+                    const change = (Math.random() - 0.5) * 0.02;
+                    const newYes = Math.max(0.01, Math.min(0.99, currentYes + change));
+                    const newNo = (1 - newYes).toFixed(2);
+                    
+                    yesPrice.textContent = `$${newYes.toFixed(2)}`;
+                    noPrice.textContent = `$${newNo}`;
+                    
+                    // Update change indicators
+                    const yesCard = document.getElementById('yesOutcome');
+                    const noCard = document.getElementById('noOutcome');
+                    
+                    const changeElement = yesCard.querySelector('.outcome-change');
+                    changeElement.textContent = change > 0 ? `+${(change * 100).toFixed(1)}%` : `${(change * 100).toFixed(1)}%`;
+                    changeElement.className = `outcome-change ${change > 0 ? 'positive' : 'negative'}`;
+                    
+                    const noChangeElement = noCard.querySelector('.outcome-change');
+                    noChangeElement.textContent = change < 0 ? `+${(-change * 100).toFixed(1)}%` : `${(-change * 100).toFixed(1)}%`;
+                    noChangeElement.className = `outcome-change ${change < 0 ? 'positive' : 'negative'}`;
+                };
+                
+                // Update prices multiple times
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(updatePrice, i * 500);
+                }
+            }
+
+            addPosition(position) {
+                const container = document.getElementById('positionsContainer');
+                const positionElement = document.createElement('div');
+                positionElement.className = 'position-item';
+                positionElement.innerHTML = `
+                    <div class="position-header">
+                        <div class="position-market">${position.market}</div>
+                        <div class="position-pnl ${position.positive ? 'positive' : 'negative'}">${position.pnl}</div>
+                    </div>
+                    <div class="position-details">
+                        <span>Side: ${position.side}</span>
+                        <span>Leverage: ${position.leverage}</span>
+                        <span>Entry: ${position.entry}</span>
+                    </div>
+                `;
+                
+                container.insertBefore(positionElement, container.firstChild);
+                positionElement.classList.add('highlight-animation');
+                
+                this.positions.push(position);
+            }
+
+            addPositions() {
+                const additionalPositions = [
+                    {
+                        market: "ETH Merge Success",
+                        side: "SHORT",
+                        leverage: "25x",
+                        entry: "$0.82",
+                        pnl: "-$450",
+                        positive: false
+                    },
+                    {
+                        market: "Fed Rate Cut Q1",
+                        side: "LONG",
+                        leverage: "15x",
+                        entry: "$0.34",
+                        pnl: "+$1,200",
+                        positive: true
+                    }
+                ];
+                
+                additionalPositions.forEach((pos, i) => {
+                    setTimeout(() => this.addPosition(pos), i * 500);
+                });
+            }
+
+            updatePnL() {
+                const totalPnl = document.getElementById('totalPnl');
+                const winRate = document.getElementById('winRate');
+                
+                // Animate P&L update
+                let currentPnl = 12450;
+                const targetPnl = 15200;
+                const increment = 150;
+                
+                const animatePnl = setInterval(() => {
+                    currentPnl += increment;
+                    if (currentPnl >= targetPnl) {
+                        currentPnl = targetPnl;
+                        clearInterval(animatePnl);
+                    }
+                    
+                    totalPnl.textContent = `+$${currentPnl.toLocaleString()}`;
+                    totalPnl.classList.add('pulse-animation');
+                }, 50);
+                
+                // Update win rate
+                setTimeout(() => {
+                    winRate.textContent = '82%';
+                    winRate.classList.add('pulse-animation');
+                }, 1000);
+            }
+
+            entangleMarkets() {
+                const entangleBtn = document.getElementById('entangleBtn');
+                entangleBtn.classList.add('highlight-animation');
+                
+                // Create entanglement visualization
+                const quantumStates = document.querySelectorAll('.quantum-state');
+                quantumStates.forEach((state, i) => {
+                    setTimeout(() => {
+                        state.style.border = '2px solid rgba(255, 214, 10, 0.6)';
+                        state.style.background = 'rgba(255, 214, 10, 0.15)';
+                        state.classList.add('pulse-animation');
+                    }, i * 100);
+                });
+                
+                // Update market title to show entanglement
+                setTimeout(() => {
+                    const marketTitle = document.getElementById('marketTitle');
+                    marketTitle.innerHTML = 'BTC $100k ⟷ ETH $10k Entangled';
+                    marketTitle.classList.add('highlight-animation');
+                }, 1000);
+            }
+
+            complete() {
+                const overlay = document.getElementById('demoOverlay');
+                overlay.querySelector('.demo-title').textContent = 'Demo Complete!';
+                overlay.querySelector('.demo-step').textContent = 'All features demonstrated';
+                
+                // Final flourish - animate all elements
+                setTimeout(() => {
+                    document.querySelectorAll('.verse-node, .quantum-state, .outcome-card, .position-item').forEach((el, i) => {
+                        setTimeout(() => {
+                            el.classList.add('pulse-animation');
+                        }, i * 50);
+                    });
+                }, 500);
+            }
+        }
+
+        // Initialize demo when page loads
+        window.addEventListener('load', () => {
+            const demo = new DemoAutomation();
+            
+            // Start demo after 1 second
+            setTimeout(() => {
+                demo.start();
+            }, 1000);
+            
+            // Also set up manual interactions
+            const leverageSlider = document.getElementById('leverageSlider');
+            const leverageDisplay = document.getElementById('leverageDisplay');
+            
+            leverageSlider.addEventListener('input', (e) => {
+                leverageDisplay.textContent = `${e.target.value}x`;
+            });
+            
+            // Outcome selection
+            const yesOutcome = document.getElementById('yesOutcome');
+            const noOutcome = document.getElementById('noOutcome');
+            
+            yesOutcome.addEventListener('click', () => {
+                yesOutcome.classList.add('selected');
+                noOutcome.classList.remove('selected');
+            });
+            
+            noOutcome.addEventListener('click', () => {
+                noOutcome.classList.add('selected');
+                yesOutcome.classList.remove('selected');
+            });
+            
+            // Trade buttons
+            const buyBtn = document.getElementById('buyBtn');
+            const sellBtn = document.getElementById('sellBtn');
+            
+            buyBtn.addEventListener('click', () => {
+                buyBtn.classList.add('pulse-animation');
+            });
+            
+            sellBtn.addEventListener('click', () => {
+                sellBtn.classList.add('pulse-animation');
+            });
+        });
+    </script>
+</body>
+</html>

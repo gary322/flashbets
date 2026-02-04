@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiverse Trading Platform - Live Demo</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0A0A0A;
+            color: #FFFFFF;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Typography */
+        .mono {
+            font-family: 'JetBrains Mono', 'SF Mono', Monaco, monospace;
+        }
+
+        /* Main Layout - Blur-inspired dark theme */
+        .app-container {
+            height: 100vh;
+            display: flex;
+            background: #0A0A0A;
+        }
+
+        /* Left Sidebar - Market List */
+        .market-sidebar {
+            width: 320px;
+            background: #0A0A0A;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 16px;
+            background: #141414;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            color: #FFFFFF;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #00FF88;
+            background: #1A1A1A;
+        }
+
+        .market-item {
+            padding: 16px;
+            margin-bottom: 8px;
+            background: #141414;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .market-item:hover {
+            background: #1A1A1A;
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(2px);
+        }
+
+        .market-item.active {
+            background: rgba(0, 255, 136, 0.05);
+            border-color: #00FF88;
+        }
+
+        .market-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #00FF88;
+        }
+
+        .market-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #FFFFFF;
+        }
+
+        .market-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .market-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .market-change {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .market-change.positive {
+            color: #00FF88;
+        }
+
+        .market-change.negative {
+            color: #FF3333;
+        }
+
+        .market-volume {
+            font-size: 11px;
+            color: #666666;
+            margin-top: 4px;
+        }
+
+        /* Center - Main Trading Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0A0A0A;
+            overflow: hidden;
+        }
+
+        /* Market Header */
+        .market-header {
+            padding: 24px 32px;
+            background: #0A0A0A;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .market-header-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #FFFFFF;
+        }
+
+        .price-display {
+            display: flex;
+            align-items: baseline;
+            gap: 24px;
+        }
+
+        .current-price-large {
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            position: relative;
+        }
+
+        .price-flash {
+            animation: priceFlash 0.3s ease-out;
+        }
+
+        @keyframes priceFlash {
+            0% { background: rgba(0, 255, 136, 0.2); }
+            100% { background: transparent; }
+        }
+
+        .price-details {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .price-change-24h {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .volume-24h {
+            font-size: 14px;
+            color: #666666;
+        }
+
+        /* Trading Panel */
+        .trading-panel {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .trading-card {
+            background: #141414;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* Leverage Controls */
+        .leverage-section {
+            margin-bottom: 32px;
+        }
+
+        .leverage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .leverage-info {
+            display: flex;
+            gap: 48px;
+        }
+
+        .leverage-group {
+            text-align: center;
+        }
+
+        .leverage-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #666666;
+            margin-bottom: 8px;
+        }
+
+        .leverage-value {
+            font-size: 36px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .leverage-value.base {
+            color: #FFFFFF;
+        }
+
+        .leverage-value.effective {
+            color: #FFB800;
+        }
+
+        .leverage-value.extreme {
+            color: #FF3333;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Slider */
+        .slider-container {
+            position: relative;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .slider-track {
+            width: 100%;
+            height: 6px;
+            background: #1A1A1A;
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .slider-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00FF88 0%, #FFB800 60%, #FF3333 100%);
+            border-radius: 3px;
+            transition: width 0.2s ease;
+        }
+
+        .slider-thumb {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s;
+        }
+
+        .slider-thumb:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .slider-thumb:active {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+
+        /* Preset Buttons */
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .preset-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            color: #666666;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover {
+            border-color: #00FF88;
+            color: #FFFFFF;
+        }
+
+        .preset-btn.active {
+            background: #00FF88;
+            border-color: #00FF88;
+            color: #0A0A0A;
+        }
+
+        .preset-btn.max {
+            margin-left: auto;
+            border-color: #FFB800;
+            color: #FFB800;
+        }
+
+        /* Chain Builder */
+        .chain-toggle {
+            width: 100%;
+            padding: 16px;
+            background: #1A1A1A;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+
+        .chain-toggle:hover {
+            border-color: #FFB800;
+            background: #1A1A1A;
+        }
+
+        .chain-toggle.active {
+            border-color: #FFB800;
+            background: rgba(255, 184, 0, 0.05);
+        }
+
+        .chain-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .chain-multiplier {
+            font-size: 14px;
+            font-weight: 700;
+            color: #FFB800;
+        }
+
+        /* Risk Metrics */
+        .risk-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding: 20px;
+            background: rgba(255, 51, 51, 0.05);
+            border: 1px solid rgba(255, 51, 51, 0.2);
+            border-radius: 6px;
+            margin-bottom: 24px;
+        }
+
+        .risk-metric {
+            text-align: center;
+        }
+
+        .risk-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #FF3333;
+            margin-bottom: 4px;
+        }
+
+        .risk-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            padding: 16px;
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid #FF3333;
+            border-radius: 6px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .warning-icon {
+            font-size: 20px;
+            color: #FF3333;
+            line-height: 1;
+        }
+
+        .warning-content {
+            flex: 1;
+        }
+
+        .warning-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FF3333;
+            margin-bottom: 4px;
+        }
+
+        .warning-text {
+            font-size: 13px;
+            color: #FFFFFF;
+            opacity: 0.8;
+        }
+
+        /* Trade Actions */
+        .trade-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .trade-btn {
+            padding: 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trade-btn.buy {
+            background: #00FF88;
+            color: #0A0A0A;
+        }
+
+        .trade-btn.buy:hover {
+            background: #00E67A;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 255, 136, 0.3);
+        }
+
+        .trade-btn.sell {
+            background: #FF3333;
+            color: #FFFFFF;
+        }
+
+        .trade-btn.sell:hover {
+            background: #E62E2E;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 51, 51, 0.3);
+        }
+
+        .trade-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Right Sidebar - Positions */
+        .positions-sidebar {
+            width: 380px;
+            background: #0A0A0A;
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .positions-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .positions-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .positions-summary {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #666666;
+        }
+
+        .total-pnl {
+            font-weight: 600;
+        }
+
+        .total-pnl.positive {
+            color: #00FF88;
+        }
+
+        .total-pnl.negative {
+            color: #FF3333;
+        }
+
+        .positions-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .position-card {
+            background: #141414;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        .position-card:hover {
+            background: #1A1A1A;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .position-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .position-market {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .position-pnl {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .position-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 11px;
+        }
+
+        .position-detail {
+            text-align: center;
+        }
+
+        .detail-label {
+            color: #666666;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .position-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .position-action {
+            flex: 1;
+            padding: 6px 0;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            color: #666666;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .position-action:hover {
+            border-color: #666666;
+            color: #FFFFFF;
+        }
+
+        .position-action.close {
+            border-color: rgba(255, 51, 51, 0.3);
+            color: #FF3333;
+        }
+
+        .position-action.close:hover {
+            background: rgba(255, 51, 51, 0.1);
+            border-color: #FF3333;
+        }
+
+        /* Live Price Animation */
+        .live-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #00FF88;
+            border-radius: 50%;
+            margin-left: 8px;
+            animation: livePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0A0A0A;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1A1A1A;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #333333;
+        }
+
+        /* Loading State */
+        .loading-shimmer {
+            background: linear-gradient(90deg, #141414 0%, #1A1A1A 50%, #141414 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Sidebar - Markets -->
+        <div class="market-sidebar">
+            <input type="text" class="search-box" placeholder="Search markets..." />
+            
+            <div class="market-item active">
+                <div class="market-title">Will BTC reach $150k by 2025?</div>
+                <div class="market-stats">
+                    <div>
+                        <div class="market-price mono">65.2%</div>
+                        <div class="market-volume">Vol: $1.2M</div>
+                    </div>
+                    <div class="market-change positive">+2.5%</div>
+                </div>
+            </div>
+
+            <div class="market-item">
+                <div class="market-title">ETH to flip BTC market cap in 2024?</div>
+                <div class="market-stats">
+                    <div>
+                        <div class="market-price mono">32.8%</div>
+                        <div class="market-volume">Vol: $845K</div>
+                    </div>
+                    <div class="market-change negative">-1.2%</div>
+                </div>
+            </div>
+
+            <div class="market-item">
+                <div class="market-title">Trump wins 2024 election</div>
+                <div class="market-stats">
+                    <div>
+                        <div class="market-price mono">48.5%</div>
+                        <div class="market-volume">Vol: $5.3M</div>
+                    </div>
+                    <div class="market-change positive">+0.8%</div>
+                </div>
+            </div>
+
+            <div class="market-item">
+                <div class="market-title">Fed cuts rates Q1 2024</div>
+                <div class="market-stats">
+                    <div>
+                        <div class="market-price mono">71.4%</div>
+                        <div class="market-volume">Vol: $432K</div>
+                    </div>
+                    <div class="market-change negative">-3.1%</div>
+                </div>
+            </div>
+
+            <div class="market-item">
+                <div class="market-title">S&P 500 above 5000 by March</div>
+                <div class="market-stats">
+                    <div>
+                        <div class="market-price mono">88.1%</div>
+                        <div class="market-volume">Vol: $287K</div>
+                    </div>
+                    <div class="market-change positive">+1.4%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Market Header -->
+            <div class="market-header">
+                <h1 class="market-header-title">Will BTC reach $150k by 2025?</h1>
+                <div class="price-display">
+                    <div class="current-price-large mono price-flash">65.2%</div>
+                    <div class="live-indicator"></div>
+                    <div class="price-details">
+                        <div class="price-change-24h positive mono">+2.5%</div>
+                        <div class="volume-24h">24h Vol: $1.2M</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trading Panel -->
+            <div class="trading-panel">
+                <div class="trading-card">
+                    <!-- Leverage Section -->
+                    <div class="leverage-section">
+                        <div class="leverage-header">
+                            <div class="leverage-info">
+                                <div class="leverage-group">
+                                    <div class="leverage-label">Base Leverage</div>
+                                    <div class="leverage-value base mono">100x</div>
+                                </div>
+                                <div class="leverage-group">
+                                    <div class="leverage-label">Effective Leverage</div>
+                                    <div class="leverage-value effective extreme mono">237x</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slider -->
+                        <div class="slider-container">
+                            <div class="slider-track">
+                                <div class="slider-fill" style="width: 100%;"></div>
+                                <div class="slider-thumb" style="left: 100%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Preset Buttons -->
+                        <div class="preset-buttons">
+                            <button class="preset-btn">1x</button>
+                            <button class="preset-btn">10x</button>
+                            <button class="preset-btn">25x</button>
+                            <button class="preset-btn">50x</button>
+                            <button class="preset-btn active">100x</button>
+                            <button class="preset-btn max">MAX</button>
+                        </div>
+
+                        <!-- Chain Toggle -->
+                        <div class="chain-toggle active">
+                            <span class="chain-label">Leverage Chaining</span>
+                            <span class="chain-multiplier mono">2.37x multiplier</span>
+                        </div>
+
+                        <!-- Risk Metrics -->
+                        <div class="risk-metrics">
+                            <div class="risk-metric">
+                                <div class="risk-label">Liquidation</div>
+                                <div class="risk-value mono">64.74%</div>
+                            </div>
+                            <div class="risk-metric">
+                                <div class="risk-label">Buffer</div>
+                                <div class="risk-value mono">0.42%</div>
+                            </div>
+                            <div class="risk-metric">
+                                <div class="risk-label">Max Profit</div>
+                                <div class="risk-value mono">8,295%</div>
+                            </div>
+                            <div class="risk-metric">
+                                <div class="risk-label">Max Loss</div>
+                                <div class="risk-value mono">100%</div>
+                            </div>
+                        </div>
+
+                        <!-- Warning -->
+                        <div class="warning-box">
+                            <div class="warning-icon">⚠️</div>
+                            <div class="warning-content">
+                                <div class="warning-title">EXTREME LEVERAGE WARNING</div>
+                                <div class="warning-text">
+                                    At 237x effective leverage, you will be liquidated on a 0.42% adverse price movement. 
+                                    This position carries extreme risk.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trade Actions -->
+                        <div class="trade-actions">
+                            <button class="trade-btn buy">BUY / LONG</button>
+                            <button class="trade-btn sell">SELL / SHORT</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar - Positions -->
+        <div class="positions-sidebar">
+            <div class="positions-header">
+                <h2 class="positions-title">Open Positions</h2>
+                <div class="positions-summary">
+                    <span>4 positions</span>
+                    <span class="total-pnl positive">Total P&L: +$3,842</span>
+                </div>
+            </div>
+
+            <div class="positions-list">
+                <div class="position-card">
+                    <div class="position-header">
+                        <div class="position-market">BTC > $150k</div>
+                        <div class="position-pnl positive mono">+$2,145</div>
+                    </div>
+                    <div class="position-details">
+                        <div class="position-detail">
+                            <div class="detail-label">Size</div>
+                            <div class="detail-value mono">$10,000</div>
+                        </div>
+                        <div class="position-detail">
+                            <div class="detail-label">Leverage</div>
+                            <div class="detail-value mono">125x</div>
+                        </div>
+                        <div class="position-detail">
+                            <div class="detail-label">Entry</div>
+                            <div class="detail-value mono">61.5%</div>
+                        </div>
+                    </div>
+                    <div class="position-actions">
+                        <button class="position-action">Add</button>
+                        <button class="position-action">Reduce</button>
+                        <button class="position-action close">Close</button>
+                    </div>
+                </div>
+
+                <div class="position-card">
+                    <div class="position-header">
+                        <div class="position-market">ETH Flippening</div>
+                        <div class="position-pnl positive mono">+$892</div>
+                    </div>
+                    <div class="position-details">
+                        <div class="position-detail">
+                            <div class="detail-label">Size</div>
+                            <div class="detail-value mono">$5,000</div>
+                        </div>
+                        <div class="position-detail">
+                            <div class="detail-label">Leverage</div>
+                            <div class="detail-value mono">75x</div>
+                        </div>
+                        <div class="position-detail">
+                            <div class="detail-label">Entry</div>
+                            <div class="detail-value mono">30.2%</div>
+                        </div>
+                    </div>
+                    <div class="position-actions">
+                        <button class="position-action">Add</button>
+                        <button class="position-action">Reduce</button>
+                        <button class="position-action close">Close</button>
+                    </div>
+                </div>
+
+                <div class="position-card">
+                    <div class="position-header">
+                        <div class="position-market">Fed Rate Cut</div>
+                        <div class="position-pnl positive mono">+$543</div>
+                    </div>
+                    <div class="position-details">
+                        <div class="position-detail">
+                            <div class="detail-label">Size</div>
+                            <div class="detail-value mono">$2,500</div>
+                        </div>
+                        <div class="position-detail">
+                            <div class="detail-label">Leverage</div>
+                            <div class="detail-value mono">50x</div>
+                        </div>
+                        <div class="position-detail">
+                            <div class="detail-label">Entry</div>
+                            <div class="detail-value mono">69.8%</div>
+                        </div>
+                    </div>
+                    <div class="position-actions">
+                        <button class="position-action">Add</button>
+                        <button class="position-action">Reduce</button>
+                        <button class="position-action close">Close</button>
+                    </div>
+                </div>
+
+                <div class="position-card">
+                    <div class="position-header">
+                        <div class="position-market">Trump Election</div>
+                        <div class="position-pnl positive mono">+$262</div>
+                    </div>
+                    <div class="position-details">
+                        <div class="position-detail">
+                            <div class="detail-label">Size</div>
+                            <div class="detail-value mono">$1,000</div>
+                        </div>
+                        <div class="position-detail">
+                            <div class="detail-label">Leverage</div>
+                            <div class="detail-value mono">25x</div>
+                        </div>
+                        <div class="position-detail">
+                            <div class="detail-label">Entry</div>
+                            <div class="detail-value mono">47.1%</div>
+                        </div>
+                    </div>
+                    <div class="position-actions">
+                        <button class="position-action">Add</button>
+                        <button class="position-action">Reduce</button>
+                        <button class="position-action close">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate live price updates
+        function updatePrice() {
+            const priceElement = document.querySelector('.current-price-large');
+            const currentPrice = parseFloat(priceElement.textContent);
+            const change = (Math.random() - 0.5) * 0.2; // ±0.1%
+            const newPrice = Math.max(0, Math.min(100, currentPrice + change));
+            
+            priceElement.textContent = newPrice.toFixed(1) + '%';
+            priceElement.classList.add('price-flash');
+            setTimeout(() => priceElement.classList.remove('price-flash'), 300);
+
+            // Update liquidation price
+            const liquidationElement = document.querySelector('.risk-metrics .risk-value');
+            const leverage = 237;
+            const liquidationPrice = currentPrice - (100 / leverage);
+            liquidationElement.textContent = liquidationPrice.toFixed(2) + '%';
+
+            // Update buffer
+            const bufferElement = document.querySelectorAll('.risk-metrics .risk-value')[1];
+            const buffer = (currentPrice - liquidationPrice) / currentPrice * 100;
+            bufferElement.textContent = buffer.toFixed(2) + '%';
+        }
+
+        // Update prices every 2-5 seconds
+        setInterval(updatePrice, 2000 + Math.random() * 3000);
+
+        // Market item interactions
+        document.querySelectorAll('.market-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.market-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Preset button interactions
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Slider interaction
+        const slider = document.querySelector('.slider-thumb');
+        const sliderTrack = document.querySelector('.slider-track');
+        const sliderFill = document.querySelector('.slider-fill');
+        let isDragging = false;
+
+        slider.addEventListener('mousedown', () => isDragging = true);
+        document.addEventListener('mouseup', () => isDragging = false);
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const rect = sliderTrack.getBoundingClientRect();
+            const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+            const percent = (x / rect.width) * 100;
+            
+            slider.style.left = percent + '%';
+            sliderFill.style.width = percent + '%';
+            
+            // Update leverage display
+            const leverage = Math.round(percent);
+            document.querySelector('.leverage-value.base').textContent = leverage + 'x';
+            
+            // Update effective leverage
+            const effective = Math.round(leverage * 2.37);
+            const effectiveElement = document.querySelector('.leverage-value.effective');
+            effectiveElement.textContent = effective + 'x';
+            
+            // Update color based on leverage
+            if (effective > 400) {
+                effectiveElement.classList.add('extreme');
+            } else {
+                effectiveElement.classList.remove('extreme');
+            }
+        });
+
+        // Trade button animations
+        document.querySelectorAll('.trade-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => this.style.transform = '', 100);
+            });
+        });
+    </script>
+</body>
+</html>

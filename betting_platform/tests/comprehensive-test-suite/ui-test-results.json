@@ -1,0 +1,163 @@
+{
+  "totalTests": 27,
+  "passed": 21,
+  "failed": 6,
+  "phases": {
+    "UI Phase 1": {
+      "passed": 4,
+      "failed": 4,
+      "tests": {
+        "UI-1.1": {
+          "status": "passed"
+        },
+        "UI-1.2": {
+          "status": "failed",
+          "error": "Hero section not visible"
+        },
+        "UI-1.3": {
+          "status": "failed",
+          "error": "Navigation menu not found"
+        },
+        "UI-1.4": {
+          "status": "failed",
+          "error": "Markets link not found"
+        },
+        "UI-1.5": {
+          "status": "failed",
+          "error": "Connect wallet button not found"
+        },
+        "UI-1.6": {
+          "status": "passed"
+        },
+        "UI-1.7": {
+          "status": "passed"
+        },
+        "UI-1.8": {
+          "status": "passed"
+        }
+      }
+    },
+    "UI Phase 2": {
+      "passed": 3,
+      "failed": 1,
+      "tests": {
+        "UI-2.1": {
+          "status": "failed",
+          "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"Connect\"), [data-testid=\"connect-wallet\"]').first()\u001b[22m\n"
+        },
+        "UI-2.2": {
+          "status": "passed"
+        },
+        "UI-2.3": {
+          "status": "passed"
+        },
+        "UI-2.4": {
+          "status": "passed"
+        }
+      }
+    },
+    "UI Phase 3": {
+      "passed": 4,
+      "failed": 1,
+      "tests": {
+        "UI-3.1": {
+          "status": "passed"
+        },
+        "UI-3.2": {
+          "status": "failed",
+          "error": "No market cards displayed"
+        },
+        "UI-3.3": {
+          "status": "passed"
+        },
+        "UI-3.4": {
+          "status": "passed"
+        },
+        "UI-3.5": {
+          "status": "passed"
+        }
+      }
+    },
+    "UI Phase 4": {
+      "passed": 5,
+      "failed": 0,
+      "tests": {
+        "UI-4.1": {
+          "status": "passed"
+        },
+        "UI-4.2": {
+          "status": "passed"
+        },
+        "UI-4.3": {
+          "status": "passed"
+        },
+        "UI-4.4": {
+          "status": "passed"
+        },
+        "UI-4.5": {
+          "status": "passed"
+        }
+      }
+    },
+    "UI Phase 5": {
+      "passed": 5,
+      "failed": 0,
+      "tests": {
+        "UI-5.1": {
+          "status": "passed"
+        },
+        "UI-5.2": {
+          "status": "passed"
+        },
+        "UI-5.3": {
+          "status": "passed"
+        },
+        "UI-5.4": {
+          "status": "passed"
+        },
+        "UI-5.5": {
+          "status": "passed"
+        }
+      }
+    }
+  },
+  "errors": [
+    {
+      "phase": "UI Phase 1",
+      "testId": "UI-1.2",
+      "testName": "Hero Section Visible",
+      "error": "Hero section not visible"
+    },
+    {
+      "phase": "UI Phase 1",
+      "testId": "UI-1.3",
+      "testName": "Navigation Menu Present",
+      "error": "Navigation menu not found"
+    },
+    {
+      "phase": "UI Phase 1",
+      "testId": "UI-1.4",
+      "testName": "Markets Link",
+      "error": "Markets link not found"
+    },
+    {
+      "phase": "UI Phase 1",
+      "testId": "UI-1.5",
+      "testName": "Connect Wallet Button",
+      "error": "Connect wallet button not found"
+    },
+    {
+      "phase": "UI Phase 2",
+      "testId": "UI-2.1",
+      "testName": "Wallet Connection Modal",
+      "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has-text(\"Connect\"), [data-testid=\"connect-wallet\"]').first()\u001b[22m\n"
+    },
+    {
+      "phase": "UI Phase 3",
+      "testId": "UI-3.2",
+      "testName": "Markets List Display",
+      "error": "No market cards displayed"
+    }
+  ],
+  "startTime": 1754124409988
+}

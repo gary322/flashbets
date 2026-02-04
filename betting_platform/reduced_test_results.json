@@ -1,0 +1,934 @@
+{
+  "total": 36,
+  "successful": 36,
+  "failed": 0,
+  "results": [
+    {
+      "persona": "Degen Trader",
+      "scenario": "Next corner kick in 30s?",
+      "journeyType": "SINGLE_BET",
+      "result": {
+        "success": true,
+        "journey": "SINGLE_BET",
+        "persona": "Degen Trader",
+        "marketId": "0x6d61726b65745f31373534363035343431313739000000000000000000000000",
+        "position": {
+          "id": "position_1754605441236",
+          "marketId": "0x6d61726b65745f31373534363035343431313739000000000000000000000000",
+          "size": 50,
+          "leverage": 400,
+          "side": "NO",
+          "mock": true
+        },
+        "result": {
+          "positionId": "position_1754605441236",
+          "claimed": true,
+          "payout": 0,
+          "timestamp": 1754605441236
+        }
+      }
+    },
+    {
+      "persona": "Degen Trader",
+      "scenario": "Next corner kick in 30s?",
+      "journeyType": "CHAINED_BETS",
+      "result": {
+        "success": true,
+        "journey": "CHAINED_BETS",
+        "persona": "Degen Trader",
+        "chainLength": 1,
+        "markets": [
+          "0x6d61726b65745f31373534363035343431323532000000000000000000000000"
+        ],
+        "leverages": [
+          300
+        ],
+        "initialStake": 10,
+        "effectiveLeverage": 500,
+        "chainedBet": {
+          "id": "chain_1754605441263",
+          "markets": [
+            "0x6d61726b65745f31373534363035343431323532000000000000000000000000"
+          ],
+          "leverages": [
+            300
+          ],
+          "stake": 10,
+          "effectiveLeverage": 500,
+          "mock": true
+        }
+      }
+    },
+    {
+      "persona": "Degen Trader",
+      "scenario": "Next corner kick in 30s?",
+      "journeyType": "ARBITRAGE",
+      "result": {
+        "success": true,
+        "journey": "ARBITRAGE",
+        "persona": "Degen Trader",
+        "markets": [
+          "0x6d61726b65745f31373534363035343431323738000000000000000000000000",
+          "0x6d61726b65745f31373534363035343431323932000000000000000000000000"
+        ],
+        "prices": {
+          "price1Yes": 5000,
+          "price1No": 5000,
+          "price2Yes": 5000,
+          "price2No": 5000
+        },
+        "positions": [],
+        "arbitrageFound": false
+      }
+    },
+    {
+      "persona": "Degen Trader",
+      "scenario": "Next corner kick in 30s?",
+      "journeyType": "ALL_IN",
+      "result": {
+        "success": true,
+        "journey": "ALL_IN",
+        "persona": "Degen Trader",
+        "marketId": "0x6d61726b65745f31373534363035343431333231000000000000000000000000",
+        "position": {
+          "id": "position_1754605441347",
+          "marketId": "0x6d61726b65745f31373534363035343431333231000000000000000000000000",
+          "size": 200,
+          "leverage": 500,
+          "side": "NO",
+          "mock": true
+        },
+        "totalExposure": 100000,
+        "outcome": "JACKPOT"
+      }
+    },
+    {
+      "persona": "Degen Trader",
+      "scenario": "Goal in next 60s?",
+      "journeyType": "SINGLE_BET",
+      "result": {
+        "success": true,
+        "journey": "SINGLE_BET",
+        "persona": "Degen Trader",
+        "marketId": "0x6d61726b65745f31373534363035343431333633000000000000000000000000",
+        "position": {
+          "id": "position_1754605441387",
+          "marketId": "0x6d61726b65745f31373534363035343431333633000000000000000000000000",
+          "size": 100,
+          "leverage": 300,
+          "side": "NO",
+          "mock": true
+        },
+        "result": {
+          "positionId": "position_1754605441387",
+          "claimed": true,
+          "payout": 0,
+          "timestamp": 1754605441387
+        }
+      }
+    },
+    {
+      "persona": "Degen Trader",
+      "scenario": "Goal in next 60s?",
+      "journeyType": "CHAINED_BETS",
+      "result": {
+        "success": true,
+        "journey": "CHAINED_BETS",
+        "persona": "Degen Trader",
+        "chainLength": 1,
+        "markets": [
+          "0x6d61726b65745f31373534363035343431343032000000000000000000000000"
+        ],
+        "leverages": [
+          400
+        ],
+        "initialStake": 100,
+        "effectiveLeverage": 500,
+        "chainedBet": {
+          "id": "chain_1754605441411",
+          "markets": [
+            "0x6d61726b65745f31373534363035343431343032000000000000000000000000"
+          ],
+          "leverages": [
+            400
+          ],
+          "stake": 100,
+          "effectiveLeverage": 500,
+          "mock": true
+        }
+      }
+    },
+    {
+      "persona": "Degen Trader",
+      "scenario": "Goal in next 60s?",
+      "journeyType": "ARBITRAGE",
+      "result": {
+        "success": true,
+        "journey": "ARBITRAGE",
+        "persona": "Degen Trader",
+        "markets": [
+          "0x6d61726b65745f31373534363035343431343235000000000000000000000000",
+          "0x6d61726b65745f31373534363035343431343337000000000000000000000000"
+        ],
+        "prices": {
+          "price1Yes": 5000,
+          "price1No": 5000,
+          "price2Yes": 5000,
+          "price2No": 5000
+        },
+        "positions": [],
+        "arbitrageFound": false
+      }
+    },
+    {
+      "persona": "Degen Trader",
+      "scenario": "Goal in next 60s?",
+      "journeyType": "ALL_IN",
+      "result": {
+        "success": true,
+        "journey": "ALL_IN",
+        "persona": "Degen Trader",
+        "marketId": "0x6d61726b65745f31373534363035343431343633000000000000000000000000",
+        "position": {
+          "id": "position_1754605441486",
+          "marketId": "0x6d61726b65745f31373534363035343431343633000000000000000000000000",
+          "size": 200,
+          "leverage": 500,
+          "side": "YES",
+          "mock": true
+        },
+        "totalExposure": 100000,
+        "outcome": "BUSTED"
+      }
+    },
+    {
+      "persona": "Degen Trader",
+      "scenario": "Yellow card in 45s?",
+      "journeyType": "SINGLE_BET",
+      "result": {
+        "success": true,
+        "journey": "SINGLE_BET",
+        "persona": "Degen Trader",
+        "marketId": "0x6d61726b65745f31373534363035343431353032000000000000000000000000",
+        "position": {
+          "id": "position_1754605441524",
+          "marketId": "0x6d61726b65745f31373534363035343431353032000000000000000000000000",
+          "size": 10,
+          "leverage": 400,
+          "side": "YES",
+          "mock": true
+        },
+        "result": {
+          "positionId": "position_1754605441524",
+          "claimed": true,
+          "payout": 0,
+          "timestamp": 1754605441524
+        }
+      }
+    },
+    {
+      "persona": "Degen Trader",
+      "scenario": "Yellow card in 45s?",
+      "journeyType": "CHAINED_BETS",
+      "result": {
+        "success": true,
+        "journey": "CHAINED_BETS",
+        "persona": "Degen Trader",
+        "chainLength": 1,
+        "markets": [
+          "0x6d61726b65745f31373534363035343431353430000000000000000000000000"
+        ],
+        "leverages": [
+          500
+        ],
+        "initialStake": 100,
+        "effectiveLeverage": 500,
+        "chainedBet": {
+          "id": "chain_1754605441548",
+          "markets": [
+            "0x6d61726b65745f31373534363035343431353430000000000000000000000000"
+          ],
+          "leverages": [
+            500
+          ],
+          "stake": 100,
+          "effectiveLeverage": 500,
+          "mock": true
+        }
+      }
+    },
+    {
+      "persona": "Degen Trader",
+      "scenario": "Yellow card in 45s?",
+      "journeyType": "ARBITRAGE",
+      "result": {
+        "success": true,
+        "journey": "ARBITRAGE",
+        "persona": "Degen Trader",
+        "markets": [
+          "0x6d61726b65745f31373534363035343431353632000000000000000000000000",
+          "0x6d61726b65745f31373534363035343431353734000000000000000000000000"
+        ],
+        "prices": {
+          "price1Yes": 5000,
+          "price1No": 5000,
+          "price2Yes": 5000,
+          "price2No": 5000
+        },
+        "positions": [],
+        "arbitrageFound": false
+      }
+    },
+    {
+      "persona": "Degen Trader",
+      "scenario": "Yellow card in 45s?",
+      "journeyType": "ALL_IN",
+      "result": {
+        "success": true,
+        "journey": "ALL_IN",
+        "persona": "Degen Trader",
+        "marketId": "0x6d61726b65745f31373534363035343431363031000000000000000000000000",
+        "position": {
+          "id": "position_1754605441624",
+          "marketId": "0x6d61726b65745f31373534363035343431363031000000000000000000000000",
+          "size": 200,
+          "leverage": 500,
+          "side": "YES",
+          "mock": true
+        },
+        "totalExposure": 100000,
+        "outcome": "JACKPOT"
+      }
+    },
+    {
+      "persona": "Whale Trader",
+      "scenario": "Next corner kick in 30s?",
+      "journeyType": "SINGLE_BET",
+      "result": {
+        "success": true,
+        "journey": "SINGLE_BET",
+        "persona": "Whale Trader",
+        "marketId": "0x6d61726b65745f31373534363035343431363339000000000000000000000000",
+        "position": {
+          "id": "position_1754605441661",
+          "marketId": "0x6d61726b65745f31373534363035343431363339000000000000000000000000",
+          "size": 50000,
+          "leverage": 100,
+          "side": "YES",
+          "mock": true
+        },
+        "result": {
+          "positionId": "position_1754605441661",
+          "claimed": true,
+          "payout": 0,
+          "timestamp": 1754605441661
+        }
+      }
+    },
+    {
+      "persona": "Whale Trader",
+      "scenario": "Next corner kick in 30s?",
+      "journeyType": "CHAINED_BETS",
+      "result": {
+        "success": true,
+        "journey": "CHAINED_BETS",
+        "persona": "Whale Trader",
+        "chainLength": 3,
+        "markets": [
+          "0x6d61726b65745f31373534363035343431363736000000000000000000000000",
+          "0x6d61726b65745f31373534363035343431363837000000000000000000000000",
+          "0x6d61726b65745f31373534363035343431363939000000000000000000000000"
+        ],
+        "leverages": [
+          100,
+          10,
+          100
+        ],
+        "initialStake": 100000,
+        "effectiveLeverage": 277.7777777777778,
+        "chainedBet": {
+          "id": "chain_1754605441706",
+          "markets": [
+            "0x6d61726b65745f31373534363035343431363736000000000000000000000000",
+            "0x6d61726b65745f31373534363035343431363837000000000000000000000000",
+            "0x6d61726b65745f31373534363035343431363939000000000000000000000000"
+          ],
+          "leverages": [
+            100,
+            10,
+            100
+          ],
+          "stake": 100000,
+          "effectiveLeverage": 277.7777777777778,
+          "mock": true
+        }
+      }
+    },
+    {
+      "persona": "Whale Trader",
+      "scenario": "Next corner kick in 30s?",
+      "journeyType": "ARBITRAGE",
+      "result": {
+        "success": true,
+        "journey": "ARBITRAGE",
+        "persona": "Whale Trader",
+        "markets": [
+          "0x6d61726b65745f31373534363035343431373231000000000000000000000000",
+          "0x6d61726b65745f31373534363035343431373333000000000000000000000000"
+        ],
+        "prices": {
+          "price1Yes": 5000,
+          "price1No": 5000,
+          "price2Yes": 5000,
+          "price2No": 5000
+        },
+        "positions": [],
+        "arbitrageFound": false
+      }
+    },
+    {
+      "persona": "Whale Trader",
+      "scenario": "Next corner kick in 30s?",
+      "journeyType": "ALL_IN",
+      "result": {
+        "success": true,
+        "journey": "ALL_IN",
+        "persona": "Whale Trader",
+        "marketId": "0x6d61726b65745f31373534363035343431373538000000000000000000000000",
+        "position": {
+          "id": "position_1754605441780",
+          "marketId": "0x6d61726b65745f31373534363035343431373538000000000000000000000000",
+          "size": 200000,
+          "leverage": 100,
+          "side": "NO",
+          "mock": true
+        },
+        "totalExposure": 20000000,
+        "outcome": "BUSTED"
+      }
+    },
+    {
+      "persona": "Whale Trader",
+      "scenario": "Goal in next 60s?",
+      "journeyType": "SINGLE_BET",
+      "result": {
+        "success": true,
+        "journey": "SINGLE_BET",
+        "persona": "Whale Trader",
+        "marketId": "0x6d61726b65745f31373534363035343431373935000000000000000000000000",
+        "position": {
+          "id": "position_1754605441816",
+          "marketId": "0x6d61726b65745f31373534363035343431373935000000000000000000000000",
+          "size": 50000,
+          "leverage": 50,
+          "side": "YES",
+          "mock": true
+        },
+        "result": {
+          "positionId": "position_1754605441816",
+          "claimed": true,
+          "payout": 0,
+          "timestamp": 1754605441816
+        }
+      }
+    },
+    {
+      "persona": "Whale Trader",
+      "scenario": "Goal in next 60s?",
+      "journeyType": "CHAINED_BETS",
+      "result": {
+        "success": true,
+        "journey": "CHAINED_BETS",
+        "persona": "Whale Trader",
+        "chainLength": 1,
+        "markets": [
+          "0x6d61726b65745f31373534363035343431383332000000000000000000000000"
+        ],
+        "leverages": [
+          50
+        ],
+        "initialStake": 50000,
+        "effectiveLeverage": 250,
+        "chainedBet": {
+          "id": "chain_1754605441840",
+          "markets": [
+            "0x6d61726b65745f31373534363035343431383332000000000000000000000000"
+          ],
+          "leverages": [
+            50
+          ],
+          "stake": 50000,
+          "effectiveLeverage": 250,
+          "mock": true
+        }
+      }
+    },
+    {
+      "persona": "Whale Trader",
+      "scenario": "Goal in next 60s?",
+      "journeyType": "ARBITRAGE",
+      "result": {
+        "success": true,
+        "journey": "ARBITRAGE",
+        "persona": "Whale Trader",
+        "markets": [
+          "0x6d61726b65745f31373534363035343431383534000000000000000000000000",
+          "0x6d61726b65745f31373534363035343431383635000000000000000000000000"
+        ],
+        "prices": {
+          "price1Yes": 5000,
+          "price1No": 5000,
+          "price2Yes": 5000,
+          "price2No": 5000
+        },
+        "positions": [],
+        "arbitrageFound": false
+      }
+    },
+    {
+      "persona": "Whale Trader",
+      "scenario": "Goal in next 60s?",
+      "journeyType": "ALL_IN",
+      "result": {
+        "success": true,
+        "journey": "ALL_IN",
+        "persona": "Whale Trader",
+        "marketId": "0x6d61726b65745f31373534363035343431383839000000000000000000000000",
+        "position": {
+          "id": "position_1754605441910",
+          "marketId": "0x6d61726b65745f31373534363035343431383839000000000000000000000000",
+          "size": 200000,
+          "leverage": 100,
+          "side": "YES",
+          "mock": true
+        },
+        "totalExposure": 20000000,
+        "outcome": "BUSTED"
+      }
+    },
+    {
+      "persona": "Whale Trader",
+      "scenario": "Yellow card in 45s?",
+      "journeyType": "SINGLE_BET",
+      "result": {
+        "success": true,
+        "journey": "SINGLE_BET",
+        "persona": "Whale Trader",
+        "marketId": "0x6d61726b65745f31373534363035343431393235000000000000000000000000",
+        "position": {
+          "id": "position_1754605441946",
+          "marketId": "0x6d61726b65745f31373534363035343431393235000000000000000000000000",
+          "size": 50000,
+          "leverage": 100,
+          "side": "YES",
+          "mock": true
+        },
+        "result": {
+          "positionId": "position_1754605441946",
+          "claimed": true,
+          "payout": 0,
+          "timestamp": 1754605441946
+        }
+      }
+    },
+    {
+      "persona": "Whale Trader",
+      "scenario": "Yellow card in 45s?",
+      "journeyType": "CHAINED_BETS",
+      "result": {
+        "success": true,
+        "journey": "CHAINED_BETS",
+        "persona": "Whale Trader",
+        "chainLength": 2,
+        "markets": [
+          "0x6d61726b65745f31373534363035343431393631000000000000000000000000",
+          "0x6d61726b65745f31373534363035343431393733000000000000000000000000"
+        ],
+        "leverages": [
+          50,
+          50
+        ],
+        "initialStake": 50000,
+        "effectiveLeverage": 312.5,
+        "chainedBet": {
+          "id": "chain_1754605441980",
+          "markets": [
+            "0x6d61726b65745f31373534363035343431393631000000000000000000000000",
+            "0x6d61726b65745f31373534363035343431393733000000000000000000000000"
+          ],
+          "leverages": [
+            50,
+            50
+          ],
+          "stake": 50000,
+          "effectiveLeverage": 312.5,
+          "mock": true
+        }
+      }
+    },
+    {
+      "persona": "Whale Trader",
+      "scenario": "Yellow card in 45s?",
+      "journeyType": "ARBITRAGE",
+      "result": {
+        "success": true,
+        "journey": "ARBITRAGE",
+        "persona": "Whale Trader",
+        "markets": [
+          "0x6d61726b65745f31373534363035343431393935000000000000000000000000",
+          "0x6d61726b65745f31373534363035343432303037000000000000000000000000"
+        ],
+        "prices": {
+          "price1Yes": 5000,
+          "price1No": 5000,
+          "price2Yes": 5000,
+          "price2No": 5000
+        },
+        "positions": [],
+        "arbitrageFound": false
+      }
+    },
+    {
+      "persona": "Whale Trader",
+      "scenario": "Yellow card in 45s?",
+      "journeyType": "ALL_IN",
+      "result": {
+        "success": true,
+        "journey": "ALL_IN",
+        "persona": "Whale Trader",
+        "marketId": "0x6d61726b65745f31373534363035343432303333000000000000000000000000",
+        "position": {
+          "id": "position_1754605442055",
+          "marketId": "0x6d61726b65745f31373534363035343432303333000000000000000000000000",
+          "size": 200000,
+          "leverage": 100,
+          "side": "NO",
+          "mock": true
+        },
+        "totalExposure": 20000000,
+        "outcome": "BUSTED"
+      }
+    },
+    {
+      "persona": "Algo Trader",
+      "scenario": "Next corner kick in 30s?",
+      "journeyType": "SINGLE_BET",
+      "result": {
+        "success": true,
+        "journey": "SINGLE_BET",
+        "persona": "Algo Trader",
+        "marketId": "0x6d61726b65745f31373534363035343432303639000000000000000000000000",
+        "position": {
+          "id": "position_1754605442090",
+          "marketId": "0x6d61726b65745f31373534363035343432303639000000000000000000000000",
+          "size": 50,
+          "leverage": 200,
+          "side": "NO",
+          "mock": true
+        },
+        "result": {
+          "positionId": "position_1754605442090",
+          "claimed": true,
+          "payout": 838.5572797176137,
+          "timestamp": 1754605442090
+        }
+      }
+    },
+    {
+      "persona": "Algo Trader",
+      "scenario": "Next corner kick in 30s?",
+      "journeyType": "CHAINED_BETS",
+      "result": {
+        "success": true,
+        "journey": "CHAINED_BETS",
+        "persona": "Algo Trader",
+        "chainLength": 3,
+        "markets": [
+          "0x6d61726b65745f31373534363035343432313035000000000000000000000000",
+          "0x6d61726b65745f31373534363035343432313137000000000000000000000000",
+          "0x6d61726b65745f31373534363035343432313237000000000000000000000000"
+        ],
+        "leverages": [
+          150,
+          100,
+          150
+        ],
+        "initialStake": 100,
+        "effectiveLeverage": 500,
+        "chainedBet": {
+          "id": "chain_1754605442135",
+          "markets": [
+            "0x6d61726b65745f31373534363035343432313035000000000000000000000000",
+            "0x6d61726b65745f31373534363035343432313137000000000000000000000000",
+            "0x6d61726b65745f31373534363035343432313237000000000000000000000000"
+          ],
+          "leverages": [
+            150,
+            100,
+            150
+          ],
+          "stake": 100,
+          "effectiveLeverage": 500,
+          "mock": true
+        }
+      }
+    },
+    {
+      "persona": "Algo Trader",
+      "scenario": "Next corner kick in 30s?",
+      "journeyType": "ARBITRAGE",
+      "result": {
+        "success": true,
+        "journey": "ARBITRAGE",
+        "persona": "Algo Trader",
+        "markets": [
+          "0x6d61726b65745f31373534363035343432313438000000000000000000000000",
+          "0x6d61726b65745f31373534363035343432313539000000000000000000000000"
+        ],
+        "prices": {
+          "price1Yes": 5000,
+          "price1No": 5000,
+          "price2Yes": 5000,
+          "price2No": 5000
+        },
+        "positions": [],
+        "arbitrageFound": false
+      }
+    },
+    {
+      "persona": "Algo Trader",
+      "scenario": "Next corner kick in 30s?",
+      "journeyType": "ALL_IN",
+      "result": {
+        "success": true,
+        "journey": "ALL_IN",
+        "persona": "Algo Trader",
+        "marketId": "0x6d61726b65745f31373534363035343432313833000000000000000000000000",
+        "position": {
+          "id": "position_1754605442204",
+          "marketId": "0x6d61726b65745f31373534363035343432313833000000000000000000000000",
+          "size": 400,
+          "leverage": 200,
+          "side": "YES",
+          "mock": true
+        },
+        "totalExposure": 80000,
+        "outcome": "BUSTED"
+      }
+    },
+    {
+      "persona": "Algo Trader",
+      "scenario": "Goal in next 60s?",
+      "journeyType": "SINGLE_BET",
+      "result": {
+        "success": true,
+        "journey": "SINGLE_BET",
+        "persona": "Algo Trader",
+        "marketId": "0x6d61726b65745f31373534363035343432323139000000000000000000000000",
+        "position": {
+          "id": "position_1754605442240",
+          "marketId": "0x6d61726b65745f31373534363035343432323139000000000000000000000000",
+          "size": 50,
+          "leverage": 200,
+          "side": "NO",
+          "mock": true
+        },
+        "result": {
+          "positionId": "position_1754605442240",
+          "claimed": true,
+          "payout": 0,
+          "timestamp": 1754605442240
+        }
+      }
+    },
+    {
+      "persona": "Algo Trader",
+      "scenario": "Goal in next 60s?",
+      "journeyType": "CHAINED_BETS",
+      "result": {
+        "success": true,
+        "journey": "CHAINED_BETS",
+        "persona": "Algo Trader",
+        "chainLength": 3,
+        "markets": [
+          "0x6d61726b65745f31373534363035343432323534000000000000000000000000",
+          "0x6d61726b65745f31373534363035343432323636000000000000000000000000",
+          "0x6d61726b65745f31373534363035343432323737000000000000000000000000"
+        ],
+        "leverages": [
+          150,
+          150,
+          150
+        ],
+        "initialStake": 100,
+        "effectiveLeverage": 500,
+        "chainedBet": {
+          "id": "chain_1754605442285",
+          "markets": [
+            "0x6d61726b65745f31373534363035343432323534000000000000000000000000",
+            "0x6d61726b65745f31373534363035343432323636000000000000000000000000",
+            "0x6d61726b65745f31373534363035343432323737000000000000000000000000"
+          ],
+          "leverages": [
+            150,
+            150,
+            150
+          ],
+          "stake": 100,
+          "effectiveLeverage": 500,
+          "mock": true
+        }
+      }
+    },
+    {
+      "persona": "Algo Trader",
+      "scenario": "Goal in next 60s?",
+      "journeyType": "ARBITRAGE",
+      "result": {
+        "success": true,
+        "journey": "ARBITRAGE",
+        "persona": "Algo Trader",
+        "markets": [
+          "0x6d61726b65745f31373534363035343432323938000000000000000000000000",
+          "0x6d61726b65745f31373534363035343432333130000000000000000000000000"
+        ],
+        "prices": {
+          "price1Yes": 5000,
+          "price1No": 5000,
+          "price2Yes": 5000,
+          "price2No": 5000
+        },
+        "positions": [],
+        "arbitrageFound": false
+      }
+    },
+    {
+      "persona": "Algo Trader",
+      "scenario": "Goal in next 60s?",
+      "journeyType": "ALL_IN",
+      "result": {
+        "success": true,
+        "journey": "ALL_IN",
+        "persona": "Algo Trader",
+        "marketId": "0x6d61726b65745f31373534363035343432333335000000000000000000000000",
+        "position": {
+          "id": "position_1754605442358",
+          "marketId": "0x6d61726b65745f31373534363035343432333335000000000000000000000000",
+          "size": 400,
+          "leverage": 200,
+          "side": "NO",
+          "mock": true
+        },
+        "totalExposure": 80000,
+        "outcome": "JACKPOT"
+      }
+    },
+    {
+      "persona": "Algo Trader",
+      "scenario": "Yellow card in 45s?",
+      "journeyType": "SINGLE_BET",
+      "result": {
+        "success": true,
+        "journey": "SINGLE_BET",
+        "persona": "Algo Trader",
+        "marketId": "0x6d61726b65745f31373534363035343432333732000000000000000000000000",
+        "position": {
+          "id": "position_1754605442392",
+          "marketId": "0x6d61726b65745f31373534363035343432333732000000000000000000000000",
+          "size": 50,
+          "leverage": 200,
+          "side": "YES",
+          "mock": true
+        },
+        "result": {
+          "positionId": "position_1754605442392",
+          "claimed": true,
+          "payout": 0,
+          "timestamp": 1754605442392
+        }
+      }
+    },
+    {
+      "persona": "Algo Trader",
+      "scenario": "Yellow card in 45s?",
+      "journeyType": "CHAINED_BETS",
+      "result": {
+        "success": true,
+        "journey": "CHAINED_BETS",
+        "persona": "Algo Trader",
+        "chainLength": 3,
+        "markets": [
+          "0x6d61726b65745f31373534363035343432343036000000000000000000000000",
+          "0x6d61726b65745f31373534363035343432343138000000000000000000000000",
+          "0x6d61726b65745f31373534363035343432343330000000000000000000000000"
+        ],
+        "leverages": [
+          100,
+          150,
+          100
+        ],
+        "initialStake": 50,
+        "effectiveLeverage": 500,
+        "chainedBet": {
+          "id": "chain_1754605442437",
+          "markets": [
+            "0x6d61726b65745f31373534363035343432343036000000000000000000000000",
+            "0x6d61726b65745f31373534363035343432343138000000000000000000000000",
+            "0x6d61726b65745f31373534363035343432343330000000000000000000000000"
+          ],
+          "leverages": [
+            100,
+            150,
+            100
+          ],
+          "stake": 50,
+          "effectiveLeverage": 500,
+          "mock": true
+        }
+      }
+    },
+    {
+      "persona": "Algo Trader",
+      "scenario": "Yellow card in 45s?",
+      "journeyType": "ARBITRAGE",
+      "result": {
+        "success": true,
+        "journey": "ARBITRAGE",
+        "persona": "Algo Trader",
+        "markets": [
+          "0x6d61726b65745f31373534363035343432343530000000000000000000000000",
+          "0x6d61726b65745f31373534363035343432343632000000000000000000000000"
+        ],
+        "prices": {
+          "price1Yes": 5000,
+          "price1No": 5000,
+          "price2Yes": 5000,
+          "price2No": 5000
+        },
+        "positions": [],
+        "arbitrageFound": false
+      }
+    },
+    {
+      "persona": "Algo Trader",
+      "scenario": "Yellow card in 45s?",
+      "journeyType": "ALL_IN",
+      "result": {
+        "success": true,
+        "journey": "ALL_IN",
+        "persona": "Algo Trader",
+        "marketId": "0x6d61726b65745f31373534363035343432343836000000000000000000000000",
+        "position": {
+          "id": "position_1754605442508",
+          "marketId": "0x6d61726b65745f31373534363035343432343836000000000000000000000000",
+          "size": 400,
+          "leverage": 200,
+          "side": "NO",
+          "mock": true
+        },
+        "totalExposure": 80000,
+        "outcome": "BUSTED"
+      }
+    }
+  ]
+}

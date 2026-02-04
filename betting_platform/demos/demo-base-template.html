@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM Demo - Base Template</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Header with BOOM branding */
+        .header {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 2px solid #FFD60A;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Bungee', cursive;
+            font-size: 36px;
+            background: linear-gradient(45deg, #FFD60A, #FFA500, #FF6B35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Demo controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            padding: 8px 16px;
+            background: rgba(255, 214, 10, 0.1);
+            border: 1px solid #FFD60A;
+            color: #FFD60A;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 214, 10, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .control-btn.active {
+            background: #FFD60A;
+            color: #0a0a0a;
+        }
+
+        .speed-selector {
+            display: flex;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .speed-btn {
+            padding: 4px 8px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .speed-btn.active {
+            background: #FFD60A;
+            color: #0a0a0a;
+        }
+
+        /* Progress indicator */
+        .progress-bar {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 999;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD60A, #FFA500);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(255, 214, 10, 0.5);
+        }
+
+        .step-indicator {
+            position: fixed;
+            top: 90px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            font-size: 14px;
+            z-index: 998;
+        }
+
+        /* Main content area */
+        .main-content {
+            margin-top: 100px;
+            padding: 20px;
+            min-height: calc(100vh - 100px);
+            position: relative;
+        }
+
+        /* Narrator system */
+        .narrator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(255, 214, 10, 0.95), rgba(255, 165, 0, 0.95));
+            color: #0a0a0a;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(255, 214, 10, 0.3);
+            z-index: 2000;
+            animation: slideIn 0.5s ease;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .narrator.hidden {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+            pointer-events: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .narrator-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .narrator-content {
+            font-size: 16px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .narrator-timer {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Demo screen */
+        .demo-screen {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Chapter navigation */
+        .chapter-nav {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 997;
+            transition: transform 0.3s;
+        }
+
+        .chapter-nav.collapsed {
+            transform: translateX(calc(100% - 40px)) translateY(-50%);
+        }
+
+        .chapter-toggle {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 60px;
+            background: rgba(255, 214, 10, 0.2);
+            border: 1px solid #FFD60A;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #FFD60A;
+        }
+
+        .chapter-list {
+            list-style: none;
+            font-size: 14px;
+        }
+
+        .chapter-item {
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chapter-item:hover {
+            background: rgba(255, 214, 10, 0.1);
+        }
+
+        .chapter-item.active {
+            background: rgba(255, 214, 10, 0.2);
+            border-left: 3px solid #FFD60A;
+        }
+
+        .chapter-item.completed::before {
+            content: '✓';
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        /* Highlighting system */
+        .highlight {
+            position: absolute;
+            border: 2px solid #FFD60A;
+            background: rgba(255, 214, 10, 0.1);
+            border-radius: 8px;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            z-index: 100;
+            animation: highlightPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes highlightPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 214, 10, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 214, 10, 0.8); }
+        }
+
+        /* Arrow pointer */
+        .arrow-pointer {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 20px 10px 0 10px;
+            border-color: #FFD60A transparent transparent transparent;
+            transform-origin: center top;
+            animation: bounce 1s ease-in-out infinite;
+            z-index: 101;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Loading animation */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3000;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 214, 10, 0.3);
+            border-top: 3px solid #FFD60A;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 24px;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .chapter-nav {
+                display: none;
+            }
+
+            .narrator {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+
+        /* Utility classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Demo-specific content area */
+        .demo-content {
+            position: relative;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">BOOM</div>
+        <div class="controls">
+            <button class="control-btn" id="playPauseBtn">⏸ Pause</button>
+            <button class="control-btn" id="restartBtn">↺ Restart</button>
+            <div class="speed-selector">
+                <button class="speed-btn" data-speed="0.5">0.5x</button>
+                <button class="speed-btn active" data-speed="1">1x</button>
+                <button class="speed-btn" data-speed="2">2x</button>
+            </div>
+            <button class="control-btn" id="fullscreenBtn">⛶ Fullscreen</button>
+        </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+        <span id="stepIndicator">Step 1 of 1</span>
+    </div>
+
+    <!-- Chapter navigation -->
+    <div class="chapter-nav" id="chapterNav">
+        <div class="chapter-toggle" onclick="toggleChapterNav()">☰</div>
+        <ul class="chapter-list" id="chapterList">
+            <!-- Chapters will be dynamically added -->
+        </ul>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="demo-screen">
+            <div class="demo-content" id="demoContent">
+                <!-- Demo-specific content will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Narrator -->
+    <div class="narrator hidden" id="narrator">
+        <div class="narrator-timer" id="narratorTimer">5s</div>
+        <div class="narrator-title">
+            <span>💡</span>
+            <span id="narratorTitle">Welcome</span>
+        </div>
+        <div class="narrator-content" id="narratorContent">
+            Initializing demo...
+        </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Highlight overlay -->
+    <div class="highlight hidden" id="highlight"></div>
+
+    <!-- Arrow pointer -->
+    <div class="arrow-pointer hidden" id="arrowPointer"></div>
+
+    <script>
+        // Base Demo Framework
+        class DemoFramework {
+            constructor(config) {
+                this.config = {
+                    title: 'BOOM Demo',
+                    totalSteps: 1,
+                    stepDuration: 8000,
+                    narratorShowTime: 5000,
+                    narratorHideTime: 3000,
+                    speed: 1,
+                    ...config
+                };
+
+                this.currentStep = 0;
+                this.isPlaying = true;
+                this.stepTimer = null;
+                this.narratorTimer = null;
+                this.chapters = [];
+                this.steps = [];
+
+                this.initializeElements();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                this.elements = {
+                    narrator: document.getElementById('narrator'),
+                    narratorTitle: document.getElementById('narratorTitle'),
+                    narratorContent: document.getElementById('narratorContent'),
+                    narratorTimer: document.getElementById('narratorTimer'),
+                    progressBar: document.getElementById('progressBar'),
+                    stepIndicator: document.getElementById('stepIndicator'),
+                    demoContent: document.getElementById('demoContent'),
+                    playPauseBtn: document.getElementById('playPauseBtn'),
+                    restartBtn: document.getElementById('restartBtn'),
+                    fullscreenBtn: document.getElementById('fullscreenBtn'),
+                    chapterList: document.getElementById('chapterList'),
+                    highlight: document.getElementById('highlight'),
+                    arrowPointer: document.getElementById('arrowPointer'),
+                    loading: document.getElementById('loading')
+                };
+            }
+
+            bindEvents() {
+                this.elements.playPauseBtn.addEventListener('click', () => this.togglePlayPause());
+                this.elements.restartBtn.addEventListener('click', () => this.restart());
+                this.elements.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
+
+                // Speed controls
+                document.querySelectorAll('.speed-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.config.speed = parseFloat(e.target.dataset.speed);
+                    });
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    switch(e.key) {
+                        case ' ':
+                            e.preventDefault();
+                            this.togglePlayPause();
+                            break;
+                        case 'ArrowRight':
+                            this.nextStep();
+                            break;
+                        case 'ArrowLeft':
+                            this.previousStep();
+                            break;
+                        case 'r':
+                            this.restart();
+                            break;
+                        case 'f':
+                            this.toggleFullscreen();
+                            break;
+                    }
+                });
+            }
+
+            // Core demo control methods
+            start() {
+                document.title = this.config.title;
+                this.buildChapters();
+                this.currentStep = 0;
+                this.isPlaying = true;
+                this.runStep();
+            }
+
+            runStep() {
+                if (this.currentStep >= this.steps.length) {
+                    this.complete();
+                    return;
+                }
+
+                const step = this.steps[this.currentStep];
+                
+                // Update UI
+                this.updateProgress();
+                this.updateStepIndicator();
+                this.updateChapterHighlight();
+
+                // Execute step
+                if (step.setup) {
+                    step.setup.call(this);
+                }
+
+                // Show narrator
+                this.showNarrator(step.title || `Step ${this.currentStep + 1}`, step.content || '');
+
+                // Handle step actions
+                if (step.action) {
+                    setTimeout(() => {
+                        step.action.call(this);
+                    }, this.config.narratorShowTime / this.config.speed);
+                }
+
+                // Schedule next step
+                if (this.isPlaying) {
+                    const duration = (step.duration || this.config.stepDuration) / this.config.speed;
+                    this.stepTimer = setTimeout(() => {
+                        this.currentStep++;
+                        this.runStep();
+                    }, duration);
+                }
+            }
+
+            showNarrator(title, content) {
+                this.elements.narratorTitle.textContent = title;
+                this.elements.narratorContent.innerHTML = content;
+                this.elements.narrator.classList.remove('hidden');
+
+                // Narrator countdown timer
+                let timeLeft = Math.floor(this.config.narratorShowTime / this.config.speed / 1000);
+                this.elements.narratorTimer.textContent = `${timeLeft}s`;
+                
+                const updateTimer = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeft > 0) {
+                        this.elements.narratorTimer.textContent = `${timeLeft}s`;
+                    } else {
+                        clearInterval(updateTimer);
+                    }
+                }, 1000);
+
+                // Hide narrator after show time
+                clearTimeout(this.narratorTimer);
+                this.narratorTimer = setTimeout(() => {
+                    this.hideNarrator();
+                    clearInterval(updateTimer);
+                }, this.config.narratorShowTime / this.config.speed);
+            }
+
+            hideNarrator() {
+                this.elements.narrator.classList.add('hidden');
+                
+                // Show narrator again after hide time
+                if (this.isPlaying) {
+                    setTimeout(() => {
+                        if (this.currentStep < this.steps.length && this.isPlaying) {
+                            this.elements.narrator.classList.remove('hidden');
+                        }
+                    }, this.config.narratorHideTime / this.config.speed);
+                }
+            }
+
+            highlight(selector, offsetX = 0, offsetY = 0) {
+                const element = document.querySelector(selector);
+                if (!element) return;
+
+                const rect = element.getBoundingClientRect();
+                const highlight = this.elements.highlight;
+                
+                highlight.style.left = `${rect.left - 5 + offsetX}px`;
+                highlight.style.top = `${rect.top - 5 + offsetY}px`;
+                highlight.style.width = `${rect.width + 10}px`;
+                highlight.style.height = `${rect.height + 10}px`;
+                highlight.classList.remove('hidden');
+
+                setTimeout(() => {
+                    highlight.classList.add('hidden');
+                }, 3000 / this.config.speed);
+            }
+
+            pointTo(selector, offsetX = 0, offsetY = 0) {
+                const element = document.querySelector(selector);
+                if (!element) return;
+
+                const rect = element.getBoundingClientRect();
+                const arrow = this.elements.arrowPointer;
+                
+                arrow.style.left = `${rect.left + rect.width / 2 + offsetX}px`;
+                arrow.style.top = `${rect.top - 30 + offsetY}px`;
+                arrow.classList.remove('hidden');
+
+                setTimeout(() => {
+                    arrow.classList.add('hidden');
+                }, 3000 / this.config.speed);
+            }
+
+            showLoading(duration = 1000) {
+                this.elements.loading.classList.add('active');
+                setTimeout(() => {
+                    this.elements.loading.classList.remove('active');
+                }, duration / this.config.speed);
+            }
+
+            updateProgress() {
+                const progress = ((this.currentStep + 1) / this.steps.length) * 100;
+                this.elements.progressBar.style.width = `${progress}%`;
+            }
+
+            updateStepIndicator() {
+                this.elements.stepIndicator.textContent = `Step ${this.currentStep + 1} of ${this.steps.length}`;
+            }
+
+            updateChapterHighlight() {
+                // Find current chapter
+                let currentChapter = 0;
+                let stepCount = 0;
+                
+                for (let i = 0; i < this.chapters.length; i++) {
+                    stepCount += this.chapters[i].steps;
+                    if (this.currentStep < stepCount) {
+                        currentChapter = i;
+                        break;
+                    }
+                }
+
+                // Update chapter list
+                document.querySelectorAll('.chapter-item').forEach((item, index) => {
+                    item.classList.remove('active');
+                    if (index < currentChapter) {
+                        item.classList.add('completed');
+                    }
+                    if (index === currentChapter) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            buildChapters() {
+                this.elements.chapterList.innerHTML = '';
+                this.chapters.forEach((chapter, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'chapter-item';
+                    li.textContent = chapter.title;
+                    li.onclick = () => this.jumpToChapter(index);
+                    this.elements.chapterList.appendChild(li);
+                });
+            }
+
+            jumpToChapter(chapterIndex) {
+                let targetStep = 0;
+                for (let i = 0; i < chapterIndex; i++) {
+                    targetStep += this.chapters[i].steps;
+                }
+                this.currentStep = targetStep;
+                clearTimeout(this.stepTimer);
+                clearTimeout(this.narratorTimer);
+                this.runStep();
+            }
+
+            togglePlayPause() {
+                this.isPlaying = !this.isPlaying;
+                this.elements.playPauseBtn.innerHTML = this.isPlaying ? '⏸ Pause' : '▶ Play';
+                
+                if (this.isPlaying) {
+                    this.runStep();
+                } else {
+                    clearTimeout(this.stepTimer);
+                    clearTimeout(this.narratorTimer);
+                }
+            }
+
+            nextStep() {
+                if (this.currentStep < this.steps.length - 1) {
+                    clearTimeout(this.stepTimer);
+                    clearTimeout(this.narratorTimer);
+                    this.currentStep++;
+                    this.runStep();
+                }
+            }
+
+            previousStep() {
+                if (this.currentStep > 0) {
+                    clearTimeout(this.stepTimer);
+                    clearTimeout(this.narratorTimer);
+                    this.currentStep--;
+                    this.runStep();
+                }
+            }
+
+            restart() {
+                clearTimeout(this.stepTimer);
+                clearTimeout(this.narratorTimer);
+                this.currentStep = 0;
+                this.isPlaying = true;
+                this.elements.playPauseBtn.innerHTML = '⏸ Pause';
+                this.runStep();
+            }
+
+            toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+
+            complete() {
+                this.showNarrator('Demo Complete!', 
+                    'Thank you for watching this BOOM platform demonstration. ' +
+                    'You can restart the demo or explore other features.');
+                this.isPlaying = false;
+                this.elements.playPauseBtn.innerHTML = '▶ Play';
+            }
+
+            // Utility methods for demos
+            createElement(tag, className, innerHTML = '') {
+                const element = document.createElement(tag);
+                if (className) element.className = className;
+                if (innerHTML) element.innerHTML = innerHTML;
+                return element;
+            }
+
+            async simulateTyping(element, text, speed = 50) {
+                element.textContent = '';
+                for (let i = 0; i < text.length; i++) {
+                    element.textContent += text[i];
+                    await new Promise(resolve => setTimeout(resolve, speed / this.config.speed));
+                }
+            }
+
+            animateNumber(element, start, end, duration = 1000) {
+                const startTime = Date.now();
+                const animate = () => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / (duration / this.config.speed), 1);
+                    const current = start + (end - start) * progress;
+                    element.textContent = Math.floor(current).toLocaleString();
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+                animate();
+            }
+        }
+
+        // Chapter navigation toggle
+        function toggleChapterNav() {
+            const nav = document.getElementById('chapterNav');
+            nav.classList.toggle('collapsed');
+        }
+
+        // Export for use in specific demos
+        window.DemoFramework = DemoFramework;
+
+        // Initialize placeholder demo
+        const placeholderDemo = new DemoFramework({
+            title: 'BOOM Demo - Base Template',
+            totalSteps: 3
+        });
+
+        placeholderDemo.chapters = [
+            { title: 'Introduction', steps: 1 },
+            { title: 'Main Content', steps: 1 },
+            { title: 'Conclusion', steps: 1 }
+        ];
+
+        placeholderDemo.steps = [
+            {
+                title: 'Welcome to BOOM',
+                content: 'This is the base template for all BOOM platform demos. Each specific demo will extend this framework with detailed content and interactions.',
+                action: function() {
+                    this.elements.demoContent.innerHTML = `
+                        <div class="fade-in" style="text-align: center; padding: 100px 20px;">
+                            <h1 style="font-size: 48px; margin-bottom: 20px; color: #FFD60A;">BOOM Platform</h1>
+                            <p style="font-size: 20px; color: #888;">Base Demo Template</p>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: 'Framework Features',
+                content: 'This framework includes automated narration, step progression, chapter navigation, highlighting, and many other features for creating comprehensive demos.',
+                action: function() {
+                    this.elements.demoContent.innerHTML = `
+                        <div class="slide-up" style="padding: 40px;">
+                            <h2 style="color: #FFD60A; margin-bottom: 20px;">Framework Features</h2>
+                            <ul style="list-style: none; font-size: 18px; line-height: 2;">
+                                <li>✓ Automated narration system</li>
+                                <li>✓ Step-by-step progression</li>
+                                <li>✓ Chapter navigation</li>
+                                <li>✓ Highlighting and pointers</li>
+                                <li>✓ Speed controls</li>
+                                <li>✓ Keyboard shortcuts</li>
+                                <li>✓ Responsive design</li>
+                            </ul>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: 'Ready for Extension',
+                content: 'Each specific demo will build upon this template to create detailed, automated presentations of BOOM platform features.',
+                action: function() {
+                    this.elements.demoContent.innerHTML = `
+                        <div class="fade-in" style="text-align: center; padding: 100px 20px;">
+                            <h2 style="color: #FFD60A; margin-bottom: 20px;">Ready for Extension</h2>
+                            <p style="font-size: 18px; color: #888;">This template is ready to be extended with specific demo content.</p>
+                        </div>
+                    `;
+                }
+            }
+        ];
+
+        // Start placeholder demo
+        placeholderDemo.start();
+    </script>
+</body>
+</html>

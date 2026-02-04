@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM - Complete Platform Demo</title>
+    
+    <style>
+        /* John Ive Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Main App Container */
+        .app-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 360px;
+            min-height: 100vh;
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Left Panel */
+        .left-panel {
+            background: #080808;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rubik+Mono+One&family=Bungee&display=swap');
+        
+        .logo {
+            font-family: 'Bungee', 'Rubik Mono One', 'Bebas Neue', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #FFD60A, #FFA500, #FF6B35, #FFD60A);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+            text-shadow: 0 0 30px rgba(255, 214, 10, 0.5);
+            transform: perspective(100px) rotateX(-5deg);
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .logo::after {
+            content: '💥';
+            margin-left: 8px;
+            font-size: 36px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Wallet Section */
+        .wallet-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .wallet-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .wallet-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #FF3B30;
+            transition: all 0.3s;
+        }
+
+        .wallet-indicator.connected {
+            background: #4CD964;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .wallet-address {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 8px;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .balance-amount {
+            font-size: 24px;
+            font-weight: 300;
+            transition: all 0.3s;
+        }
+
+        .chain-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .solana-badge {
+            background: linear-gradient(135deg, #14F195 0%, #9945FF 100%);
+        }
+
+        .polygon-badge {
+            background: linear-gradient(135deg, #8247E5 0%, #6038D0 100%);
+        }
+
+        /* Main Panel */
+        .main-panel {
+            background: #0A0A0A;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Market Header */
+        .market-header {
+            padding: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%);
+        }
+
+        .market-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        /* Right Panel - Positions */
+        .right-panel {
+            background: #080808;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Demo Narrator */
+        .demo-narrator {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 800px;
+            background: linear-gradient(135deg, #FFD60A, #FFA500, #FF6B35);
+            color: #000;
+            padding: 24px;
+            border-radius: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(255, 214, 10, 0.5), 0 0 100px rgba(255, 165, 0, 0.3);
+            z-index: 1000;
+            animation: slideUp 0.5s ease-out, glow 2s ease-in-out infinite;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 20px 60px rgba(255, 214, 10, 0.5), 0 0 100px rgba(255, 165, 0, 0.3); }
+            50% { box-shadow: 0 20px 80px rgba(255, 214, 10, 0.7), 0 0 120px rgba(255, 165, 0, 0.5); }
+        }
+
+        .demo-narrator.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) translateY(20px);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .narrator-step {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        .narrator-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .narrator-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .narrator-progress {
+            height: 4px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .narrator-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD60A, #FFA500, #FF6B35);
+            border-radius: 2px;
+            transition: width 0.3s;
+            box-shadow: 0 0 10px rgba(255, 214, 10, 0.5);
+        }
+
+        /* Bridge Animation */
+        .bridge-visual {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 200px;
+            display: none;
+        }
+
+        .bridge-visual.active {
+            display: block;
+        }
+
+        .bridge-path {
+            stroke: #FFD60A;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawPath 3s ease-out forwards;
+        }
+
+        @keyframes drawPath {
+            to { stroke-dashoffset: 0; }
+        }
+
+        .bridge-dot {
+            width: 20px;
+            height: 20px;
+            background: #FFD60A;
+            border-radius: 50%;
+            position: absolute;
+            animation: moveDot 3s ease-out forwards;
+        }
+
+        @keyframes moveDot {
+            0% { left: 50px; }
+            100% { left: 530px; }
+        }
+
+        /* Flash Timer */
+        .flash-timer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            display: none;
+        }
+
+        .flash-timer.active {
+            display: block;
+            animation: zoomIn 0.5s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .timer-circle {
+            fill: none;
+            stroke: #FFD60A;
+            stroke-width: 8;
+            stroke-dasharray: 565;
+            stroke-dashoffset: 0;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: 700;
+            color: #FFD60A;
+        }
+
+        /* Quantum Correlation Matrix */
+        .quantum-matrix {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 20px;
+            background: rgba(123, 63, 242, 0.05);
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .correlation-cell {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(123, 63, 242, 0.3);
+            transition: all 0.3s;
+        }
+
+        .correlation-cell.active {
+            background: rgba(123, 63, 242, 0.2);
+            border-color: #7B3FF2;
+            transform: scale(1.05);
+        }
+
+        /* Verse Tree */
+        .verse-tree {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .verse-node {
+            padding: 12px;
+            margin: 4px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .verse-node.level-1 { margin-left: 0; }
+        .verse-node.level-2 { margin-left: 30px; }
+        .verse-node.level-3 { margin-left: 60px; }
+        .verse-node.level-4 { margin-left: 90px; }
+
+        .verse-node.active {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: #FFD60A;
+        }
+
+        /* Order Types Panel */
+        .order-types-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .order-type-card {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .order-type-card.active {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: #FFD60A;
+            transform: translateY(-4px);
+        }
+
+        .order-type-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .order-type-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .order-type-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Leverage Display */
+        .leverage-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: none;
+        }
+
+        .leverage-display.active {
+            display: block;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from { transform: translate(-50%, -50%) scale(0); }
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .leverage-number {
+            font-size: 120px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #4CD964 0%, #FFD60A 50%, #FF3B30 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+
+        /* Highlight Effect */
+        .highlight {
+            position: relative;
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 214, 10, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 214, 10, 0.8); }
+        }
+
+        /* Position Item */
+        .position-item {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            opacity: 0;
+            transform: translateX(50px);
+            animation: slideInRight 0.5s forwards;
+        }
+
+        @keyframes slideInRight {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .position-pnl {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .position-pnl.positive {
+            color: #4CD964;
+        }
+
+        .position-pnl.negative {
+            color: #FF3B30;
+        }
+
+        /* Market Card */
+        .outcome-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .outcome-card.highlighted {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: #FFD60A;
+            transform: scale(1.02);
+        }
+
+        /* Markets Grid */
+        .markets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .market-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .market-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(255, 214, 10, 0.3);
+        }
+
+        .market-card.selected {
+            background: linear-gradient(135deg, rgba(255, 214, 10, 0.1), rgba(255, 165, 0, 0.1));
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+        }
+
+        .market-card.selected::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #FFD60A, #FFA500, #FF6B35, #FFD60A);
+            border-radius: 12px;
+            z-index: -1;
+            animation: borderRotate 3s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .market-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .market-card-odds {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .market-card-volume {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .market-card-platform {
+            font-size: 11px;
+            color: #FFD60A;
+            margin-top: 8px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main App -->
+    <div class="app-container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <div class="logo">BOOM</div>
+            </div>
+            
+            <div class="wallet-section" id="wallet-section">
+                <div class="wallet-card">
+                    <div class="wallet-status">
+                        <div class="wallet-indicator" id="wallet-indicator"></div>
+                        <span id="wallet-status-text">Disconnected</span>
+                        <span class="chain-badge solana-badge" id="chain-badge" style="display: none;">SOLANA</span>
+                    </div>
+                    <div class="wallet-address" id="wallet-address"></div>
+                    <div class="balance-display">
+                        <div class="balance-amount" id="balance">0 SOL</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market List -->
+            <div style="padding: 20px;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255, 255, 255, 0.4); margin-bottom: 16px;">AGGREGATED MARKETS</div>
+                <div id="market-list"></div>
+            </div>
+        </div>
+
+        <!-- Main Panel -->
+        <div class="main-panel">
+            <div class="market-header">
+                <div class="market-title" id="market-title">Welcome to Multiverse</div>
+                <div id="market-info" style="margin-top: 16px;"></div>
+            </div>
+            
+            <div class="market-content" id="main-content" style="padding: 32px;">
+                <!-- Bridge Visual -->
+                <div class="bridge-visual" id="bridge-visual">
+                    <svg width="600" height="200">
+                        <path class="bridge-path" d="M 50 100 Q 300 50 550 100" />
+                    </svg>
+                    <div class="bridge-dot"></div>
+                    <div style="position: absolute; left: 30px; top: 120px; text-align: center;">
+                        <div style="font-size: 20px;">🟣</div>
+                        <div style="font-size: 14px; margin-top: 4px;">Solana</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Your Wallet</div>
+                    </div>
+                    <div style="position: absolute; left: 270px; top: 20px; text-align: center;">
+                        <div style="font-size: 16px; color: #FFD60A;">Wormhole Bridge</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Cross-chain Transfer</div>
+                    </div>
+                    <div style="position: absolute; right: 30px; top: 120px; text-align: center;">
+                        <div style="font-size: 20px;">🟪</div>
+                        <div style="font-size: 14px; margin-top: 4px;">Polygon</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Polymarket</div>
+                    </div>
+                </div>
+
+                <!-- Flash Timer -->
+                <div class="flash-timer" id="flash-timer">
+                    <svg width="200" height="200">
+                        <circle class="timer-circle" cx="100" cy="100" r="90" id="timer-circle"/>
+                    </svg>
+                    <div class="timer-text" id="timer-text">30</div>
+                </div>
+
+                <!-- Leverage Display -->
+                <div class="leverage-display" id="leverage-display">
+                    <div class="leverage-number" id="leverage-number">1x</div>
+                    <div style="font-size: 24px; font-weight: 600; color: rgba(255, 255, 255, 0.8);">EFFECTIVE LEVERAGE</div>
+                </div>
+
+                <!-- Dynamic Content Area -->
+                <div id="dynamic-content"></div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Positions -->
+        <div class="right-panel">
+            <div class="panel-header">
+                <div style="font-size: 16px; font-weight: 600;">Portfolio</div>
+                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 4px;">Total P&L: <span id="total-pnl" style="color: #4CD964;">+0 SOL</span></div>
+            </div>
+            
+            <div style="padding: 20px; overflow-y: auto;" id="positions-list">
+                <!-- Positions will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Narrator -->
+    <div class="demo-narrator" id="narrator">
+        <div class="narrator-step" id="narrator-step">STEP 1 OF 35</div>
+        <div class="narrator-title" id="narrator-title">Welcome to BOOM</div>
+        <div class="narrator-text" id="narrator-text">
+            The ultimate betting aggregator platform. We connect you to Polymarket, DraftKings, FanDuel, and more - finding the best odds and routing your bets. Let's start the complete platform tour!
+        </div>
+        <div class="narrator-progress">
+            <div class="narrator-progress-bar" id="progress-bar" style="width: 0%;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Demo Steps
+        const demoSteps = [
+            {
+                step: 1,
+                title: "Welcome to BOOM",
+                text: "The ultimate betting aggregator platform. We connect you to Polymarket, DraftKings, FanDuel, and more - finding the best odds and routing your bets. We NEVER hold your funds - everything goes directly to the platforms. Let's start!",
+                action: () => {
+                    document.getElementById('market-title').innerHTML = '<span style="font-family: \'Bungee\', sans-serif; font-size: 42px;">Welcome to BOOM 💥</span>';
+                }
+            },
+            {
+                step: 2,
+                title: "Connecting Phantom Wallet (Solana)",
+                text: "First, let's connect your Phantom wallet. Phantom is the leading Solana wallet. Why Solana? It's fast (400ms blocks), cheap ($0.00025 per transaction), and bridges easily to other chains. Watch as we connect...",
+                action: () => {
+                    document.getElementById('wallet-section').classList.add('highlight');
+                    setTimeout(() => {
+                        document.getElementById('wallet-indicator').classList.add('connected');
+                        document.getElementById('wallet-status-text').textContent = 'Connected';
+                        document.getElementById('chain-badge').style.display = 'inline-block';
+                        document.getElementById('wallet-address').textContent = '7xKXt...9PsW8';
+                        animateSOLBalance(0, 125.5, 2000);
+                    }, 2000);
+                }
+            },
+            {
+                step: 3,
+                title: "Cross-Chain Money Routing to Polygon",
+                text: "Polymarket runs on Polygon. Watch as we bridge your SOL to USDC on Polygon using Wormhole. Your 125 SOL becomes ~$15,000 USDC on Polygon. This happens automatically when you bet on Polymarket through us!",
+                action: () => {
+                    document.getElementById('wallet-section').classList.remove('highlight');
+                    document.getElementById('market-title').textContent = '🌉 Bridging SOL → Polygon';
+                    document.getElementById('bridge-visual').classList.add('active');
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: flex; gap: 40px; align-items: center;">
+                            <div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">From (Solana)</div>
+                                <div style="font-size: 24px;">125 SOL</div>
+                            </div>
+                            <div style="font-size: 24px;">→</div>
+                            <div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">To (Polygon)</div>
+                                <div style="font-size: 24px; color: #FFD60A;">15,000 USDC</div>
+                            </div>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        document.getElementById('chain-badge').className = 'chain-badge polygon-badge';
+                        document.getElementById('chain-badge').textContent = 'POLYGON';
+                    }, 3000);
+                }
+            },
+            {
+                step: 4,
+                title: "Polymarket Markets - Choose Your Bet",
+                text: "Now on Polygon! Here are live Polymarket markets. Over 500+ active markets with $2B+ in volume. Click on 'US Recession Q4' to dive deeper. All bets go DIRECTLY to Polymarket's smart contracts!",
+                action: () => {
+                    document.getElementById('bridge-visual').classList.remove('active');
+                    document.getElementById('market-title').textContent = '📊 Live Polymarket Markets';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin-bottom: 16px;">Select a market to view details • All prices live from Polymarket</div>
+                    `;
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div class="markets-grid">
+                            <div class="market-card selected" onclick="selectMarket(this)">
+                                <div class="market-card-title">Will US enter recession Q4?</div>
+                                <div class="market-card-odds">
+                                    <span style="color: #FF3B30;">YES 42%</span>
+                                    <span style="color: #4CD964;">NO 58%</span>
+                                </div>
+                                <div class="market-card-volume">Volume: $127M</div>
+                                <div class="market-card-platform">Polymarket</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">Bitcoin above $150k by 2025?</div>
+                                <div class="market-card-odds">
+                                    <span>YES 65%</span>
+                                    <span>NO 35%</span>
+                                </div>
+                                <div class="market-card-volume">Volume: $89M</div>
+                                <div class="market-card-platform">Polymarket</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">SpaceX Mars landing 2026?</div>
+                                <div class="market-card-odds">
+                                    <span>YES 31%</span>
+                                    <span>NO 69%</span>
+                                </div>
+                                <div class="market-card-volume">Volume: $43M</div>
+                                <div class="market-card-platform">Polymarket</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">AI beats human at math olympiad?</div>
+                                <div class="market-card-odds">
+                                    <span>YES 78%</span>
+                                    <span>NO 22%</span>
+                                </div>
+                                <div class="market-card-volume">Volume: $21M</div>
+                                <div class="market-card-platform">Polymarket</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">Fed cuts rates 3+ times?</div>
+                                <div class="market-card-odds">
+                                    <span>YES 71%</span>
+                                    <span>NO 29%</span>
+                                </div>
+                                <div class="market-card-volume">Volume: $67M</div>
+                                <div class="market-card-platform">Polymarket</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">Taylor Swift announces retirement?</div>
+                                <div class="market-card-odds">
+                                    <span>YES 3%</span>
+                                    <span>NO 97%</span>
+                                </div>
+                                <div class="market-card-volume">Volume: $8.2M</div>
+                                <div class="market-card-platform">Polymarket</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">China GDP growth >5%?</div>
+                                <div class="market-card-odds">
+                                    <span>YES 44%</span>
+                                    <span>NO 56%</span>
+                                </div>
+                                <div class="market-card-volume">Volume: $31M</div>
+                                <div class="market-card-platform">Polymarket</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">Newsom wins CA governor?</div>
+                                <div class="market-card-odds">
+                                    <span>YES 61%</span>
+                                    <span>NO 39%</span>
+                                </div>
+                                <div class="market-card-volume">Volume: $18M</div>
+                                <div class="market-card-platform">Polymarket</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">Apple releases AR glasses?</div>
+                                <div class="market-card-odds">
+                                    <span>YES 82%</span>
+                                    <span>NO 18%</span>
+                                </div>
+                                <div class="market-card-volume">Volume: $55M</div>
+                                <div class="market-card-platform">Polymarket</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(255, 214, 10, 0.1); border-radius: 8px; text-align: center;">
+                            📍 Selected: US Recession Q4 • Contract: 0x4D97...3e2B • Click to trade
+                        </div>
+                    `;
+                    addMarketToList('US Recession Q4', '42%', 'Polymarket');
+                }
+            },
+            {
+                step: 5,
+                title: "Quantum Positions - Economic Correlations",
+                text: "QUANTUM EXAMPLE 1: Your single bet spreads across correlated markets. Betting $1000 on 'US Recession'? It automatically splits: 40% to 'Fed Rate Cuts', 30% to 'Unemployment >5%', 30% to 'S&P500 <4000'. All on Polymarket! One position, multiple outcomes.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🔮 Quantum: Economic Correlation';
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div class="quantum-matrix">
+                            <div class="correlation-cell active">
+                                <div style="font-size: 18px; margin-bottom: 4px;">US Recession</div>
+                                <div style="font-size: 24px; color: #FFD60A;">42%</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">$400 allocated</div>
+                            </div>
+                            <div class="correlation-cell active">
+                                <div style="font-size: 18px; margin-bottom: 4px;">Fed Cuts Rates</div>
+                                <div style="font-size: 24px; color: #00D4FF;">78%</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">$300 allocated</div>
+                            </div>
+                            <div class="correlation-cell active">
+                                <div style="font-size: 18px; margin-bottom: 4px;">Unemployment >5%</div>
+                                <div style="font-size: 24px; color: #7B3FF2;">31%</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">$300 allocated</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; text-align: center; color: #FFD60A;">
+                            Correlation Score: 0.87 • Expected Return: +45% if any 2 hit
+                        </div>
+                    `;
+                    addPosition('Quantum: Econ Crisis', 'MULTI', '1,000 USDC', 'ACTIVE');
+                }
+            },
+            {
+                step: 6,
+                title: "Quantum Positions - Tech Market Correlations",
+                text: "QUANTUM EXAMPLE 2: Tech sector correlation. Bet $2000 on 'AI market cap >$5T by 2026'. Auto-splits: 35% 'NVIDIA >$2T', 35% 'OpenAI IPO >$200B', 30% 'Google AI revenue >$100B'. Higher correlation = higher potential return. All markets from Polymarket!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🔮 Quantum: Tech Correlation';
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div class="quantum-matrix">
+                            <div class="correlation-cell active">
+                                <div style="font-size: 18px; margin-bottom: 4px;">AI Market >$5T</div>
+                                <div style="font-size: 24px; color: #4CD964;">67%</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">$700 allocated</div>
+                            </div>
+                            <div class="correlation-cell active">
+                                <div style="font-size: 18px; margin-bottom: 4px;">NVIDIA >$2T</div>
+                                <div style="font-size: 24px; color: #FFD60A;">71%</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">$700 allocated</div>
+                            </div>
+                            <div class="correlation-cell active">
+                                <div style="font-size: 18px; margin-bottom: 4px;">OpenAI IPO >$200B</div>
+                                <div style="font-size: 24px; color: #00D4FF;">55%</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">$600 allocated</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; text-align: center; color: #4CD964;">
+                            Correlation Score: 0.92 • Expected Return: +65% if all hit
+                        </div>
+                    `;
+                    addPosition('Quantum: AI Boom', 'MULTI', '2,000 USDC', 'ACTIVE');
+                }
+            },
+            {
+                step: 7,
+                title: "Verse Hierarchy - Political Markets",
+                text: "VERSE EXAMPLE 1: Political hierarchy on Polymarket. 'Global Politics 2025' (root) → 'US Politics' → 'State Elections' → 'California Governor'. Deeper levels = higher bonuses. Bet at root? Spreads across 156 markets. Bet on specific race? +30% depth bonus!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🌳 Verse: Political Hierarchy';
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div class="verse-tree">
+                            <div class="verse-node level-1 active">
+                                🌍 Global Politics 2025
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">156 markets • $189M volume • Base odds</div>
+                            </div>
+                            <div class="verse-node level-2 active">
+                                🇺🇸 US Politics
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">87 markets • $112M volume • +10% bonus</div>
+                            </div>
+                            <div class="verse-node level-3 active">
+                                📊 State Elections
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">52 markets • $67M volume • +20% bonus</div>
+                            </div>
+                            <div class="verse-node level-4 active">
+                                🌴 California Governor
+                                <div style="font-size: 12px; color: #FFD60A;">Newsom 61% • $31M volume • +30% bonus</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(123, 63, 242, 0.1); border-radius: 8px;">
+                            💡 Betting $1000 at California level auto-splits across all CA races with +20% bonus on winnings!
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 8,
+                title: "Verse Hierarchy - Science & Climate",
+                text: "VERSE EXAMPLE 2: Science hierarchy. 'Global Science 2025' → 'Climate Tech' → 'Carbon Capture' → 'DAC <$100/ton'. Each level focuses your bet more. Root = diversified across all science. Specific = concentrated with +40% bonus. All on Polymarket!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🌳 Verse: Science Hierarchy';
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div class="verse-tree">
+                            <div class="verse-node level-1">
+                                🔬 Global Science 2025
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">89 markets • $76M volume • Base odds</div>
+                            </div>
+                            <div class="verse-node level-2">
+                                🌡️ Climate Tech
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">41 markets • $43M volume • +10% bonus</div>
+                            </div>
+                            <div class="verse-node level-3">
+                                💨 Carbon Capture
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">18 markets • $21M volume • +25% bonus</div>
+                            </div>
+                            <div class="verse-node level-4 active">
+                                ⚡ DAC <$100/ton by 2026
+                                <div style="font-size: 12px; color: #4CD964;">YES 34% • $8.2M volume • +40% bonus</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(76, 217, 100, 0.1); border-radius: 8px;">
+                            📍 All markets live on Polymarket. We just organize them hierarchically for better discovery!
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 9,
+                title: "Flash Betting - Live Sports Markets",
+                text: "Now entering FLASH BETTING! These are live games happening RIGHT NOW across multiple sports. Unlike Polymarket's long-term markets, these resolve in hours or minutes. Pick Lakers vs Celtics to see real-time action!",
+                action: () => {
+                    document.getElementById('dynamic-content').innerHTML = '';
+                    document.getElementById('market-title').textContent = '⚡ Live Flash Markets';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin-bottom: 16px;">Games happening NOW • Real-time odds from multiple sportsbooks</div>
+                    `;
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div class="markets-grid">
+                            <div class="market-card selected">
+                                <div class="market-card-title">🏀 Lakers vs Celtics</div>
+                                <div class="market-card-odds">
+                                    <span style="color: #FFD60A;">LAL 45%</span>
+                                    <span style="color: #4CD964;">BOS 55%</span>
+                                </div>
+                                <div class="market-card-volume">Time: 1:58:00</div>
+                                <div class="market-card-platform">DraftKings</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">🏈 Chiefs vs Bills</div>
+                                <div class="market-card-odds">
+                                    <span>KC 62%</span>
+                                    <span>BUF 38%</span>
+                                </div>
+                                <div class="market-card-volume">Q3 - 8:45</div>
+                                <div class="market-card-platform">FanDuel</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">⚽ Man City vs Liverpool</div>
+                                <div class="market-card-odds">
+                                    <span>MCI 51%</span>
+                                    <span>LIV 49%</span>
+                                </div>
+                                <div class="market-card-volume">89th min</div>
+                                <div class="market-card-platform">BetMGM</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">🎾 Djokovic vs Alcaraz</div>
+                                <div class="market-card-odds">
+                                    <span>DJO 58%</span>
+                                    <span>ALC 42%</span>
+                                </div>
+                                <div class="market-card-volume">Set 3</div>
+                                <div class="market-card-platform">Caesars</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">⚾ Yankees vs Dodgers</div>
+                                <div class="market-card-odds">
+                                    <span>NYY 47%</span>
+                                    <span>LAD 53%</span>
+                                </div>
+                                <div class="market-card-volume">Bottom 7th</div>
+                                <div class="market-card-platform">DraftKings</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">🏀 Warriors vs Nets</div>
+                                <div class="market-card-odds">
+                                    <span>GSW 71%</span>
+                                    <span>BKN 29%</span>
+                                </div>
+                                <div class="market-card-volume">Q4 - 2:15</div>
+                                <div class="market-card-platform">FanDuel</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">🏒 Rangers vs Bruins</div>
+                                <div class="market-card-odds">
+                                    <span>NYR 44%</span>
+                                    <span>BOS 56%</span>
+                                </div>
+                                <div class="market-card-volume">Period 3</div>
+                                <div class="market-card-platform">BetMGM</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">🏈 49ers vs Cowboys</div>
+                                <div class="market-card-odds">
+                                    <span>SF 68%</span>
+                                    <span>DAL 32%</span>
+                                </div>
+                                <div class="market-card-volume">Q2 - 5:22</div>
+                                <div class="market-card-platform">DraftKings</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">⚽ Real Madrid vs Barcelona</div>
+                                <div class="market-card-odds">
+                                    <span>RMA 52%</span>
+                                    <span>FCB 48%</span>
+                                </div>
+                                <div class="market-card-volume">45th min</div>
+                                <div class="market-card-platform">FanDuel</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(255, 214, 10, 0.1); border-radius: 8px; text-align: center;">
+                            ⚡ Selected: Lakers vs Celtics • Updates every second • Click to bet
+                        </div>
+                    `;
+                    addMarketToList('🏀 LAL vs BOS', '2 hours', 'DraftKings');
+                }
+            },
+            {
+                step: 10,
+                title: "Flash Betting - 15 Minute NFL Quarter",
+                text: "Shorter flash bet: 'Chiefs score in Q4?' (15 minutes left). This is where flash betting shines - quick resolution, high action. Odds change rapidly based on field position. Market from FanDuel, updated in real-time!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '⚡ Flash: Chiefs TD in Q4 (15min)';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: flex; gap: 40px;">
+                            <div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">YES - Score TD</div>
+                                <div style="font-size: 32px; color: #FF3B30;">68%</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">NO - No TD</div>
+                                <div style="font-size: 32px;">32%</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Time Left</div>
+                                <div style="font-size: 32px; color: #FFD60A;">14:47</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(255, 59, 48, 0.1); border-radius: 8px;">
+                            🏈 Chiefs on opponent's 35-yard line • High scoring probability!
+                        </div>
+                    `;
+                    addMarketToList('🏈 Chiefs Q4 TD', '15 min', 'FanDuel');
+                }
+            },
+            {
+                step: 11,
+                title: "Flash Betting - 60 Second Tennis Point",
+                text: "Even shorter: 'Djokovic wins next point?' (60 seconds). Tennis points average 20-30 seconds. Perfect for flash betting! Odds shift with each serve. Market from BetMGM with sub-second updates.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '⚡ Flash: Djokovic Next Point (60s)';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: flex; gap: 40px;">
+                            <div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Djokovic Wins</div>
+                                <div style="font-size: 32px; color: #4CD964;">62%</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Alcaraz Wins</div>
+                                <div style="font-size: 32px;">38%</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Serving</div>
+                                <div style="font-size: 32px; color: #FFD60A;">Djokovic</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px;">
+                            🎾 Advantage server • First serve coming up • 60 second market
+                        </div>
+                    `;
+                    document.getElementById('flash-timer').classList.add('active');
+                    document.getElementById('timer-text').textContent = '60';
+                    startCountdown(60);
+                    addMarketToList('🎾 Next Point', '60 sec', 'BetMGM');
+                }
+            },
+            {
+                step: 12,
+                title: "Flash Betting - Ultra Fast Markets (<60s)",
+                text: "ULTRA-FAST MARKETS! These resolve in seconds! Corner kicks, free throws, tennis serves - all happening RIGHT NOW! Select 'Man City Corner Goal' to experience the rush. These markets update multiple times per second!",
+                action: () => {
+                    document.getElementById('flash-timer').classList.remove('active');
+                    document.getElementById('market-title').textContent = '⚡⚡ Ultra-Fast Flash Markets';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin-bottom: 16px;">Markets resolving in SECONDS • Real-time updates</div>
+                    `;
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div class="markets-grid">
+                            <div class="market-card selected" style="border-color: #FF3B30;">
+                                <div class="market-card-title">⚽ Man City Corner Goal</div>
+                                <div class="market-card-odds">
+                                    <span style="color: #FFD60A;">YES 28%</span>
+                                    <span>NO 72%</span>
+                                </div>
+                                <div class="market-card-volume" style="color: #FF3B30;">30 SECONDS!</div>
+                                <div class="market-card-platform">DraftKings</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">🏀 Curry 3-Pointer</div>
+                                <div class="market-card-odds">
+                                    <span>YES 41%</span>
+                                    <span>NO 59%</span>
+                                </div>
+                                <div class="market-card-volume">5 SECONDS!</div>
+                                <div class="market-card-platform">FanDuel</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">🏈 Next Play TD</div>
+                                <div class="market-card-odds">
+                                    <span>YES 18%</span>
+                                    <span>NO 82%</span>
+                                </div>
+                                <div class="market-card-volume">20 seconds</div>
+                                <div class="market-card-platform">BetMGM</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">🎾 Ace on Serve</div>
+                                <div class="market-card-odds">
+                                    <span>YES 22%</span>
+                                    <span>NO 78%</span>
+                                </div>
+                                <div class="market-card-volume">10 seconds</div>
+                                <div class="market-card-platform">Caesars</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">⚾ Strike on Pitch</div>
+                                <div class="market-card-odds">
+                                    <span>YES 65%</span>
+                                    <span>NO 35%</span>
+                                </div>
+                                <div class="market-card-volume">8 seconds</div>
+                                <div class="market-card-platform">DraftKings</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">🏀 Free Throw Made</div>
+                                <div class="market-card-odds">
+                                    <span>YES 89%</span>
+                                    <span>NO 11%</span>
+                                </div>
+                                <div class="market-card-volume">12 seconds</div>
+                                <div class="market-card-platform">FanDuel</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">⚽ Penalty Scored</div>
+                                <div class="market-card-odds">
+                                    <span>YES 76%</span>
+                                    <span>NO 24%</span>
+                                </div>
+                                <div class="market-card-volume">45 seconds</div>
+                                <div class="market-card-platform">BetMGM</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">🏒 Powerplay Goal</div>
+                                <div class="market-card-odds">
+                                    <span>YES 31%</span>
+                                    <span>NO 69%</span>
+                                </div>
+                                <div class="market-card-volume">55 seconds</div>
+                                <div class="market-card-platform">DraftKings</div>
+                            </div>
+                            <div class="market-card">
+                                <div class="market-card-title">🏈 2-Point Convert</div>
+                                <div class="market-card-odds">
+                                    <span>YES 48%</span>
+                                    <span>NO 52%</span>
+                                </div>
+                                <div class="market-card-volume">15 seconds</div>
+                                <div class="market-card-platform">FanDuel</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(255, 59, 48, 0.1); border-radius: 8px; text-align: center;">
+                            🚨 LIVE: Man City Corner Kick NOW! De Bruyne stepping up!
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        document.getElementById('flash-timer').classList.add('active');
+                        document.getElementById('timer-text').textContent = '30';
+                        startCountdown(30);
+                    }, 2000);
+                    addMarketToList('⚽ Corner Goal', '30 sec', 'DraftKings');
+                }
+            },
+            {
+                step: 13,
+                title: "Flash Betting - 5 Second Basketball Shot",
+                text: "FASTEST MARKET: 'Curry makes this 3-pointer?' (5 seconds!). He's shooting RIGHT NOW! These markets require instant decision making. Powered by FanDuel's live court-side data. Resolution in literally seconds!",
+                action: () => {
+                    document.getElementById('flash-timer').classList.remove('active');
+                    setTimeout(() => {
+                        document.getElementById('market-title').textContent = '⚡ LIVE: Curry 3-Pointer (5s)';
+                        document.getElementById('market-info').innerHTML = `
+                            <div style="display: flex; gap: 40px; align-items: center;">
+                                <div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Makes Shot</div>
+                                    <div style="font-size: 48px; color: #4CD964;">41%</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Misses</div>
+                                    <div style="font-size: 48px;">59%</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 16px; padding: 16px; background: rgba(255, 59, 48, 0.2); border-radius: 8px; text-align: center;">
+                                <div style="font-size: 20px; color: #FF3B30;">🏀 CURRY SHOOTING NOW!</div>
+                            </div>
+                        `;
+                        document.getElementById('flash-timer').classList.add('active');
+                        document.getElementById('timer-text').textContent = '5';
+                        document.getElementById('timer-text').style.color = '#FF3B30';
+                        startCountdown(5);
+                        addMarketToList('🏀 Curry 3PT', '5 sec!', 'FanDuel');
+                    }, 500);
+                }
+            },
+            {
+                step: 14,
+                title: "Flash Quantum - Correlated Sports Moments",
+                text: "FLASH QUANTUM EXAMPLE 1: NFL RedZone correlation. Your $500 bet on 'TD in next play' auto-splits: 40% 'Pass TD', 30% 'Rush TD', 30% 'Field Goal instead'. All resolve in <30 seconds! Correlation across instant outcomes. Markets from multiple providers!",
+                action: () => {
+                    document.getElementById('flash-timer').classList.remove('active');
+                    document.getElementById('market-title').textContent = '🔮⚡ Flash Quantum: RedZone';
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div class="quantum-matrix">
+                            <div class="correlation-cell active">
+                                <div style="font-size: 18px; margin-bottom: 4px;">Any Score</div>
+                                <div style="font-size: 24px; color: #FFD60A;">73%</div>
+                                <div style="font-size: 12px;">DraftKings</div>
+                            </div>
+                            <div class="correlation-cell active">
+                                <div style="font-size: 18px; margin-bottom: 4px;">Pass TD</div>
+                                <div style="font-size: 24px; color: #4CD964;">45%</div>
+                                <div style="font-size: 12px;">FanDuel</div>
+                            </div>
+                            <div class="correlation-cell active">
+                                <div style="font-size: 18px; margin-bottom: 4px;">Rush TD</div>
+                                <div style="font-size: 24px; color: #00D4FF;">28%</div>
+                                <div style="font-size: 12px;">BetMGM</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; text-align: center;">
+                            <div style="font-size: 20px; color: #FF3B30;">⏱️ All resolve in 20 seconds!</div>
+                            <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Best odds aggregated from 3 platforms</div>
+                        </div>
+                    `;
+                    addPosition('Flash Quantum: NFL', 'MULTI', '500 USDC', 'PENDING');
+                }
+            },
+            {
+                step: 15,
+                title: "Flash Quantum - Multi-Game Parlay",
+                text: "FLASH QUANTUM EXAMPLE 2: Live parlay across 3 games happening NOW. $1000 splits: Lakers score next (33%), Yankees get a hit (33%), Djokovic ace (34%). All resolve within 2 minutes! Each leg from different sportsbook for best odds.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🔮⚡ Flash Quantum: Live Parlay';
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div class="quantum-matrix">
+                            <div class="correlation-cell active">
+                                <div style="font-size: 18px; margin-bottom: 4px;">🏀 Lakers Score</div>
+                                <div style="font-size: 24px; color: #FFD60A;">51%</div>
+                                <div style="font-size: 12px;">45 sec • DraftKings</div>
+                            </div>
+                            <div class="correlation-cell active">
+                                <div style="font-size: 18px; margin-bottom: 4px;">⚾ Yankees Hit</div>
+                                <div style="font-size: 24px; color: #4CD964;">67%</div>
+                                <div style="font-size: 12px;">90 sec • FanDuel</div>
+                            </div>
+                            <div class="correlation-cell active">
+                                <div style="font-size: 18px; margin-bottom: 4px;">🎾 Djokovic Ace</div>
+                                <div style="font-size: 24px; color: #00D4FF;">31%</div>
+                                <div style="font-size: 12px;">30 sec • BetMGM</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(123, 63, 242, 0.1); border-radius: 8px;">
+                            Combined odds: 10.5x • All 3 hit = $10,500 return on $1000!
+                        </div>
+                    `;
+                    addPosition('Flash Parlay 3x', 'ACTIVE', '1,000 USDC', 'LIVE');
+                }
+            },
+            {
+                step: 16,
+                title: "Flash Verse - NBA Game Hierarchy",
+                text: "FLASH VERSE EXAMPLE 1: NBA game hierarchy. 'Full Game' (2hr) → 'Q4' (12min) → 'Last 2 min' → 'Final shot' (5sec). Bet deeper for faster resolution & higher bonus! Each level on different platform for best odds. Full game on DraftKings, final shot on FanDuel.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🌳⚡ Flash Verse: NBA Hierarchy';
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div class="verse-tree">
+                            <div class="verse-node level-1">
+                                🏀 Warriors vs Nets (Full Game)
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">2 hours • DraftKings • Base odds</div>
+                            </div>
+                            <div class="verse-node level-2">
+                                📊 4th Quarter Winner
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">12 min • FanDuel • +15% bonus</div>
+                            </div>
+                            <div class="verse-node level-3 active">
+                                ⏰ Final 2 Minutes
+                                <div style="font-size: 12px; color: #FFD60A;">2 min • BetMGM • +30% bonus</div>
+                            </div>
+                            <div class="verse-node level-4">
+                                🎯 Game-Winning Shot
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">5 sec • Caesars • +50% bonus</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; color: #FFD60A;">
+                            Deeper = Faster resolution + Higher bonus + More excitement!
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 17,
+                title: "Flash Verse - Soccer Match Hierarchy",
+                text: "FLASH VERSE EXAMPLE 2: Soccer hierarchy. 'Full Match' (90min) → 'Second Half' (45min) → 'Next 10 min' → 'Next corner' (30sec). Perfect for in-play betting! We find best odds across all platforms for each level. Real-time routing!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🌳⚡ Flash Verse: Soccer Match';
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div class="verse-tree">
+                            <div class="verse-node level-1">
+                                ⚽ Liverpool vs Real Madrid
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">90 min • Polymarket • Base odds</div>
+                            </div>
+                            <div class="verse-node level-2">
+                                🥅 Second Half Result
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">45 min • DraftKings • +10% bonus</div>
+                            </div>
+                            <div class="verse-node level-3">
+                                ⏱️ Goal in Next 10 Min
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">10 min • FanDuel • +25% bonus</div>
+                            </div>
+                            <div class="verse-node level-4 active">
+                                🚩 Next Corner Goal
+                                <div style="font-size: 12px; color: #4CD964;">30 sec • BetMGM • +40% bonus</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(76, 217, 100, 0.1); border-radius: 8px;">
+                            ⚡ Corner kick happening NOW! 30 seconds to big returns!
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 18,
+                title: "Order Types - Market Orders",
+                text: "Now let's explore ORDER TYPES. First: MARKET ORDERS. Buy/sell immediately at current price. 'US Recession at 42%? BUY NOW!' Instant execution, no waiting. Your order routes to the platform with best liquidity. Simple and fast!",
+                action: () => {
+                    document.getElementById('dynamic-content').innerHTML = '';
+                    document.getElementById('market-title').textContent = '📊 Order Types Overview';
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div class="order-types-grid">
+                            <div class="order-type-card active">
+                                <div class="order-type-icon">⚡</div>
+                                <div class="order-type-name">Market Order</div>
+                                <div class="order-type-desc">Buy/Sell immediately at current price</div>
+                                <div style="margin-top: 8px; color: #4CD964;">EXECUTING: YES @ 42%</div>
+                            </div>
+                            <div class="order-type-card">
+                                <div class="order-type-icon">🎯</div>
+                                <div class="order-type-name">Limit Order</div>
+                                <div class="order-type-desc">Set your target price</div>
+                            </div>
+                            <div class="order-type-card">
+                                <div class="order-type-icon">🛡️</div>
+                                <div class="order-type-name">Stop Loss</div>
+                                <div class="order-type-desc">Protect from losses</div>
+                            </div>
+                            <div class="order-type-card">
+                                <div class="order-type-icon">📈</div>
+                                <div class="order-type-name">Trailing Stop</div>
+                                <div class="order-type-desc">Lock in profits</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 19,
+                title: "Order Types - Limit Orders",
+                text: "LIMIT ORDERS: Set your price! 'Buy US Recession YES only if it drops to 38%'. Order waits until your price is met. Perfect for patient traders. We monitor all platforms and execute when your target price appears anywhere!",
+                action: () => {
+                    document.querySelector('.order-type-card.active').classList.remove('active');
+                    document.querySelectorAll('.order-type-card')[1].classList.add('active');
+                    document.querySelectorAll('.order-type-card')[1].innerHTML += `
+                        <div style="margin-top: 8px; color: #FFD60A;">WAITING: YES @ 38%</div>
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6);">Current: 42%</div>
+                    `;
+                }
+            },
+            {
+                step: 20,
+                title: "Order Types - Stop Loss",
+                text: "STOP LOSS: Protect yourself! 'If my Bitcoin $150k position drops to 55% (from 65%), sell automatically'. Limits your downside. Essential for risk management. Triggers across any platform where you have positions.",
+                action: () => {
+                    document.querySelectorAll('.order-type-card')[1].classList.remove('active');
+                    document.querySelectorAll('.order-type-card')[2].classList.add('active');
+                    document.querySelectorAll('.order-type-card')[2].innerHTML += `
+                        <div style="margin-top: 8px; color: #FF3B30;">PROTECTION: Sell if < 55%</div>
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6);">Max loss: -$1,000</div>
+                    `;
+                }
+            },
+            {
+                step: 21,
+                title: "Order Types - Trailing Stop",
+                text: "TRAILING STOP: Lock in profits! 'Trail 5% behind peak price'. If market rises to 70%, stop moves to 65%. If it then drops to 65%, you sell. Captures upside while protecting gains. Smart profit protection!",
+                action: () => {
+                    document.querySelectorAll('.order-type-card')[2].classList.remove('active');
+                    document.querySelectorAll('.order-type-card')[3].classList.add('active');
+                    document.querySelectorAll('.order-type-card')[3].innerHTML += `
+                        <div style="margin-top: 8px; color: #4CD964;">TRAILING: 5% below peak</div>
+                        <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6);">Peak: 70% → Stop: 65%</div>
+                    `;
+                }
+            },
+            {
+                step: 22,
+                title: "Order Types - Iceberg Orders",
+                text: "ICEBERG ORDERS: Hide your size! Want to buy $100k worth? Show only $5k at a time. Prevents market manipulation. As each $5k fills, next $5k appears. Used by whales. We split across multiple platforms for ultimate stealth!",
+                action: () => {
+                    document.getElementById('dynamic-content').innerHTML += `
+                        <div style="margin-top: 20px; padding: 20px; background: rgba(123, 63, 242, 0.1); border-radius: 12px;">
+                            <div style="font-size: 18px; margin-bottom: 12px;">🧊 Iceberg Order Active</div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                                <div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Total Size</div>
+                                    <div style="font-size: 20px;">$100,000</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Visible Size</div>
+                                    <div style="font-size: 20px; color: #FFD60A;">$5,000</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Filled</div>
+                                    <div style="font-size: 20px; color: #4CD964;">$35,000</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 23,
+                title: "Leverage Explained - Amplify Your Positions",
+                text: "Finally, LEVERAGE! Multiply your buying power. With $1,000, control up to $500,000 in positions! How? Platforms offer leverage: DraftKings (100x), FanDuel (50x), AAVE lending (2x). We chain them for up to 500x! Higher leverage = higher risk!",
+                action: () => {
+                    document.getElementById('dynamic-content').innerHTML = '';
+                    document.getElementById('market-title').textContent = '💪 Understanding Leverage';
+                    document.getElementById('leverage-display').classList.add('active');
+                    animateLeverage(1, 500, 4000);
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; margin-top: 20px;">
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; color: #4CD964;">10x</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Conservative</div>
+                                    <div style="font-size: 14px;">$1k → $10k</div>
+                                    <div style="font-size: 11px; color: #4CD964;">10% move = 100% gain</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; color: #FFD60A;">50x</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Moderate</div>
+                                    <div style="font-size: 14px;">$1k → $50k</div>
+                                    <div style="font-size: 11px; color: #FFD60A;">2% move = 100% gain</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; color: #FF9500;">100x</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Aggressive</div>
+                                    <div style="font-size: 14px;">$1k → $100k</div>
+                                    <div style="font-size: 11px; color: #FF9500;">1% move = 100% gain</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; color: #FF3B30;">500x</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">EXTREME</div>
+                                    <div style="font-size: 14px;">$1k → $500k</div>
+                                    <div style="font-size: 11px; color: #FF3B30;">0.2% move = wipeout!</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                                <div style="font-size: 14px; color: #FFD60A;">
+                                    ⚠️ Leverage provided by platforms, not us. We aggregate and coordinate for maximum efficiency.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 24,
+                title: "Live Trading Demo - Complex Position",
+                text: "Let's place a real complex trade! Quantum position on 'Tech Boom' with 50x leverage, limit order at 45%, trailing stop at -5%. This routes to 3 platforms simultaneously. Watch the magic happen!",
+                action: () => {
+                    document.getElementById('leverage-display').classList.remove('active');
+                    document.getElementById('market-title').textContent = '🚀 Executing Complex Trade';
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div style="padding: 20px; background: rgba(255, 214, 10, 0.05); border-radius: 12px;">
+                            <div style="font-size: 20px; margin-bottom: 16px;">Quantum Leveraged Position</div>
+                            <div style="display: grid; gap: 12px;">
+                                <div style="padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Position Type:</span>
+                                        <span style="color: #7B3FF2;">Quantum (3 markets)</span>
+                                    </div>
+                                </div>
+                                <div style="padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Order Type:</span>
+                                        <span style="color: #FFD60A;">Limit @ 45%</span>
+                                    </div>
+                                </div>
+                                <div style="padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Leverage:</span>
+                                        <span style="color: #FF9500;">50x</span>
+                                    </div>
+                                </div>
+                                <div style="padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Protection:</span>
+                                        <span style="color: #4CD964;">Trailing Stop -5%</span>
+                                    </div>
+                                </div>
+                                <div style="padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Total Exposure:</span>
+                                        <span style="font-size: 20px; color: #FFD60A;">$50,000</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 16px; text-align: center;">
+                                <div style="font-size: 16px; color: #4CD964;">✓ POSITION OPENED</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Routed to Polymarket, DraftKings, FanDuel</div>
+                            </div>
+                        </div>
+                    `;
+                    addPosition('Quantum Tech 50x', 'LIMIT', '1,000 USDC', 'WAITING');
+                }
+            },
+            {
+                step: 25,
+                title: "Portfolio Overview - Your Positions",
+                text: "Your portfolio is now live! 8 active positions across Polymarket, DraftKings, FanDuel. Total exposure: $125,000 from just $5,000 capital (25x average leverage). Real-time P&L tracking across all platforms!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '💼 Portfolio Performance';
+                    document.getElementById('total-pnl').textContent = '+127.5 SOL';
+                    document.getElementById('total-pnl').style.fontSize = '20px';
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4);">TOTAL POSITIONS</div>
+                                <div style="font-size: 24px;">8</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4);">WIN RATE</div>
+                                <div style="font-size: 24px; color: #4CD964;">75%</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4);">AVG LEVERAGE</div>
+                                <div style="font-size: 24px; color: #FFD60A;">25x</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4);">TOTAL EXPOSURE</div>
+                                <div style="font-size: 24px;">$125K</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 24px;">
+                            <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin-bottom: 12px;">Platform Distribution:</div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                                <div style="padding: 12px; background: rgba(138, 71, 229, 0.1); border-radius: 8px;">
+                                    <div style="font-size: 16px;">Polymarket</div>
+                                    <div style="font-size: 20px; color: #8A47E5;">$67,000</div>
+                                </div>
+                                <div style="padding: 12px; background: rgba(255, 152, 0, 0.1); border-radius: 8px;">
+                                    <div style="font-size: 16px;">DraftKings</div>
+                                    <div style="font-size: 20px; color: #FF9800;">$38,000</div>
+                                </div>
+                                <div style="padding: 12px; background: rgba(0, 150, 136, 0.1); border-radius: 8px;">
+                                    <div style="font-size: 16px;">FanDuel</div>
+                                    <div style="font-size: 20px; color: #009688;">$20,000</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 26,
+                title: "Demo Complete - Start Aggregating!",
+                text: "You've seen it all! Cross-chain routing, Polymarket integration, flash betting (2hr to 5sec), quantum positions, verse hierarchies, 5 order types, and 500x leverage. We aggregate the best of all platforms. Ready to start? Connect your wallet!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🚀 Ready to Aggregate!';
+                    document.getElementById('dynamic-content').innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <div style="font-size: 32px; margin-bottom: 24px; background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                                The Future of Betting is Here
+                            </div>
+                            <div style="font-size: 18px; color: rgba(255, 255, 255, 0.8); margin-bottom: 32px;">
+                                One platform. All markets. Best odds. Always.
+                            </div>
+                            <button style="padding: 16px 32px; background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%); border: none; border-radius: 8px; color: #000; font-weight: 600; font-size: 16px; cursor: pointer;">
+                                Connect Wallet & Start Trading
+                            </button>
+                            <div style="margin-top: 32px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                                <div>
+                                    <div style="font-size: 24px;">🌐</div>
+                                    <div style="font-size: 14px; margin-top: 8px;">10+ Platforms</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px;">⚡</div>
+                                    <div style="font-size: 14px; margin-top: 8px;">5 sec markets</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px;">💪</div>
+                                    <div style="font-size: 14px; margin-top: 8px;">500x leverage</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    confetti();
+                }
+            }
+        ];
+
+        let currentStep = 0;
+        let narratorVisible = true;
+        let stepInterval;
+
+        // Start demo
+        function startDemo() {
+            runStep(0);
+        }
+
+        function runStep(stepIndex) {
+            if (stepIndex >= demoSteps.length) {
+                endDemo();
+                return;
+            }
+
+            const step = demoSteps[stepIndex];
+            currentStep = stepIndex;
+            
+            // Update narrator
+            document.getElementById('narrator-step').textContent = `STEP ${step.step} OF ${demoSteps.length}`;
+            document.getElementById('narrator-title').textContent = step.title;
+            document.getElementById('narrator-text').textContent = step.text;
+            document.getElementById('progress-bar').style.width = `${(step.step / demoSteps.length) * 100}%`;
+            
+            // Show narrator
+            document.getElementById('narrator').classList.remove('hidden');
+            narratorVisible = true;
+            
+            // Run action
+            if (step.action) {
+                step.action();
+            }
+            
+            // Hide narrator after 5 seconds
+            setTimeout(() => {
+                document.getElementById('narrator').classList.add('hidden');
+                narratorVisible = false;
+            }, 5000);
+            
+            // Next step after 8 seconds
+            stepInterval = setTimeout(() => {
+                runStep(stepIndex + 1);
+            }, 8000);
+        }
+
+        function endDemo() {
+            document.getElementById('narrator').style.display = 'none';
+        }
+
+        // Helper functions
+        function animateSOLBalance(start, end, duration) {
+            const element = document.getElementById('balance');
+            const increment = (end - start) / (duration / 50);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = `${current.toFixed(1)} SOL`;
+            }, 50);
+        }
+
+        function animateLeverage(start, end, duration) {
+            const element = document.getElementById('leverage-number');
+            const increment = (end - start) / (duration / 50);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = `${Math.round(current)}x`;
+            }, 50);
+        }
+
+        function startCountdown(seconds) {
+            let remaining = seconds;
+            const timer = setInterval(() => {
+                remaining--;
+                document.getElementById('timer-text').textContent = remaining;
+                const offset = 565 - (565 * (seconds - remaining) / seconds);
+                document.getElementById('timer-circle').style.strokeDashoffset = offset;
+                
+                if (remaining <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('timer-text').textContent = '✓';
+                    document.getElementById('timer-text').style.color = '#4CD964';
+                }
+            }, 1000);
+        }
+
+        function addMarketToList(name, info, platform) {
+            const marketList = document.getElementById('market-list');
+            const item = document.createElement('div');
+            item.className = 'outcome-card';
+            item.innerHTML = `
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="font-size: 14px;">${name}</div>
+                    <div style="font-size: 12px; color: #FFD60A;">${platform}</div>
+                </div>
+                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 4px;">${info}</div>
+            `;
+            marketList.appendChild(item);
+        }
+
+        function addPosition(market, type, size, status) {
+            const positionsList = document.getElementById('positions-list');
+            const item = document.createElement('div');
+            item.className = 'position-item';
+            item.innerHTML = `
+                <div style="font-size: 14px; font-weight: 500;">${market}</div>
+                <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                    <span style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">${type}</span>
+                    <span style="font-size: 12px;">${size}</span>
+                </div>
+                <div class="position-pnl ${status.includes('+') ? 'positive' : ''}">${status}</div>
+            `;
+            positionsList.appendChild(item);
+        }
+
+        function confetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetto = document.createElement('div');
+                confetto.style.position = 'fixed';
+                confetto.style.width = '10px';
+                confetto.style.height = '10px';
+                confetto.style.background = ['#FFD60A', '#4CD964', '#00D4FF', '#7B3FF2'][Math.floor(Math.random() * 4)];
+                confetto.style.left = Math.random() * window.innerWidth + 'px';
+                confetto.style.top = '-10px';
+                confetto.style.borderRadius = '50%';
+                confetto.style.zIndex = '10000';
+                document.body.appendChild(confetto);
+                
+                const duration = Math.random() * 3 + 2;
+                confetto.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], {
+                    duration: duration * 1000,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                });
+                
+                setTimeout(() => confetto.remove(), duration * 1000);
+            }
+        }
+
+        // Start demo on load
+        window.addEventListener('load', () => {
+            setTimeout(startDemo, 1000);
+        });
+    </script>
+</body>
+</html>

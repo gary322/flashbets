@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Final Verse Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #000; color: #fff; padding: 20px; font-family: -apple-system, sans-serif; }
+        .controls { margin: 20px 0; }
+        button { background: #FFD60A; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .debug { background: #111; padding: 20px; margin: 20px 0; border-radius: 8px; font-family: monospace; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        .info { color: #007aff; }
+    </style>
+</head>
+<body>
+    <h1>Final Verse Test</h1>
+    
+    <div class="controls">
+        <button onclick="testEverything()">Run Complete Test</button>
+        <button onclick="testAPI()">1. Test API</button>
+        <button onclick="testVerseCreation()">2. Test Verse Creation</button>
+        <button onclick="testRealMarket()">3. Test Real Market</button>
+        <button onclick="clearDebug()">Clear</button>
+    </div>
+    
+    <div id="debug" class="debug"></div>
+    
+    <!-- Copy exact structure from index.html -->
+    <div class="verses-section" id="versesSection" style="display: block;">
+        <div class="section-title">Related Stages - Chain Your Leverage</div>
+        <div class="verse-flow-container" id="verseFlowContainer">
+            <svg class="verse-connections" id="verseConnections">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="10" 
+                            refX="9" refY="5" orient="auto">
+                        <polygon points="0 0, 10 5, 0 10" class="verse-arrow" />
+                    </marker>
+                </defs>
+            </svg>
+            <div class="verse-levels" id="verseLevels">
+                <!-- Verses will be added here -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize platform state
+        window.platformState = {
+            selectedVerses: [],
+            markets: new Map(),
+            quantumMode: false
+        };
+    </script>
+    
+    <script src="platform_main.js"></script>
+    
+    <script>
+        const debug = document.getElementById('debug');
+        
+        function log(msg, className = '') {
+            const div = document.createElement('div');
+            div.className = className;
+            div.innerHTML = `${new Date().toLocaleTimeString()}: ${msg}`;
+            debug.appendChild(div);
+            console.log(msg);
+        }
+        
+        function clearDebug() {
+            debug.innerHTML = '';
+        }
+        
+        async function testEverything() {
+            clearDebug();
+            log('Running complete test...', 'info');
+            await testAPI();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testVerseCreation();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testRealMarket();
+        }
+        
+        async function testAPI() {
+            log('\\n=== Testing API ===', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                
+                log(`✓ API returned ${markets.length} markets`, 'success');
+                
+                if (markets.length > 0) {
+                    const market = markets[0];
+                    log(`First market: ${market.question || market.title}`);
+                    log(`Has verses: ${market.verses ? 'YES (' + market.verses.length + ')' : 'NO'}`, 
+                        market.verses ? 'success' : 'error');
+                    
+                    if (market.verses && market.verses.length > 0) {
+                        log(`First verse: ${market.verses[0].name} (${market.verses[0].multiplier}x)`);
+                    }
+                }
+            } catch (error) {
+                log(`✗ API Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testVerseCreation() {
+            log('\\n=== Testing Verse Creation ===', 'info');
+            
+            // Check if updateAvailableVerses exists
+            if (!window.updateAvailableVerses) {
+                log('✗ updateAvailableVerses not found', 'error');
+                return;
+            }
+            
+            log('✓ updateAvailableVerses exists', 'success');
+            
+            // Create test verses
+            const testVerses = [
+                {
+                    id: "test_1",
+                    name: "Test Verse L1",
+                    description: "Test description",
+                    level: 1,
+                    multiplier: 1.5,
+                    category: "Test",
+                    risk_tier: "Low",
+                    market_count: 1
+                },
+                {
+                    id: "test_2",
+                    name: "Test Verse L2",
+                    description: "Another test",
+                    level: 2,
+                    multiplier: 3.0,
+                    category: "Test",
+                    risk_tier: "Medium",
+                    parent_id: "test_1",
+                    market_count: 1
+                }
+            ];
+            
+            // Clear existing verses
+            document.getElementById('verseLevels').innerHTML = '';
+            
+            // Call updateAvailableVerses
+            try {
+                window.updateAvailableVerses(testVerses);
+                log('✓ Called updateAvailableVerses', 'success');
+                
+                // Check results
+                setTimeout(() => {
+                    const verseLevels = document.getElementById('verseLevels');
+                    const levelContainers = verseLevels.querySelectorAll('.verse-level');
+                    const verseCards = verseLevels.querySelectorAll('.verse-card');
+                    
+                    log(`Results:`, 'info');
+                    log(`- Level containers: ${levelContainers.length}`, levelContainers.length > 0 ? 'success' : 'error');
+                    log(`- Verse cards: ${verseCards.length}`, verseCards.length > 0 ? 'success' : 'error');
+                    log(`- VerseLevels HTML length: ${verseLevels.innerHTML.length} chars`);
+                    
+                    if (verseCards.length > 0) {
+                        log(`✓ First verse card text: "${verseCards[0].textContent.trim().substring(0, 50)}..."`, 'success');
+                    }
+                }, 200);
+                
+            } catch (error) {
+                log(`✗ Error in updateAvailableVerses: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+        
+        async function testRealMarket() {
+            log('\\n=== Testing Real Market ===', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                
+                if (markets.length > 0 && markets[0].verses) {
+                    const market = markets[0];
+                    log(`Using market: ${market.question || market.title}`);
+                    log(`Verses count: ${market.verses.length}`);
+                    
+                    // Clear and update
+                    document.getElementById('verseLevels').innerHTML = '';
+                    
+                    window.updateAvailableVerses(market.verses);
+                    log('✓ Called updateAvailableVerses with real verses', 'success');
+                    
+                    // Check results
+                    setTimeout(() => {
+                        const verseCards = document.querySelectorAll('.verse-card');
+                        log(`Created ${verseCards.length} verse cards`, verseCards.length > 0 ? 'success' : 'error');
+                        
+                        // Also check console for any errors
+                        if (verseCards.length === 0) {
+                            log('Check browser console for errors!', 'error');
+                        }
+                    }, 300);
+                }
+            } catch (error) {
+                log(`✗ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            setTimeout(testEverything, 500);
+        });
+    </script>
+</body>
+</html>

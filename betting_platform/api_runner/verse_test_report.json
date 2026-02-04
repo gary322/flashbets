@@ -1,0 +1,778 @@
+{
+  "timestamp": "2025-08-01T16:31:51.769Z",
+  "results": {
+    "totalMarkets": 40,
+    "totalVerses": 126,
+    "byCategory": {
+      "politics": {
+        "markets": 5,
+        "totalVerses": 19,
+        "avgVerses": 3.8,
+        "versesByTier": {
+          "Low": 5,
+          "Medium": 9,
+          "High": 4,
+          "Extreme": 0,
+          "Very High": null
+        }
+      },
+      "sports": {
+        "markets": 5,
+        "totalVerses": 20,
+        "avgVerses": 4,
+        "versesByTier": {
+          "Low": 5,
+          "Medium": 14,
+          "High": 1,
+          "Extreme": 0
+        }
+      },
+      "finance": {
+        "markets": 5,
+        "totalVerses": 8,
+        "avgVerses": 1.6,
+        "versesByTier": {
+          "Low": 5,
+          "Medium": 3,
+          "High": 0,
+          "Extreme": 0
+        }
+      },
+      "crypto": {
+        "markets": 5,
+        "totalVerses": 20,
+        "avgVerses": 4,
+        "versesByTier": {
+          "Low": 0,
+          "Medium": 7,
+          "High": 11,
+          "Extreme": 0,
+          "Very High": null
+        }
+      },
+      "entertainment": {
+        "markets": 5,
+        "totalVerses": 20,
+        "avgVerses": 4,
+        "versesByTier": {
+          "Low": 8,
+          "Medium": 11,
+          "High": 1,
+          "Extreme": 0
+        }
+      },
+      "science": {
+        "markets": 5,
+        "totalVerses": 14,
+        "avgVerses": 2.8,
+        "versesByTier": {
+          "Low": 0,
+          "Medium": 5,
+          "High": 4,
+          "Extreme": 1,
+          "Very High": null
+        }
+      },
+      "technology": {
+        "markets": 5,
+        "totalVerses": 20,
+        "avgVerses": 4,
+        "versesByTier": {
+          "Low": 0,
+          "Medium": 11,
+          "High": 8,
+          "Extreme": 0,
+          "Very High": null
+        }
+      },
+      "weather": {
+        "markets": 5,
+        "totalVerses": 5,
+        "avgVerses": 1,
+        "versesByTier": {
+          "Low": 5,
+          "Medium": 0,
+          "High": 0,
+          "Extreme": 0
+        }
+      }
+    },
+    "byRiskTier": {
+      "Low": 28,
+      "Medium": 60,
+      "High": 29,
+      "Extreme": 1,
+      "Very High": null
+    },
+    "verseDistribution": {
+      "Climate": {
+        "total": 14,
+        "byRiskTier": {
+          "Low": 1,
+          "Medium": 3,
+          "High": 6,
+          "Extreme": 2,
+          "Very High": null
+        }
+      },
+      "Economics": {
+        "total": 75,
+        "byRiskTier": {
+          "Low": 4,
+          "Medium": 24,
+          "High": 30,
+          "Extreme": 8,
+          "Very High": null
+        }
+      },
+      "Technology": {
+        "total": 40,
+        "byRiskTier": {
+          "Low": 0,
+          "Medium": 7,
+          "High": 15,
+          "Extreme": 8,
+          "Very High": null
+        }
+      },
+      "Health": {
+        "total": 15,
+        "byRiskTier": {
+          "Low": 0,
+          "Medium": 3,
+          "High": 6,
+          "Extreme": 5,
+          "Very High": null
+        }
+      },
+      "Crypto": {
+        "total": 46,
+        "byRiskTier": {
+          "Low": 0,
+          "Medium": 7,
+          "High": 14,
+          "Extreme": 11,
+          "Very High": null
+        }
+      },
+      "Transport": {
+        "total": 10,
+        "byRiskTier": {
+          "Low": 0,
+          "Medium": 1,
+          "High": 2,
+          "Extreme": 3,
+          "Very High": null
+        }
+      },
+      "Legal": {
+        "total": 7,
+        "byRiskTier": {
+          "Low": 0,
+          "Medium": 2,
+          "High": 4,
+          "Extreme": 0,
+          "Very High": null
+        }
+      },
+      "Sports": {
+        "total": 38,
+        "byRiskTier": {
+          "Low": 1,
+          "Medium": 11,
+          "High": 18,
+          "Extreme": 5,
+          "Very High": null
+        }
+      },
+      "Food": {
+        "total": 4,
+        "byRiskTier": {
+          "Low": 1,
+          "Medium": 1,
+          "High": 2,
+          "Extreme": 0
+        }
+      },
+      "Agriculture": {
+        "total": 3,
+        "byRiskTier": {
+          "Low": 0,
+          "Medium": 1,
+          "High": 2,
+          "Extreme": 0
+        }
+      },
+      "Politics": {
+        "total": 49,
+        "byRiskTier": {
+          "Low": 1,
+          "Medium": 10,
+          "High": 18,
+          "Extreme": 10,
+          "Very High": null
+        }
+      },
+      "Education": {
+        "total": 4,
+        "byRiskTier": {
+          "Low": 1,
+          "Medium": 1,
+          "High": 2,
+          "Extreme": 0
+        }
+      },
+      "Entertainment": {
+        "total": 34,
+        "byRiskTier": {
+          "Low": 3,
+          "Medium": 12,
+          "High": 17,
+          "Extreme": 0,
+          "Very High": null
+        }
+      },
+      "Culture": {
+        "total": 15,
+        "byRiskTier": {
+          "Low": 3,
+          "Medium": 6,
+          "High": 5,
+          "Extreme": 0,
+          "Very High": null
+        }
+      },
+      "Energy": {
+        "total": 14,
+        "byRiskTier": {
+          "Low": 1,
+          "Medium": 4,
+          "High": 7,
+          "Extreme": 2
+        }
+      },
+      "Finance": {
+        "total": 6,
+        "byRiskTier": {
+          "Low": 1,
+          "Medium": 3,
+          "High": 2,
+          "Extreme": 0
+        }
+      },
+      "Cybersecurity": {
+        "total": 3,
+        "byRiskTier": {
+          "Low": 0,
+          "Medium": 0,
+          "High": 1,
+          "Extreme": 0,
+          "Very High": null
+        }
+      },
+      "Disasters": {
+        "total": 5,
+        "byRiskTier": {
+          "Low": 0,
+          "Medium": 0,
+          "High": 1,
+          "Extreme": 1,
+          "Very High": null
+        }
+      },
+      "Retail": {
+        "total": 10,
+        "byRiskTier": {
+          "Low": 1,
+          "Medium": 3,
+          "High": 5,
+          "Extreme": 0,
+          "Very High": null
+        }
+      },
+      "Science": {
+        "total": 13,
+        "byRiskTier": {
+          "Low": 0,
+          "Medium": 1,
+          "High": 5,
+          "Extreme": 2,
+          "Very High": null
+        }
+      },
+      "Media": {
+        "total": 4,
+        "byRiskTier": {
+          "Low": 1,
+          "Medium": 2,
+          "High": 1,
+          "Extreme": 0
+        }
+      },
+      "Resources": {
+        "total": 2,
+        "byRiskTier": {
+          "Low": 0,
+          "Medium": 0,
+          "High": 1,
+          "Extreme": 1
+        }
+      },
+      "Space": {
+        "total": 6,
+        "byRiskTier": {
+          "Low": 1,
+          "Medium": 0,
+          "High": 2,
+          "Extreme": 2,
+          "Very High": null
+        }
+      },
+      "General": {
+        "total": 1,
+        "byRiskTier": {
+          "Low": 1,
+          "Medium": 0,
+          "High": 0,
+          "Extreme": 0
+        }
+      },
+      "Defense": {
+        "total": 3,
+        "byRiskTier": {
+          "Low": 0,
+          "Medium": 2,
+          "High": 1,
+          "Extreme": 0
+        }
+      },
+      "Real Estate": {
+        "total": 3,
+        "byRiskTier": {
+          "Low": 0,
+          "Medium": 1,
+          "High": 2,
+          "Extreme": 0
+        }
+      }
+    }
+  },
+  "detailedTests": {
+    "politics": [
+      {
+        "title": "2024 US Presidential Election",
+        "keywords": [
+          "election",
+          "president",
+          "2024",
+          "biden",
+          "trump"
+        ]
+      },
+      {
+        "title": "Biden Approval Rating Above 50%",
+        "keywords": [
+          "biden",
+          "approval",
+          "rating",
+          "president"
+        ]
+      },
+      {
+        "title": "GOP Wins House Majority 2024",
+        "keywords": [
+          "republican",
+          "gop",
+          "house",
+          "congress",
+          "majority"
+        ]
+      },
+      {
+        "title": "Supreme Court Decision on Roe",
+        "keywords": [
+          "supreme",
+          "court",
+          "abortion",
+          "roe",
+          "justice"
+        ]
+      },
+      {
+        "title": "Ukraine War Ends by 2024",
+        "keywords": [
+          "ukraine",
+          "war",
+          "russia",
+          "peace",
+          "conflict"
+        ]
+      }
+    ],
+    "sports": [
+      {
+        "title": "Super Bowl 2024 Winner",
+        "keywords": [
+          "nfl",
+          "super",
+          "bowl",
+          "football",
+          "championship"
+        ]
+      },
+      {
+        "title": "NBA Finals 2024 Champion",
+        "keywords": [
+          "nba",
+          "basketball",
+          "finals",
+          "championship",
+          "playoff"
+        ]
+      },
+      {
+        "title": "World Cup 2026 Winner",
+        "keywords": [
+          "world",
+          "cup",
+          "soccer",
+          "football",
+          "fifa"
+        ]
+      },
+      {
+        "title": "Yankees Win World Series",
+        "keywords": [
+          "mlb",
+          "baseball",
+          "yankees",
+          "world",
+          "series"
+        ]
+      },
+      {
+        "title": "Tiger Woods Wins Major",
+        "keywords": [
+          "golf",
+          "tiger",
+          "woods",
+          "major",
+          "pga"
+        ]
+      }
+    ],
+    "finance": [
+      {
+        "title": "S&P 500 Above 5000",
+        "keywords": [
+          "sp500",
+          "stock",
+          "market",
+          "index",
+          "equity"
+        ]
+      },
+      {
+        "title": "Tesla Stock Above $300",
+        "keywords": [
+          "tesla",
+          "tsla",
+          "stock",
+          "electric",
+          "vehicle"
+        ]
+      },
+      {
+        "title": "Fed Raises Rates in 2024",
+        "keywords": [
+          "federal",
+          "reserve",
+          "interest",
+          "rates",
+          "inflation"
+        ]
+      },
+      {
+        "title": "Recession in 2024",
+        "keywords": [
+          "recession",
+          "economy",
+          "gdp",
+          "growth",
+          "downturn"
+        ]
+      },
+      {
+        "title": "Gold Price Above $2500",
+        "keywords": [
+          "gold",
+          "precious",
+          "metal",
+          "commodity",
+          "price"
+        ]
+      }
+    ],
+    "crypto": [
+      {
+        "title": "Bitcoin Above $100k",
+        "keywords": [
+          "bitcoin",
+          "btc",
+          "cryptocurrency",
+          "price",
+          "100k"
+        ]
+      },
+      {
+        "title": "Ethereum Flips Bitcoin",
+        "keywords": [
+          "ethereum",
+          "eth",
+          "flippening",
+          "market",
+          "cap"
+        ]
+      },
+      {
+        "title": "US Approves Bitcoin ETF",
+        "keywords": [
+          "bitcoin",
+          "etf",
+          "sec",
+          "approval",
+          "regulation"
+        ]
+      },
+      {
+        "title": "Solana Above $500",
+        "keywords": [
+          "solana",
+          "sol",
+          "blockchain",
+          "price",
+          "defi"
+        ]
+      },
+      {
+        "title": "CBDC Launched by 2025",
+        "keywords": [
+          "cbdc",
+          "digital",
+          "currency",
+          "central",
+          "bank"
+        ]
+      }
+    ],
+    "entertainment": [
+      {
+        "title": "Oscars 2024 Best Picture",
+        "keywords": [
+          "oscars",
+          "academy",
+          "awards",
+          "movie",
+          "film"
+        ]
+      },
+      {
+        "title": "Taylor Swift New Album #1",
+        "keywords": [
+          "taylor",
+          "swift",
+          "music",
+          "album",
+          "billboard"
+        ]
+      },
+      {
+        "title": "Marvel Movie Tops Box Office",
+        "keywords": [
+          "marvel",
+          "mcu",
+          "movie",
+          "box",
+          "office"
+        ]
+      },
+      {
+        "title": "Netflix Wins Most Emmys",
+        "keywords": [
+          "netflix",
+          "emmy",
+          "awards",
+          "streaming",
+          "television"
+        ]
+      },
+      {
+        "title": "GTA 6 Breaks Sales Record",
+        "keywords": [
+          "gta",
+          "grand",
+          "theft",
+          "auto",
+          "gaming"
+        ]
+      }
+    ],
+    "science": [
+      {
+        "title": "SpaceX Mars Landing 2024",
+        "keywords": [
+          "spacex",
+          "mars",
+          "landing",
+          "space",
+          "exploration"
+        ]
+      },
+      {
+        "title": "AI Wins Nobel Prize",
+        "keywords": [
+          "ai",
+          "artificial",
+          "intelligence",
+          "nobel",
+          "prize"
+        ]
+      },
+      {
+        "title": "Fusion Power Breakthrough",
+        "keywords": [
+          "fusion",
+          "energy",
+          "nuclear",
+          "power",
+          "breakthrough"
+        ]
+      },
+      {
+        "title": "COVID Variant Emerges",
+        "keywords": [
+          "covid",
+          "variant",
+          "pandemic",
+          "virus",
+          "health"
+        ]
+      },
+      {
+        "title": "Quantum Computer Supremacy",
+        "keywords": [
+          "quantum",
+          "computer",
+          "supremacy",
+          "technology",
+          "computing"
+        ]
+      }
+    ],
+    "technology": [
+      {
+        "title": "Apple Releases AR Glasses",
+        "keywords": [
+          "apple",
+          "ar",
+          "augmented",
+          "reality",
+          "glasses"
+        ]
+      },
+      {
+        "title": "ChatGPT 5 Released",
+        "keywords": [
+          "chatgpt",
+          "openai",
+          "ai",
+          "language",
+          "model"
+        ]
+      },
+      {
+        "title": "Tesla Full Self Driving",
+        "keywords": [
+          "tesla",
+          "fsd",
+          "autonomous",
+          "driving",
+          "autopilot"
+        ]
+      },
+      {
+        "title": "Meta Stock Above $400",
+        "keywords": [
+          "meta",
+          "facebook",
+          "stock",
+          "social",
+          "media"
+        ]
+      },
+      {
+        "title": "iPhone 16 Sales Record",
+        "keywords": [
+          "iphone",
+          "apple",
+          "sales",
+          "smartphone",
+          "record"
+        ]
+      }
+    ],
+    "weather": [
+      {
+        "title": "Hurricane Season Active 2024",
+        "keywords": [
+          "hurricane",
+          "season",
+          "atlantic",
+          "storm",
+          "weather"
+        ]
+      },
+      {
+        "title": "California Drought Ends",
+        "keywords": [
+          "california",
+          "drought",
+          "rain",
+          "water",
+          "weather"
+        ]
+      },
+      {
+        "title": "Record Heat Wave 2024",
+        "keywords": [
+          "heat",
+          "wave",
+          "temperature",
+          "record",
+          "climate"
+        ]
+      },
+      {
+        "title": "White Christmas NYC",
+        "keywords": [
+          "white",
+          "christmas",
+          "snow",
+          "nyc",
+          "weather"
+        ]
+      },
+      {
+        "title": "El Nino Effects 2024",
+        "keywords": [
+          "el",
+          "nino",
+          "weather",
+          "pattern",
+          "climate"
+        ]
+      }
+    ]
+  },
+  "versesCatalog": 424
+}

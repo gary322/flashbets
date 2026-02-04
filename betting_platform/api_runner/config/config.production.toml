@@ -1,0 +1,44 @@
+# Production-specific configuration overrides
+# IMPORTANT: Use environment variables for sensitive values
+
+[server]
+host = "0.0.0.0"
+port = 8080
+workers = 16  # Increased for production load
+
+[database]
+# Use environment variable for production database
+# url = "${DATABASE_URL}"
+max_connections = 200
+min_connections = 50
+
+[redis]
+# Use environment variable for production Redis
+# url = "${REDIS_URL}"
+pool_size = 50
+
+[solana]
+rpc_url = "https://api.mainnet-beta.solana.com"
+ws_url = "wss://api.mainnet-beta.solana.com"
+# Use environment variable for production program ID
+# program_id = "${SOLANA_PROGRAM_ID}"
+
+[security]
+# MUST use environment variable for production JWT secret
+# jwt_secret = "${JWT_SECRET}"
+bcrypt_cost = 14  # Increased for production security
+rate_limit_requests = 50  # Stricter rate limiting
+cors_origins = ["https://betting-platform.com", "https://www.betting-platform.com"]
+
+[features]
+enable_mock_services = false
+enable_test_endpoints = false
+enable_debug_logging = false
+
+[monitoring]
+log_level = "warn"
+enable_performance_tracking = true
+
+[performance]
+cache_ttl = 600  # Longer cache in production
+max_concurrent_requests = 5000  # Higher limit for production

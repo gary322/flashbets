@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Verses Flow</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
+        .status { padding: 20px; background: #111; margin: 20px 0; border-radius: 8px; }
+        .error { color: #ff3b30; }
+        .success { color: #4cd964; }
+        button { 
+            background: #FFD60A; 
+            color: #000; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Verses Flow Debug Test</h1>
+    
+    <div class="status" id="status">Initializing...</div>
+    
+    <button onclick="testMarketSelection()">Test Market Selection</button>
+    <button onclick="testVerseDisplay()">Test Verse Display</button>
+    <button onclick="checkElements()">Check DOM Elements</button>
+    
+    <div id="output"></div>
+    
+    <script src="backend_integration.js"></script>
+    <script src="platform_main.js"></script>
+    <script>
+        function log(message, isError = false) {
+            const status = document.getElementById('status');
+            const div = document.createElement('div');
+            div.className = isError ? 'error' : 'success';
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            status.appendChild(div);
+            console.log(message);
+        }
+        
+        function checkElements() {
+            log('Checking DOM elements...');
+            
+            const elements = [
+                'verseFlowContainer',
+                'verseConnections',
+                'verseLevels',
+                'verseGrid',
+                'marketSearchInput',
+                'marketSearchResults'
+            ];
+            
+            elements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    log(`✓ Found #${id} - display: ${el.style.display || 'default'}`, false);
+                } else {
+                    log(`✗ Missing #${id}`, true);
+                }
+            });
+            
+            // Check if functions exist
+            const functions = [
+                'updateAvailableVerses',
+                'updateVerseFlow',
+                'createVerseCard',
+                'getVersesForMarket'
+            ];
+            
+            functions.forEach(fn => {
+                if (typeof window[fn] === 'function') {
+                    log(`✓ Function ${fn} exists`, false);
+                } else {
+                    log(`✗ Function ${fn} missing`, true);
+                }
+            });
+        }
+        
+        async function testMarketSelection() {
+            log('Testing market selection...');
+            
+            // Create a test market
+            const testMarket = {
+                id: 'test-btc',
+                title: 'Will Bitcoin reach $100k by 2025?',
+                category: 'Crypto',
+                outcomes: [
+                    { name: 'Yes', price: 0.65 },
+                    { name: 'No', price: 0.35 }
+                ],
+                volume24h: 2500000,
+                liquidity: 1000000
+            };
+            
+            try {
+                // Set as selected market
+                platformState.selectedMarket = testMarket;
+                log('Market set in platformState');
+                
+                // Get verses
+                const verses = getVersesForMarket(testMarket);
+                log(`Generated ${verses.length} verses for market`);
+                
+                // Update display
+                updateAvailableVerses(verses);
+                log('Called updateAvailableVerses');
+                
+                // Check what happened
+                setTimeout(() => {
+                    const flowContainer = document.getElementById('verseFlowContainer');
+                    const grid = document.getElementById('verseGrid');
+                    log(`Flow container display: ${flowContainer?.style.display || 'not found'}`);
+                    log(`Grid display: ${grid?.style.display || 'not found'}`);
+                    
+                    const levels = document.querySelectorAll('.verse-level');
+                    log(`Found ${levels.length} verse levels`);
+                    
+                    const cards = document.querySelectorAll('.verse-card');
+                    log(`Found ${cards.length} verse cards`);
+                }, 500);
+                
+            } catch (error) {
+                log('Error: ' + error.message, true);
+                console.error(error);
+            }
+        }
+        
+        function testVerseDisplay() {
+            log('Testing verse display directly...');
+            
+            // Create test verses
+            const testVerses = [
+                { id: 'v1', name: 'Test Level 1', multiplier: 1.5, level: 1, description: 'Level 1 verse' },
+                { id: 'v2', name: 'Test Level 2', multiplier: 2.0, level: 2, description: 'Level 2 verse' },
+                { id: 'v3', name: 'Test Level 3', multiplier: 3.0, level: 3, description: 'Level 3 verse' }
+            ];
+            
+            try {
+                updateAvailableVerses(testVerses);
+                log('Called updateAvailableVerses with test data');
+            } catch (error) {
+                log('Error: ' + error.message, true);
+                console.error(error);
+            }
+        }
+        
+        // Check on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                log('Page loaded, checking initial state...');
+                checkElements();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Verse Test</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body style="background: #000; color: #fff; padding: 20px;">
+    <h1>Quick Verse Test</h1>
+    
+    <button onclick="quickTest()">Run Quick Test</button>
+    
+    <div id="results" style="margin: 20px 0; padding: 20px; background: #111; border-radius: 8px;">
+        <p>Click the button to test...</p>
+    </div>
+    
+    <!-- Test verse container -->
+    <div class="verses-section" id="versesSection" style="display: block; margin-top: 30px;">
+        <div class="section-title">Test Verses</div>
+        <div class="verse-flow-container" id="verseFlowContainer">
+            <svg class="verse-connections" id="verseConnections"></svg>
+            <div class="verse-levels" id="verseLevels"></div>
+        </div>
+    </div>
+    
+    <script src="platform_main.js"></script>
+    <script>
+        // Wait for script to load
+        window.addEventListener('load', function() {
+            console.log('Page loaded');
+            console.log('updateAvailableVerses exists:', typeof window.updateAvailableVerses);
+            console.log('All window functions:', Object.keys(window).filter(k => k.includes('Verse')));
+        });
+        
+        // Initialize minimal state
+        window.platformState = {
+            selectedVerses: [],
+            markets: new Map()
+        };
+        
+        function quickTest() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing...</p>';
+            
+            // Test data
+            const testVerses = [
+                {
+                    id: "test1",
+                    name: "Basic Market",
+                    description: "Test description",
+                    level: 1,
+                    multiplier: 1.5,
+                    category: "Test",
+                    risk_tier: "Low"
+                },
+                {
+                    id: "test2",
+                    name: "Advanced Market",
+                    description: "Higher risk test",
+                    level: 2,
+                    multiplier: 3.0,
+                    category: "Test",
+                    risk_tier: "Medium"
+                }
+            ];
+            
+            try {
+                // Call the function directly
+                console.log('Calling updateAvailableVerses...');
+                window.updateAvailableVerses(testVerses);
+                
+                // Check results after a delay
+                setTimeout(() => {
+                    const verseLevels = document.getElementById('verseLevels');
+                    const verseCards = document.querySelectorAll('.verse-card');
+                    
+                    let html = '<p style="color: #4cd964;">✓ Test completed</p>';
+                    html += `<p>verseLevels children: ${verseLevels.children.length}</p>`;
+                    html += `<p>verse-card elements: ${verseCards.length}</p>`;
+                    
+                    if (verseCards.length > 0) {
+                        html += '<p style="color: #4cd964;">✓ Verses are being created!</p>';
+                        html += '<p>First card content:</p>';
+                        html += `<pre style="background: #222; padding: 10px; border-radius: 4px;">${verseCards[0].outerHTML}</pre>`;
+                    } else {
+                        html += '<p style="color: #ff3b30;">✗ No verse cards found</p>';
+                        html += '<p>verseLevels HTML:</p>';
+                        html += `<pre style="background: #222; padding: 10px; border-radius: 4px;">${verseLevels.innerHTML || '(empty)'}</pre>`;
+                    }
+                    
+                    results.innerHTML = html;
+                }, 500);
+                
+            } catch (error) {
+                results.innerHTML = `<p style="color: #ff3b30;">Error: ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

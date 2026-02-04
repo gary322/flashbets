@@ -1,0 +1,14 @@
+# Development-specific configuration overrides
+# Only values that differ from default need to be specified
+
+[server]
+# Development uses default port 8081
+
+[database]
+# Development uses local database with default credentials
+
+[features]
+# All features enabled in development (same as default)
+
+[monitoring]
+log_level = "debug"  # More verbose logging in development

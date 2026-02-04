@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Integration Test Dashboard</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success { background: #4CD964; color: #000; }
+        .error { background: #FF3B30; color: #fff; }
+        .pending { background: #FFD60A; color: #000; }
+        button {
+            background: #FFD60A;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Platform Integration Test Dashboard</h1>
+    
+    <div class="test-section">
+        <h2>1. Backend API Connection</h2>
+        <button onclick="testBackendAPI()">Test Backend API</button>
+        <div id="backendResult" class="test-result pending">Not tested yet</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Smart Contract Connection</h2>
+        <button onclick="testSmartContracts()">Test Smart Contracts</button>
+        <div id="contractResult" class="test-result pending">Not tested yet</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Polymarket API Integration</h2>
+        <button onclick="testPolymarket()">Test Polymarket</button>
+        <div id="polymarketResult" class="test-result pending">Not tested yet</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. WebSocket Real-time Updates</h2>
+        <button onclick="testWebSocket()">Test WebSocket</button>
+        <div id="websocketResult" class="test-result pending">Not tested yet</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Verse System</h2>
+        <button onclick="testVerseSystem()">Test Verses</button>
+        <div id="verseResult" class="test-result pending">Not tested yet</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>6. Full Trade Flow</h2>
+        <button onclick="testTradeFlow()">Test Trade Flow</button>
+        <div id="tradeResult" class="test-result pending">Not tested yet</div>
+    </div>
+    
+    <script src="backend_integration.js"></script>
+    <script>
+        async function testBackendAPI() {
+            const result = document.getElementById('backendResult');
+            try {
+                const response = await fetch('http://localhost:8081/api/markets');
+                if (response.ok) {
+                    const markets = await response.json();
+                    result.className = 'test-result success';
+                    result.textContent = `✓ Backend API connected! Found ${markets.length} markets`;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.textContent = `✗ Backend API error: ${error.message}`;
+            }
+        }
+        
+        async function testSmartContracts() {
+            const result = document.getElementById('contractResult');
+            try {
+                const response = await fetch('http://localhost:8081/api/program/info');
+                if (response.ok) {
+                    const info = await response.json();
+                    result.className = 'test-result success';
+                    result.textContent = `✓ Smart contracts connected! Program ID: ${info.programId || 'Connected'}`;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.textContent = `✗ Smart contract error: ${error.message}`;
+            }
+        }
+        
+        async function testPolymarket() {
+            const result = document.getElementById('polymarketResult');
+            try {
+                if (window.backendAPI) {
+                    const markets = await window.backendAPI.fetchPolymarketMarkets();
+                    result.className = 'test-result success';
+                    result.textContent = `✓ Polymarket API working! ${markets.length > 0 ? 'Markets available' : 'API accessible'}`;
+                } else {
+                    throw new Error('Backend API not loaded');
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.textContent = `✗ Polymarket error: ${error.message}`;
+            }
+        }
+        
+        async function testWebSocket() {
+            const result = document.getElementById('websocketResult');
+            try {
+                if (window.backendAPI && window.backendAPI.ws) {
+                    const state = window.backendAPI.ws.readyState;
+                    if (state === WebSocket.OPEN) {
+                        result.className = 'test-result success';
+                        result.textContent = '✓ WebSocket connected and ready for real-time updates';
+                    } else {
+                        throw new Error(`WebSocket state: ${state}`);
+                    }
+                } else {
+                    throw new Error('WebSocket not initialized');
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.textContent = `✗ WebSocket error: ${error.message}`;
+            }
+        }
+        
+        async function testVerseSystem() {
+            const result = document.getElementById('verseResult');
+            try {
+                if (window.backendAPI) {
+                    // Test with a mock market ID
+                    const verses = await window.backendAPI.getMarketVerses('btc_100k_2025');
+                    result.className = 'test-result success';
+                    result.textContent = `✓ Verse system working! ${verses.length} verses generated`;
+                } else {
+                    throw new Error('Backend API not loaded');
+                }
+            } catch (error) {
+                result.className = 'test-result error';
+                result.textContent = `✗ Verse system error: ${error.message}`;
+            }
+        }
+        
+        async function testTradeFlow() {
+            const result = document.getElementById('tradeResult');
+            try {
+                // Test the full calculation flow
+                const testTrade = {
+                    baseAmount: 100,
+                    selectedVerses: [
+                        { multiplier: 2.0 },
+                        { multiplier: 1.5 }
+                    ],
+                    leverage: 5
+                };
+                
+                const calculation = window.backendAPI.calculateTotalPayout(
+                    testTrade.baseAmount,
+                    testTrade.selectedVerses,
+                    testTrade.leverage
+                );
+                
+                result.className = 'test-result success';
+                result.textContent = `✓ Trade flow working! 100 SOL @ ${calculation.totalMultiplier}x = ${calculation.potentialPayout} SOL potential`;
+            } catch (error) {
+                result.className = 'test-result error';
+                result.textContent = `✗ Trade flow error: ${error.message}`;
+            }
+        }
+        
+        // Run all tests on load
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Wait for backend API to load
+            let retries = 0;
+            while (!window.backendAPI && retries < 10) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+            
+            console.log('Integration tests ready');
+        });
+    </script>
+</body>
+</html>

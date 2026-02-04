@@ -1,0 +1,73 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Logs
+*.log
+logs/
+**/logs/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Node / Next
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Rust
+target/
+**/target/
+**/*.rs.bk
+
+# Solidity/Hardhat generated
+artifacts/
+**/artifacts/
+cache/
+**/cache/
+typechain/
+**/typechain/
+
+# Solana local ledgers / snapshots
+test-ledger/
+**/test-ledger/
+snapshots/
+**/snapshots/
+rocksdb/
+**/rocksdb/
+
+# Large test artifacts / results (keep test code, ignore outputs)
+betting_platform/tests/load-testing/
+betting_platform/test_e2e/results/
+
+# Redis dumps
+dump.rdb
+
+# Keypairs / wallets (never commit real keys)
+keypairs/
+**/keypairs/
+wallets/
+**/wallets/
+**/*keypair*.json
+**/*-keypair.json
+
+# Polymarket local/generated credentials (never commit)
+polymarket_credentials.json
+**/polymarket_credentials.json
+betting_platform/api_runner/polymarket_config.rs
+betting_platform/api_runner/init_polymarket.sh
+betting_platform/api_runner/test_polymarket_auth.js

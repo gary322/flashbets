@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM - Order Types Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Reuse base styles from template */
+        .header {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 2px solid #FFD60A;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Bungee', cursive;
+            font-size: 36px;
+            background: linear-gradient(45deg, #FFD60A, #FFA500, #FF6B35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            padding: 8px 16px;
+            background: rgba(255, 214, 10, 0.1);
+            border: 1px solid #FFD60A;
+            color: #FFD60A;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 214, 10, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .speed-selector {
+            display: flex;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .speed-btn {
+            padding: 4px 8px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .speed-btn.active {
+            background: #FFD60A;
+            color: #0a0a0a;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 999;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD60A, #FFA500);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(255, 214, 10, 0.5);
+        }
+
+        .step-indicator {
+            position: fixed;
+            top: 90px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            font-size: 14px;
+            z-index: 998;
+        }
+
+        .main-content {
+            margin-top: 100px;
+            padding: 20px;
+            min-height: calc(100vh - 100px);
+            position: relative;
+        }
+
+        .narrator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(255, 214, 10, 0.95), rgba(255, 165, 0, 0.95));
+            color: #0a0a0a;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(255, 214, 10, 0.3);
+            z-index: 2000;
+            animation: slideIn 0.5s ease;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .narrator.hidden {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+            pointer-events: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .narrator-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .narrator-content {
+            font-size: 16px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .narrator-timer {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Order Types specific styles */
+        .order-interface {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .order-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .order-tab {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .order-tab.active {
+            background: linear-gradient(135deg, #FFD60A, #FFA500);
+            color: #0a0a0a;
+            border-color: #FFD60A;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 214, 10, 0.3);
+        }
+
+        .order-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .form-input {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.05);
+        }
+
+        .order-book {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .order-book-side {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .order-book-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bids .order-book-title {
+            color: #4CAF50;
+        }
+
+        .asks .order-book-title {
+            color: #FF5252;
+        }
+
+        .order-book-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .order-book-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .order-book-header {
+            font-weight: 600;
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .submit-btn {
+            grid-column: span 2;
+            padding: 15px;
+            background: linear-gradient(135deg, #FFD60A, #FFA500);
+            color: #0a0a0a;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 214, 10, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .order-status {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .status-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #FFC107;
+        }
+
+        .status-filled {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .status-cancelled {
+            background: rgba(255, 82, 82, 0.2);
+            color: #FF5252;
+        }
+
+        .execution-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(76, 175, 80, 0.95);
+            color: #fff;
+            padding: 30px 50px;
+            border-radius: 16px;
+            font-size: 24px;
+            font-weight: 600;
+            z-index: 3000;
+            animation: executionPulse 0.5s ease;
+            display: none;
+        }
+
+        .execution-animation.show {
+            display: block;
+        }
+
+        @keyframes executionPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .price-line {
+            position: absolute;
+            height: 2px;
+            background: #FFD60A;
+            width: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: pricePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pricePulse {
+            0%, 100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .order-type-description {
+            background: rgba(255, 214, 10, 0.1);
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .description-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFD60A;
+            margin-bottom: 10px;
+        }
+
+        .description-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .order-form {
+                grid-template-columns: 1fr;
+            }
+
+            .order-book {
+                grid-template-columns: 1fr;
+            }
+
+            .submit-btn {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">BOOM</div>
+        <div class="controls">
+            <button class="control-btn" id="playPauseBtn">⏸ Pause</button>
+            <button class="control-btn" id="restartBtn">↺ Restart</button>
+            <div class="speed-selector">
+                <button class="speed-btn" data-speed="0.5">0.5x</button>
+                <button class="speed-btn active" data-speed="1">1x</button>
+                <button class="speed-btn" data-speed="2">2x</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+        <span id="stepIndicator">Step 1 of 50</span>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="order-interface" id="orderInterface">
+            <!-- Dynamic content will be inserted here -->
+        </div>
+    </div>
+
+    <!-- Narrator -->
+    <div class="narrator hidden" id="narrator">
+        <div class="narrator-timer" id="narratorTimer">5s</div>
+        <div class="narrator-title">
+            <span>📊</span>
+            <span id="narratorTitle">Order Types Demo</span>
+        </div>
+        <div class="narrator-content" id="narratorContent">
+            Welcome to the comprehensive Order Types demonstration.
+        </div>
+    </div>
+
+    <!-- Execution animation -->
+    <div class="execution-animation" id="executionAnimation">
+        ✓ ORDER EXECUTED
+    </div>
+
+    <script>
+        // Order Types Demo Implementation
+        class OrderTypesDemo {
+            constructor() {
+                this.currentStep = 0;
+                this.isPlaying = true;
+                this.speed = 1;
+                this.totalSteps = 50;
+                this.stepTimer = null;
+                this.narratorTimer = null;
+
+                // Demo data
+                this.markets = [
+                    { id: 1, title: 'Will Bitcoin exceed $150k by Dec 2025?', yes: 65, no: 35 },
+                    { id: 2, title: 'US Recession in Q4 2025?', yes: 42, no: 58 },
+                    { id: 3, title: 'Will AI market cap reach $10T?', yes: 78, no: 22 }
+                ];
+
+                this.orderBook = {
+                    bids: [
+                        { price: 0.64, amount: 1000, total: 640 },
+                        { price: 0.63, amount: 2500, total: 1575 },
+                        { price: 0.62, amount: 3200, total: 1984 },
+                        { price: 0.61, amount: 1800, total: 1098 },
+                        { price: 0.60, amount: 5000, total: 3000 }
+                    ],
+                    asks: [
+                        { price: 0.66, amount: 1200, total: 792 },
+                        { price: 0.67, amount: 2000, total: 1340 },
+                        { price: 0.68, amount: 3500, total: 2380 },
+                        { price: 0.69, amount: 1500, total: 1035 },
+                        { price: 0.70, amount: 4000, total: 2800 }
+                    ]
+                };
+
+                this.initialize();
+            }
+
+            initialize() {
+                this.bindControls();
+                this.start();
+            }
+
+            bindControls() {
+                document.getElementById('playPauseBtn').addEventListener('click', () => this.togglePlayPause());
+                document.getElementById('restartBtn').addEventListener('click', () => this.restart());
+
+                document.querySelectorAll('.speed-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.speed = parseFloat(e.target.dataset.speed);
+                    });
+                });
+            }
+
+            start() {
+                this.currentStep = 0;
+                this.runStep();
+            }
+
+            runStep() {
+                if (this.currentStep >= this.totalSteps) {
+                    this.complete();
+                    return;
+                }
+
+                this.updateProgress();
+                this.updateStepIndicator();
+
+                const stepActions = [
+                    () => this.introductionStep(),
+                    () => this.showMarketOrder(),
+                    () => this.demonstrateMarketOrder(),
+                    () => this.executeMarketOrder(),
+                    () => this.showMarketOrderResult(),
+                    () => this.showLimitOrder(),
+                    () => this.demonstrateLimitOrder(),
+                    () => this.placeLimitOrder(),
+                    () => this.showLimitOrderPending(),
+                    () => this.fillLimitOrder(),
+                    () => this.showStopLoss(),
+                    () => this.demonstrateStopLoss(),
+                    () => this.triggerStopLoss(),
+                    () => this.showTrailingStop(),
+                    () => this.demonstrateTrailingStop(),
+                    () => this.adjustTrailingStop(),
+                    () => this.showIcebergOrder(),
+                    () => this.demonstrateIcebergOrder(),
+                    () => this.executeIcebergSlices(),
+                    () => this.showOCOOrder(),
+                    () => this.demonstrateOCOOrder(),
+                    () => this.triggerOCOCondition(),
+                    () => this.showBracketOrder(),
+                    () => this.demonstrateBracketOrder(),
+                    () => this.executeBracketOrder(),
+                    () => this.showTimeBasedOrders(),
+                    () => this.demonstrateGTC(),
+                    () => this.demonstrateIOC(),
+                    () => this.demonstrateFOK(),
+                    () => this.showTWAPOrder(),
+                    () => this.demonstrateTWAPOrder(),
+                    () => this.executeTWAPSlices(),
+                    () => this.showConditionalOrders(),
+                    () => this.demonstrateIfThen(),
+                    () => this.executeConditionalLogic(),
+                    () => this.showAdvancedStrategies(),
+                    () => this.demonstrateScalping(),
+                    () => this.demonstrateArbitrage(),
+                    () => this.demonstrateDCA(),
+                    () => this.showOrderBookDepth(),
+                    () => this.analyzeMarketImpact(),
+                    () => this.demonstrateSlippage(),
+                    () => this.showSlippageProtection(),
+                    () => this.demonstrateFailedOrder(),
+                    () => this.showOrderRecovery(),
+                    () => this.demonstrateGasOptimization(),
+                    () => this.showPerformanceMetrics(),
+                    () => this.demonstrateBulkOrders(),
+                    () => this.showOrderHistory(),
+                    () => this.finalSummary()
+                ];
+
+                if (stepActions[this.currentStep]) {
+                    stepActions[this.currentStep]();
+                }
+
+                if (this.isPlaying) {
+                    this.stepTimer = setTimeout(() => {
+                        this.currentStep++;
+                        this.runStep();
+                    }, 8000 / this.speed);
+                }
+            }
+
+            // Step implementations
+            introductionStep() {
+                this.showNarrator('Welcome to Order Types', 
+                    'BOOM platform offers 10+ advanced order types for professional trading. Let\'s explore each type with live demonstrations.');
+                
+                document.getElementById('orderInterface').innerHTML = `
+                    <div style="text-align: center; padding: 100px 20px;">
+                        <h1 style="font-size: 48px; margin-bottom: 30px; color: #FFD60A;">Order Types Mastery</h1>
+                        <p style="font-size: 20px; color: #888; margin-bottom: 40px;">Professional Trading Tools on BOOM Platform</p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto;">
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px;">
+                                <div style="font-size: 32px; color: #FFD60A; margin-bottom: 10px;">10+</div>
+                                <div style="color: #888;">Order Types</div>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px;">
+                                <div style="font-size: 32px; color: #4CAF50; margin-bottom: 10px;"><100ms</div>
+                                <div style="color: #888;">Execution Speed</div>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px;">
+                                <div style="font-size: 32px; color: #FF5252; margin-bottom: 10px;">1%</div>
+                                <div style="color: #888;">Max Slippage</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showMarketOrder() {
+                this.showNarrator('Market Orders', 
+                    'Market orders execute immediately at the best available price. Perfect for when you need instant execution.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div class="order-type-description">
+                        <div class="description-title">MARKET ORDER</div>
+                        <div class="description-text">
+                            Executes immediately at the current market price. Guarantees execution but not price.
+                            <br><br>
+                            • Instant execution (<100ms)
+                            <br>• Best for liquid markets
+                            <br>• May experience slippage in volatile conditions
+                        </div>
+                    </div>
+                    <div class="order-tabs">
+                        <div class="order-tab active">Market</div>
+                        <div class="order-tab">Limit</div>
+                        <div class="order-tab">Stop-Loss</div>
+                        <div class="order-tab">Advanced</div>
+                    </div>
+                    <div class="order-form">
+                        <div class="form-group">
+                            <label class="form-label">Market</label>
+                            <input class="form-input" value="Bitcoin >$150k by Dec 2025" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Side</label>
+                            <input class="form-input" value="YES" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount (USDC)</label>
+                            <input class="form-input" id="marketAmount" value="1000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Est. Price</label>
+                            <input class="form-input" value="0.65" readonly>
+                        </div>
+                        <button class="submit-btn" id="marketOrderBtn">PLACE MARKET ORDER</button>
+                    </div>
+                `;
+            }
+
+            demonstrateMarketOrder() {
+                this.showNarrator('Placing Market Order', 
+                    'Watch as we place a $1,000 market order. The order will execute instantly at the best available price.');
+
+                // Animate amount input
+                const amountInput = document.getElementById('marketAmount');
+                if (amountInput) {
+                    amountInput.style.border = '2px solid #FFD60A';
+                    amountInput.style.animation = 'pulse 1s ease-in-out';
+                }
+
+                // Highlight submit button
+                setTimeout(() => {
+                    const btn = document.getElementById('marketOrderBtn');
+                    if (btn) {
+                        btn.style.transform = 'scale(1.05)';
+                        btn.style.boxShadow = '0 10px 30px rgba(255, 214, 10, 0.5)';
+                    }
+                }, 2000 / this.speed);
+            }
+
+            executeMarketOrder() {
+                this.showNarrator('Execution in Progress', 
+                    'Order sent to Polymarket. Matching with counterparties...');
+
+                const btn = document.getElementById('marketOrderBtn');
+                if (btn) {
+                    btn.textContent = 'EXECUTING...';
+                    btn.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
+                }
+
+                // Show execution animation
+                setTimeout(() => {
+                    const execAnimation = document.getElementById('executionAnimation');
+                    execAnimation.classList.add('show');
+                    setTimeout(() => {
+                        execAnimation.classList.remove('show');
+                    }, 2000 / this.speed);
+                }, 1000 / this.speed);
+            }
+
+            showMarketOrderResult() {
+                this.showNarrator('Order Executed!', 
+                    'Market order filled at 0.65. You now own 1,538 YES shares of Bitcoin >$150k.');
+
+                document.getElementById('orderInterface').innerHTML += `
+                    <div class="order-status">
+                        <div class="status-header">
+                            <div class="status-title">Order #10234</div>
+                            <div class="status-badge status-filled">FILLED</div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 15px;">
+                            <div>
+                                <div style="color: #888; font-size: 12px;">Type</div>
+                                <div style="font-size: 16px; margin-top: 5px;">Market Order</div>
+                            </div>
+                            <div>
+                                <div style="color: #888; font-size: 12px;">Execution Price</div>
+                                <div style="font-size: 16px; margin-top: 5px; color: #4CAF50;">0.65 USDC</div>
+                            </div>
+                            <div>
+                                <div style="color: #888; font-size: 12px;">Shares</div>
+                                <div style="font-size: 16px; margin-top: 5px;">1,538</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showLimitOrder() {
+                this.showNarrator('Limit Orders', 
+                    'Limit orders let you set your exact price. They only execute when the market reaches your specified price.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div class="order-type-description">
+                        <div class="description-title">LIMIT ORDER</div>
+                        <div class="description-text">
+                            Sets a specific price at which you want to buy or sell. Guarantees price but not execution.
+                            <br><br>
+                            • Control over execution price
+                            <br>• May not fill if price isn't reached
+                            <br>• Good for patient traders
+                        </div>
+                    </div>
+                    <div class="order-tabs">
+                        <div class="order-tab">Market</div>
+                        <div class="order-tab active">Limit</div>
+                        <div class="order-tab">Stop-Loss</div>
+                        <div class="order-tab">Advanced</div>
+                    </div>
+                    <div class="order-form">
+                        <div class="form-group">
+                            <label class="form-label">Market</label>
+                            <input class="form-input" value="US Recession Q4 2025" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Side</label>
+                            <input class="form-input" value="NO" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Limit Price</label>
+                            <input class="form-input" id="limitPrice" value="0.55">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount (USDC)</label>
+                            <input class="form-input" value="2000">
+                        </div>
+                        <button class="submit-btn">PLACE LIMIT ORDER</button>
+                    </div>
+                    <div class="order-book">
+                        <div class="order-book-side bids">
+                            <div class="order-book-title">
+                                <span style="color: #4CAF50;">●</span> BIDS
+                            </div>
+                            ${this.renderOrderBookSide(this.orderBook.bids)}
+                        </div>
+                        <div class="order-book-side asks">
+                            <div class="order-book-title">
+                                <span style="color: #FF5252;">●</span> ASKS
+                            </div>
+                            ${this.renderOrderBookSide(this.orderBook.asks)}
+                        </div>
+                    </div>
+                `;
+            }
+
+            demonstrateLimitOrder() {
+                this.showNarrator('Setting Limit Price', 
+                    'We\'re setting a limit buy at 0.55, below the current market price of 0.58. This order will wait for the price to drop.');
+
+                const priceInput = document.getElementById('limitPrice');
+                if (priceInput) {
+                    priceInput.style.border = '2px solid #FFD60A';
+                    this.animateValue(priceInput, 0.58, 0.55, 2000);
+                }
+            }
+
+            placeLimitOrder() {
+                this.showNarrator('Order Placed in Book', 
+                    'Your limit order is now in the order book, waiting for a match at 0.55 or better.');
+
+                // Add limit order to order book display
+                const bidsContainer = document.querySelector('.bids');
+                if (bidsContainer) {
+                    const newOrder = document.createElement('div');
+                    newOrder.className = 'order-book-row';
+                    newOrder.style.background = 'rgba(255, 214, 10, 0.1)';
+                    newOrder.style.border = '1px solid #FFD60A';
+                    newOrder.innerHTML = `
+                        <div style="color: #FFD60A;">0.55</div>
+                        <div>3636</div>
+                        <div>2000</div>
+                    `;
+                    bidsContainer.appendChild(newOrder);
+                }
+            }
+
+            showLimitOrderPending() {
+                this.showNarrator('Waiting for Match', 
+                    'Your limit order is pending. It will execute when a seller accepts 0.55 or lower.');
+
+                document.getElementById('orderInterface').innerHTML += `
+                    <div class="order-status">
+                        <div class="status-header">
+                            <div class="status-title">Order #10235</div>
+                            <div class="status-badge status-pending">PENDING</div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <div style="color: #888; font-size: 12px;">Time in Book</div>
+                            <div style="font-size: 16px; margin-top: 5px;" id="timeInBook">00:00:12</div>
+                        </div>
+                    </div>
+                `;
+
+                // Animate timer
+                let seconds = 12;
+                const timer = setInterval(() => {
+                    seconds++;
+                    const timeElement = document.getElementById('timeInBook');
+                    if (timeElement) {
+                        const mins = Math.floor(seconds / 60);
+                        const secs = seconds % 60;
+                        timeElement.textContent = `00:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    }
+                    if (seconds > 20) clearInterval(timer);
+                }, 1000 / this.speed);
+            }
+
+            fillLimitOrder() {
+                this.showNarrator('Order Filled!', 
+                    'Market moved to 0.55 and your limit order was filled. You saved compared to the market order!');
+
+                const statusBadge = document.querySelector('.status-pending');
+                if (statusBadge) {
+                    statusBadge.className = 'status-badge status-filled';
+                    statusBadge.textContent = 'FILLED';
+                    statusBadge.style.animation = 'pulse 1s ease-in-out';
+                }
+
+                // Show execution animation
+                const execAnimation = document.getElementById('executionAnimation');
+                execAnimation.textContent = '✓ LIMIT ORDER FILLED @ 0.55';
+                execAnimation.classList.add('show');
+                setTimeout(() => {
+                    execAnimation.classList.remove('show');
+                }, 2000 / this.speed);
+            }
+
+            showStopLoss() {
+                this.showNarrator('Stop-Loss Orders', 
+                    'Stop-loss orders automatically sell your position when the price drops to a certain level, limiting your losses.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div class="order-type-description">
+                        <div class="description-title">STOP-LOSS ORDER</div>
+                        <div class="description-text">
+                            Automatically triggers a market sell when price falls to your stop level.
+                            <br><br>
+                            • Risk management tool
+                            <br>• Protects against large losses
+                            <br>• Converts to market order when triggered
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div style="position: absolute; top: 30%; width: 100%; height: 2px; background: #4CAF50;"></div>
+                        <div style="position: absolute; top: 30%; left: 10px; color: #4CAF50; font-size: 12px;">Entry: 0.65</div>
+                        <div class="price-line"></div>
+                        <div style="position: absolute; top: 50%; left: 10px; color: #FFD60A; font-size: 12px;">Current: 0.62</div>
+                        <div style="position: absolute; top: 70%; width: 100%; height: 2px; background: #FF5252; border-top: 2px dashed #FF5252;"></div>
+                        <div style="position: absolute; top: 70%; left: 10px; color: #FF5252; font-size: 12px;">Stop: 0.58</div>
+                    </div>
+                    <div class="order-form" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Position</label>
+                            <input class="form-input" value="1,538 YES shares @ 0.65" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Current Price</label>
+                            <input class="form-input" id="currentPrice" value="0.62" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Stop Price</label>
+                            <input class="form-input" value="0.58" style="color: #FF5252;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Potential Loss</label>
+                            <input class="form-input" value="-$107.66 (-10.8%)" readonly style="color: #FF5252;">
+                        </div>
+                        <button class="submit-btn" style="background: linear-gradient(135deg, #FF5252, #ff3838);">
+                            SET STOP-LOSS
+                        </button>
+                    </div>
+                `;
+            }
+
+            demonstrateStopLoss() {
+                this.showNarrator('Price Movement', 
+                    'Watch as the price drops. When it hits 0.58, the stop-loss will trigger automatically.');
+
+                const priceInput = document.getElementById('currentPrice');
+                if (priceInput) {
+                    this.animateValue(priceInput, 0.62, 0.58, 3000);
+                    
+                    // Animate price line
+                    const priceLine = document.querySelector('.price-line');
+                    if (priceLine) {
+                        priceLine.style.transition = 'top 3s ease';
+                        priceLine.style.top = '70%';
+                    }
+                }
+            }
+
+            triggerStopLoss() {
+                this.showNarrator('Stop-Loss Triggered!', 
+                    'Price hit 0.58, triggering your stop-loss. Position closed, limiting loss to 10.8%.');
+
+                const execAnimation = document.getElementById('executionAnimation');
+                execAnimation.textContent = '⚠️ STOP-LOSS TRIGGERED';
+                execAnimation.style.background = 'rgba(255, 82, 82, 0.95)';
+                execAnimation.classList.add('show');
+                setTimeout(() => {
+                    execAnimation.classList.remove('show');
+                    execAnimation.style.background = '';
+                }, 2000 / this.speed);
+            }
+
+            showTrailingStop() {
+                this.showNarrator('Trailing Stop Orders', 
+                    'Trailing stops follow the price up but lock in profits when it reverses.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div class="order-type-description">
+                        <div class="description-title">TRAILING STOP ORDER</div>
+                        <div class="description-text">
+                            Dynamically adjusts stop price as market moves in your favor.
+                            <br><br>
+                            • Locks in profits automatically
+                            <br>• Follows price upward
+                            <br>• Triggers on reversal
+                        </div>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.02); border-radius: 12px; padding: 20px; margin: 20px 0;">
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center;">
+                            <div>
+                                <div style="color: #888; font-size: 12px;">Entry Price</div>
+                                <div style="font-size: 20px; color: #fff; margin-top: 5px;">0.50</div>
+                            </div>
+                            <div>
+                                <div style="color: #888; font-size: 12px;">Current Price</div>
+                                <div style="font-size: 20px; color: #4CAF50; margin-top: 5px;" id="trailingCurrent">0.65</div>
+                            </div>
+                            <div>
+                                <div style="color: #888; font-size: 12px;">Trail Distance</div>
+                                <div style="font-size: 20px; color: #FFD60A; margin-top: 5px;">10%</div>
+                            </div>
+                            <div>
+                                <div style="color: #888; font-size: 12px;">Stop Price</div>
+                                <div style="font-size: 20px; color: #FF5252; margin-top: 5px;" id="trailingStop">0.585</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            demonstrateTrailingStop() {
+                this.showNarrator('Trail in Action', 
+                    'As price rises to 0.70, the trailing stop follows, moving up to 0.63 (10% below).');
+
+                const currentElement = document.getElementById('trailingCurrent');
+                const stopElement = document.getElementById('trailingStop');
+                
+                if (currentElement && stopElement) {
+                    this.animateValue(currentElement, 0.65, 0.70, 2000);
+                    setTimeout(() => {
+                        this.animateValue(stopElement, 0.585, 0.63, 1000);
+                        stopElement.style.color = '#4CAF50';
+                    }, 2000 / this.speed);
+                }
+            }
+
+            adjustTrailingStop() {
+                this.showNarrator('Price Reversal', 
+                    'Price drops to 0.63, triggering the trailing stop. You locked in 26% profit!');
+
+                const currentElement = document.getElementById('trailingCurrent');
+                if (currentElement) {
+                    setTimeout(() => {
+                        this.animateValue(currentElement, 0.70, 0.63, 2000);
+                        currentElement.style.color = '#FF5252';
+                    }, 1000 / this.speed);
+                }
+
+                setTimeout(() => {
+                    const execAnimation = document.getElementById('executionAnimation');
+                    execAnimation.textContent = '💰 PROFIT LOCKED: +26%';
+                    execAnimation.style.background = 'rgba(76, 175, 80, 0.95)';
+                    execAnimation.classList.add('show');
+                    setTimeout(() => {
+                        execAnimation.classList.remove('show');
+                        execAnimation.style.background = '';
+                    }, 2000 / this.speed);
+                }, 3000 / this.speed);
+            }
+
+            showIcebergOrder() {
+                this.showNarrator('Iceberg Orders', 
+                    'Iceberg orders hide your true order size, showing only a small portion to the market.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div class="order-type-description">
+                        <div class="description-title">ICEBERG ORDER</div>
+                        <div class="description-text">
+                            Conceals large orders by showing only a small portion at a time.
+                            <br><br>
+                            • Prevents market impact
+                            <br>• Hides true intentions
+                            <br>• Executes in slices
+                        </div>
+                    </div>
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 24px; color: #FFD60A; margin-bottom: 20px;">Total Order: 50,000 USDC</div>
+                        <div style="display: flex; justify-content: center; gap: 10px; margin: 30px 0;">
+                            ${[1,2,3,4,5,6,7,8,9,10].map(i => `
+                                <div id="slice${i}" style="width: 40px; height: 100px; background: rgba(255, 255, 255, 0.1); 
+                                     border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px; 
+                                     display: flex; align-items: flex-end;">
+                                    <div style="width: 100%; height: ${i === 1 ? '20%' : '0%'}; 
+                                         background: linear-gradient(to top, #FFD60A, #FFA500); 
+                                         border-radius: 0 0 4px 4px; transition: height 0.5s;"></div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div style="color: #888;">Visible: <span id="visibleAmount" style="color: #FFD60A;">5,000</span> USDC</div>
+                        <div style="color: #888; margin-top: 10px;">Hidden: <span id="hiddenAmount" style="color: #666;">45,000</span> USDC</div>
+                    </div>
+                `;
+            }
+
+            demonstrateIcebergOrder() {
+                this.showNarrator('Iceberg Execution', 
+                    'Only 5,000 USDC is visible. As each slice fills, the next appears automatically.');
+            }
+
+            executeIcebergSlices() {
+                this.showNarrator('Progressive Execution', 
+                    'Watch as slices execute one by one, maintaining stealth while filling the full 50,000 USDC order.');
+
+                let sliceIndex = 1;
+                const executeSlice = () => {
+                    if (sliceIndex <= 10) {
+                        // Clear current slice
+                        const currentSlice = document.querySelector(`#slice${sliceIndex} div`);
+                        if (currentSlice) {
+                            currentSlice.style.height = '0%';
+                        }
+
+                        // Show next slice
+                        if (sliceIndex < 10) {
+                            const nextSlice = document.querySelector(`#slice${sliceIndex + 1} div`);
+                            if (nextSlice) {
+                                nextSlice.style.height = '20%';
+                            }
+                        }
+
+                        // Update amounts
+                        const visibleElement = document.getElementById('visibleAmount');
+                        const hiddenElement = document.getElementById('hiddenAmount');
+                        if (visibleElement && hiddenElement) {
+                            const remaining = (10 - sliceIndex) * 5000;
+                            visibleElement.textContent = sliceIndex < 10 ? '5,000' : '0';
+                            hiddenElement.textContent = remaining.toLocaleString();
+                        }
+
+                        sliceIndex++;
+                        if (sliceIndex <= 10) {
+                            setTimeout(executeSlice, 500 / this.speed);
+                        }
+                    }
+                };
+                executeSlice();
+            }
+
+            showOCOOrder() {
+                this.showNarrator('OCO Orders', 
+                    'One-Cancels-Other orders place two orders simultaneously. When one fills, the other cancels.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div class="order-type-description">
+                        <div class="description-title">OCO (ONE-CANCELS-OTHER)</div>
+                        <div class="description-text">
+                            Places two orders where execution of one automatically cancels the other.
+                            <br><br>
+                            • Profit target + Stop loss
+                            <br>• Dual strategy execution
+                            <br>• Automatic order management
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                        <div id="ocoOrder1" style="background: rgba(76, 175, 80, 0.1); border: 2px solid #4CAF50; 
+                             border-radius: 12px; padding: 20px;">
+                            <div style="font-size: 18px; font-weight: 600; color: #4CAF50; margin-bottom: 15px;">
+                                Order 1: Take Profit
+                            </div>
+                            <div style="color: #888; font-size: 14px;">Limit Sell @ 0.75</div>
+                            <div style="margin-top: 10px;">Amount: 1,000 shares</div>
+                            <div style="margin-top: 10px; color: #4CAF50;">Profit: +$150 (+15%)</div>
+                        </div>
+                        <div id="ocoOrder2" style="background: rgba(255, 82, 82, 0.1); border: 2px solid #FF5252; 
+                             border-radius: 12px; padding: 20px;">
+                            <div style="font-size: 18px; font-weight: 600; color: #FF5252; margin-bottom: 15px;">
+                                Order 2: Stop Loss
+                            </div>
+                            <div style="color: #888; font-size: 14px;">Stop @ 0.60</div>
+                            <div style="margin-top: 10px;">Amount: 1,000 shares</div>
+                            <div style="margin-top: 10px; color: #FF5252;">Loss: -$50 (-5%)</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            demonstrateOCOOrder() {
+                this.showNarrator('OCO Active', 
+                    'Both orders are now active. Whichever condition is met first will execute and cancel the other.');
+            }
+
+            triggerOCOCondition() {
+                this.showNarrator('Take Profit Hit!', 
+                    'Price reached 0.75, triggering the take profit order. Stop loss automatically cancelled.');
+
+                const order1 = document.getElementById('ocoOrder1');
+                const order2 = document.getElementById('ocoOrder2');
+                
+                if (order1) {
+                    order1.style.background = 'rgba(76, 175, 80, 0.3)';
+                    order1.style.boxShadow = '0 0 30px rgba(76, 175, 80, 0.5)';
+                    order1.innerHTML += '<div style="position: absolute; top: 10px; right: 10px; background: #4CAF50; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px;">EXECUTED</div>';
+                }
+                
+                if (order2) {
+                    order2.style.opacity = '0.3';
+                    order2.style.textDecoration = 'line-through';
+                    order2.innerHTML += '<div style="position: absolute; top: 10px; right: 10px; background: #666; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px;">CANCELLED</div>';
+                }
+            }
+
+            showBracketOrder() {
+                this.showNarrator('Bracket Orders', 
+                    'Bracket orders combine entry, profit target, and stop loss in one complete trade plan.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div class="order-type-description">
+                        <div class="description-title">BRACKET ORDER</div>
+                        <div class="description-text">
+                            Complete trade setup: Entry + Take Profit + Stop Loss
+                            <br><br>
+                            • Full position management
+                            <br>• Risk/reward defined upfront
+                            <br>• Professional trading strategy
+                        </div>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.02); border-radius: 16px; padding: 30px; margin: 20px 0;">
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <div style="font-size: 24px; color: #FFD60A;">AI Market Cap >$10T by 2026</div>
+                            <div style="color: #888; margin-top: 10px;">Current Price: 0.78</div>
+                        </div>
+                        <div style="position: relative; height: 200px; margin: 30px 0;">
+                            <div style="position: absolute; top: 20%; width: 100%; height: 2px; background: #4CAF50;"></div>
+                            <div style="position: absolute; top: 20%; right: 20px; color: #4CAF50;">TP: 0.90 (+15.4%)</div>
+                            <div style="position: absolute; top: 50%; width: 100%; height: 3px; background: #FFD60A;"></div>
+                            <div style="position: absolute; top: 50%; right: 20px; color: #FFD60A;">Entry: 0.78</div>
+                            <div style="position: absolute; top: 80%; width: 100%; height: 2px; background: #FF5252;"></div>
+                            <div style="position: absolute; top: 80%; right: 20px; color: #FF5252;">SL: 0.70 (-10.3%)</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="display: inline-block; padding: 10px 20px; background: rgba(255, 214, 10, 0.1); 
+                                 border: 1px solid #FFD60A; border-radius: 8px;">
+                                Risk/Reward Ratio: <span style="color: #4CAF50; font-weight: 600;">1:1.5</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            demonstrateBracketOrder() {
+                this.showNarrator('Complete Strategy', 
+                    'Entry triggers at 0.78, then automatically sets take profit at 0.90 and stop loss at 0.70.');
+            }
+
+            executeBracketOrder() {
+                this.showNarrator('Bracket Activated', 
+                    'Position opened! Take profit and stop loss orders are now protecting your trade.');
+
+                const execAnimation = document.getElementById('executionAnimation');
+                execAnimation.textContent = '📊 BRACKET ORDER ACTIVE';
+                execAnimation.style.background = 'linear-gradient(135deg, #FFD60A, #FFA500)';
+                execAnimation.classList.add('show');
+                setTimeout(() => {
+                    execAnimation.classList.remove('show');
+                    execAnimation.style.background = '';
+                }, 2000 / this.speed);
+            }
+
+            showTimeBasedOrders() {
+                this.showNarrator('Time-Based Orders', 
+                    'Control how long your orders stay active with GTC, IOC, and FOK order types.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div class="order-type-description">
+                        <div class="description-title">TIME-IN-FORCE OPTIONS</div>
+                        <div class="description-text">
+                            Specify how long orders remain active in the market.
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0;">
+                        <div id="gtcCard" style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px;">
+                            <div style="font-size: 20px; font-weight: 600; color: #FFD60A; margin-bottom: 10px;">GTC</div>
+                            <div style="color: #888; font-size: 14px; margin-bottom: 10px;">Good Till Cancelled</div>
+                            <div style="font-size: 13px; line-height: 1.6;">
+                                Remains active until filled or manually cancelled. Default for most orders.
+                            </div>
+                        </div>
+                        <div id="iocCard" style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px;">
+                            <div style="font-size: 20px; font-weight: 600; color: #4CAF50; margin-bottom: 10px;">IOC</div>
+                            <div style="color: #888; font-size: 14px; margin-bottom: 10px;">Immediate or Cancel</div>
+                            <div style="font-size: 13px; line-height: 1.6;">
+                                Fills immediately available liquidity, cancels remainder.
+                            </div>
+                        </div>
+                        <div id="fokCard" style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px;">
+                            <div style="font-size: 20px; font-weight: 600; color: #FF5252; margin-bottom: 10px;">FOK</div>
+                            <div style="color: #888; font-size: 14px; margin-bottom: 10px;">Fill or Kill</div>
+                            <div style="font-size: 13px; line-height: 1.6;">
+                                Must fill entire order immediately or cancel completely.
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            demonstrateGTC() {
+                this.showNarrator('GTC Example', 
+                    'Good Till Cancelled order stays in the book indefinitely. Perfect for patient limit orders.');
+
+                const gtcCard = document.getElementById('gtcCard');
+                if (gtcCard) {
+                    gtcCard.style.border = '2px solid #FFD60A';
+                    gtcCard.style.boxShadow = '0 0 30px rgba(255, 214, 10, 0.3)';
+                }
+            }
+
+            demonstrateIOC() {
+                this.showNarrator('IOC Example', 
+                    'Immediate or Cancel: Buying 1000 shares, only 600 available. Fills 600, cancels 400.');
+
+                const iocCard = document.getElementById('iocCard');
+                if (iocCard) {
+                    iocCard.style.border = '2px solid #4CAF50';
+                    iocCard.style.boxShadow = '0 0 30px rgba(76, 175, 80, 0.3)';
+                    
+                    setTimeout(() => {
+                        iocCard.innerHTML += `
+                            <div style="margin-top: 15px; padding: 10px; background: rgba(76, 175, 80, 0.1); 
+                                 border-radius: 8px; font-size: 12px;">
+                                ✓ Filled: 600 shares<br>
+                                ✗ Cancelled: 400 shares
+                            </div>
+                        `;
+                    }, 1500 / this.speed);
+                }
+            }
+
+            demonstrateFOK() {
+                this.showNarrator('FOK Example', 
+                    'Fill or Kill: Need exactly 5000 shares. If not available, entire order cancels.');
+
+                const fokCard = document.getElementById('fokCard');
+                if (fokCard) {
+                    fokCard.style.border = '2px solid #FF5252';
+                    fokCard.style.boxShadow = '0 0 30px rgba(255, 82, 82, 0.3)';
+                    
+                    setTimeout(() => {
+                        fokCard.innerHTML += `
+                            <div style="margin-top: 15px; padding: 10px; background: rgba(255, 82, 82, 0.1); 
+                                 border-radius: 8px; font-size: 12px;">
+                                ✗ Order Killed<br>
+                                Only 4,800 shares available
+                            </div>
+                        `;
+                    }, 1500 / this.speed);
+                }
+            }
+
+            showTWAPOrder() {
+                this.showNarrator('TWAP Orders', 
+                    'Time-Weighted Average Price orders split large orders across time to minimize market impact.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div class="order-type-description">
+                        <div class="description-title">TWAP ORDER</div>
+                        <div class="description-text">
+                            Executes large orders in smaller chunks over time for better average price.
+                            <br><br>
+                            • Reduces market impact
+                            <br>• Better average execution
+                            <br>• Algorithmic trading
+                        </div>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.02); border-radius: 16px; padding: 30px;">
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <div style="font-size: 24px; color: #FFD60A;">100,000 USDC Order</div>
+                            <div style="color: #888; margin-top: 10px;">Split over 2 hours</div>
+                        </div>
+                        <div id="twapChart" style="height: 200px; position: relative; margin: 30px 0;">
+                            <!-- TWAP visualization will be added here -->
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center;">
+                            <div>
+                                <div style="color: #888; font-size: 12px;">Slices</div>
+                                <div style="font-size: 20px; color: #FFD60A;" id="twapSlices">0/20</div>
+                            </div>
+                            <div>
+                                <div style="color: #888; font-size: 12px;">Executed</div>
+                                <div style="font-size: 20px;" id="twapExecuted">0</div>
+                            </div>
+                            <div>
+                                <div style="color: #888; font-size: 12px;">Avg Price</div>
+                                <div style="font-size: 20px; color: #4CAF50;" id="twapAvgPrice">-</div>
+                            </div>
+                            <div>
+                                <div style="color: #888; font-size: 12px;">Time Left</div>
+                                <div style="font-size: 20px;" id="twapTimeLeft">2:00:00</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            demonstrateTWAPOrder() {
+                this.showNarrator('TWAP Configuration', 
+                    'Splitting 100,000 USDC into 20 slices of 5,000 each, executing every 6 minutes.');
+
+                const chartContainer = document.getElementById('twapChart');
+                if (chartContainer) {
+                    // Create TWAP slice visualization
+                    for (let i = 0; i < 20; i++) {
+                        const slice = document.createElement('div');
+                        slice.style.position = 'absolute';
+                        slice.style.left = `${i * 5}%`;
+                        slice.style.bottom = '0';
+                        slice.style.width = '4%';
+                        slice.style.height = '0%';
+                        slice.style.background = 'linear-gradient(to top, #FFD60A, #FFA500)';
+                        slice.style.transition = 'height 0.5s';
+                        slice.id = `twapSlice${i}`;
+                        chartContainer.appendChild(slice);
+                    }
+                }
+            }
+
+            executeTWAPSlices() {
+                this.showNarrator('TWAP Execution', 
+                    'Executing slices automatically. Each fills at slightly different prices for optimal average.');
+
+                let sliceCount = 0;
+                let totalExecuted = 0;
+                const prices = [0.64, 0.645, 0.643, 0.647, 0.65, 0.648, 0.646, 0.649];
+                
+                const executeNextSlice = () => {
+                    if (sliceCount < 8) { // Show first 8 slices for demo
+                        const slice = document.getElementById(`twapSlice${sliceCount}`);
+                        if (slice) {
+                            slice.style.height = `${40 + Math.random() * 20}%`;
+                        }
+                        
+                        totalExecuted += 5000;
+                        const avgPrice = prices.slice(0, sliceCount + 1).reduce((a, b) => a + b, 0) / (sliceCount + 1);
+                        
+                        document.getElementById('twapSlices').textContent = `${sliceCount + 1}/20`;
+                        document.getElementById('twapExecuted').textContent = totalExecuted.toLocaleString();
+                        document.getElementById('twapAvgPrice').textContent = avgPrice.toFixed(3);
+                        
+                        sliceCount++;
+                        setTimeout(executeNextSlice, 400 / this.speed);
+                    }
+                };
+                executeNextSlice();
+            }
+
+            showConditionalOrders() {
+                this.showNarrator('Conditional Orders', 
+                    'Set complex conditions that trigger orders based on multiple factors.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div class="order-type-description">
+                        <div class="description-title">CONDITIONAL ORDERS</div>
+                        <div class="description-text">
+                            Execute orders based on if-then logic and multiple conditions.
+                        </div>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.02); border-radius: 16px; padding: 30px;">
+                        <div style="font-size: 20px; color: #FFD60A; margin-bottom: 20px;">IF-THEN Logic Builder</div>
+                        <div id="conditionalLogic" style="background: rgba(0, 0, 0, 0.3); border-radius: 12px; 
+                             padding: 20px; font-family: monospace; font-size: 14px; line-height: 1.8;">
+                            <span style="color: #FF5252;">IF</span> (<br>
+                            &nbsp;&nbsp;<span style="color: #4CAF50;">Bitcoin > $150k</span> == TRUE<br>
+                            &nbsp;&nbsp;<span style="color: #FFD60A;">AND</span><br>
+                            &nbsp;&nbsp;<span style="color: #4CAF50;">AI Market Cap > $10T</span> == TRUE<br>
+                            ) <span style="color: #FF5252;">THEN</span> {<br>
+                            &nbsp;&nbsp;<span style="color: #03A9F4;">EXECUTE:</span> BUY "Tech Bubble 2026" @ MARKET<br>
+                            &nbsp;&nbsp;<span style="color: #03A9F4;">AMOUNT:</span> 10,000 USDC<br>
+                            }
+                        </div>
+                    </div>
+                `;
+            }
+
+            demonstrateIfThen() {
+                this.showNarrator('Condition Monitoring', 
+                    'System continuously monitors both conditions. When both are TRUE, the order triggers.');
+
+                const logicElement = document.getElementById('conditionalLogic');
+                if (logicElement) {
+                    // Highlight conditions one by one
+                    setTimeout(() => {
+                        const lines = logicElement.innerHTML.split('<br>');
+                        lines[1] = lines[1].replace('Bitcoin > $150k', '<span style="background: rgba(76, 175, 80, 0.3); padding: 2px 6px; border-radius: 4px;">Bitcoin > $150k ✓</span>');
+                        logicElement.innerHTML = lines.join('<br>');
+                    }, 1500 / this.speed);
+                    
+                    setTimeout(() => {
+                        const lines = logicElement.innerHTML.split('<br>');
+                        lines[3] = lines[3].replace('AI Market Cap > $10T', '<span style="background: rgba(76, 175, 80, 0.3); padding: 2px 6px; border-radius: 4px;">AI Market Cap > $10T ✓</span>');
+                        logicElement.innerHTML = lines.join('<br>');
+                    }, 3000 / this.speed);
+                }
+            }
+
+            executeConditionalLogic() {
+                this.showNarrator('Conditions Met!', 
+                    'Both conditions are TRUE. Executing buy order for Tech Bubble 2026.');
+
+                const execAnimation = document.getElementById('executionAnimation');
+                execAnimation.textContent = '⚡ CONDITIONAL ORDER TRIGGERED';
+                execAnimation.style.background = 'linear-gradient(135deg, #03A9F4, #0288D1)';
+                execAnimation.classList.add('show');
+                setTimeout(() => {
+                    execAnimation.classList.remove('show');
+                    execAnimation.style.background = '';
+                }, 2000 / this.speed);
+            }
+
+            showAdvancedStrategies() {
+                this.showNarrator('Advanced Strategies', 
+                    'Combine order types for sophisticated trading strategies.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div style="font-size: 24px; text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                        Professional Trading Strategies
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                        <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px;">
+                            <div style="font-size: 18px; font-weight: 600; color: #4CAF50; margin-bottom: 10px;">
+                                Scalping
+                            </div>
+                            <div style="font-size: 13px; line-height: 1.6; color: #ccc;">
+                                • Market orders for entry<br>
+                                • Tight stop-losses<br>
+                                • Quick profit targets<br>
+                                • High frequency trades
+                            </div>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px;">
+                            <div style="font-size: 18px; font-weight: 600; color: #FFD60A; margin-bottom: 10px;">
+                                Arbitrage
+                            </div>
+                            <div style="font-size: 13px; line-height: 1.6; color: #ccc;">
+                                • Cross-market orders<br>
+                                • IOC for instant fills<br>
+                                • Conditional triggers<br>
+                                • Risk-free profits
+                            </div>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px;">
+                            <div style="font-size: 18px; font-weight: 600; color: #FF5252; margin-bottom: 10px;">
+                                DCA Strategy
+                            </div>
+                            <div style="font-size: 13px; line-height: 1.6; color: #ccc;">
+                                • TWAP for averaging<br>
+                                • Scheduled orders<br>
+                                • Risk distribution<br>
+                                • Long-term accumulation
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            demonstrateScalping() {
+                this.showNarrator('Scalping Strategy', 
+                    'Quick in-and-out trades capturing small price movements with high volume.');
+            }
+
+            demonstrateArbitrage() {
+                this.showNarrator('Arbitrage Opportunity', 
+                    'Same market priced differently on Polymarket (0.65) vs DraftKings (0.68). Instant 3% profit!');
+            }
+
+            demonstrateDCA() {
+                this.showNarrator('Dollar Cost Averaging', 
+                    'Automatically buying $1000 worth every week regardless of price, reducing timing risk.');
+            }
+
+            showOrderBookDepth() {
+                this.showNarrator('Order Book Depth', 
+                    'Understanding liquidity and market depth helps optimize order placement.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div style="background: rgba(255, 255, 255, 0.02); border-radius: 16px; padding: 30px;">
+                        <div style="font-size: 20px; color: #FFD60A; margin-bottom: 20px;">Market Depth Visualization</div>
+                        <div style="height: 300px; position: relative; background: rgba(0, 0, 0, 0.3); border-radius: 12px; overflow: hidden;">
+                            <div style="position: absolute; bottom: 0; left: 0; width: 50%; height: 60%; 
+                                 background: linear-gradient(to right, transparent, rgba(76, 175, 80, 0.3));"></div>
+                            <div style="position: absolute; bottom: 0; right: 0; width: 50%; height: 70%; 
+                                 background: linear-gradient(to left, transparent, rgba(255, 82, 82, 0.3));"></div>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                                 color: #FFD60A; font-size: 18px; font-weight: 600;">0.65</div>
+                            <div style="position: absolute; bottom: 10px; left: 10px; color: #4CAF50; font-size: 12px;">
+                                Total Bids: 245,000 USDC
+                            </div>
+                            <div style="position: absolute; bottom: 10px; right: 10px; color: #FF5252; font-size: 12px;">
+                                Total Asks: 198,000 USDC
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            analyzeMarketImpact() {
+                this.showNarrator('Market Impact Analysis', 
+                    'Large orders move the market. A $50,000 buy would push price from 0.65 to 0.67.');
+            }
+
+            demonstrateSlippage() {
+                this.showNarrator('Slippage Example', 
+                    'Buying $10,000 at market: First $5,000 fills at 0.65, next $3,000 at 0.66, last $2,000 at 0.67.');
+            }
+
+            showSlippageProtection() {
+                this.showNarrator('Slippage Protection', 
+                    'BOOM limits slippage to 1% maximum. Orders cancel if price moves too far.');
+            }
+
+            demonstrateFailedOrder() {
+                this.showNarrator('Order Failure', 
+                    'Sometimes orders fail due to insufficient liquidity or network issues. Watch the recovery...');
+
+                const execAnimation = document.getElementById('executionAnimation');
+                execAnimation.textContent = '❌ ORDER FAILED';
+                execAnimation.style.background = 'rgba(255, 82, 82, 0.95)';
+                execAnimation.classList.add('show');
+                setTimeout(() => {
+                    execAnimation.classList.remove('show');
+                    execAnimation.style.background = '';
+                }, 2000 / this.speed);
+            }
+
+            showOrderRecovery() {
+                this.showNarrator('Automatic Recovery', 
+                    'BOOM automatically retries failed orders with smart adjustments to ensure execution.');
+
+                const execAnimation = document.getElementById('executionAnimation');
+                setTimeout(() => {
+                    execAnimation.textContent = '🔄 RETRYING...';
+                    execAnimation.style.background = 'rgba(255, 193, 7, 0.95)';
+                    execAnimation.classList.add('show');
+                    setTimeout(() => {
+                        execAnimation.classList.remove('show');
+                        execAnimation.style.background = '';
+                    }, 1500 / this.speed);
+                }, 1000 / this.speed);
+
+                setTimeout(() => {
+                    execAnimation.textContent = '✅ ORDER RECOVERED';
+                    execAnimation.style.background = 'rgba(76, 175, 80, 0.95)';
+                    execAnimation.classList.add('show');
+                    setTimeout(() => {
+                        execAnimation.classList.remove('show');
+                        execAnimation.style.background = '';
+                    }, 2000 / this.speed);
+                }, 3000 / this.speed);
+            }
+
+            demonstrateGasOptimization() {
+                this.showNarrator('Gas Optimization', 
+                    'BOOM batches orders to minimize gas costs. Multiple orders execute in one transaction.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 24px; color: #FFD60A; margin-bottom: 30px;">Gas Cost Savings</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 600px; margin: 0 auto;">
+                            <div>
+                                <div style="font-size: 16px; color: #FF5252; margin-bottom: 10px;">Without Optimization</div>
+                                <div style="font-size: 14px; color: #888;">
+                                    5 orders × 150,000 gas<br>
+                                    = 750,000 total gas<br>
+                                    ≈ $37.50
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-size: 16px; color: #4CAF50; margin-bottom: 10px;">With BOOM Batching</div>
+                                <div style="font-size: 14px; color: #888;">
+                                    1 batch × 200,000 gas<br>
+                                    = 200,000 total gas<br>
+                                    ≈ $10.00 (73% saved!)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showPerformanceMetrics() {
+                this.showNarrator('Performance Metrics', 
+                    'Track your order execution performance with detailed analytics.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div style="background: rgba(255, 255, 255, 0.02); border-radius: 16px; padding: 30px;">
+                        <div style="font-size: 24px; color: #FFD60A; margin-bottom: 30px; text-align: center;">
+                            Order Execution Analytics
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 32px; color: #4CAF50;">98.5%</div>
+                                <div style="color: #888; font-size: 14px; margin-top: 5px;">Fill Rate</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 32px; color: #FFD60A;">87ms</div>
+                                <div style="color: #888; font-size: 14px; margin-top: 5px;">Avg Latency</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 32px; color: #03A9F4;">0.3%</div>
+                                <div style="color: #888; font-size: 14px; margin-top: 5px;">Avg Slippage</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 32px; color: #FF5252;">2.1%</div>
+                                <div style="color: #888; font-size: 14px; margin-top: 5px;">Failed Orders</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            demonstrateBulkOrders() {
+                this.showNarrator('Bulk Order Execution', 
+                    'Place multiple orders across different markets simultaneously with one click.');
+            }
+
+            showOrderHistory() {
+                this.showNarrator('Order History', 
+                    'Complete audit trail of all your orders with detailed execution reports.');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div style="background: rgba(255, 255, 255, 0.02); border-radius: 16px; padding: 20px;">
+                        <div style="font-size: 20px; color: #FFD60A; margin-bottom: 20px;">Recent Orders</div>
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                        <th style="padding: 10px; text-align: left; color: #888;">Time</th>
+                                        <th style="padding: 10px; text-align: left; color: #888;">Type</th>
+                                        <th style="padding: 10px; text-align: left; color: #888;">Market</th>
+                                        <th style="padding: 10px; text-align: left; color: #888;">Amount</th>
+                                        <th style="padding: 10px; text-align: left; color: #888;">Price</th>
+                                        <th style="padding: 10px; text-align: left; color: #888;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        <td style="padding: 10px;">14:32:01</td>
+                                        <td style="padding: 10px;">Market</td>
+                                        <td style="padding: 10px;">BTC >$150k</td>
+                                        <td style="padding: 10px;">$1,000</td>
+                                        <td style="padding: 10px;">0.65</td>
+                                        <td style="padding: 10px;"><span style="color: #4CAF50;">Filled</span></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        <td style="padding: 10px;">14:35:22</td>
+                                        <td style="padding: 10px;">Limit</td>
+                                        <td style="padding: 10px;">US Recession</td>
+                                        <td style="padding: 10px;">$2,000</td>
+                                        <td style="padding: 10px;">0.55</td>
+                                        <td style="padding: 10px;"><span style="color: #4CAF50;">Filled</span></td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        <td style="padding: 10px;">14:38:45</td>
+                                        <td style="padding: 10px;">Stop-Loss</td>
+                                        <td style="padding: 10px;">AI >$10T</td>
+                                        <td style="padding: 10px;">$1,538</td>
+                                        <td style="padding: 10px;">0.58</td>
+                                        <td style="padding: 10px;"><span style="color: #FF5252;">Triggered</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+
+            finalSummary() {
+                this.showNarrator('Order Types Mastery Complete!', 
+                    'You\'ve learned all 10+ order types available on BOOM. Use these tools to trade like a professional!');
+
+                document.getElementById('orderInterface').innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <h1 style="font-size: 48px; margin-bottom: 30px; color: #FFD60A;">Order Types Mastered! 🎓</h1>
+                        <p style="font-size: 20px; color: #888; margin-bottom: 40px;">
+                            You now understand all professional order types on BOOM platform
+                        </p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; 
+                             max-width: 800px; margin: 0 auto;">
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+                                ✓ Market Orders
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+                                ✓ Limit Orders
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+                                ✓ Stop-Loss
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+                                ✓ Trailing Stops
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+                                ✓ Iceberg Orders
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+                                ✓ OCO Orders
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+                                ✓ Bracket Orders
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+                                ✓ Time-Based
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+                                ✓ TWAP Orders
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px;">
+                                ✓ Conditional
+                            </div>
+                        </div>
+                        <div style="margin-top: 40px;">
+                            <button onclick="location.reload()" style="padding: 15px 30px; background: linear-gradient(135deg, #FFD60A, #FFA500); 
+                                 color: #0a0a0a; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; 
+                                 cursor: pointer;">
+                                REPLAY DEMO
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Helper methods
+            showNarrator(title, content) {
+                const narrator = document.getElementById('narrator');
+                const narratorTitle = document.getElementById('narratorTitle');
+                const narratorContent = document.getElementById('narratorContent');
+                const narratorTimer = document.getElementById('narratorTimer');
+
+                narratorTitle.textContent = title;
+                narratorContent.innerHTML = content;
+                narrator.classList.remove('hidden');
+
+                let timeLeft = Math.floor(5000 / this.speed / 1000);
+                narratorTimer.textContent = `${timeLeft}s`;
+                
+                const updateTimer = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeft > 0) {
+                        narratorTimer.textContent = `${timeLeft}s`;
+                    } else {
+                        clearInterval(updateTimer);
+                    }
+                }, 1000);
+
+                clearTimeout(this.narratorTimer);
+                this.narratorTimer = setTimeout(() => {
+                    narrator.classList.add('hidden');
+                    clearInterval(updateTimer);
+                    
+                    setTimeout(() => {
+                        if (this.isPlaying) {
+                            narrator.classList.remove('hidden');
+                        }
+                    }, 3000 / this.speed);
+                }, 5000 / this.speed);
+            }
+
+            renderOrderBookSide(orders) {
+                let html = `
+                    <div class="order-book-row order-book-header">
+                        <div>Price</div>
+                        <div>Amount</div>
+                        <div>Total</div>
+                    </div>
+                `;
+                orders.forEach(order => {
+                    html += `
+                        <div class="order-book-row">
+                            <div>${order.price}</div>
+                            <div>${order.amount.toLocaleString()}</div>
+                            <div>${order.total.toLocaleString()}</div>
+                        </div>
+                    `;
+                });
+                return html;
+            }
+
+            animateValue(element, start, end, duration) {
+                const startTime = Date.now();
+                const animate = () => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / (duration / this.speed), 1);
+                    const current = start + (end - start) * progress;
+                    element.value = current.toFixed(2);
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+                animate();
+            }
+
+            updateProgress() {
+                const progress = ((this.currentStep + 1) / this.totalSteps) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+            }
+
+            updateStepIndicator() {
+                document.getElementById('stepIndicator').textContent = 
+                    `Step ${this.currentStep + 1} of ${this.totalSteps}`;
+            }
+
+            togglePlayPause() {
+                this.isPlaying = !this.isPlaying;
+                document.getElementById('playPauseBtn').innerHTML = this.isPlaying ? '⏸ Pause' : '▶ Play';
+                
+                if (this.isPlaying) {
+                    this.runStep();
+                } else {
+                    clearTimeout(this.stepTimer);
+                    clearTimeout(this.narratorTimer);
+                }
+            }
+
+            restart() {
+                clearTimeout(this.stepTimer);
+                clearTimeout(this.narratorTimer);
+                this.currentStep = 0;
+                this.isPlaying = true;
+                document.getElementById('playPauseBtn').innerHTML = '⏸ Pause';
+                this.runStep();
+            }
+
+            complete() {
+                this.showNarrator('Demo Complete!', 
+                    'You\'ve mastered all order types on the BOOM platform. Ready to trade like a pro!');
+                this.isPlaying = false;
+                document.getElementById('playPauseBtn').innerHTML = '▶ Play';
+            }
+        }
+
+        // Initialize demo
+        const demo = new OrderTypesDemo();
+    </script>
+</body>
+</html>

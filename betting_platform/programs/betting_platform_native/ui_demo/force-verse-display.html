@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Force Verse Display</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #000; color: #fff; padding: 20px; }
+        .controls { margin: 20px 0; }
+        button { background: #FFD60A; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Force Verse Display Test</h1>
+    
+    <div class="controls">
+        <button onclick="forceLoadMarket()">Force Load Market with Verses</button>
+        <button onclick="manualVerseDisplay()">Manual Verse Display</button>
+    </div>
+    
+    <div id="status" style="background: #111; padding: 20px; margin: 20px 0; border-radius: 8px;"></div>
+    
+    <!-- Copy of main app structure -->
+    <div class="market-details" style="display: block;">
+        <div class="verses-section" id="versesSection" style="display: block;">
+            <div class="section-title">Related Stages - Chain Your Leverage</div>
+            <div class="verse-flow-container" id="verseFlowContainer">
+                <svg class="verse-connections" id="verseConnections">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" 
+                                refX="9" refY="5" orient="auto">
+                            <polygon points="0 0, 10 5, 0 10" class="verse-arrow" />
+                        </marker>
+                    </defs>
+                </svg>
+                <div class="verse-levels" id="verseLevels">
+                    <!-- Verses will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize platform state
+        window.platformState = {
+            selectedVerses: [],
+            markets: new Map(),
+            quantumMode: false
+        };
+        
+        const status = document.getElementById('status');
+        
+        function log(msg) {
+            status.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${msg}</div>`;
+            console.log(msg);
+        }
+        
+        // Load platform_main.js
+        const script = document.createElement('script');
+        script.src = 'platform_main.js';
+        script.onload = () => {
+            log('✓ platform_main.js loaded');
+            log(`updateAvailableVerses exists: ${typeof window.updateAvailableVerses}`);
+        };
+        document.body.appendChild(script);
+        
+        async function forceLoadMarket() {
+            log('Fetching markets...');
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                
+                if (markets.length > 0) {
+                    const market = markets[0];
+                    log(`Found market: ${market.title || market.question}`);
+                    
+                    if (market.verses && market.verses.length > 0) {
+                        log(`Market has ${market.verses.length} verses`);
+                        
+                        // Force display verses
+                        if (window.updateAvailableVerses) {
+                            window.updateAvailableVerses(market.verses);
+                            log('✓ Called updateAvailableVerses');
+                            
+                            // Check results
+                            setTimeout(() => {
+                                const cards = document.querySelectorAll('.verse-card');
+                                log(`Result: ${cards.length} verse cards created`);
+                            }, 500);
+                        }
+                    } else {
+                        log('No verses in market data');
+                    }
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`);
+            }
+        }
+        
+        function manualVerseDisplay() {
+            log('Creating verses manually...');
+            
+            const verseLevels = document.getElementById('verseLevels');
+            verseLevels.innerHTML = '';
+            
+            // Create Level 1
+            const level1 = document.createElement('div');
+            level1.className = 'verse-level';
+            level1.id = 'verse-level-1';
+            
+            const label1 = document.createElement('div');
+            label1.className = 'verse-level-label';
+            label1.textContent = 'Level 1';
+            level1.appendChild(label1);
+            
+            // Create a verse card
+            const card1 = document.createElement('div');
+            card1.className = 'verse-card';
+            card1.innerHTML = `
+                <div class="verse-header">
+                    <div class="verse-title">General Markets</div>
+                    <div class="verse-multiplier">1.2x</div>
+                </div>
+                <div class="verse-description">Various prediction markets across different topics</div>
+                <div class="verse-stats">
+                    <div class="verse-stat">
+                        <div class="verse-stat-label">Level</div>
+                        <div class="verse-stat-value">L1</div>
+                    </div>
+                    <div class="verse-stat">
+                        <div class="verse-stat-label">Risk</div>
+                        <div class="verse-stat-value">Low</div>
+                    </div>
+                </div>
+            `;
+            level1.appendChild(card1);
+            
+            // Create Level 2
+            const level2 = document.createElement('div');
+            level2.className = 'verse-level';
+            level2.id = 'verse-level-2';
+            
+            const label2 = document.createElement('div');
+            label2.className = 'verse-level-label';
+            label2.textContent = 'Level 2';
+            level2.appendChild(label2);
+            
+            const card2 = document.createElement('div');
+            card2.className = 'verse-card has-parent';
+            card2.innerHTML = `
+                <div class="verse-header">
+                    <div class="verse-title">Economic Indicators</div>
+                    <div class="verse-multiplier">2.64x</div>
+                </div>
+                <div class="verse-description">Federal Reserve and economic data</div>
+                <div class="verse-stats">
+                    <div class="verse-stat">
+                        <div class="verse-stat-label">Level</div>
+                        <div class="verse-stat-value">L2</div>
+                    </div>
+                    <div class="verse-stat">
+                        <div class="verse-stat-label">Risk</div>
+                        <div class="verse-stat-value">Medium</div>
+                    </div>
+                </div>
+            `;
+            level2.appendChild(card2);
+            
+            verseLevels.appendChild(level1);
+            verseLevels.appendChild(level2);
+            
+            log('✓ Created 2 verse levels manually');
+            
+            // Draw connections
+            setTimeout(() => {
+                const svg = document.getElementById('verseConnections');
+                const container = document.getElementById('verseFlowContainer');
+                
+                const rect1 = card1.getBoundingClientRect();
+                const rect2 = card2.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                const x1 = rect1.right - containerRect.left;
+                const y1 = rect1.top + rect1.height/2 - containerRect.top;
+                const x2 = rect2.left - containerRect.left;
+                const y2 = rect2.top + rect2.height/2 - containerRect.top;
+                
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const midX = (x1 + x2) / 2;
+                
+                path.setAttribute('d', `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`);
+                path.setAttribute('stroke', '#FFD60A');
+                path.setAttribute('stroke-width', '2');
+                path.setAttribute('fill', 'none');
+                path.setAttribute('opacity', '0.5');
+                path.setAttribute('marker-end', 'url(#arrowhead)');
+                
+                svg.appendChild(path);
+                log('✓ Drew connection arrow');
+            }, 100);
+        }
+    </script>
+</body>
+</html>

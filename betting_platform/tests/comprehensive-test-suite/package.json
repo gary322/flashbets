@@ -1,0 +1,22 @@
+{
+  "name": "comprehensive-test-suite",
+  "version": "1.0.0",
+  "main": "phase1-onboarding-tests.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@solana/web3.js": "^1.98.4",
+    "bs58": "^6.0.0",
+    "chalk": "^4.1.2",
+    "node-fetch": "^2.7.0",
+    "ora": "^8.2.0",
+    "playwright": "^1.54.2",
+    "tweetnacl": "^1.0.3",
+    "ws": "^8.18.3"
+  }
+}

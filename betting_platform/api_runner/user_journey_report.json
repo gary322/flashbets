@@ -1,0 +1,140 @@
+{
+  "timestamp": "2025-08-01T17:32:06.063Z",
+  "summary": {
+    "total_journeys": 3,
+    "total_steps": 17,
+    "successful_steps": 15,
+    "success_rate": "88.2",
+    "total_duration": 550
+  },
+  "journeys": [
+    {
+      "journey": "new_user_onboarding",
+      "userId": "user_1754069525513_cd730c8e",
+      "steps": [
+        {
+          "step": "create_demo_account",
+          "status": 200,
+          "success": true,
+          "response": {
+            "message": "Demo account created successfully",
+            "privateKey": "2SRgDph3aAXuieMzv6Uk5LKxW3HCWxS6p9nJAHazL3kQjX9gkFeiZtnq17zZDniJdE2gCbbjefmFffBv3ar8kdGS",
+            "wallet": "Do9vqdz8JGUhNSUmaSHxH1BZNM3uAbZ9BJZ5tEjTVBKU",
+            "warning": "This is a demo account. Do not send real funds to this address."
+          }
+        },
+        {
+          "step": "check_balance",
+          "status": 200,
+          "success": true,
+          "balance": 1000000000
+        },
+        {
+          "step": "browse_verses",
+          "status": 200,
+          "success": true,
+          "verse_count": 424
+        },
+        {
+          "step": "verse_matching",
+          "status": 200,
+          "success": true,
+          "matches_found": 4
+        },
+        {
+          "step": "browse_markets",
+          "status": 200,
+          "success": true,
+          "market_count": 20
+        },
+        {
+          "step": "first_trade",
+          "status": 200,
+          "success": true,
+          "position_id": "6daa635f-9562-45f3-8bd9-307f681c7bb9"
+        },
+        {
+          "step": "check_positions",
+          "status": 200,
+          "success": true,
+          "position_count": 0
+        }
+      ],
+      "success": true,
+      "duration": 22
+    },
+    {
+      "journey": "advanced_trading",
+      "userId": "user_1754069525535_2092b942",
+      "steps": [
+        {
+          "step": "place_limit_order",
+          "status": 200,
+          "success": true
+        },
+        {
+          "step": "place_stop_loss",
+          "status": 200,
+          "success": true
+        },
+        {
+          "step": "check_orders",
+          "status": 200,
+          "success": true,
+          "order_count": 2
+        },
+        {
+          "step": "portfolio_metrics",
+          "status": 200,
+          "success": true
+        },
+        {
+          "step": "risk_metrics",
+          "status": 200,
+          "success": true,
+          "risk_score": 25
+        }
+      ],
+      "success": true,
+      "duration": 3
+    },
+    {
+      "journey": "professional_trader",
+      "userId": "user_1754069525538_ccfc09cc",
+      "steps": [
+        {
+          "step": "external_markets",
+          "status": 502,
+          "success": false,
+          "market_count": 0
+        },
+        {
+          "step": "quantum_position",
+          "status": 200,
+          "success": true,
+          "quantum_id": "0addc12a-8c8d-4e37-aa88-dec9aac4f310"
+        },
+        {
+          "step": "monitor_greeks",
+          "status": 200,
+          "success": true,
+          "has_greeks": false
+        },
+        {
+          "step": "high_frequency_trading",
+          "trades": 5,
+          "success_rate": "0.0",
+          "avg_latency": 0.4
+        },
+        {
+          "step": "websocket_test",
+          "status": "simulated",
+          "success": true,
+          "connection": "ws://localhost:8081/ws/v2"
+        }
+      ],
+      "success": true,
+      "duration": 525
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verse Display Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .verses-section {
+            margin-top: 32px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 16px;
+        }
+
+        .verse-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .verse-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .verse-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .verse-card.selected {
+            border-color: #FFA500;
+            background: rgba(255, 165, 0, 0.05);
+        }
+
+        .verse-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .verse-title {
+            font-size: 16px;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .verse-multiplier {
+            font-size: 24px;
+            font-weight: 600;
+            color: #FFA500;
+        }
+
+        .verse-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 16px;
+        }
+
+        .verse-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .verse-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .verse-stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .verse-stat-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        button {
+            background: #FFD60A;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Verse Display Test</h1>
+    
+    <button onclick="addStaticVerses()">Add Static Verses</button>
+    <button onclick="clearVerses()">Clear Verses</button>
+    
+    <div class="verses-section">
+        <div class="section-title">Related Verses - Multiply Your Leverage</div>
+        <div class="verse-grid" id="verseGrid">
+            <!-- Dynamic verses will appear here -->
+        </div>
+    </div>
+
+    <script>
+        function addStaticVerses() {
+            const verseGrid = document.getElementById('verseGrid');
+            
+            // Clear existing
+            verseGrid.innerHTML = '';
+            
+            // Add test verses
+            const verses = [
+                { id: 'btc-100k', name: 'BTC to $100k Club', multiplier: 2.5, level: 2, description: 'For believers in six-figure Bitcoin' },
+                { id: 'crypto-bull', name: 'Crypto Bull Market', multiplier: 1.8, level: 1, description: 'General crypto optimism' },
+                { id: 'degen-mode', name: 'Full Degen', multiplier: 5.0, level: 3, description: 'Maximum risk, maximum reward' },
+                { id: 'safe-play', name: 'Safe Harbor', multiplier: 1.1, level: 1, description: 'Conservative multiplier' }
+            ];
+            
+            verses.forEach(verse => {
+                const card = document.createElement('div');
+                card.className = 'verse-card';
+                card.id = `verse-card-${verse.id}`;
+                card.onclick = () => {
+                    card.classList.toggle('selected');
+                    console.log('Clicked verse:', verse.name);
+                };
+                
+                card.innerHTML = `
+                    <div class="verse-header">
+                        <div class="verse-title">${verse.name}</div>
+                        <div class="verse-multiplier">${verse.multiplier}x</div>
+                    </div>
+                    <div class="verse-description">${verse.description}</div>
+                    <div class="verse-stats">
+                        <div class="verse-stat">
+                            <div class="verse-stat-label">Level</div>
+                            <div class="verse-stat-value">L${verse.level}</div>
+                        </div>
+                        <div class="verse-stat">
+                            <div class="verse-stat-label">Active</div>
+                            <div class="verse-stat-value">Yes</div>
+                        </div>
+                    </div>
+                `;
+                
+                verseGrid.appendChild(card);
+            });
+            
+            console.log('Added', verses.length, 'verses to the grid');
+        }
+        
+        function clearVerses() {
+            document.getElementById('verseGrid').innerHTML = '';
+            console.log('Cleared verses');
+        }
+        
+        // Auto-add verses on load for testing
+        setTimeout(addStaticVerses, 500);
+    </script>
+</body>
+</html>

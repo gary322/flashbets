@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiverse Platform - Complete Market Demo</title>
+    
+    <style>
+        /* John Ive Design System */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Main App Container */
+        .app-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 360px;
+            min-height: 100vh;
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Left Panel */
+        .left-panel {
+            background: #080808;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Wallet Section */
+        .wallet-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .wallet-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .wallet-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #FF3B30;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .wallet-indicator.connected {
+            background: #4CD964;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Panel */
+        .main-panel {
+            background: #0A0A0A;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .market-header {
+            padding: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%);
+        }
+
+        .market-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        /* Market Cards */
+        .market-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .market-card.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .market-card.highlighted {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.05);
+            box-shadow: 0 0 40px rgba(255, 214, 10, 0.2);
+        }
+
+        .market-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .market-price {
+            font-size: 36px;
+            font-weight: 300;
+            margin-bottom: 8px;
+        }
+
+        .market-details {
+            display: flex;
+            gap: 24px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Quantum Markets */
+        .quantum-group {
+            background: linear-gradient(135deg, rgba(123, 63, 242, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%);
+            border: 2px solid rgba(123, 63, 242, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .quantum-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #7B3FF2 0%, #00D4FF 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .quantum-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .quantum-markets {
+            display: grid;
+            gap: 12px;
+        }
+
+        .quantum-market {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .quantum-market.entangled {
+            border-color: #7B3FF2;
+            background: rgba(123, 63, 242, 0.1);
+        }
+
+        .quantum-probability {
+            font-size: 24px;
+            font-weight: 600;
+            color: #00D4FF;
+        }
+
+        .quantum-state {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+        }
+
+        .quantum-connector {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(to bottom, #7B3FF2, #00D4FF);
+            opacity: 0.5;
+            animation: quantumFlow 3s infinite;
+        }
+
+        @keyframes quantumFlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Verse Hierarchy */
+        .verse-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .verse-tree {
+            margin-left: 0;
+        }
+
+        .verse-node {
+            margin-bottom: 12px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .verse-node::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 12px;
+            width: 12px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .verse-node.root {
+            padding-left: 0;
+        }
+
+        .verse-node.root::before {
+            display: none;
+        }
+
+        .verse-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .verse-item.highlighted {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: #FFD60A;
+        }
+
+        .verse-depth-badge {
+            padding: 4px 8px;
+            background: rgba(255, 214, 10, 0.2);
+            color: #FFD60A;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .verse-children {
+            margin-top: 12px;
+            margin-left: 24px;
+            padding-left: 12px;
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Flash Market */
+        .flash-market {
+            background: linear-gradient(135deg, rgba(255, 59, 48, 0.1) 0%, rgba(255, 214, 10, 0.1) 100%);
+            border: 2px solid #FFD60A;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flash-badge {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            padding: 6px 12px;
+            background: #FF3B30;
+            color: #FFFFFF;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            animation: flashPulse 1s infinite;
+        }
+
+        @keyframes flashPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .flash-timer-display {
+            font-size: 48px;
+            font-weight: 900;
+            color: #FFD60A;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            background: #080808;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .positions-list {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .position-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        .position-item.active {
+            opacity: 1;
+            transform: translateX(0);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Narrator */
+        .narrator {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 900px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            color: #000;
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(255, 214, 10, 0.4);
+            z-index: 1000;
+        }
+
+        .narrator-step {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .narrator-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .narrator-text {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .narrator-action {
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 2px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #000;
+            transition: width 0.5s;
+        }
+
+        /* Highlights */
+        .highlight-box {
+            position: absolute;
+            border: 3px solid #FFD60A;
+            border-radius: 12px;
+            pointer-events: none;
+            animation: highlightPulse 2s infinite;
+            z-index: 100;
+        }
+
+        @keyframes highlightPulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 20px rgba(255, 214, 10, 0.5); }
+            50% { opacity: 0.7; box-shadow: 0 0 40px rgba(255, 214, 10, 0.8); }
+        }
+
+        /* Order Book */
+        .orderbook {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .orderbook-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 8px 0;
+            font-size: 13px;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .orderbook-row.buy {
+            color: #4CD964;
+        }
+
+        .orderbook-row.sell {
+            color: #FF3B30;
+        }
+
+        .orderbook-spread {
+            text-align: center;
+            padding: 8px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Leverage Display */
+        .leverage-meter {
+            text-align: center;
+            padding: 32px;
+        }
+
+        .leverage-value {
+            font-size: 96px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #4CD964 0%, #FFD60A 50%, #FF3B30 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+
+        .leverage-chain {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .chain-step {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .chain-step.active {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: #FFD60A;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <div class="logo">Multiverse Platform</div>
+            </div>
+            
+            <div class="wallet-section">
+                <div class="wallet-card">
+                    <div>
+                        <span class="wallet-indicator" id="wallet-indicator"></span>
+                        <span id="wallet-status">Disconnected</span>
+                    </div>
+                    <div style="margin-top: 12px; font-size: 24px; font-weight: 300;" id="balance">$0.00</div>
+                </div>
+            </div>
+
+            <div style="padding: 20px;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255, 255, 255, 0.4); margin-bottom: 16px;">ACTIVE MARKETS</div>
+                <div id="market-list"></div>
+            </div>
+        </div>
+
+        <!-- Main Panel -->
+        <div class="main-panel">
+            <div class="market-header">
+                <h1 style="font-size: 28px; font-weight: 600; margin-bottom: 12px;" id="main-title">Multiverse Trading Platform</h1>
+                <div id="header-info"></div>
+            </div>
+            
+            <div class="market-content" id="content">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <div class="panel-header">
+                <div style="font-size: 16px; font-weight: 600;">Portfolio</div>
+                <div style="font-size: 24px; font-weight: 300; margin-top: 8px;" id="total-pnl">+$0</div>
+            </div>
+            
+            <div class="positions-list" id="positions">
+                <!-- Positions will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Narrator -->
+    <div class="narrator" id="narrator">
+        <div class="narrator-step" id="step-number">STEP 1 OF 20</div>
+        <div class="narrator-title" id="step-title">Welcome to Multiverse</div>
+        <div class="narrator-text" id="step-text">
+            Let's explore the most advanced prediction market platform ever built.
+        </div>
+        <div class="narrator-action" id="step-action">
+            👀 Watch as we connect your wallet...
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress" style="width: 5%;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Demo data and script
+        const demoSteps = [
+            {
+                title: "Platform Introduction",
+                text: "Welcome to Multiverse - the most advanced prediction market platform. We combine Polymarket's liquidity, sub-minute flash betting, quantum positions, and up to 500x leverage.",
+                action: "Starting the complete platform demonstration...",
+                duration: 8000,
+                execute: () => {
+                    document.getElementById('content').innerHTML = `
+                        <div style="text-align: center; padding: 60px;">
+                            <h2 style="font-size: 48px; font-weight: 900; margin-bottom: 24px;">
+                                <span style="background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">MULTIVERSE</span>
+                            </h2>
+                            <p style="font-size: 20px; color: rgba(255, 255, 255, 0.8);">The Future of Prediction Markets</p>
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 48px;">
+                                <div style="padding: 24px; background: rgba(255, 255, 255, 0.03); border-radius: 12px;">
+                                    <div style="font-size: 36px; font-weight: 700; color: #FFD60A;">$127M</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">TOTAL VOLUME</div>
+                                </div>
+                                <div style="padding: 24px; background: rgba(255, 255, 255, 0.03); border-radius: 12px;">
+                                    <div style="font-size: 36px; font-weight: 700; color: #00D4FF;">14,283</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">ACTIVE MARKETS</div>
+                                </div>
+                                <div style="padding: 24px; background: rgba(255, 255, 255, 0.03); border-radius: 12px;">
+                                    <div style="font-size: 36px; font-weight: 700; color: #7B3FF2;">500x</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">MAX LEVERAGE</div>
+                                </div>
+                                <div style="padding: 24px; background: rgba(255, 255, 255, 0.03); border-radius: 12px;">
+                                    <div style="font-size: 36px; font-weight: 700; color: #4CD964;">5-60s</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">FLASH MARKETS</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: "Wallet Connection",
+                text: "First, we connect your wallet. The platform supports both MetaMask (Ethereum/Polygon) and Phantom (Solana). Watch as we establish a secure connection and load your balance.",
+                action: "Connecting MetaMask wallet to the platform...",
+                duration: 6000,
+                execute: () => {
+                    setTimeout(() => {
+                        document.getElementById('wallet-indicator').classList.add('connected');
+                        document.getElementById('wallet-status').textContent = 'Connected: 0x742d...8963';
+                        animateValue('balance', 0, 25000, 3000);
+                    }, 2000);
+                }
+            },
+            {
+                title: "Polymarket Integration - Bitcoin Market",
+                text: "Let's start with a Polymarket prediction: 'Will Bitcoin reach $150,000 by 2025?' This market has deep liquidity from Polymarket's CTF Exchange with over $1.2M in volume.",
+                action: "Loading Bitcoin $150k market from Polymarket...",
+                duration: 8000,
+                execute: () => {
+                    document.getElementById('main-title').textContent = 'Polymarket: Bitcoin $150k by 2025';
+                    document.getElementById('header-info').innerHTML = `
+                        <div style="display: flex; gap: 32px; align-items: baseline;">
+                            <span style="font-size: 48px; font-weight: 300;">65.2%</span>
+                            <span style="color: #4CD964; font-size: 20px;">+2.5%</span>
+                            <span style="color: rgba(255, 255, 255, 0.6);">Volume: $1,234,567</span>
+                        </div>
+                    `;
+                    
+                    document.getElementById('content').innerHTML = `
+                        <div class="market-card active highlighted">
+                            <div class="market-name">Will Bitcoin reach $150,000 by January 1, 2025?</div>
+                            <div class="market-price">65.2%</div>
+                            <div class="market-details">
+                                <span>YES shares: $0.652</span>
+                                <span>NO shares: $0.348</span>
+                                <span>24h Volume: $1.2M</span>
+                                <span>Liquidity: $8.7M</span>
+                            </div>
+                        </div>
+                        
+                        <div class="orderbook">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Order Book</div>
+                            <div class="orderbook-row sell"><span>65.5%</span><span>$12,450</span><span>$45,820</span></div>
+                            <div class="orderbook-row sell"><span>65.4%</span><span>$8,200</span><span>$33,370</span></div>
+                            <div class="orderbook-row sell"><span>65.3%</span><span>$15,670</span><span>$25,170</span></div>
+                            <div class="orderbook-spread">— Spread: 0.2% —</div>
+                            <div class="orderbook-row buy"><span>65.1%</span><span>$9,500</span><span>$9,500</span></div>
+                            <div class="orderbook-row buy"><span>65.0%</span><span>$18,320</span><span>$27,820</span></div>
+                            <div class="orderbook-row buy"><span>64.9%</span><span>$21,180</span><span>$49,000</span></div>
+                        </div>
+                    `;
+                    
+                    addMarket('BTC $150k', '65.2%', 'Polymarket');
+                }
+            },
+            {
+                title: "Multiple Polymarket Positions",
+                text: "Polymarket offers thousands of markets. Here are some popular ones: Trump election odds, Fed rate cuts, ETH flippening, and S&P 500 predictions. Each market has its own liquidity pool and order book.",
+                action: "Loading additional Polymarket markets...",
+                duration: 8000,
+                execute: () => {
+                    document.getElementById('main-title').textContent = 'Polymarket Active Markets';
+                    document.getElementById('content').innerHTML = `
+                        <div class="market-card active">
+                            <div class="market-name">🗳️ Will Trump win the 2024 election?</div>
+                            <div class="market-price">48.5%</div>
+                            <div class="market-details">
+                                <span>Volume: $5.3M</span>
+                                <span>Liquidity: $12.1M</span>
+                                <span>Traders: 45,821</span>
+                            </div>
+                        </div>
+                        
+                        <div class="market-card active">
+                            <div class="market-name">📉 Will Fed cut rates in Q1 2024?</div>
+                            <div class="market-price">71.4%</div>
+                            <div class="market-details">
+                                <span>Volume: $432K</span>
+                                <span>Liquidity: $2.8M</span>
+                                <span>Traders: 8,234</span>
+                            </div>
+                        </div>
+                        
+                        <div class="market-card active">
+                            <div class="market-name">🔄 Will ETH flip BTC market cap in 2024?</div>
+                            <div class="market-price">32.8%</div>
+                            <div class="market-details">
+                                <span>Volume: $845K</span>
+                                <span>Liquidity: $4.2M</span>
+                                <span>Traders: 12,456</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    addMarket('Trump 2024', '48.5%', 'Polymarket');
+                    addMarket('Fed Rate Cut', '71.4%', 'Polymarket');
+                    addMarket('ETH Flip BTC', '32.8%', 'Polymarket');
+                }
+            },
+            {
+                title: "Flash Betting Introduction",
+                text: "Now let's explore FLASH BETTING - markets that resolve in 5-60 seconds! Perfect for live sports moments. We're watching the final minute of Man City vs Liverpool. Will there be a goal?",
+                action: "⚡ Entering Flash Market: Live Soccer Match",
+                duration: 10000,
+                execute: () => {
+                    document.getElementById('main-title').textContent = '⚡ FLASH: Man City vs Liverpool';
+                    document.getElementById('header-info').innerHTML = `
+                        <div style="color: #FFD60A; font-size: 18px;">89th Minute - Score: 2-2</div>
+                    `;
+                    
+                    document.getElementById('content').innerHTML = `
+                        <div class="flash-market">
+                            <div class="flash-badge">LIVE</div>
+                            <h2 style="font-size: 24px; margin-bottom: 16px;">Will there be a goal in the next 30 seconds?</h2>
+                            <div class="flash-timer-display" id="flash-countdown">30</div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px;">
+                                <div style="padding: 20px; background: rgba(76, 217, 100, 0.1); border: 2px solid #4CD964; border-radius: 8px; text-align: center;">
+                                    <div style="font-size: 14px; margin-bottom: 8px;">YES - Goal Scored</div>
+                                    <div style="font-size: 32px; font-weight: 700; color: #4CD964;">28%</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 8px;">Payout: 3.57x</div>
+                                </div>
+                                <div style="padding: 20px; background: rgba(255, 59, 48, 0.1); border: 2px solid #FF3B30; border-radius: 8px; text-align: center;">
+                                    <div style="font-size: 14px; margin-bottom: 8px;">NO - No Goal</div>
+                                    <div style="font-size: 32px; font-weight: 700; color: #FF3B30;">72%</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 8px;">Payout: 1.39x</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 24px; padding: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Data Source: DraftKings Live</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Resolution: ZK Proof within 10 seconds</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Micro-tau: 0.0001/s time decay</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Start countdown
+                    let seconds = 30;
+                    const timer = setInterval(() => {
+                        seconds--;
+                        document.getElementById('flash-countdown').textContent = seconds;
+                        if (seconds <= 0) {
+                            clearInterval(timer);
+                            document.getElementById('flash-countdown').textContent = 'GOAL!';
+                            document.getElementById('flash-countdown').style.color = '#4CD964';
+                        }
+                    }, 333);
+                    
+                    addMarket('⚡ Goal in 30s', '28%', 'FLASH');
+                }
+            },
+            {
+                title: "Flash Market Resolution",
+                text: "GOAL SCORED! Salah scores in the 90th minute! The market resolves instantly using ZK proofs from DraftKings data. Winners receive immediate payouts. The entire process took just 30 seconds.",
+                action: "Market resolved: YES wins at 28% → Payout: 3.57x",
+                duration: 6000,
+                execute: () => {
+                    addPosition('Flash: Goal Scored', 'YES @ 28%', '$500', '+$1,285', '#4CD964');
+                    document.getElementById('header-info').innerHTML = `
+                        <div style="color: #4CD964; font-size: 20px;">✅ Market Resolved - Goal Scored!</div>
+                    `;
+                }
+            },
+            {
+                title: "More Flash Markets",
+                text: "Flash markets are available for all live sports: basketball (next basket in 24s), tennis (ace on this serve), NFL (touchdown this drive), and more. Each resolves in under a minute.",
+                action: "Showing variety of flash betting options...",
+                duration: 8000,
+                execute: () => {
+                    document.getElementById('main-title').textContent = '⚡ Active Flash Markets';
+                    document.getElementById('content').innerHTML = `
+                        <div class="market-card active highlighted">
+                            <div class="market-name">🏀 Lakers to score in next 24 seconds</div>
+                            <div class="market-price">42%</div>
+                            <div class="market-details">
+                                <span>Shot clock: 18s</span>
+                                <span>Quarter: Q4</span>
+                                <span>Resolves: 24s</span>
+                            </div>
+                        </div>
+                        
+                        <div class="market-card active">
+                            <div class="market-name">🎾 Djokovic ace on this serve</div>
+                            <div class="market-price">35%</div>
+                            <div class="market-details">
+                                <span>Set: 3rd</span>
+                                <span>Score: 5-4</span>
+                                <span>Resolves: 15s</span>
+                            </div>
+                        </div>
+                        
+                        <div class="market-card active">
+                            <div class="market-name">🏈 Chiefs touchdown this drive</div>
+                            <div class="market-price">58%</div>
+                            <div class="market-details">
+                                <span>Red zone</span>
+                                <span>2nd & Goal</span>
+                                <span>Resolves: 45s</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    addMarket('⚡ Lakers 24s', '42%', 'FLASH');
+                    addMarket('⚡ Djokovic Ace', '35%', 'FLASH');
+                    addMarket('⚡ Chiefs TD', '58%', 'FLASH');
+                }
+            },
+            {
+                title: "Quantum Positions - The Concept",
+                text: "QUANTUM POSITIONS let you bet on multiple correlated outcomes simultaneously. Your position exists in 'superposition' until markets resolve. Let me show you with the election markets.",
+                action: "Entering quantum superposition across election markets...",
+                duration: 10000,
+                execute: () => {
+                    document.getElementById('main-title').textContent = '🔮 Quantum Position: US Elections';
+                    document.getElementById('header-info').innerHTML = `
+                        <div style="color: #7B3FF2;">Superposition across 3 entangled markets</div>
+                    `;
+                    
+                    document.getElementById('content').innerHTML = `
+                        <div class="quantum-group">
+                            <div class="quantum-header">
+                                <div class="quantum-icon">🔮</div>
+                                <div class="quantum-title">Quantum Superposition Active</div>
+                            </div>
+                            
+                            <div class="quantum-markets">
+                                <div class="quantum-market entangled">
+                                    <div>
+                                        <div style="font-size: 16px; font-weight: 600;">Trump wins presidency</div>
+                                        <div class="quantum-state">State |ψ₁⟩ - Primary position</div>
+                                    </div>
+                                    <div>
+                                        <div class="quantum-probability">48.5%</div>
+                                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Weight: 40%</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="quantum-market entangled">
+                                    <div>
+                                        <div style="font-size: 16px; font-weight: 600;">Republicans win Senate</div>
+                                        <div class="quantum-state">State |ψ₂⟩ - Correlated</div>
+                                    </div>
+                                    <div>
+                                        <div class="quantum-probability">52.1%</div>
+                                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Weight: 35%</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="quantum-market entangled">
+                                    <div>
+                                        <div style="font-size: 16px; font-weight: 600;">Red wave in swing states</div>
+                                        <div class="quantum-state">State |ψ₃⟩ - Entangled</div>
+                                    </div>
+                                    <div>
+                                        <div class="quantum-probability">44.7%</div>
+                                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Weight: 25%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 24px; padding: 16px; background: rgba(123, 63, 242, 0.1); border-radius: 8px;">
+                                <div style="font-size: 14px; margin-bottom: 8px;">🌀 Quantum Advantages:</div>
+                                <div style="font-size: 12px; line-height: 1.8;">
+                                    • Position exists in all three states simultaneously<br>
+                                    • Correlation bonus: +15% on correlated outcomes<br>
+                                    • Entanglement multiplier: 1.5x leverage<br>
+                                    • Collapse to most profitable state on resolution
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: "Quantum Collapse Mechanism",
+                text: "When one market resolves, the quantum position 'collapses' based on correlations. If Trump wins, your Senate and swing state positions automatically adjust for maximum profit.",
+                action: "Demonstrating wavefunction collapse...",
+                duration: 8000,
+                execute: () => {
+                    document.getElementById('content').innerHTML += `
+                        <div style="margin-top: 24px; padding: 24px; background: linear-gradient(135deg, rgba(76, 217, 100, 0.1) 0%, rgba(123, 63, 242, 0.1) 100%); border: 2px solid #4CD964; border-radius: 12px;">
+                            <h3 style="font-size: 20px; margin-bottom: 16px;">⚡ Wavefunction Collapsing...</h3>
+                            <div style="font-size: 16px; line-height: 1.8;">
+                                <div>✅ Trump wins → Probability cascade initiated</div>
+                                <div>✅ Senate position auto-adjusts to 78% probability</div>
+                                <div>✅ Swing states position crystallizes at 91%</div>
+                                <div style="margin-top: 12px; font-size: 20px; font-weight: 700; color: #4CD964;">
+                                    Total Profit: +$4,827 (3.2x base return)
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    addPosition('Quantum: Elections', 'COLLAPSED', '$1,500', '+$4,827', '#7B3FF2');
+                }
+            },
+            {
+                title: "Verse Hierarchy System",
+                text: "Markets are organized in VERSES - hierarchical structures that group related predictions. Each level deeper gives you a 10% leverage bonus. Let me show you the complete hierarchy.",
+                action: "Exploring the verse tree structure...",
+                duration: 10000,
+                execute: () => {
+                    document.getElementById('main-title').textContent = '🌳 Verse Hierarchy System';
+                    document.getElementById('header-info').innerHTML = `
+                        <div>Navigate market relationships for depth bonuses</div>
+                    `;
+                    
+                    document.getElementById('content').innerHTML = `
+                        <div class="verse-container">
+                            <div class="verse-tree">
+                                <div class="verse-node root">
+                                    <div class="verse-item highlighted">
+                                        <div style="font-size: 18px; font-weight: 600;">🌍 Global Events 2024</div>
+                                        <div class="verse-depth-badge">ROOT</div>
+                                        <div style="margin-left: auto; color: rgba(255, 255, 255, 0.6);">458 markets</div>
+                                    </div>
+                                    
+                                    <div class="verse-children">
+                                        <div class="verse-node">
+                                            <div class="verse-item">
+                                                <div style="font-size: 16px;">🏛️ Politics & Elections</div>
+                                                <div class="verse-depth-badge">+10%</div>
+                                                <div style="margin-left: auto; color: rgba(255, 255, 255, 0.6);">127 markets</div>
+                                            </div>
+                                            
+                                            <div class="verse-children">
+                                                <div class="verse-node">
+                                                    <div class="verse-item">
+                                                        <div>🇺🇸 US Presidential Election</div>
+                                                        <div class="verse-depth-badge">+20%</div>
+                                                        <div style="margin-left: auto; color: rgba(255, 255, 255, 0.6);">43 markets</div>
+                                                    </div>
+                                                </div>
+                                                <div class="verse-node">
+                                                    <div class="verse-item">
+                                                        <div>🏛️ Congressional Races</div>
+                                                        <div class="verse-depth-badge">+20%</div>
+                                                        <div style="margin-left: auto; color: rgba(255, 255, 255, 0.6);">38 markets</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="verse-node">
+                                            <div class="verse-item">
+                                                <div style="font-size: 16px;">💰 Financial Markets</div>
+                                                <div class="verse-depth-badge">+10%</div>
+                                                <div style="margin-left: auto; color: rgba(255, 255, 255, 0.6);">189 markets</div>
+                                            </div>
+                                            
+                                            <div class="verse-children">
+                                                <div class="verse-node">
+                                                    <div class="verse-item">
+                                                        <div>₿ Crypto Predictions</div>
+                                                        <div class="verse-depth-badge">+20%</div>
+                                                        <div style="margin-left: auto; color: rgba(255, 255, 255, 0.6);">67 markets</div>
+                                                    </div>
+                                                </div>
+                                                <div class="verse-node">
+                                                    <div class="verse-item">
+                                                        <div>📈 Stock Market</div>
+                                                        <div class="verse-depth-badge">+20%</div>
+                                                        <div style="margin-left: auto; color: rgba(255, 255, 255, 0.6);">54 markets</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="verse-node">
+                                            <div class="verse-item">
+                                                <div style="font-size: 16px;">⚽ Sports</div>
+                                                <div class="verse-depth-badge">+10%</div>
+                                                <div style="margin-left: auto; color: rgba(255, 255, 255, 0.6);">142 markets</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 24px; padding: 16px; background: rgba(255, 214, 10, 0.1); border-radius: 8px;">
+                                <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">📊 Verse Benefits:</div>
+                                <div style="font-size: 12px; line-height: 1.8; color: rgba(255, 255, 255, 0.8);">
+                                    • Each level deeper = +10% leverage bonus<br>
+                                    • Cross-verse arbitrage opportunities<br>
+                                    • Correlation tracking between related markets<br>
+                                    • Flash markets inherit parent verse properties
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: "Verse Depth Trading",
+                text: "Let's trade in a 3rd-level verse: Global > Financial > Crypto > Bitcoin. At this depth, you get +30% leverage bonus automatically. This stacks with other multipliers!",
+                action: "Trading in deep verse with bonus active...",
+                duration: 8000,
+                execute: () => {
+                    document.getElementById('header-info').innerHTML = `
+                        <div style="color: #FFD60A;">Trading at Depth 3: +30% Leverage Bonus Active</div>
+                    `;
+                    
+                    addPosition('Verse: BTC>$150k', 'DEPTH-3', '$2,000', '+$428', '#FFD60A');
+                }
+            },
+            {
+                title: "Base Leverage System",
+                text: "Now let's explore LEVERAGE. Starting with 100x base leverage - already extreme by traditional standards. This means a $1,000 position controls $100,000 in market exposure.",
+                action: "Demonstrating base leverage mechanics...",
+                duration: 8000,
+                execute: () => {
+                    document.getElementById('main-title').textContent = '📈 Leverage Trading System';
+                    document.getElementById('content').innerHTML = `
+                        <div class="leverage-meter">
+                            <div class="leverage-value" id="leverage-display">100x</div>
+                            <div style="font-size: 18px; color: rgba(255, 255, 255, 0.6);">BASE LEVERAGE</div>
+                            
+                            <div style="margin-top: 32px; padding: 24px; background: rgba(255, 255, 255, 0.03); border-radius: 12px;">
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; text-align: left;">
+                                    <div>
+                                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">Your Capital</div>
+                                        <div style="font-size: 20px; font-weight: 600;">$1,000</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">Position Size</div>
+                                        <div style="font-size: 20px; font-weight: 600;">$100,000</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">Liquidation Move</div>
+                                        <div style="font-size: 20px; font-weight: 600; color: #FFD60A;">1%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: "Leverage Chain - Step 1: Borrow",
+                text: "Step 1 of leverage chaining: BORROW. Use your position as collateral to borrow additional capital at 80% LTV. This multiplies your leverage by 1.5x, taking us from 100x to 150x.",
+                action: "Applying borrow multiplier to leverage...",
+                duration: 8000,
+                execute: () => {
+                    animateLeverage(100, 150);
+                    document.getElementById('content').innerHTML += `
+                        <div class="leverage-chain">
+                            <div class="chain-step active">
+                                <div style="font-size: 14px; font-weight: 600;">BORROW</div>
+                                <div style="font-size: 12px; color: #FFD60A;">1.5x</div>
+                            </div>
+                            <div class="chain-step">
+                                <div style="font-size: 14px; font-weight: 600;">LIQUIDITY</div>
+                                <div style="font-size: 12px;">1.2x</div>
+                            </div>
+                            <div class="chain-step">
+                                <div style="font-size: 14px; font-weight: 600;">HEDGE</div>
+                                <div style="font-size: 12px;">1.1x</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: "Leverage Chain - Step 2: Liquidity",
+                text: "Step 2: PROVIDE LIQUIDITY. Supply your leveraged position to the AMM pool to earn fees. This adds another 1.2x multiplier. We're now at 180x effective leverage.",
+                action: "Adding liquidity multiplier...",
+                duration: 8000,
+                execute: () => {
+                    animateLeverage(150, 180);
+                    document.querySelectorAll('.chain-step')[1].classList.add('active');
+                }
+            },
+            {
+                title: "Leverage Chain - Step 3: Hedge",
+                text: "Final step: HEDGE. Create offsetting positions in correlated markets. This adds 1.1x multiplier. Combined with verse bonuses and flash multipliers, we can reach 500x EFFECTIVE LEVERAGE!",
+                action: "Achieving maximum leverage through chaining...",
+                duration: 8000,
+                execute: () => {
+                    animateLeverage(180, 500);
+                    document.querySelectorAll('.chain-step')[2].classList.add('active');
+                    document.getElementById('leverage-display').style.background = 'linear-gradient(135deg, #FF3B30 0%, #FFD60A 100%)';
+                    document.getElementById('leverage-display').style.webkitBackgroundClip = 'text';
+                    document.getElementById('leverage-display').style.webkitTextFillColor = 'transparent';
+                    
+                    document.getElementById('content').innerHTML += `
+                        <div style="margin-top: 24px; padding: 20px; background: rgba(255, 59, 48, 0.1); border: 2px solid #FF3B30; border-radius: 12px;">
+                            <div style="font-size: 16px; font-weight: 600; color: #FF3B30; margin-bottom: 8px;">
+                                ⚠️ EXTREME LEVERAGE WARNING
+                            </div>
+                            <div style="font-size: 14px; line-height: 1.6;">
+                                At 500x leverage, a 0.2% adverse move will liquidate your position.<br>
+                                Maximum profit potential: 50,000% on a 100% move.<br>
+                                This is for experienced traders only.
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: "Live Trading Example",
+                text: "Let's place a real trade using everything we've learned. We'll trade 'ETH to flip BTC' with quantum positioning, in a deep verse, using 250x leveraged chain. Watch the execution...",
+                action: "Executing complex multi-feature trade...",
+                duration: 10000,
+                execute: () => {
+                    document.getElementById('main-title').textContent = '🎯 Live Trade Execution';
+                    document.getElementById('content').innerHTML = `
+                        <div style="padding: 32px; background: linear-gradient(135deg, rgba(255, 214, 10, 0.05) 0%, rgba(123, 63, 242, 0.05) 100%); border: 2px solid #FFD60A; border-radius: 16px;">
+                            <h2 style="font-size: 24px; margin-bottom: 24px;">Executing Multi-Feature Trade</h2>
+                            
+                            <div style="display: grid; gap: 16px;">
+                                <div style="padding: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
+                                    <div style="color: #4CD964;">✅ Market: ETH to flip BTC market cap</div>
+                                </div>
+                                <div style="padding: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
+                                    <div style="color: #4CD964;">✅ Quantum: Entangled with ETH>$10k, BTC<$100k</div>
+                                </div>
+                                <div style="padding: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
+                                    <div style="color: #4CD964;">✅ Verse: Financial > Crypto > Flippening (Depth 3, +30%)</div>
+                                </div>
+                                <div style="padding: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
+                                    <div style="color: #4CD964;">✅ Leverage: 250x (100x base × 2.5x chain)</div>
+                                </div>
+                                <div style="padding: 16px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
+                                    <div style="color: #4CD964;">✅ Position Size: $5,000 × 250 = $1,250,000 exposure</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 24px; padding: 20px; background: rgba(76, 217, 100, 0.1); border: 2px solid #4CD964; border-radius: 12px;">
+                                <div style="font-size: 20px; font-weight: 700; color: #4CD964;">
+                                    TRADE EXECUTED SUCCESSFULLY
+                                </div>
+                                <div style="margin-top: 8px; font-size: 14px;">
+                                    Transaction Hash: 0x7f3d...8a2b<br>
+                                    Gas Used: 287,432<br>
+                                    Block: 18,234,567
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    addPosition('ETH Flip MEGA', '250x QUANTUM', '$5,000', 'PENDING', '#FFD60A');
+                }
+            },
+            {
+                title: "Order Types & Execution",
+                text: "The platform supports advanced order types: Market orders, Limit orders, Stop Loss, Take Profit, Iceberg (hidden size), and TWAP (time-weighted). Each optimized for MEV protection.",
+                action: "Demonstrating order type variety...",
+                duration: 8000,
+                execute: () => {
+                    document.getElementById('main-title').textContent = '📊 Advanced Order Types';
+                    document.getElementById('content').innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                            <div class="market-card active">
+                                <div style="font-size: 16px; font-weight: 600; color: #4CD964;">Market Order</div>
+                                <div style="font-size: 14px; margin-top: 8px; color: rgba(255, 255, 255, 0.7);">
+                                    Execute immediately at best available price. Includes slippage protection.
+                                </div>
+                            </div>
+                            
+                            <div class="market-card active">
+                                <div style="font-size: 16px; font-weight: 600; color: #00D4FF;">Limit Order</div>
+                                <div style="font-size: 14px; margin-top: 8px; color: rgba(255, 255, 255, 0.7);">
+                                    Set exact entry price. Order fills when market reaches your price.
+                                </div>
+                            </div>
+                            
+                            <div class="market-card active">
+                                <div style="font-size: 16px; font-weight: 600; color: #FF3B30;">Stop Loss</div>
+                                <div style="font-size: 14px; margin-top: 8px; color: rgba(255, 255, 255, 0.7);">
+                                    Automatically exit position to limit losses at predetermined level.
+                                </div>
+                            </div>
+                            
+                            <div class="market-card active">
+                                <div style="font-size: 16px; font-weight: 600; color: #FFD60A;">Take Profit</div>
+                                <div style="font-size: 14px; margin-top: 8px; color: rgba(255, 255, 255, 0.7);">
+                                    Lock in gains automatically when target price is reached.
+                                </div>
+                            </div>
+                            
+                            <div class="market-card active">
+                                <div style="font-size: 16px; font-weight: 600; color: #7B3FF2;">Iceberg Order</div>
+                                <div style="font-size: 14px; margin-top: 8px; color: rgba(255, 255, 255, 0.7);">
+                                    Hide large orders by showing only small portions to the market.
+                                </div>
+                            </div>
+                            
+                            <div class="market-card active">
+                                <div style="font-size: 16px; font-weight: 600; color: #FFA500;">TWAP Order</div>
+                                <div style="font-size: 14px; margin-top: 8px; color: rgba(255, 255, 255, 0.7);">
+                                    Execute large trades over time to minimize market impact.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: "Portfolio Performance",
+                text: "Your demo portfolio is now complete! You've executed trades across Polymarket, Flash markets, Quantum positions, and leveraged chains. Total P&L: +$28,847 on $15,000 invested (192% return).",
+                action: "Calculating final portfolio metrics...",
+                duration: 8000,
+                execute: () => {
+                    document.getElementById('main-title').textContent = '💼 Portfolio Summary';
+                    document.getElementById('total-pnl').textContent = '+$28,847';
+                    document.getElementById('total-pnl').style.color = '#4CD964';
+                    
+                    document.getElementById('content').innerHTML = `
+                        <div style="padding: 32px; background: linear-gradient(135deg, rgba(76, 217, 100, 0.05) 0%, rgba(255, 214, 10, 0.05) 100%); border: 2px solid #4CD964; border-radius: 16px;">
+                            <h2 style="font-size: 28px; margin-bottom: 24px;">Demo Complete - Portfolio Performance</h2>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 32px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 32px; font-weight: 700; color: #4CD964;">+192%</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">TOTAL RETURN</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 32px; font-weight: 700; color: #FFD60A;">87%</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">WIN RATE</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 32px; font-weight: 700; color: #00D4FF;">2.34</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">SHARPE RATIO</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 32px; font-weight: 700; color: #7B3FF2;">162x</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">AVG LEVERAGE</div>
+                                </div>
+                            </div>
+                            
+                            <div style="padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 12px;">
+                                <h3 style="font-size: 18px; margin-bottom: 16px;">What You've Learned:</h3>
+                                <div style="line-height: 2;">
+                                    ✅ Polymarket integration with deep liquidity<br>
+                                    ✅ Flash betting with 5-60 second resolution<br>
+                                    ✅ Quantum positions across correlated markets<br>
+                                    ✅ Verse hierarchy with depth bonuses<br>
+                                    ✅ 500x leverage through 3-step chaining<br>
+                                    ✅ Advanced order types and MEV protection<br>
+                                    ✅ Real-time portfolio management
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                title: "Platform Ready",
+                text: "The Multiverse platform is now ready for live trading. Connect your wallet, fund your account, and start with small positions to test the platform. Remember: with great leverage comes great responsibility!",
+                action: "Start trading at app.multiverse.finance",
+                duration: 10000,
+                execute: () => {
+                    document.getElementById('main-title').textContent = '🚀 Welcome to the Future of Trading';
+                    document.getElementById('content').innerHTML += `
+                        <div style="margin-top: 24px; text-align: center;">
+                            <button style="padding: 20px 48px; background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%); border: none; border-radius: 12px; color: #000; font-size: 18px; font-weight: 700; cursor: pointer;">
+                                START LIVE TRADING
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Confetti effect
+                    for (let i = 0; i < 50; i++) {
+                        setTimeout(() => createConfetti(), i * 50);
+                    }
+                }
+            }
+        ];
+
+        let currentStep = 0;
+        let stepTimeout;
+
+        function runDemo() {
+            if (currentStep >= demoSteps.length) {
+                document.getElementById('narrator').style.display = 'none';
+                return;
+            }
+
+            const step = demoSteps[currentStep];
+            
+            // Update narrator
+            document.getElementById('step-number').textContent = `STEP ${currentStep + 1} OF ${demoSteps.length}`;
+            document.getElementById('step-title').textContent = step.title;
+            document.getElementById('step-text').textContent = step.text;
+            document.getElementById('step-action').textContent = `👉 ${step.action}`;
+            document.getElementById('progress').style.width = `${((currentStep + 1) / demoSteps.length) * 100}%`;
+            
+            // Execute step
+            step.execute();
+            
+            // Schedule next step
+            currentStep++;
+            stepTimeout = setTimeout(runDemo, step.duration);
+        }
+
+        // Helper functions
+        function animateValue(id, start, end, duration) {
+            const element = document.getElementById(id);
+            const increment = (end - start) / (duration / 50);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = `$${current.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }, 50);
+        }
+
+        function animateLeverage(start, end) {
+            const element = document.getElementById('leverage-display');
+            const duration = 2000;
+            const increment = (end - start) / (duration / 50);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = `${Math.round(current)}x`;
+            }, 50);
+        }
+
+        function addMarket(name, price, type) {
+            const list = document.getElementById('market-list');
+            const item = document.createElement('div');
+            item.className = 'market-card';
+            item.style.marginBottom = '12px';
+            item.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 14px;">${name}</div>
+                    <div>
+                        <span style="font-size: 16px; font-weight: 600;">${price}</span>
+                        <span style="font-size: 11px; color: rgba(255, 255, 255, 0.5); margin-left: 8px;">${type}</span>
+                    </div>
+                </div>
+            `;
+            list.appendChild(item);
+            setTimeout(() => item.classList.add('active'), 100);
+        }
+
+        function addPosition(name, type, size, pnl, color = '#4CD964') {
+            const list = document.getElementById('positions');
+            const item = document.createElement('div');
+            item.className = 'position-item';
+            item.innerHTML = `
+                <div style="font-size: 14px; font-weight: 600;">${name}</div>
+                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 4px;">${type} • ${size}</div>
+                <div style="font-size: 18px; font-weight: 700; color: ${color}; margin-top: 8px;">${pnl}</div>
+            `;
+            list.appendChild(item);
+            setTimeout(() => item.classList.add('active'), 100);
+        }
+
+        function createConfetti() {
+            const colors = ['#FFD60A', '#4CD964', '#00D4FF', '#7B3FF2', '#FF3B30'];
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.left = Math.random() * window.innerWidth + 'px';
+            confetti.style.top = '-10px';
+            confetti.style.borderRadius = '50%';
+            confetti.style.zIndex = '10000';
+            document.body.appendChild(confetti);
+            
+            const duration = Math.random() * 3 + 2;
+            confetti.animate([
+                { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+            ], {
+                duration: duration * 1000,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            });
+            
+            setTimeout(() => confetti.remove(), duration * 1000);
+        }
+
+        // Start demo
+        setTimeout(runDemo, 1000);
+    </script>
+</body>
+</html>

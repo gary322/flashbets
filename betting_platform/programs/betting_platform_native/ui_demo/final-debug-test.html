@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Final Debug Test - Verses & Quantum</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #000; color: #fff; padding: 20px; font-family: sans-serif; }
+        .test-section { margin: 20px 0; padding: 20px; background: #111; border-radius: 8px; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        .warning { color: #FFD60A; }
+        button { background: #FFD60A; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .debug-output { background: #222; padding: 10px; border-radius: 4px; margin: 10px 0; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Final Debug Test - Verses & Quantum</h1>
+    
+    <div class="test-section">
+        <h2>System Check</h2>
+        <div id="systemCheck" class="debug-output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="testVerseDisplay()">Test Verse Display</button>
+        <button onclick="testQuantumToggle()">Test Quantum Toggle</button>
+        <button onclick="testFullFlow()">Test Full Flow</button>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+    
+    <div id="testOutput" class="debug-output"></div>
+    
+    <!-- Include the main app structure for testing -->
+    <div class="test-section">
+        <h2>Verse Display Test Area</h2>
+        <div class="verses-section" id="versesSection" style="display: block;">
+            <div class="section-title">Related Stages - Chain Your Leverage</div>
+            <div class="verse-flow-container" id="verseFlowContainer">
+                <svg class="verse-connections" id="verseConnections">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" 
+                                refX="9" refY="5" orient="auto">
+                            <polygon points="0 0, 10 5, 0 10" class="verse-arrow" />
+                        </marker>
+                    </defs>
+                </svg>
+                <div class="verse-levels" id="verseLevels"></div>
+            </div>
+            <div class="verse-grid" id="verseGrid" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Quantum Toggle Test Area</h2>
+        <div class="quantum-toggle" id="quantumToggle" onclick="toggleQuantumMode()">
+            <div class="quantum-icon">⚛️</div>
+            <div class="quantum-info">
+                <div class="quantum-label">Quantum Mode</div>
+                <div class="quantum-description">Split position across all outcomes</div>
+            </div>
+            <div class="toggle-switch"></div>
+        </div>
+        <div class="quantum-states" id="quantumStates" style="display: none; margin-top: 20px;">
+            <div class="quantum-state-grid" id="quantumStateGrid">
+                <!-- Dynamic quantum states -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="platform_main.js"></script>
+    <script>
+        // Initialize platform state
+        window.platformState = {
+            markets: new Map(),
+            selectedMarket: null,
+            selectedOutcome: null,
+            selectedVerses: [],
+            activePositions: [],
+            quantumMode: false
+        };
+        
+        const output = document.getElementById('testOutput');
+        
+        function log(msg, type = '') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff3b30' : type === 'success' ? '#4cd964' : '#fff';
+            output.innerHTML += `<div style="color: ${color}">[${timestamp}] ${msg}</div>`;
+            console.log(msg);
+        }
+        
+        function clearConsole() {
+            output.innerHTML = '';
+        }
+        
+        // System check on load
+        window.addEventListener('load', () => {
+            const check = document.getElementById('systemCheck');
+            let html = '';
+            
+            // Check functions
+            const functions = [
+                'updateAvailableVerses',
+                'createVerseCard', 
+                'updateVerseFlow',
+                'toggleQuantumMode',
+                'updateQuantumStates'
+            ];
+            
+            functions.forEach(fn => {
+                if (window[fn]) {
+                    html += `<div class="success">✓ ${fn} loaded</div>`;
+                } else {
+                    html += `<div class="error">✗ ${fn} NOT loaded</div>`;
+                }
+            });
+            
+            // Check DOM elements
+            const elements = {
+                'versesSection': document.getElementById('versesSection'),
+                'verseLevels': document.getElementById('verseLevels'),
+                'quantumToggle': document.getElementById('quantumToggle'),
+                'quantumStates': document.getElementById('quantumStates')
+            };
+            
+            html += '<br><strong>DOM Elements:</strong><br>';
+            for (const [name, el] of Object.entries(elements)) {
+                if (el) {
+                    html += `<div class="success">✓ ${name} found</div>`;
+                } else {
+                    html += `<div class="error">✗ ${name} NOT found</div>`;
+                }
+            }
+            
+            check.innerHTML = html;
+        });
+        
+        function testVerseDisplay() {
+            log('Testing verse display...', 'info');
+            
+            const testVerses = [
+                {
+                    id: "verse_1",
+                    name: "Test Market Category",
+                    description: "General prediction markets",
+                    level: 1,
+                    multiplier: 1.5,
+                    category: "General",
+                    risk_tier: "Low"
+                },
+                {
+                    id: "verse_2", 
+                    name: "Crypto Trends",
+                    description: "Cryptocurrency specific predictions",
+                    level: 2,
+                    multiplier: 3.0,
+                    category: "Topic",
+                    risk_tier: "Medium"
+                }
+            ];
+            
+            try {
+                log('Calling updateAvailableVerses with test data');
+                window.updateAvailableVerses(testVerses);
+                
+                setTimeout(() => {
+                    const cards = document.querySelectorAll('.verse-card');
+                    const levels = document.querySelectorAll('.verse-level');
+                    log(`Result: ${cards.length} verse cards in ${levels.length} levels`, 
+                        cards.length > 0 ? 'success' : 'error');
+                    
+                    // Check card content
+                    if (cards.length > 0) {
+                        const firstCard = cards[0];
+                        log(`First card HTML: ${firstCard.innerHTML.substring(0, 100)}...`);
+                    }
+                }, 100);
+                
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function testQuantumToggle() {
+            log('Testing quantum toggle...', 'info');
+            
+            try {
+                const initialState = platformState.quantumMode;
+                log(`Initial quantum mode: ${initialState}`);
+                
+                // Toggle
+                toggleQuantumMode();
+                
+                setTimeout(() => {
+                    const newState = platformState.quantumMode;
+                    const toggle = document.getElementById('quantumToggle');
+                    const states = document.getElementById('quantumStates');
+                    
+                    log(`New quantum mode: ${newState}`, newState !== initialState ? 'success' : 'error');
+                    log(`Toggle has 'active' class: ${toggle.classList.contains('active')}`);
+                    log(`Quantum states display: ${states.style.display}`);
+                }, 100);
+                
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testFullFlow() {
+            log('Testing full flow...', 'info');
+            
+            try {
+                // Fetch real market data
+                log('Fetching markets from API...');
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                
+                if (markets.length > 0) {
+                    log(`Fetched ${markets.length} markets`, 'success');
+                    
+                    const firstMarket = markets[0];
+                    log(`First market: ${firstMarket.title || firstMarket.question}`);
+                    
+                    if (firstMarket.verses && firstMarket.verses.length > 0) {
+                        log(`Market has ${firstMarket.verses.length} verses`, 'success');
+                        
+                        // Display verses
+                        window.updateAvailableVerses(firstMarket.verses);
+                        
+                        // Store market for quantum test
+                        platformState.selectedMarket = firstMarket.id;
+                        platformState.markets.set(firstMarket.id, firstMarket);
+                        
+                        setTimeout(() => {
+                            const cards = document.querySelectorAll('.verse-card');
+                            log(`Displayed ${cards.length} verse cards`, 
+                                cards.length > 0 ? 'success' : 'error');
+                            
+                            // Test quantum with market selected
+                            log('Testing quantum with market selected...');
+                            toggleQuantumMode();
+                        }, 200);
+                        
+                    } else {
+                        log('No verses in market data', 'error');
+                    }
+                } else {
+                    log('No markets returned from API', 'error');
+                }
+                
+            } catch (error) {
+                log(`API Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

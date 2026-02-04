@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Betting Platform - Full Integration Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #0a0a0b;
+            color: #e4e4e7;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #FFB800;
+        }
+        .test-section {
+            background: #1a1a1d;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            border: 1px solid #2a2a2d;
+        }
+        .test-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .status-success {
+            background: #10b98133;
+            color: #10b981;
+        }
+        .status-error {
+            background: #ef444433;
+            color: #ef4444;
+        }
+        .status-pending {
+            background: #f59e0b33;
+            color: #f59e0b;
+        }
+        .test-result {
+            margin: 12px 0;
+            padding: 12px;
+            background: #0a0a0b;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        button {
+            background: #FFB800;
+            color: #0a0a0b;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background: #FFB800dd;
+            transform: translateY(-1px);
+        }
+        button:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #2a2a2d;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+        .metric {
+            display: inline-block;
+            margin: 0 20px 10px 0;
+        }
+        .metric-label {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFB800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Betting Platform - Full Integration Test</h1>
+        <p>This page tests the complete integration between the UI, API Backend, and Solana blockchain.</p>
+
+        <!-- System Status -->
+        <div class="test-section">
+            <h2>System Status</h2>
+            <div id="system-status">
+                <div class="metric">
+                    <div class="metric-label">Solana Validator</div>
+                    <div class="metric-value" id="solana-status">Checking...</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">API Backend</div>
+                    <div class="metric-value" id="api-status">Checking...</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">UI Frontend</div>
+                    <div class="metric-value" id="ui-status">Checking...</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">WebSocket</div>
+                    <div class="metric-value" id="ws-status">Checking...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Tests -->
+        <div class="test-section">
+            <h2>API Integration Tests</h2>
+            <button onclick="runApiTests()">Run All API Tests</button>
+            
+            <div id="api-tests">
+                <div class="test-result" id="health-test">
+                    <span class="test-status status-pending">PENDING</span> Health Check
+                </div>
+                <div class="test-result" id="markets-test">
+                    <span class="test-status status-pending">PENDING</span> Markets Endpoint
+                </div>
+                <div class="test-result" id="verses-test">
+                    <span class="test-status status-pending">PENDING</span> Verses Endpoint
+                </div>
+                <div class="test-result" id="demo-wallet-test">
+                    <span class="test-status status-pending">PENDING</span> Demo Wallet Creation
+                </div>
+            </div>
+        </div>
+
+        <!-- WebSocket Tests -->
+        <div class="test-section">
+            <h2>WebSocket Real-time Tests</h2>
+            <button onclick="testWebSocket()">Test WebSocket Connection</button>
+            <div class="test-result" id="ws-test-result">
+                <span class="test-status status-pending">PENDING</span> WebSocket Connection
+            </div>
+            <div id="ws-messages" style="max-height: 200px; overflow-y: auto;"></div>
+        </div>
+
+        <!-- UI Integration -->
+        <div class="test-section">
+            <h2>Live UI Preview</h2>
+            <p>The betting platform UI should load below, connected to the local backend:</p>
+            <div class="iframe-container">
+                <iframe src="http://localhost:3000" id="ui-frame"></iframe>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="test-section">
+            <h2>Performance Metrics</h2>
+            <div id="performance-metrics">
+                <div class="metric">
+                    <div class="metric-label">API Response Time</div>
+                    <div class="metric-value" id="api-response-time">-</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Markets Loaded</div>
+                    <div class="metric-value" id="markets-count">-</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">WS Messages/sec</div>
+                    <div class="metric-value" id="ws-rate">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8081';
+        const WS_URL = 'ws://localhost:8081/ws';
+        let ws = null;
+        let wsMessageCount = 0;
+        let wsStartTime = null;
+
+        // Check system status on load
+        window.onload = async function() {
+            checkSystemStatus();
+            setInterval(checkSystemStatus, 5000); // Check every 5 seconds
+        };
+
+        async function checkSystemStatus() {
+            // Check Solana
+            try {
+                const response = await fetch('http://localhost:8899', { method: 'POST', body: '{"jsonrpc":"2.0","id":1,"method":"getHealth"}' });
+                document.getElementById('solana-status').textContent = response.ok ? '✅ Running' : '❌ Error';
+            } catch {
+                document.getElementById('solana-status').textContent = '❌ Offline';
+            }
+
+            // Check API
+            try {
+                const response = await fetch(API_BASE + '/health');
+                document.getElementById('api-status').textContent = response.ok ? '✅ Running' : '❌ Error';
+            } catch {
+                document.getElementById('api-status').textContent = '❌ Offline';
+            }
+
+            // Check UI
+            try {
+                const response = await fetch('http://localhost:3000', { mode: 'no-cors' });
+                document.getElementById('ui-status').textContent = '✅ Running';
+            } catch {
+                document.getElementById('ui-status').textContent = '❌ Offline';
+            }
+
+            // Check WebSocket
+            document.getElementById('ws-status').textContent = ws && ws.readyState === WebSocket.OPEN ? '✅ Connected' : '❌ Disconnected';
+        }
+
+        async function runApiTests() {
+            const tests = [
+                { id: 'health-test', name: 'Health Check', endpoint: '/health' },
+                { id: 'markets-test', name: 'Markets', endpoint: '/api/markets' },
+                { id: 'verses-test', name: 'Verses', endpoint: '/api/verses' },
+            ];
+
+            for (const test of tests) {
+                const element = document.getElementById(test.id);
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch(API_BASE + test.endpoint);
+                    const data = await response.json();
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (response.ok) {
+                        element.innerHTML = `<span class="test-status status-success">✅ PASS</span> ${test.name} (${responseTime}ms)`;
+                        
+                        // Update metrics
+                        if (test.id === 'markets-test') {
+                            document.getElementById('markets-count').textContent = data.count || '0';
+                            document.getElementById('api-response-time').textContent = responseTime + 'ms';
+                        }
+                    } else {
+                        element.innerHTML = `<span class="test-status status-error">❌ FAIL</span> ${test.name} - Status: ${response.status}`;
+                    }
+                } catch (error) {
+                    element.innerHTML = `<span class="test-status status-error">❌ ERROR</span> ${test.name} - ${error.message}`;
+                }
+            }
+
+            // Test demo wallet creation
+            testDemoWallet();
+        }
+
+        async function testDemoWallet() {
+            const element = document.getElementById('demo-wallet-test');
+            try {
+                const response = await fetch(API_BASE + '/api/wallet/demo/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: 'Test User' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    element.innerHTML = `<span class="test-status status-success">✅ PASS</span> Demo Wallet Created: ${data.wallet || 'Success'}`;
+                } else {
+                    element.innerHTML = `<span class="test-status status-error">❌ FAIL</span> Demo Wallet - Status: ${response.status}`;
+                }
+            } catch (error) {
+                element.innerHTML = `<span class="test-status status-error">❌ ERROR</span> Demo Wallet - ${error.message}`;
+            }
+        }
+
+        function testWebSocket() {
+            const resultElement = document.getElementById('ws-test-result');
+            const messagesElement = document.getElementById('ws-messages');
+            
+            if (ws) {
+                ws.close();
+            }
+
+            wsMessageCount = 0;
+            wsStartTime = Date.now();
+
+            ws = new WebSocket(WS_URL);
+            
+            ws.onopen = () => {
+                resultElement.innerHTML = '<span class="test-status status-success">✅ CONNECTED</span> WebSocket Connection Established';
+                ws.send(JSON.stringify({ type: 'subscribe', channel: 'markets' }));
+            };
+
+            ws.onmessage = (event) => {
+                wsMessageCount++;
+                const message = JSON.parse(event.data);
+                
+                // Update rate
+                const elapsed = (Date.now() - wsStartTime) / 1000;
+                const rate = (wsMessageCount / elapsed).toFixed(2);
+                document.getElementById('ws-rate').textContent = rate;
+                
+                // Add message to display
+                const messageDiv = document.createElement('div');
+                messageDiv.textContent = `[${new Date().toLocaleTimeString()}] ${JSON.stringify(message).substring(0, 100)}...`;
+                messagesElement.insertBefore(messageDiv, messagesElement.firstChild);
+                
+                // Keep only last 10 messages
+                while (messagesElement.children.length > 10) {
+                    messagesElement.removeChild(messagesElement.lastChild);
+                }
+            };
+
+            ws.onerror = (error) => {
+                resultElement.innerHTML = '<span class="test-status status-error">❌ ERROR</span> WebSocket Connection Failed';
+            };
+
+            ws.onclose = () => {
+                resultElement.innerHTML = '<span class="test-status status-error">❌ CLOSED</span> WebSocket Connection Closed';
+                document.getElementById('ws-status').textContent = '❌ Disconnected';
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 Quantum Betting - Realistic Verse Markets</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 20px 40px;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Market Showcase */
+        .market-showcase {
+            margin-top: 100px;
+            padding: 40px;
+        }
+
+        .showcase-title {
+            text-align: center;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .showcase-subtitle {
+            text-align: center;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 60px;
+        }
+
+        /* Market Cards */
+        .markets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .market-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .market-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(255, 214, 10, 0.1);
+        }
+
+        .market-card.active {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.05);
+        }
+
+        .market-header {
+            margin-bottom: 20px;
+        }
+
+        .market-category {
+            font-size: 12px;
+            color: #FFD60A;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .market-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .market-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.5;
+        }
+
+        .market-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat {
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #FFD60A;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 5px;
+        }
+
+        /* Verse Visualization */
+        .verse-visualization {
+            margin-top: 60px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .verse-tree {
+            position: relative;
+            min-height: 600px;
+            margin: 40px 0;
+        }
+
+        .verse-node {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 200px;
+        }
+
+        .verse-node:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #FFD60A;
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .verse-node.selected {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: #FFD60A;
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.3);
+        }
+
+        .verse-node.level-0 {
+            background: rgba(255, 214, 10, 0.2);
+            border-color: #FFD60A;
+            font-size: 18px;
+            font-weight: 600;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 20px;
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .verse-node.level-1 {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .verse-node.level-2 {
+            font-size: 14px;
+        }
+
+        .verse-node.level-3 {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .verse-name {
+            margin-bottom: 5px;
+        }
+
+        .verse-multiplier {
+            font-size: 12px;
+            color: #FFD60A;
+            font-weight: 600;
+        }
+
+        .verse-description {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .verse-connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(to right, transparent, rgba(255, 214, 10, 0.3), transparent);
+            transform-origin: left center;
+            pointer-events: none;
+        }
+
+        /* Leverage Calculator */
+        .leverage-calculator {
+            position: fixed;
+            right: 40px;
+            top: 120px;
+            width: 300px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(20px);
+        }
+
+        .calculator-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #FFD60A;
+        }
+
+        .leverage-display {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .leverage-number {
+            font-size: 64px;
+            font-weight: 700;
+            color: #FFD60A;
+            line-height: 1;
+        }
+
+        .leverage-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .leverage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD60A 0%, #FFA500 50%, #FF6B6B 100%);
+            width: 10%;
+            transition: width 0.3s ease-out;
+        }
+
+        .selected-verses {
+            margin-top: 30px;
+        }
+
+        .selected-verse-item {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .verse-remove {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 59, 48, 0.2);
+            border: 1px solid #FF3B30;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .verse-remove:hover {
+            background: #FF3B30;
+            transform: scale(1.2);
+        }
+
+        /* Info Panel */
+        .info-panel {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #FFD60A;
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <nav class="nav">
+            <div class="logo">Quantum Betting 2025</div>
+            <div style="display: flex; gap: 30px; align-items: center;">
+                <span style="color: rgba(255, 255, 255, 0.6);">Balance: $50,000</span>
+                <span style="color: #FFD60A;">MMT: 12,500</span>
+            </div>
+        </nav>
+    </div>
+
+    <div class="market-showcase">
+        <h1 class="showcase-title">Trending Markets - January 2025</h1>
+        <p class="showcase-subtitle">Click on any market to explore its verse hierarchy</p>
+
+        <div class="markets-grid">
+            <!-- Market 1: AI Company IPO -->
+            <div class="market-card" onclick="showMarket(1)">
+                <div class="market-header">
+                    <div class="market-category">Technology / Finance</div>
+                    <div class="market-title">Will OpenAI IPO above $200B valuation by Q2 2025?</div>
+                    <div class="market-description">
+                        Following Microsoft's reduced stake and new enterprise partnerships, market speculation on OpenAI's public offering intensifies.
+                    </div>
+                </div>
+                <div class="market-stats">
+                    <div class="stat">
+                        <div class="stat-value">$2.3M</div>
+                        <div class="stat-label">Volume</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">8,432</div>
+                        <div class="stat-label">Traders</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">68%</div>
+                        <div class="stat-label">Yes</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market 2: Climate Event -->
+            <div class="market-card" onclick="showMarket(2)">
+                <div class="market-header">
+                    <div class="market-category">Climate / Geography</div>
+                    <div class="market-title">Will California experience a Category 5 atmospheric river in 2025?</div>
+                    <div class="market-description">
+                        With El Niño patterns strengthening and ocean temperatures at record highs, extreme weather probability increases.
+                    </div>
+                </div>
+                <div class="market-stats">
+                    <div class="stat">
+                        <div class="stat-value">$890K</div>
+                        <div class="stat-label">Volume</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">3,201</div>
+                        <div class="stat-label">Traders</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">41%</div>
+                        <div class="stat-label">Yes</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market 3: Space Tourism -->
+            <div class="market-card" onclick="showMarket(3)">
+                <div class="market-header">
+                    <div class="market-category">Space / Tourism</div>
+                    <div class="market-title">Will SpaceX Starship complete first commercial lunar tourist flight in 2025?</div>
+                    <div class="market-description">
+                        Japanese billionaire's dearMoon project aims for first civilian lunar flyby after successful orbital tests.
+                    </div>
+                </div>
+                <div class="market-stats">
+                    <div class="stat">
+                        <div class="stat-value">$1.7M</div>
+                        <div class="stat-label">Volume</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">5,623</div>
+                        <div class="stat-label">Traders</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">29%</div>
+                        <div class="stat-label">Yes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="verse-visualization" id="verseVisualization" style="display: none;">
+            <h2 style="text-align: center; margin-bottom: 20px;">Verse Hierarchy</h2>
+            <div class="verse-tree" id="verseTree">
+                <!-- Verses will be dynamically generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Leverage Calculator -->
+    <div class="leverage-calculator" id="leverageCalculator" style="display: none;">
+        <div class="calculator-title">Leverage Calculator</div>
+        <div class="leverage-display">
+            <div class="leverage-number" id="leverageValue">1.0x</div>
+        </div>
+        <div class="leverage-bar">
+            <div class="leverage-fill" id="leverageFill"></div>
+        </div>
+        <div class="info-panel">
+            <div class="info-title">How Verses Work</div>
+            <div class="info-text">
+                Each verse represents a correlated factor that affects the main market outcome. Selecting verses multiplies your leverage based on their correlation strength.
+            </div>
+        </div>
+        <div class="selected-verses">
+            <h4 style="margin-bottom: 15px; color: rgba(255, 255, 255, 0.8);">Selected Verses</h4>
+            <div id="selectedVersesList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Market data with realistic verse hierarchies
+        const markets = {
+            1: {
+                title: "OpenAI IPO above $200B",
+                mainVerse: "OpenAI IPO Valuation > $200B by Q2 2025",
+                verses: [
+                    // Level 1 - Primary factors
+                    {
+                        id: 'ai-revenue',
+                        name: 'Revenue Growth Metrics',
+                        level: 1,
+                        multiplier: 1.8,
+                        description: 'ChatGPT Enterprise & API revenue reaching $5B ARR',
+                        position: { left: '20%', top: '150px' },
+                        children: [
+                            {
+                                id: 'enterprise-adoption',
+                                name: 'Enterprise Adoption Rate',
+                                level: 2,
+                                multiplier: 1.4,
+                                description: 'Fortune 500 companies using GPT-4 APIs',
+                                position: { left: '10%', top: '250px' }
+                            },
+                            {
+                                id: 'api-usage',
+                                name: 'API Call Volume',
+                                level: 2,
+                                multiplier: 1.3,
+                                description: 'Daily API requests exceeding 1B',
+                                position: { left: '25%', top: '250px' }
+                            }
+                        ]
+                    },
+                    {
+                        id: 'ai-competition',
+                        name: 'Competitive Landscape',
+                        level: 1,
+                        multiplier: 1.6,
+                        description: 'Market position vs Google Gemini & Anthropic',
+                        position: { left: '50%', top: '150px' },
+                        children: [
+                            {
+                                id: 'model-performance',
+                                name: 'GPT-5 Launch Success',
+                                level: 2,
+                                multiplier: 1.5,
+                                description: 'Next-gen model outperforming competitors',
+                                position: { left: '45%', top: '250px' }
+                            },
+                            {
+                                id: 'market-share',
+                                name: 'AI Market Share',
+                                level: 2,
+                                multiplier: 1.2,
+                                description: 'Maintaining >40% of enterprise AI market',
+                                position: { left: '60%', top: '250px' }
+                            }
+                        ]
+                    },
+                    {
+                        id: 'regulatory',
+                        name: 'Regulatory Environment',
+                        level: 1,
+                        multiplier: 1.7,
+                        description: 'AI regulation and compliance status',
+                        position: { left: '80%', top: '150px' },
+                        children: [
+                            {
+                                id: 'us-ai-act',
+                                name: 'US AI Act Compliance',
+                                level: 2,
+                                multiplier: 1.4,
+                                description: 'Meeting federal AI safety requirements',
+                                position: { left: '75%', top: '250px' }
+                            },
+                            {
+                                id: 'eu-compliance',
+                                name: 'EU AI Act Status',
+                                level: 2,
+                                multiplier: 1.3,
+                                description: 'European market access maintained',
+                                position: { left: '90%', top: '250px' }
+                            }
+                        ]
+                    }
+                ]
+            },
+            2: {
+                title: "California Category 5 Atmospheric River",
+                mainVerse: "CA Cat 5 Atmospheric River in 2025",
+                verses: [
+                    {
+                        id: 'ocean-temp',
+                        name: 'Pacific Ocean Temperatures',
+                        level: 1,
+                        multiplier: 1.9,
+                        description: 'Sea surface temps 3°C above historical average',
+                        position: { left: '20%', top: '150px' },
+                        children: [
+                            {
+                                id: 'elnino-strength',
+                                name: 'El Niño Intensity',
+                                level: 2,
+                                multiplier: 1.5,
+                                description: 'Super El Niño conditions developing',
+                                position: { left: '15%', top: '250px' }
+                            },
+                            {
+                                id: 'pdo-phase',
+                                name: 'Pacific Decadal Oscillation',
+                                level: 2,
+                                multiplier: 1.3,
+                                description: 'Positive PDO phase alignment',
+                                position: { left: '30%', top: '250px' }
+                            }
+                        ]
+                    },
+                    {
+                        id: 'jet-stream',
+                        name: 'Jet Stream Patterns',
+                        level: 1,
+                        multiplier: 1.7,
+                        description: 'Persistent low-pressure systems directing moisture',
+                        position: { left: '50%', top: '150px' },
+                        children: [
+                            {
+                                id: 'arctic-warming',
+                                name: 'Arctic Amplification',
+                                level: 2,
+                                multiplier: 1.4,
+                                description: 'Weakened jet stream meandering',
+                                position: { left: '45%', top: '250px' }
+                            },
+                            {
+                                id: 'blocking-patterns',
+                                name: 'Atmospheric Blocking',
+                                level: 2,
+                                multiplier: 1.3,
+                                description: 'High-pressure ridges steering storms',
+                                position: { left: '60%', top: '250px' }
+                            }
+                        ]
+                    },
+                    {
+                        id: 'moisture-transport',
+                        name: 'Moisture Transport Metrics',
+                        level: 1,
+                        multiplier: 1.8,
+                        description: 'Integrated water vapor exceeding 250kg/m/s',
+                        position: { left: '80%', top: '150px' },
+                        children: [
+                            {
+                                id: 'tropical-moisture',
+                                name: 'Tropical Moisture Tap',
+                                level: 2,
+                                multiplier: 1.4,
+                                description: 'Direct connection to tropical Pacific',
+                                position: { left: '75%', top: '250px' }
+                            },
+                            {
+                                id: 'duration',
+                                name: 'Event Duration',
+                                level: 2,
+                                multiplier: 1.3,
+                                description: 'Sustained 72+ hour moisture flow',
+                                position: { left: '90%', top: '250px' }
+                            }
+                        ]
+                    }
+                ]
+            },
+            3: {
+                title: "SpaceX Lunar Tourist Flight",
+                mainVerse: "SpaceX Commercial Lunar Flight 2025",
+                verses: [
+                    {
+                        id: 'starship-ready',
+                        name: 'Starship Technical Readiness',
+                        level: 1,
+                        multiplier: 2.0,
+                        description: 'Full orbital refueling and life support certified',
+                        position: { left: '20%', top: '150px' },
+                        children: [
+                            {
+                                id: 'orbital-refuel',
+                                name: 'Orbital Refueling Success',
+                                level: 2,
+                                multiplier: 1.6,
+                                description: 'Demonstrated propellant transfer in orbit',
+                                position: { left: '10%', top: '250px' }
+                            },
+                            {
+                                id: 'life-support',
+                                name: 'Life Support Systems',
+                                level: 2,
+                                multiplier: 1.5,
+                                description: '7-day crew cabin environment verified',
+                                position: { left: '25%', top: '250px' },
+                                children: [
+                                    {
+                                        id: 'radiation-shield',
+                                        name: 'Radiation Shielding',
+                                        level: 3,
+                                        multiplier: 1.2,
+                                        description: 'Van Allen belt protection tested',
+                                        position: { left: '20%', top: '350px' }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        id: 'regulatory-approval',
+                        name: 'Launch Licensing',
+                        level: 1,
+                        multiplier: 1.7,
+                        description: 'FAA approval for lunar trajectory with crew',
+                        position: { left: '50%', top: '150px' },
+                        children: [
+                            {
+                                id: 'faa-license',
+                                name: 'FAA Launch License',
+                                level: 2,
+                                multiplier: 1.4,
+                                description: 'Commercial crew deep space authorization',
+                                position: { left: '45%', top: '250px' }
+                            },
+                            {
+                                id: 'international',
+                                name: 'International Clearances',
+                                level: 2,
+                                multiplier: 1.3,
+                                description: 'Lunar flyby trajectory approvals',
+                                position: { left: '60%', top: '250px' }
+                            }
+                        ]
+                    },
+                    {
+                        id: 'mission-prep',
+                        name: 'Mission Preparation',
+                        level: 1,
+                        multiplier: 1.6,
+                        description: 'Crew training and mission systems ready',
+                        position: { left: '80%', top: '150px' },
+                        children: [
+                            {
+                                id: 'crew-training',
+                                name: 'Tourist Crew Training',
+                                level: 2,
+                                multiplier: 1.3,
+                                description: '6-month astronaut preparation program',
+                                position: { left: '75%', top: '250px' }
+                            },
+                            {
+                                id: 'abort-systems',
+                                name: 'Abort Capability',
+                                level: 2,
+                                multiplier: 1.4,
+                                description: 'Free-return trajectory abort tested',
+                                position: { left: '90%', top: '250px' }
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        let selectedVerses = new Set();
+        let currentMarket = null;
+        let currentLeverage = 1.0;
+
+        function showMarket(marketId) {
+            // Update active card
+            document.querySelectorAll('.market-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Show visualization
+            document.getElementById('verseVisualization').style.display = 'block';
+            document.getElementById('leverageCalculator').style.display = 'block';
+
+            // Clear and rebuild verse tree
+            currentMarket = markets[marketId];
+            selectedVerses.clear();
+            buildVerseTree();
+            updateLeverage();
+        }
+
+        function buildVerseTree() {
+            const tree = document.getElementById('verseTree');
+            tree.innerHTML = '';
+
+            // Add main verse
+            const mainNode = createVerseNode({
+                id: 'main',
+                name: currentMarket.mainVerse,
+                level: 0,
+                multiplier: 1,
+                description: 'Primary market outcome'
+            });
+            mainNode.classList.add('level-0');
+            tree.appendChild(mainNode);
+
+            // Add all verses recursively
+            currentMarket.verses.forEach(verse => {
+                addVerseToTree(verse, tree);
+            });
+
+            // Draw connections
+            setTimeout(drawConnections, 100);
+        }
+
+        function addVerseToTree(verse, container) {
+            const node = createVerseNode(verse);
+            node.style.left = verse.position.left;
+            node.style.top = verse.position.top;
+            node.classList.add(`level-${verse.level}`);
+            container.appendChild(node);
+
+            // Add children recursively
+            if (verse.children) {
+                verse.children.forEach(child => {
+                    addVerseToTree(child, container);
+                });
+            }
+        }
+
+        function createVerseNode(verse) {
+            const node = document.createElement('div');
+            node.className = 'verse-node slide-in';
+            node.id = `verse-${verse.id}`;
+            node.dataset.verseId = verse.id;
+            node.dataset.multiplier = verse.multiplier;
+            node.dataset.name = verse.name;
+
+            node.innerHTML = `
+                <div class="verse-name">${verse.name}</div>
+                <div class="verse-multiplier">×${verse.multiplier}</div>
+                ${verse.description ? `<div class="verse-description">${verse.description}</div>` : ''}
+            `;
+
+            if (verse.id !== 'main') {
+                node.onclick = () => toggleVerse(verse.id);
+            }
+
+            return node;
+        }
+
+        function toggleVerse(verseId) {
+            const node = document.getElementById(`verse-${verseId}`);
+            
+            if (selectedVerses.has(verseId)) {
+                selectedVerses.delete(verseId);
+                node.classList.remove('selected');
+            } else {
+                selectedVerses.add(verseId);
+                node.classList.add('selected');
+            }
+
+            updateLeverage();
+        }
+
+        function updateLeverage() {
+            currentLeverage = 1.0;
+            const selectedList = document.getElementById('selectedVersesList');
+            selectedList.innerHTML = '';
+
+            selectedVerses.forEach(verseId => {
+                const node = document.getElementById(`verse-${verseId}`);
+                const multiplier = parseFloat(node.dataset.multiplier);
+                const name = node.dataset.name;
+
+                currentLeverage *= multiplier;
+
+                // Add to selected list
+                const item = document.createElement('div');
+                item.className = 'selected-verse-item';
+                item.innerHTML = `
+                    <span>${name}</span>
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        <span style="color: #FFD60A;">×${multiplier}</span>
+                        <div class="verse-remove" onclick="removeVerse('${verseId}')">×</div>
+                    </span>
+                `;
+                selectedList.appendChild(item);
+            });
+
+            // Cap at 100x
+            currentLeverage = Math.min(currentLeverage, 100);
+
+            // Update display
+            document.getElementById('leverageValue').textContent = currentLeverage.toFixed(1) + 'x';
+            document.getElementById('leverageFill').style.width = (currentLeverage / 100 * 100) + '%';
+        }
+
+        function removeVerse(verseId) {
+            toggleVerse(verseId);
+        }
+
+        function drawConnections() {
+            const tree = document.getElementById('verseTree');
+            const mainNode = document.querySelector('.level-0');
+
+            // Connect level 1 to main
+            document.querySelectorAll('.level-1').forEach(node => {
+                createConnection(mainNode, node, tree);
+            });
+
+            // Connect level 2 to level 1
+            currentMarket.verses.forEach(verse => {
+                if (verse.children) {
+                    const parentNode = document.getElementById(`verse-${verse.id}`);
+                    verse.children.forEach(child => {
+                        const childNode = document.getElementById(`verse-${child.id}`);
+                        createConnection(parentNode, childNode, tree);
+                    });
+                }
+            });
+
+            // Connect level 3 to level 2
+            currentMarket.verses.forEach(verse => {
+                if (verse.children) {
+                    verse.children.forEach(child => {
+                        if (child.children) {
+                            const parentNode = document.getElementById(`verse-${child.id}`);
+                            child.children.forEach(grandchild => {
+                                const childNode = document.getElementById(`verse-${grandchild.id}`);
+                                createConnection(parentNode, childNode, tree);
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function createConnection(from, to, container) {
+            if (!from || !to) return;
+
+            const line = document.createElement('div');
+            line.className = 'verse-connection';
+
+            const fromRect = from.getBoundingClientRect();
+            const toRect = to.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+
+            const x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
+            const x2 = toRect.left + toRect.width / 2 - containerRect.left;
+            const y2 = toRect.top + toRect.height / 2 - containerRect.top;
+
+            const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+
+            line.style.width = `${length}px`;
+            line.style.left = `${x1}px`;
+            line.style.top = `${y1}px`;
+            line.style.transform = `rotate(${angle}deg)`;
+
+            container.appendChild(line);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Quantum Betting Platform</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Main Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                <svg class="navbar-logo" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="15" stroke="var(--color-primary)" stroke-width="2"/>
+                    <path d="M16 8 L16 24 M8 16 L24 16" stroke="var(--color-primary)" stroke-width="2"/>
+                    <circle cx="16" cy="16" r="4" fill="var(--color-primary)"/>
+                </svg>
+                <span>Quantum</span>
+            </a>
+            
+            <div class="navbar-menu">
+                <div class="search-container">
+                    <input type="search" placeholder="Search markets..." class="search-input">
+                </div>
+                
+                <div class="navbar-actions">
+                    <button class="btn btn-icon" onclick="showNotifications()">
+                        <span class="notification-badge">3</span>
+                        🔔
+                    </button>
+                    
+                    <div class="wallet-info">
+                        <div class="wallet-balance">
+                            <span class="balance-label">Balance</span>
+                            <span class="balance-amount">◎ 1,234.56</span>
+                        </div>
+                        <button class="wallet-address" onclick="showWalletMenu()">
+                            0x7g9N...48AU
+                        </button>
+                    </div>
+                    
+                    <button class="btn btn-icon" onclick="showSettings()">⚙️</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- App Tabs -->
+    <div class="app-tabs">
+        <button class="tab active" onclick="switchTab('overview')">Overview</button>
+        <button class="tab" onclick="switchTab('markets')">Markets</button>
+        <button class="tab" onclick="switchTab('create-market')">Create Market</button>
+        <button class="tab" onclick="switchTab('verses')">Verses</button>
+        <button class="tab" onclick="switchTab('portfolio')">Portfolio</button>
+        <button class="tab" onclick="switchTab('trading')">Trading</button>
+        <button class="tab" onclick="switchTab('quantum')">Quantum</button>
+        <button class="tab" onclick="switchTab('defi')">DeFi</button>
+        <button class="tab" onclick="switchTab('analytics')">Analytics</button>
+        <button class="tab" onclick="switchTab('governance')">Governance</button>
+    </div>
+
+    <!-- Dashboard Content -->
+    <main class="dashboard-content">
+        <div class="container">
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <h1>Welcome back, Trader!</h1>
+                <p class="welcome-subtitle">Here's your trading overview for today</p>
+            </section>
+
+            <!-- Portfolio Summary -->
+            <section class="portfolio-summary">
+                <div class="portfolio-stat-card">
+                    <div class="portfolio-stat-label">Total Portfolio Value</div>
+                    <div class="portfolio-stat-value">$45,678.90</div>
+                    <div class="portfolio-stat-change positive">+$2,345.67 (+5.4%)</div>
+                </div>
+                
+                <div class="portfolio-stat-card">
+                    <div class="portfolio-stat-label">Active Positions</div>
+                    <div class="portfolio-stat-value">12</div>
+                    <div class="portfolio-stat-change">3 winning, 2 losing</div>
+                </div>
+                
+                <div class="portfolio-stat-card">
+                    <div class="portfolio-stat-label">Available Margin</div>
+                    <div class="portfolio-stat-value">$23,456</div>
+                    <div class="portfolio-stat-change">Max leverage: 100x</div>
+                </div>
+                
+                <div class="portfolio-stat-card">
+                    <div class="portfolio-stat-label">MMT Staked</div>
+                    <div class="portfolio-stat-value">10,000 MMT</div>
+                    <div class="portfolio-stat-change positive">+45.2 MMT today</div>
+                </div>
+                
+                <div class="portfolio-stat-card">
+                    <div class="portfolio-stat-label">Win Rate</div>
+                    <div class="portfolio-stat-value">67.3%</div>
+                    <div class="portfolio-stat-change positive">↑ 2.1% this week</div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h2>Quick Actions</h2>
+                <div class="action-grid">
+                    <button class="action-card" onclick="location.href='markets.html'">
+                        <div class="action-icon">📊</div>
+                        <h3>Browse Markets</h3>
+                        <p>Explore all prediction markets</p>
+                    </button>
+                    
+                    <button class="action-card" onclick="location.href='create-market.html'">
+                        <div class="action-icon">➕</div>
+                        <h3>Create Market</h3>
+                        <p>Launch your own market</p>
+                    </button>
+                    
+                    <button class="action-card" onclick="location.href='verses.html'">
+                        <div class="action-icon">🌳</div>
+                        <h3>Manage Verses</h3>
+                        <p>Build market hierarchies</p>
+                    </button>
+                    
+                    <button class="action-card" onclick="location.href='trading.html'">
+                        <div class="action-icon">💹</div>
+                        <h3>Trading Terminal</h3>
+                        <p>Professional trading interface</p>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Trending Markets -->
+            <section class="trending-markets">
+                <div class="section-header">
+                    <h2>🔥 Trending Markets</h2>
+                    <button class="btn btn-secondary" onclick="location.href='markets.html'">View All</button>
+                </div>
+                
+                <div class="markets-grid">
+                    <div class="market-card" onclick="openMarket('market-1')">
+                        <div class="market-card-header">
+                            <h3 class="market-card-title">Will AI achieve AGI by 2027?</h3>
+                            <span class="badge badge-primary">Technology</span>
+                        </div>
+                        <div class="market-card-odds">
+                            <div class="odds-button odds-button-yes">
+                                <span class="odds-label">YES</span>
+                                <span class="odds-value">34%</span>
+                            </div>
+                            <div class="odds-button odds-button-no">
+                                <span class="odds-label">NO</span>
+                                <span class="odds-value">66%</span>
+                            </div>
+                        </div>
+                        <div class="market-card-stats">
+                            <span>Volume: $1.98M</span>
+                            <span>Ends in 3 years</span>
+                        </div>
+                        <div class="market-actions">
+                            <button class="btn btn-sm btn-success" onclick="quickBet(event, 'yes', 'market-1')">Bet YES</button>
+                            <button class="btn btn-sm btn-danger" onclick="quickBet(event, 'no', 'market-1')">Bet NO</button>
+                        </div>
+                    </div>
+
+                    <div class="market-card quantum" onclick="openMarket('market-2')">
+                        <div class="market-card-header">
+                            <h3 class="market-card-title">Ethereum > $10K in 2025?</h3>
+                            <span class="badge badge-warning">Quantum</span>
+                        </div>
+                        <div class="quantum-display">
+                            <div class="quantum-state">
+                                <span class="state-label">Universe A</span>
+                                <span class="state-value">68%</span>
+                            </div>
+                            <div class="quantum-state">
+                                <span class="state-label">Universe B</span>
+                                <span class="state-value">25%</span>
+                            </div>
+                        </div>
+                        <div class="market-card-stats">
+                            <span>Entangled with BTC>$100K</span>
+                            <span>Volume: $3.2M</span>
+                        </div>
+                        <div class="market-actions">
+                            <button class="btn btn-sm btn-primary" onclick="observeQuantum(event, 'market-2')">
+                                🔬 Observe State
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="market-card" onclick="openMarket('market-3')">
+                        <div class="market-card-header">
+                            <h3 class="market-card-title">Next US Fed Rate Decision</h3>
+                            <span class="badge badge-success">Finance</span>
+                        </div>
+                        <div class="market-multi-outcomes">
+                            <div class="outcome">Cut 50bp - 15%</div>
+                            <div class="outcome">Cut 25bp - 22%</div>
+                            <div class="outcome">Hold - 48%</div>
+                            <div class="outcome">Raise - 15%</div>
+                        </div>
+                        <div class="market-card-stats">
+                            <span>Volume: $5.6M</span>
+                            <span>Resolves in 28 days</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Positions -->
+            <section class="active-positions">
+                <div class="section-header">
+                    <h2>📈 Your Active Positions</h2>
+                    <button class="btn btn-secondary" onclick="location.href='portfolio.html'">Manage All</button>
+                </div>
+                
+                <div class="positions-table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Market</th>
+                                <th>Side</th>
+                                <th>Size</th>
+                                <th>Entry Price</th>
+                                <th>Current Price</th>
+                                <th>P&L</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Bitcoin > $100K by 2025</td>
+                                <td><span class="badge badge-success">YES</span></td>
+                                <td>$5,000</td>
+                                <td>$0.12</td>
+                                <td>$0.15</td>
+                                <td class="text-success">+$1,250 (+25%)</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="managePosition('pos-1')">Manage</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2024 Election - Democrat</td>
+                                <td><span class="badge badge-danger">NO</span></td>
+                                <td>$3,000</td>
+                                <td>$0.48</td>
+                                <td>$0.52</td>
+                                <td class="text-danger">-$250 (-8.3%)</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="managePosition('pos-2')">Manage</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>SpaceX Mars Landing</td>
+                                <td><span class="badge badge-success">YES</span></td>
+                                <td>$2,000</td>
+                                <td>$0.41</td>
+                                <td>$0.41</td>
+                                <td class="text-secondary">$0 (0%)</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="managePosition('pos-3')">Manage</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- DeFi Overview -->
+            <section class="defi-overview">
+                <div class="section-header">
+                    <h2>🏦 DeFi Earnings</h2>
+                    <button class="btn btn-secondary" onclick="location.href='defi.html'">View Details</button>
+                </div>
+                
+                <div class="defi-grid">
+                    <div class="defi-card">
+                        <div class="defi-card-icon">🪙</div>
+                        <h3 class="defi-card-title">MMT Staking</h3>
+                        <div class="defi-stats">
+                            <div class="defi-stat-row">
+                                <span class="defi-stat-label">Staked</span>
+                                <span class="defi-stat-value">10,000 MMT</span>
+                            </div>
+                            <div class="defi-stat-row">
+                                <span class="defi-stat-label">APY</span>
+                                <span class="defi-stat-value highlight">18.7%</span>
+                            </div>
+                            <div class="defi-stat-row">
+                                <span class="defi-stat-label">Daily Earnings</span>
+                                <span class="defi-stat-value">5.12 MMT</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary">Stake More</button>
+                    </div>
+                    
+                    <div class="defi-card">
+                        <div class="defi-card-icon">💧</div>
+                        <h3 class="defi-card-title">Liquidity Provision</h3>
+                        <div class="defi-stats">
+                            <div class="defi-stat-row">
+                                <span class="defi-stat-label">Total Value</span>
+                                <span class="defi-stat-value">$12,345</span>
+                            </div>
+                            <div class="defi-stat-row">
+                                <span class="defi-stat-label">Pool APY</span>
+                                <span class="defi-stat-value highlight">42.3%</span>
+                            </div>
+                            <div class="defi-stat-row">
+                                <span class="defi-stat-label">Fees Earned</span>
+                                <span class="defi-stat-value">$234.56</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary">Add Liquidity</button>
+                    </div>
+                    
+                    <div class="defi-card">
+                        <div class="defi-card-icon">⚡</div>
+                        <h3 class="defi-card-title">Flash Loans</h3>
+                        <div class="defi-stats">
+                            <div class="defi-stat-row">
+                                <span class="defi-stat-label">Available</span>
+                                <span class="defi-stat-value">$500K</span>
+                            </div>
+                            <div class="defi-stat-row">
+                                <span class="defi-stat-label">Fee</span>
+                                <span class="defi-stat-value">2%</span>
+                            </div>
+                            <div class="defi-stat-row">
+                                <span class="defi-stat-label">Used Today</span>
+                                <span class="defi-stat-value">0</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary">Access Loans</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="recent-activity">
+                <h2>Recent Activity</h2>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon success">✓</div>
+                        <div class="activity-content">
+                            <h4>Position Opened</h4>
+                            <p>Bought YES on "AI achieves AGI by 2027" for $2,000</p>
+                        </div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon warning">⚛️</div>
+                        <div class="activity-content">
+                            <h4>Quantum State Observed</h4>
+                            <p>Collapsed "ETH > $10K" to Universe A (68% probability)</p>
+                        </div>
+                        <div class="activity-time">5 hours ago</div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon info">🪙</div>
+                        <div class="activity-content">
+                            <h4>MMT Rewards Claimed</h4>
+                            <p>Received 45.2 MMT from staking rewards</p>
+                        </div>
+                        <div class="activity-time">1 day ago</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-items">
+            <a href="dashboard.html" class="mobile-nav-item active">
+                <span class="mobile-nav-icon">🏠</span>
+                <span class="mobile-nav-label">Home</span>
+            </a>
+            <a href="markets.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">📊</span>
+                <span class="mobile-nav-label">Markets</span>
+            </a>
+            <a href="create-market.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">➕</span>
+                <span class="mobile-nav-label">Create</span>
+            </a>
+            <a href="portfolio.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">💼</span>
+                <span class="mobile-nav-label">Portfolio</span>
+            </a>
+            <a href="profile.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">👤</span>
+                <span class="mobile-nav-label">Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Styles specific to dashboard -->
+    <style>
+        /* Search Container */
+        .search-container {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 300px;
+            padding: var(--spacing-sm) var(--spacing-md);
+            padding-left: 40px;
+            background-color: var(--color-bg-primary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-full);
+            color: var(--color-text-primary);
+            font-size: 0.875rem;
+        }
+        
+        .search-input::before {
+            content: '🔍';
+            position: absolute;
+            left: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        /* Wallet Info */
+        .wallet-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .wallet-balance {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .balance-label {
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+        }
+        
+        .balance-amount {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+        
+        .wallet-address {
+            padding: var(--spacing-sm) var(--spacing-md);
+            background-color: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-md);
+            color: var(--color-text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .wallet-address:hover {
+            background-color: var(--color-bg-elevated);
+        }
+        
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background-color: var(--color-danger);
+            color: white;
+            font-size: 0.625rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: var(--radius-full);
+        }
+        
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: var(--spacing-xl) 0;
+            min-height: calc(100vh - 64px - 48px);
+        }
+        
+        /* Welcome Section */
+        .welcome-section {
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .welcome-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 1.125rem;
+        }
+        
+        /* Quick Actions */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .action-card {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .action-card:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .action-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .action-card h3 {
+            margin-bottom: var(--spacing-sm);
+            color: var(--color-text-primary);
+        }
+        
+        .action-card p {
+            color: var(--color-text-secondary);
+            margin: 0;
+        }
+        
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        /* Markets Grid */
+        .markets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        /* Positions Table */
+        .positions-table-container {
+            overflow-x: auto;
+        }
+        
+        /* Recent Activity */
+        .recent-activity {
+            margin-top: var(--spacing-3xl);
+        }
+        
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
+        }
+        
+        .activity-item:hover {
+            background-color: var(--color-bg-tertiary);
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        
+        .activity-icon.success {
+            background-color: var(--color-success-bg);
+            color: var(--color-success);
+        }
+        
+        .activity-icon.warning {
+            background-color: var(--color-warning-bg);
+            color: var(--color-warning);
+        }
+        
+        .activity-icon.info {
+            background-color: rgba(29, 155, 240, 0.1);
+            color: var(--color-primary);
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-content h4 {
+            font-size: 0.875rem;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .activity-content p {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin: 0;
+        }
+        
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-input {
+                width: 200px;
+            }
+            
+            .wallet-info {
+                display: none;
+            }
+            
+            .markets-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .dashboard-content {
+                padding-bottom: 80px; /* Space for mobile nav */
+            }
+        }
+    </style>
+
+    <!-- Dashboard JavaScript -->
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            checkWalletConnection();
+            loadDashboardData();
+        });
+        
+        // Check if wallet should connect on load
+        function checkWalletConnection() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('connect') === 'true') {
+                // Show wallet connection modal
+                setTimeout(() => {
+                    showNotification('success', 'Wallet Connected', 'Successfully connected to Phantom wallet');
+                }, 1000);
+            }
+        }
+        
+        // Load dashboard data
+        function loadDashboardData() {
+            // Simulate loading real-time data
+            updatePrices();
+            setInterval(updatePrices, 5000);
+        }
+        
+        // Update market prices
+        function updatePrices() {
+            // Simulate price updates
+            const priceElements = document.querySelectorAll('.odds-value');
+            priceElements.forEach(el => {
+                const currentPrice = parseInt(el.textContent);
+                const change = Math.floor(Math.random() * 5) - 2;
+                const newPrice = Math.max(1, Math.min(99, currentPrice + change));
+                el.textContent = newPrice + '%';
+            });
+        }
+        
+        // Switch tabs
+        function switchTab(tabName) {
+            window.location.href = tabName + '.html';
+        }
+        
+        // Show notifications
+        function showNotifications() {
+            showNotification('info', 'Notifications', 'You have 3 new notifications');
+        }
+        
+        // Show settings
+        function showSettings() {
+            window.location.href = 'settings.html';
+        }
+        
+        // Show wallet menu
+        function showWalletMenu() {
+            alert('Wallet Menu:\n\n• Copy Address\n• View on Explorer\n• Disconnect Wallet\n• Export Private Key');
+        }
+        
+        // Open market
+        function openMarket(marketId) {
+            window.location.href = `trading.html?market=${marketId}`;
+        }
+        
+        // Quick bet
+        function quickBet(event, side, marketId) {
+            event.stopPropagation();
+            showNotification('success', 'Order Placed', `Placed ${side.toUpperCase()} bet on market`);
+        }
+        
+        // Observe quantum state
+        function observeQuantum(event, marketId) {
+            event.stopPropagation();
+            const collapsed = Math.random() > 0.5 ? 'A' : 'B';
+            showNotification('warning', 'Quantum Collapsed', `Market collapsed to Universe ${collapsed}`);
+        }
+        
+        // Manage position
+        function managePosition(positionId) {
+            window.location.href = `portfolio.html?position=${positionId}`;
+        }
+        
+        // Show notification
+        function showNotification(type, title, message) {
+            const container = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification fade-in';
+            notification.innerHTML = `
+                <div class="notification-icon ${type}">${getNotificationIcon(type)}</div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close" onclick="closeNotification(this)">×</button>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+        
+        function getNotificationIcon(type) {
+            switch(type) {
+                case 'success': return '✓';
+                case 'error': return '✗';
+                case 'warning': return '⚠';
+                default: return 'ℹ';
+            }
+        }
+        
+        function closeNotification(button) {
+            button.parentElement.remove();
+        }
+    </script>
+</body>
+</html>

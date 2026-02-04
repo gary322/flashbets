@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Betting - Ultra Detailed Money Flow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Demo Stage */
+        .demo-stage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #0A0A0A 0%, #000000 100%);
+        }
+
+        /* Demo Navigation */
+        .demo-nav {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px 40px;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .demo-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .demo-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .demo-btn.active {
+            background: #FFD60A;
+            color: #000000;
+            border-color: #FFD60A;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #FFD60A;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.5);
+        }
+
+        /* Step Indicator */
+        .step-indicator {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 40px;
+            z-index: 1000;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+
+        .step.active {
+            opacity: 1;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: #FFD60A;
+            color: #000000;
+            border-color: #FFD60A;
+            box-shadow: 0 0 20px rgba(255, 214, 10, 0.5);
+        }
+
+        .step-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+        }
+
+        /* Main Demo Container */
+        .demo-container {
+            width: 90%;
+            max-width: 1400px;
+            margin: 120px auto 120px;
+            display: none;
+        }
+
+        .demo-container.active {
+            display: block;
+        }
+
+        /* Section: Money Input */
+        .money-input-section {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .section-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 40px;
+        }
+
+        .amount-input-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 20px;
+            padding: 30px 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .currency-symbol {
+            font-size: 48px;
+            color: #FFD60A;
+            font-weight: 600;
+        }
+
+        .amount-input {
+            font-size: 48px;
+            background: transparent;
+            border: none;
+            color: #FFD60A;
+            width: 300px;
+            text-align: center;
+            font-weight: 600;
+            outline: none;
+        }
+
+        /* Section: Mode Selection */
+        .mode-section {
+            padding: 60px 0;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .mode-card {
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-5px);
+        }
+
+        .mode-card.selected {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.05);
+        }
+
+        .mode-card.quantum.selected {
+            border-color: #8A61FF;
+            background: rgba(138, 97, 255, 0.05);
+        }
+
+        .mode-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .mode-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .mode-description {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        /* Money Flow Visualization */
+        .money-flow-section {
+            padding: 60px 0;
+        }
+
+        .flow-container {
+            position: relative;
+            min-height: 600px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            overflow: hidden;
+        }
+
+        /* Money Nodes */
+        .money-node {
+            position: absolute;
+            padding: 20px 30px;
+            background: rgba(255, 214, 10, 0.1);
+            border: 2px solid #FFD60A;
+            border-radius: 15px;
+            transition: all 0.5s;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .money-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.3);
+        }
+
+        .money-node.quantum {
+            background: rgba(138, 97, 255, 0.1);
+            border-color: #8A61FF;
+        }
+
+        .money-node.yes {
+            background: rgba(76, 217, 100, 0.1);
+            border-color: #4CD964;
+        }
+
+        .money-node.no {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: #FF3B30;
+        }
+
+        .node-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 5px;
+        }
+
+        .node-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #FFD60A;
+        }
+
+        .node-multiplier {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 5px;
+        }
+
+        /* Flow Lines */
+        .flow-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #FFD60A, transparent);
+            opacity: 0;
+            transition: all 0.5s;
+            z-index: 5;
+        }
+
+        .flow-line.active {
+            opacity: 1;
+        }
+
+        .flow-line.quantum {
+            background: linear-gradient(90deg, transparent, #8A61FF, transparent);
+        }
+
+        /* Money Particles */
+        .money-particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #FFD60A;
+            border-radius: 50%;
+            opacity: 0;
+            box-shadow: 0 0 10px #FFD60A;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        @keyframes flowParticle {
+            0% {
+                opacity: 0;
+                transform: translate(0, 0) scale(0);
+            }
+            10% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            90% {
+                opacity: 1;
+                transform: translate(var(--dx), var(--dy)) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--dx), var(--dy)) scale(0);
+            }
+        }
+
+        /* Calculation Display */
+        .calculation-display {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 350px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .calculation-display.active {
+            opacity: 1;
+        }
+
+        .calc-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #FFD60A;
+        }
+
+        .calc-step {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.3s;
+        }
+
+        .calc-step.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .calc-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 5px;
+        }
+
+        .calc-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #FFD60A;
+        }
+
+        .calc-formula {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 5px;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        /* Verse Display */
+        .verse-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .verse-card {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .verse-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.02);
+        }
+
+        .verse-card.selected {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.05);
+        }
+
+        .verse-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .verse-multiplier {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFD60A;
+            margin-bottom: 10px;
+        }
+
+        .verse-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Quantum Split Visual */
+        .quantum-split-visual {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin: 40px 0;
+        }
+
+        .quantum-state {
+            padding: 30px;
+            background: rgba(138, 97, 255, 0.05);
+            border: 2px solid rgba(138, 97, 255, 0.3);
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-state::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(138, 97, 255, 0.1) 0%, transparent 70%);
+            animation: quantumPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes quantumPulse {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.2) rotate(180deg);
+                opacity: 1;
+            }
+        }
+
+        .quantum-outcome {
+            position: relative;
+            z-index: 1;
+        }
+
+        .outcome-label {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .outcome-probability {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .outcome-amount {
+            font-size: 32px;
+            font-weight: 600;
+            color: #FFD60A;
+        }
+
+        /* Final Summary */
+        .summary-section {
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .summary-item {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .summary-label {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 10px;
+        }
+
+        .summary-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFD60A;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        /* Explanation Tooltips */
+        .explanation-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #FFD60A;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 300px;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        .explanation-tooltip.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .tooltip-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFD60A;
+            margin-bottom: 10px;
+        }
+
+        .tooltip-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Interactive Elements */
+        .interactive-element {
+            cursor: help;
+            position: relative;
+        }
+
+        .interactive-element::after {
+            content: '?';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background: #FFD60A;
+            color: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+        <div class="step active" id="step1">
+            <div class="step-number">1</div>
+            <div class="step-label">Enter Money</div>
+        </div>
+        <div class="step" id="step2">
+            <div class="step-number">2</div>
+            <div class="step-label">Choose Mode</div>
+        </div>
+        <div class="step" id="step3">
+            <div class="step-number">3</div>
+            <div class="step-label">Select Market</div>
+        </div>
+        <div class="step" id="step4">
+            <div class="step-number">4</div>
+            <div class="step-label">Pick Verses</div>
+        </div>
+        <div class="step" id="step5">
+            <div class="step-number">5</div>
+            <div class="step-label">See Flow</div>
+        </div>
+    </div>
+
+    <!-- Demo Stage -->
+    <div class="demo-stage">
+        <!-- Section 1: Money Input -->
+        <div class="demo-container active" id="section1">
+            <div class="money-input-section">
+                <h1 class="section-title">How Much Do You Want to Invest?</h1>
+                <p class="section-subtitle">This is your starting amount - we'll show you exactly where every dollar goes</p>
+                
+                <div class="amount-input-container">
+                    <span class="currency-symbol">$</span>
+                    <input type="number" class="amount-input" id="investmentAmount" value="10000" min="100" step="100">
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <button class="demo-btn active" style="font-size: 18px; padding: 15px 40px;" onclick="goToSection(2)">
+                        Next: Choose Your Mode →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Mode Selection -->
+        <div class="demo-container" id="section2">
+            <div class="mode-section">
+                <h1 class="section-title" style="text-align: center;">Choose Your Betting Mode</h1>
+                <p class="section-subtitle" style="text-align: center;">This determines how your money is distributed</p>
+                
+                <div class="mode-grid">
+                    <div class="mode-card" id="standardMode" onclick="selectMode('standard')">
+                        <div class="mode-icon">📊</div>
+                        <h2 class="mode-title">Standard Betting</h2>
+                        <p class="mode-description">
+                            All your money goes to ONE outcome (YES or NO).
+                            Simple and straightforward - you're either right or wrong.
+                        </p>
+                        <div style="margin-top: 30px; padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
+                            <div style="font-size: 32px; font-weight: 700; color: #FFD60A;">$10,000</div>
+                            <div style="font-size: 16px; color: rgba(255, 255, 255, 0.6); margin-top: 5px;">on your chosen side</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mode-card quantum" id="quantumMode" onclick="selectMode('quantum')">
+                        <div class="mode-icon">⚛️</div>
+                        <h2 class="mode-title">Quantum Betting</h2>
+                        <p class="mode-description">
+                            Your money exists in BOTH outcomes simultaneously.
+                            It's split based on probability until the market resolves.
+                        </p>
+                        <div style="margin-top: 30px; padding: 20px; background: rgba(138, 97, 255, 0.1); border-radius: 10px;">
+                            <div style="display: flex; justify-content: space-around;">
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #4CD964;">$3,500</div>
+                                    <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">YES (35%)</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700; color: #FF3B30;">$6,500</div>
+                                    <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">NO (65%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Market Selection -->
+        <div class="demo-container" id="section3">
+            <div class="mode-section">
+                <h1 class="section-title" style="text-align: center;">Select Your Market</h1>
+                <p class="section-subtitle" style="text-align: center;">Choose what you want to bet on</p>
+                
+                <div style="max-width: 800px; margin: 40px auto;">
+                    <div class="verse-card selected" style="padding: 40px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h2 style="font-size: 28px; margin-bottom: 10px;">Will AGI be achieved by 2025?</h2>
+                                <p style="color: rgba(255, 255, 255, 0.6); font-size: 18px;">
+                                    Artificial General Intelligence reaching human-level capabilities
+                                </p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Base Leverage</div>
+                                <div style="font-size: 48px; font-weight: 700; color: #FFD60A;">5x</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="padding: 20px; background: rgba(76, 217, 100, 0.1); border-radius: 10px; text-align: center;">
+                                <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">YES</div>
+                                <div style="font-size: 32px; font-weight: 700; color: #4CD964;">35%</div>
+                            </div>
+                            <div style="padding: 20px; background: rgba(255, 59, 48, 0.1); border-radius: 10px; text-align: center;">
+                                <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">NO</div>
+                                <div style="font-size: 32px; font-weight: 700; color: #FF3B30;">65%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Verse Selection -->
+        <div class="demo-container" id="section4">
+            <div class="mode-section">
+                <h1 class="section-title" style="text-align: center;">Select Your Verses</h1>
+                <p class="section-subtitle" style="text-align: center;">Each verse multiplies your leverage - they compound!</p>
+                
+                <div class="verse-container">
+                    <div class="verse-card interactive-element" onclick="toggleVerse(this, 'compute', 2.0)">
+                        <div class="verse-name">Compute Scaling</div>
+                        <div class="verse-multiplier">×2.0</div>
+                        <div class="verse-description">Will compute power continue exponential growth?</div>
+                    </div>
+                    
+                    <div class="verse-card interactive-element" onclick="toggleVerse(this, 'algorithm', 1.8)">
+                        <div class="verse-name">Algorithm Breakthrough</div>
+                        <div class="verse-multiplier">×1.8</div>
+                        <div class="verse-description">Will there be a major algorithmic breakthrough?</div>
+                    </div>
+                    
+                    <div class="verse-card interactive-element" onclick="toggleVerse(this, 'labs', 1.7)">
+                        <div class="verse-name">Lab Competition</div>
+                        <div class="verse-multiplier">×1.7</div>
+                        <div class="verse-description">Will multiple labs achieve breakthroughs?</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px; padding: 30px; background: rgba(255, 255, 255, 0.05); border-radius: 15px;">
+                    <div style="font-size: 20px; color: rgba(255, 255, 255, 0.6); margin-bottom: 10px;">Total Leverage</div>
+                    <div style="font-size: 48px; font-weight: 700; color: #FFD60A;">
+                        <span id="baseLeverage">5</span> × <span id="verseMultipliers">1</span> = <span id="totalLeverage">5</span>x
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Money Flow Visualization -->
+        <div class="demo-container" id="section5">
+            <div class="money-flow-section">
+                <h1 class="section-title" style="text-align: center;">Watch Your Money Flow</h1>
+                <p class="section-subtitle" style="text-align: center;">See exactly how your investment moves through the system</p>
+                
+                <div class="flow-container" id="flowContainer">
+                    <!-- Dynamic flow visualization will be inserted here -->
+                </div>
+                
+                <div class="quantum-split-visual" id="quantumSplitVisual" style="display: none;">
+                    <div class="quantum-state">
+                        <div class="quantum-outcome">
+                            <div class="outcome-label" style="color: #4CD964;">YES State</div>
+                            <div class="outcome-probability" style="color: #4CD964;">35%</div>
+                            <div class="outcome-amount" id="yesStateAmount">$0</div>
+                            <div style="font-size: 16px; color: rgba(255, 255, 255, 0.6); margin-top: 10px;">
+                                If YES wins, you get this
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="quantum-state">
+                        <div class="quantum-outcome">
+                            <div class="outcome-label" style="color: #FF3B30;">NO State</div>
+                            <div class="outcome-probability" style="color: #FF3B30;">65%</div>
+                            <div class="outcome-amount" id="noStateAmount">$0</div>
+                            <div style="font-size: 16px; color: rgba(255, 255, 255, 0.6); margin-top: 10px;">
+                                If NO wins, you get this
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-section">
+                    <h2 style="font-size: 36px; margin-bottom: 40px;">Final Summary</h2>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-label">Your Investment</div>
+                            <div class="summary-value" id="summaryInvestment">$10,000</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Total Leverage</div>
+                            <div class="summary-value" id="summaryLeverage">5x</div>
+                        </div>
+                        <div class="summary-item" id="standardSummary">
+                            <div class="summary-label">Total Position</div>
+                            <div class="summary-value" id="summaryPosition">$50,000</div>
+                        </div>
+                        <div class="summary-item" id="quantumYesSummary" style="display: none;">
+                            <div class="summary-label">YES Position</div>
+                            <div class="summary-value" style="color: #4CD964;" id="summaryYes">$0</div>
+                        </div>
+                        <div class="summary-item" id="quantumNoSummary" style="display: none;">
+                            <div class="summary-label">NO Position</div>
+                            <div class="summary-value" style="color: #FF3B30;" id="summaryNo">$0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calculation Display -->
+    <div class="calculation-display" id="calculationDisplay">
+        <div class="calc-title">Live Calculations</div>
+        <div id="calcSteps"></div>
+    </div>
+
+    <!-- Demo Navigation -->
+    <div class="demo-nav">
+        <button class="demo-btn" onclick="previousSection()">← Back</button>
+        <button class="play-btn" onclick="playAnimation()">▶</button>
+        <button class="demo-btn" onclick="nextSection()">Next →</button>
+        <button class="demo-btn" onclick="reset()">Reset</button>
+    </div>
+
+    <script>
+        let currentSection = 1;
+        let selectedMode = null;
+        let selectedVerses = [];
+        let investment = 10000;
+        let baseLeverage = 5;
+        let animationRunning = false;
+
+        function goToSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.demo-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(`section${section}`).classList.add('active');
+            
+            // Update step indicator
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index < section) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+            
+            currentSection = section;
+            
+            // Special handling for section 5
+            if (section === 5) {
+                showMoneyFlow();
+            }
+        }
+
+        function nextSection() {
+            if (currentSection < 5) {
+                goToSection(currentSection + 1);
+            }
+        }
+
+        function previousSection() {
+            if (currentSection > 1) {
+                goToSection(currentSection - 1);
+            }
+        }
+
+        function selectMode(mode) {
+            selectedMode = mode;
+            
+            // Update UI
+            document.querySelectorAll('.mode-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            if (mode === 'standard') {
+                document.getElementById('standardMode').classList.add('selected');
+            } else {
+                document.getElementById('quantumMode').classList.add('selected');
+            }
+            
+            // Auto advance after selection
+            setTimeout(() => nextSection(), 500);
+        }
+
+        function toggleVerse(element, verseId, multiplier) {
+            element.classList.toggle('selected');
+            
+            if (element.classList.contains('selected')) {
+                selectedVerses.push({ id: verseId, multiplier: multiplier });
+            } else {
+                selectedVerses = selectedVerses.filter(v => v.id !== verseId);
+            }
+            
+            updateTotalLeverage();
+        }
+
+        function updateTotalLeverage() {
+            let totalMultiplier = 1;
+            selectedVerses.forEach(verse => {
+                totalMultiplier *= verse.multiplier;
+            });
+            
+            document.getElementById('verseMultipliers').textContent = totalMultiplier.toFixed(1);
+            document.getElementById('totalLeverage').textContent = (baseLeverage * totalMultiplier).toFixed(1);
+        }
+
+        function showMoneyFlow() {
+            investment = parseFloat(document.getElementById('investmentAmount').value) || 10000;
+            const flowContainer = document.getElementById('flowContainer');
+            flowContainer.innerHTML = '';
+            
+            // Show calculation display
+            document.getElementById('calculationDisplay').classList.add('active');
+            
+            if (selectedMode === 'standard') {
+                showStandardFlow(flowContainer);
+            } else {
+                showQuantumFlow(flowContainer);
+            }
+            
+            // Update summary
+            updateSummary();
+        }
+
+        function showStandardFlow(container) {
+            // Hide quantum visual
+            document.getElementById('quantumSplitVisual').style.display = 'none';
+            
+            // Create flow nodes
+            let currentY = 50;
+            let currentAmount = investment;
+            
+            // Initial investment
+            createMoneyNode(container, 'Your Investment', currentAmount, 50, currentY);
+            
+            // Base leverage
+            currentY += 120;
+            currentAmount *= baseLeverage;
+            createFlowLine(container, 50, currentY - 70, 50, currentY - 20);
+            createMoneyNode(container, `Base Leverage (×${baseLeverage})`, currentAmount, 50, currentY);
+            
+            // Verses
+            selectedVerses.forEach((verse, index) => {
+                currentY += 120;
+                currentAmount *= verse.multiplier;
+                createFlowLine(container, 50, currentY - 70, 50, currentY - 20);
+                createMoneyNode(container, `${verse.id} (×${verse.multiplier})`, currentAmount, 50, currentY);
+            });
+            
+            // Show calculations
+            showCalculations('standard', investment, currentAmount);
+        }
+
+        function showQuantumFlow(container) {
+            // Show quantum visual
+            document.getElementById('quantumSplitVisual').style.display = 'grid';
+            
+            // Create split flow
+            let currentY = 50;
+            
+            // Initial investment
+            createMoneyNode(container, 'Your Investment', investment, 50, currentY);
+            
+            // Quantum split
+            currentY += 120;
+            const yesAmount = investment * 0.35;
+            const noAmount = investment * 0.65;
+            
+            // Split lines
+            createFlowLine(container, 50, currentY - 70, 30, currentY - 20, 'quantum');
+            createFlowLine(container, 50, currentY - 70, 70, currentY - 20, 'quantum');
+            
+            createMoneyNode(container, 'YES (35%)', yesAmount, 30, currentY, 'yes');
+            createMoneyNode(container, 'NO (65%)', noAmount, 70, currentY, 'no');
+            
+            // Apply leverage to both paths
+            let yesTotal = yesAmount * baseLeverage;
+            let noTotal = noAmount * baseLeverage;
+            
+            selectedVerses.forEach(verse => {
+                yesTotal *= verse.multiplier;
+                noTotal *= verse.multiplier;
+            });
+            
+            // Update quantum visual
+            document.getElementById('yesStateAmount').textContent = '$' + yesTotal.toLocaleString();
+            document.getElementById('noStateAmount').textContent = '$' + noTotal.toLocaleString();
+            
+            // Show calculations
+            showCalculations('quantum', investment, { yes: yesTotal, no: noTotal });
+        }
+
+        function createMoneyNode(container, label, value, x, y, type = '') {
+            const node = document.createElement('div');
+            node.className = `money-node ${type}`;
+            node.style.left = `${x}%`;
+            node.style.top = `${y}px`;
+            node.style.transform = 'translateX(-50%)';
+            
+            node.innerHTML = `
+                <div class="node-label">${label}</div>
+                <div class="node-value">$${value.toLocaleString()}</div>
+            `;
+            
+            container.appendChild(node);
+            
+            // Animate in
+            setTimeout(() => {
+                node.style.opacity = '1';
+                node.style.transform = 'translateX(-50%) scale(1)';
+            }, 100);
+        }
+
+        function createFlowLine(container, x1, y1, x2, y2, type = '') {
+            const line = document.createElement('div');
+            line.className = `flow-line ${type}`;
+            
+            const angle = Math.atan2(y2 - y1, (x2 - x1) * container.offsetWidth / 100) * 180 / Math.PI;
+            const length = Math.sqrt(Math.pow((x2 - x1) * container.offsetWidth / 100, 2) + Math.pow(y2 - y1, 2));
+            
+            line.style.left = `${x1}%`;
+            line.style.top = `${y1}px`;
+            line.style.width = `${length}px`;
+            line.style.transform = `rotate(${angle}deg)`;
+            line.style.transformOrigin = '0 50%';
+            
+            container.appendChild(line);
+            
+            setTimeout(() => line.classList.add('active'), 200);
+            
+            // Add flowing particles
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => createFlowingParticle(line, x1, y1, x2, y2), i * 500);
+            }
+        }
+
+        function createFlowingParticle(line, x1, y1, x2, y2) {
+            const particle = document.createElement('div');
+            particle.className = 'money-particle';
+            
+            const container = line.parentElement;
+            particle.style.left = `${x1}%`;
+            particle.style.top = `${y1}px`;
+            
+            const dx = (x2 - x1) * container.offsetWidth / 100;
+            const dy = y2 - y1;
+            
+            particle.style.setProperty('--dx', `${dx}px`);
+            particle.style.setProperty('--dy', `${dy}px`);
+            particle.style.animation = 'flowParticle 2s ease-out';
+            
+            container.appendChild(particle);
+            
+            setTimeout(() => particle.remove(), 2000);
+        }
+
+        function showCalculations(mode, initial, final) {
+            const calcSteps = document.getElementById('calcSteps');
+            calcSteps.innerHTML = '';
+            
+            if (mode === 'standard') {
+                addCalcStep(calcSteps, 'Starting Amount', `$${initial.toLocaleString()}`, '', 0);
+                addCalcStep(calcSteps, 'Base Leverage', `×${baseLeverage}`, `$${initial} × ${baseLeverage}`, 200);
+                
+                let current = initial * baseLeverage;
+                selectedVerses.forEach((verse, index) => {
+                    const prev = current;
+                    current *= verse.multiplier;
+                    addCalcStep(calcSteps, `${verse.id}`, `×${verse.multiplier}`, 
+                        `$${prev.toLocaleString()} × ${verse.multiplier}`, 400 + index * 200);
+                });
+                
+                addCalcStep(calcSteps, 'Final Position', `$${final.toLocaleString()}`, '', 
+                    600 + selectedVerses.length * 200);
+            } else {
+                addCalcStep(calcSteps, 'Starting Amount', `$${initial.toLocaleString()}`, '', 0);
+                addCalcStep(calcSteps, 'Quantum Split', '', '', 200);
+                addCalcStep(calcSteps, '→ YES (35%)', `$${(initial * 0.35).toLocaleString()}`, '', 300);
+                addCalcStep(calcSteps, '→ NO (65%)', `$${(initial * 0.65).toLocaleString()}`, '', 400);
+                addCalcStep(calcSteps, 'After Leverage', '', '', 600);
+                addCalcStep(calcSteps, '→ YES Total', `$${final.yes.toLocaleString()}`, '', 700);
+                addCalcStep(calcSteps, '→ NO Total', `$${final.no.toLocaleString()}`, '', 800);
+            }
+        }
+
+        function addCalcStep(container, label, value, formula, delay) {
+            const step = document.createElement('div');
+            step.className = 'calc-step';
+            step.innerHTML = `
+                <div class="calc-label">${label}</div>
+                <div class="calc-value">${value}</div>
+                ${formula ? `<div class="calc-formula">${formula}</div>` : ''}
+            `;
+            container.appendChild(step);
+            
+            setTimeout(() => step.classList.add('visible'), delay);
+        }
+
+        function updateSummary() {
+            investment = parseFloat(document.getElementById('investmentAmount').value) || 10000;
+            let totalMultiplier = baseLeverage;
+            selectedVerses.forEach(verse => {
+                totalMultiplier *= verse.multiplier;
+            });
+            
+            document.getElementById('summaryInvestment').textContent = '$' + investment.toLocaleString();
+            document.getElementById('summaryLeverage').textContent = totalMultiplier.toFixed(1) + 'x';
+            
+            if (selectedMode === 'standard') {
+                document.getElementById('standardSummary').style.display = 'block';
+                document.getElementById('quantumYesSummary').style.display = 'none';
+                document.getElementById('quantumNoSummary').style.display = 'none';
+                
+                document.getElementById('summaryPosition').textContent = 
+                    '$' + (investment * totalMultiplier).toLocaleString();
+            } else {
+                document.getElementById('standardSummary').style.display = 'none';
+                document.getElementById('quantumYesSummary').style.display = 'block';
+                document.getElementById('quantumNoSummary').style.display = 'block';
+                
+                document.getElementById('summaryYes').textContent = 
+                    '$' + (investment * 0.35 * totalMultiplier).toLocaleString();
+                document.getElementById('summaryNo').textContent = 
+                    '$' + (investment * 0.65 * totalMultiplier).toLocaleString();
+            }
+        }
+
+        function playAnimation() {
+            if (animationRunning) return;
+            animationRunning = true;
+            
+            // Start from beginning
+            goToSection(1);
+            
+            setTimeout(() => {
+                // Auto-fill amount
+                document.getElementById('investmentAmount').value = 10000;
+                goToSection(2);
+            }, 2000);
+            
+            setTimeout(() => {
+                // Select quantum mode
+                selectMode('quantum');
+            }, 4000);
+            
+            setTimeout(() => {
+                // Go to market
+                goToSection(3);
+            }, 6000);
+            
+            setTimeout(() => {
+                // Go to verses
+                goToSection(4);
+            }, 8000);
+            
+            setTimeout(() => {
+                // Select verses
+                document.querySelectorAll('.verse-card').forEach((card, index) => {
+                    setTimeout(() => card.click(), index * 500);
+                });
+            }, 10000);
+            
+            setTimeout(() => {
+                // Show final flow
+                goToSection(5);
+                animationRunning = false;
+            }, 12000);
+        }
+
+        function reset() {
+            currentSection = 1;
+            selectedMode = null;
+            selectedVerses = [];
+            document.getElementById('investmentAmount').value = 10000;
+            document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+            goToSection(1);
+        }
+
+        // Update investment amount display
+        document.getElementById('investmentAmount').addEventListener('input', function() {
+            investment = parseFloat(this.value) || 0;
+            if (selectedMode) {
+                document.querySelector(`#${selectedMode}Mode .mode-card div:last-child div:first-child`).textContent = 
+                    '$' + investment.toLocaleString();
+            }
+        });
+    </script>
+</body>
+</html>

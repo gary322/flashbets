@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ui-next:
+    name: UI (Next.js)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: betting_platform/app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: betting_platform/app/package-lock.json
+
+      - run: npm ci
+      - run: npm run type-check
+      - run: npm run lint
+      - run: npm run build
+
+  api-runner:
+    name: API (Rust/Axum)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: betting_platform/api_runner
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            betting_platform/api_runner -> target
+
+      - run: cargo test --locked
+
+  flash-bets-program:
+    name: Flash Bets (Rust)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: betting_platform/flash_bets/program
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            betting_platform/flash_bets/program -> target
+
+      - run: cargo test --locked
+
+  root-programs:
+    name: Root Programs (Rust)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            . -> target
+
+      - run: cargo test --locked

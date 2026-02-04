@@ -1,0 +1,209 @@
+{
+  "test_scenarios": {
+    "core_infrastructure": {
+      "global_config": {
+        "tests": [
+          {"action": "initialize", "params": {}, "expected": "success"}
+        ]
+      },
+      "fee_vault": {
+        "tests": [
+          {"action": "collect_fee", "amount": 50, "expected": "success"},
+          {"action": "collect_fee", "amount": 500, "expected": "success"},
+          {"action": "collect_fee", "amount": 5000, "expected": "success"}
+        ]
+      },
+      "mmt_token": {
+        "tests": [
+          {"action": "initialize", "supply": 1000000000, "expected": "success"},
+          {"action": "transfer", "amount": 100, "expected": "success"},
+          {"action": "transfer", "amount": 1000, "expected": "success"},
+          {"action": "transfer", "amount": 10000, "expected": "success"}
+        ]
+      },
+      "staking_pool": {
+        "tests": [
+          {"action": "stake", "amount": 100, "expected_rebate": 15, "expected": "success"},
+          {"action": "stake", "amount": 1000, "expected_rebate": 150, "expected": "success"},
+          {"action": "stake", "amount": 10000, "expected_rebate": 1500, "expected": "success"},
+          {"action": "stake", "amount": 100000, "expected_rebate": 15000, "expected": "success"}
+        ]
+      }
+    },
+    "amm_system": {
+      "lmsr": {
+        "tests": [
+          {"action": "add_liquidity", "amount": 100, "expected": "success"},
+          {"action": "add_liquidity", "amount": 1000, "expected": "success"},
+          {"action": "add_liquidity", "amount": 10000, "expected": "success"},
+          {"action": "place_bet", "amount": 10, "expected": "success"},
+          {"action": "place_bet", "amount": 100, "expected": "success"},
+          {"action": "place_bet", "amount": 1000, "expected": "success"}
+        ]
+      },
+      "pmamm": {
+        "tests": [
+          {"action": "create_market", "outcomes": 2, "expected": "success"},
+          {"action": "create_market", "outcomes": 8, "expected": "success"},
+          {"action": "create_market", "outcomes": 32, "expected": "success"},
+          {"action": "create_market", "outcomes": 64, "expected": "success"},
+          {"action": "swap", "amount": 50, "expected": "success"},
+          {"action": "swap", "amount": 500, "expected": "success"},
+          {"action": "swap", "amount": 5000, "expected": "success"},
+          {"action": "swap", "amount": 50000, "expected": "success"}
+        ]
+      },
+      "l2amm": {
+        "tests": [
+          {"action": "create_market", "outcomes": 65, "expected": "success"},
+          {"action": "create_market", "outcomes": 80, "expected": "success"},
+          {"action": "create_market", "outcomes": 100, "expected": "success"}
+        ]
+      },
+      "slippage_protection": {
+        "tests": [
+          {"action": "set_max_slippage", "bps": 100, "expected": "success"},
+          {"action": "set_max_slippage", "bps": 500, "expected": "success"},
+          {"action": "set_max_slippage", "bps": 1000, "expected": "success"}
+        ]
+      }
+    },
+    "trading_engine": {
+      "position_manager": {
+        "tests": [
+          {"action": "open_position", "amount": 10, "expected": "success"},
+          {"action": "open_position", "amount": 100, "expected": "success"},
+          {"action": "open_position", "amount": 1000, "expected": "success"},
+          {"action": "open_position", "amount": 10000, "expected": "success"},
+          {"action": "open_position", "amount": 100000, "expected": "success"}
+        ]
+      },
+      "leverage_controller": {
+        "tests": [
+          {"action": "apply_leverage", "leverage": 1, "amount": 1000, "expected": "success"},
+          {"action": "apply_leverage", "leverage": 10, "amount": 1000, "expected": "success"},
+          {"action": "apply_leverage", "leverage": 50, "amount": 1000, "expected": "success"},
+          {"action": "apply_leverage", "leverage": 100, "amount": 1000, "expected": "success"},
+          {"action": "apply_leverage", "leverage": 150, "amount": 1000, "expected": "fail"}
+        ]
+      },
+      "pnl_calculator": {
+        "tests": [
+          {"action": "calculate_pnl", "position": 1000, "change": 10, "type": "gain", "expected": "100"},
+          {"action": "calculate_pnl", "position": 1000, "change": 50, "type": "gain", "expected": "500"},
+          {"action": "calculate_pnl", "position": 1000, "change": 200, "type": "gain", "expected": "2000"},
+          {"action": "calculate_pnl", "position": 1000, "change": 10, "type": "loss", "expected": "-100"},
+          {"action": "calculate_pnl", "position": 1000, "change": 50, "type": "loss", "expected": "-500"},
+          {"action": "calculate_pnl", "position": 1000, "change": 90, "type": "loss", "expected": "-900"}
+        ]
+      }
+    },
+    "risk_management": {
+      "liquidation_engine": {
+        "tests": [
+          {"action": "check_liquidation", "position": 100, "leverage": 100, "expected": "monitoring"},
+          {"action": "liquidate", "position": 10000, "leverage": 50, "percent": 8, "expected": "800"},
+          {"action": "liquidate", "position": 50000, "leverage": 75, "percent": 8, "expected": "4000"}
+        ]
+      },
+      "correlation_matrix": {
+        "tests": [
+          {"action": "build_matrix", "markets": 10, "expected": "success"},
+          {"action": "build_matrix", "markets": 50, "expected": "success"},
+          {"action": "build_matrix", "markets": 100, "expected": "success"}
+        ]
+      },
+      "stress_test": {
+        "tests": [
+          {"action": "simulate_crash", "percent": 20, "expected": "success"},
+          {"action": "simulate_crash", "percent": 50, "expected": "success"},
+          {"action": "simulate_crash", "percent": 80, "expected": "circuit_break"}
+        ]
+      }
+    },
+    "defi_features": {
+      "flash_loan": {
+        "tests": [
+          {"action": "borrow", "amount": 1000, "fee_percent": 2, "expected_fee": 20},
+          {"action": "borrow", "amount": 10000, "fee_percent": 2, "expected_fee": 200},
+          {"action": "borrow", "amount": 100000, "fee_percent": 2, "expected_fee": 2000}
+        ]
+      },
+      "borrowing": {
+        "tests": [
+          {"action": "borrow", "amount": 1000, "collateral_ratio": 150, "required": 1500},
+          {"action": "borrow", "amount": 1000, "collateral_ratio": 200, "required": 2000},
+          {"action": "borrow", "amount": 1000, "collateral_ratio": 300, "required": 3000}
+        ]
+      }
+    },
+    "edge_cases": {
+      "dust_trades": {
+        "tests": [
+          {"action": "trade", "amount": 0.01, "expected": "success"},
+          {"action": "trade", "amount": 0.10, "expected": "success"},
+          {"action": "trade", "amount": 0.99, "expected": "success"}
+        ]
+      },
+      "max_limits": {
+        "tests": [
+          {"action": "leverage", "value": 100, "expected": "success"},
+          {"action": "leverage", "value": 101, "expected": "fail"},
+          {"action": "outcomes", "value": 100, "expected": "success"},
+          {"action": "outcomes", "value": 101, "expected": "fail"}
+        ]
+      },
+      "rapid_fire": {
+        "tests": [
+          {"action": "batch_trades", "count": 100, "duration": 10, "expected": "success"}
+        ]
+      }
+    },
+    "user_journeys": {
+      "new_user": {
+        "steps": [
+          {"action": "create_account", "expected": "success"},
+          {"action": "deposit", "amount": 100, "expected": "success"},
+          {"action": "first_trade", "amount": 50, "expected": "success"},
+          {"action": "check_pnl", "expected": "success"},
+          {"action": "withdraw", "amount": 120, "expected": "success"}
+        ]
+      },
+      "active_trader": {
+        "steps": [
+          {"action": "open_position", "amount": 1000, "expected": "success"},
+          {"action": "apply_leverage", "leverage": 10, "expected": "success"},
+          {"action": "open_position", "amount": 2000, "expected": "success"},
+          {"action": "check_liquidation", "expected": "safe"},
+          {"action": "close_position", "expected": "success"}
+        ]
+      },
+      "liquidity_provider": {
+        "steps": [
+          {"action": "add_liquidity", "amount": 10000, "expected": "success"},
+          {"action": "check_fees_earned", "expected": "success"},
+          {"action": "remove_liquidity", "amount": 5000, "expected": "success"}
+        ]
+      },
+      "mmt_staker": {
+        "steps": [
+          {"action": "buy_mmt", "amount": 10000, "expected": "success"},
+          {"action": "stake_mmt", "amount": 10000, "expected": "success"},
+          {"action": "check_rebates", "expected": "1500"},
+          {"action": "unstake", "after_days": 180, "expected": "success"}
+        ]
+      }
+    }
+  },
+  "performance_targets": {
+    "cu_per_trade": 20000,
+    "tps": 5000,
+    "markets_per_second": 350,
+    "max_leverage": 100,
+    "liquidation_percent": 8,
+    "flash_loan_fee": 2,
+    "staking_rebate": 15,
+    "bootstrap_target": 100000,
+    "mmt_supply": 1000000000
+  }
+}

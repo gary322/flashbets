@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Verses Issue</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #000; color: #fff; padding: 20px; font-family: monospace; }
+        .debug { background: #111; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        .data { background: #222; padding: 10px; margin: 10px 0; border-radius: 4px; overflow: auto; max-height: 300px; }
+        button { background: #FFD60A; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Debug Verses Issue</h1>
+    
+    <div class="debug">
+        <button onclick="fetchAndAnalyze()">Fetch Market & Analyze</button>
+        <button onclick="testVerseDisplay()">Test Verse Display Directly</button>
+        <button onclick="clearDebug()">Clear</button>
+    </div>
+    
+    <div id="output"></div>
+    
+    <!-- Test verse section -->
+    <div class="verses-section" id="versesSection" style="display: block; margin-top: 30px;">
+        <div class="section-title">Test Verse Display</div>
+        <div class="verse-flow-container" id="verseFlowContainer">
+            <svg class="verse-connections" id="verseConnections"></svg>
+            <div class="verse-levels" id="verseLevels"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize platform state
+        window.platformState = {
+            selectedVerses: [],
+            markets: new Map()
+        };
+    </script>
+    
+    <script src="platform_main.js"></script>
+    
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(msg, type = '') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = msg;
+            output.appendChild(div);
+            console.log(msg);
+        }
+        
+        function clearDebug() {
+            output.innerHTML = '';
+        }
+        
+        async function fetchAndAnalyze() {
+            clearDebug();
+            log('Fetching markets from API...');
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                
+                log(`✓ Fetched ${markets.length} markets`, 'success');
+                
+                // Analyze first market
+                if (markets.length > 0) {
+                    const market = markets[0];
+                    log('\n<strong>First Market Analysis:</strong>');
+                    log(`Title: ${market.title || market.question || 'Unknown'}`);
+                    log(`ID: ${market.id}`);
+                    log(`Has verses property: ${market.hasOwnProperty('verses') ? 'YES' : 'NO'}`);
+                    
+                    if (market.verses) {
+                        log(`Verses is array: ${Array.isArray(market.verses) ? 'YES' : 'NO'}`);
+                        log(`Verses length: ${market.verses.length}`, market.verses.length > 0 ? 'success' : 'error');
+                        
+                        if (market.verses.length > 0) {
+                            log('\n<strong>First Verse:</strong>');
+                            log(`<pre class="data">${JSON.stringify(market.verses[0], null, 2)}</pre>`);
+                            
+                            // Test updateAvailableVerses directly
+                            log('\n<strong>Testing updateAvailableVerses:</strong>');
+                            if (window.updateAvailableVerses) {
+                                log('✓ updateAvailableVerses exists', 'success');
+                                
+                                try {
+                                    // Call with the verses
+                                    window.updateAvailableVerses(market.verses);
+                                    log('✓ Called updateAvailableVerses', 'success');
+                                    
+                                    // Check results
+                                    setTimeout(() => {
+                                        const verseLevels = document.getElementById('verseLevels');
+                                        const verseCards = document.querySelectorAll('.verse-card');
+                                        log(`\nResults: ${verseLevels.children.length} levels, ${verseCards.length} cards`, 
+                                            verseCards.length > 0 ? 'success' : 'error');
+                                    }, 200);
+                                    
+                                } catch (error) {
+                                    log(`✗ Error calling updateAvailableVerses: ${error.message}`, 'error');
+                                    console.error(error);
+                                }
+                            } else {
+                                log('✗ updateAvailableVerses not found', 'error');
+                            }
+                        }
+                    } else {
+                        log('✗ No verses property on market', 'error');
+                    }
+                    
+                    // Show full market data
+                    log('\n<strong>Full Market Data:</strong>');
+                    log(`<pre class="data">${JSON.stringify(market, null, 2)}</pre>`);
+                }
+                
+            } catch (error) {
+                log(`✗ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function testVerseDisplay() {
+            log('\n<strong>Testing Direct Verse Display:</strong>');
+            
+            const testVerses = [
+                {
+                    id: "test_verse_1",
+                    name: "Test Market Category",
+                    description: "General prediction markets",
+                    level: 1,
+                    multiplier: 1.5,
+                    category: "General",
+                    risk_tier: "Low",
+                    market_count: 5
+                },
+                {
+                    id: "test_verse_2",
+                    name: "Advanced Trading",
+                    description: "Higher risk trading strategies",
+                    level: 2,
+                    multiplier: 3.0,
+                    category: "Advanced",
+                    risk_tier: "Medium",
+                    market_count: 3
+                }
+            ];
+            
+            log('Test verses:');
+            log(`<pre class="data">${JSON.stringify(testVerses, null, 2)}</pre>`);
+            
+            if (window.updateAvailableVerses) {
+                try {
+                    window.updateAvailableVerses(testVerses);
+                    log('✓ Called updateAvailableVerses with test data', 'success');
+                    
+                    setTimeout(() => {
+                        const verseLevels = document.getElementById('verseLevels');
+                        const verseCards = document.querySelectorAll('.verse-card');
+                        log(`Results: ${verseLevels.children.length} levels, ${verseCards.length} cards`, 
+                            verseCards.length > 0 ? 'success' : 'error');
+                        
+                        if (verseLevels.children.length === 0) {
+                            log('verseLevels innerHTML: ' + (verseLevels.innerHTML || '(empty)'), 'error');
+                        }
+                    }, 200);
+                    
+                } catch (error) {
+                    log(`✗ Error: ${error.message}`, 'error');
+                    console.error(error);
+                }
+            } else {
+                log('✗ updateAvailableVerses not found', 'error');
+            }
+        }
+        
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            setTimeout(fetchAndAnalyze, 500);
+        });
+    </script>
+</body>
+</html>

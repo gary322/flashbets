@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Verse Trading - Complete System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Demo Stage */
+        .demo-stage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #0A0A0A 0%, #000000 100%);
+        }
+
+        /* Demo Navigation */
+        .demo-nav {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px 40px;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .demo-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .demo-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .demo-btn.active {
+            background: #FFD60A;
+            color: #000000;
+            border-color: #FFD60A;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #FFD60A;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.5);
+        }
+
+        /* Feature Containers */
+        .feature-container {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+            width: 100%;
+            max-width: 1400px;
+            padding: 40px;
+        }
+
+        .feature-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Market Selection */
+        .market-selection {
+            text-align: center;
+        }
+
+        .selection-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .markets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .market-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .market-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.05);
+            border-color: rgba(255, 214, 10, 0.5);
+        }
+
+        .market-card.selected {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.1);
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(255, 214, 10, 0.3);
+        }
+
+        /* Verse Configuration */
+        .verse-config {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 40px;
+        }
+
+        .config-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .verse-tree {
+            position: relative;
+            min-height: 700px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 40px;
+            overflow: hidden;
+        }
+
+        .verse-node {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: scale(0);
+            z-index: 10;
+        }
+
+        .verse-node.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .verse-node:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.1);
+            z-index: 20;
+        }
+
+        .verse-node.selected {
+            background: rgba(255, 214, 10, 0.2);
+            border-color: #FFD60A;
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.3);
+        }
+
+        .verse-node.quantum {
+            background: rgba(138, 97, 255, 0.2);
+            border-color: #8A61FF;
+            animation: quantumPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes quantumPulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(138, 97, 255, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(138, 97, 255, 0.8);
+            }
+        }
+
+        /* Connection Arrows */
+        .verse-connection {
+            position: absolute;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .connection-line {
+            stroke: rgba(255, 255, 255, 0.2);
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 5, 5;
+            animation: flowAnimation 3s linear infinite;
+        }
+
+        .connection-line.active {
+            stroke: #FFD60A;
+            stroke-width: 3;
+            stroke-dasharray: none;
+        }
+
+        .connection-line.quantum {
+            stroke: #8A61FF;
+            stroke-width: 3;
+            stroke-dasharray: 10, 5;
+            animation: quantumFlow 2s linear infinite;
+        }
+
+        @keyframes flowAnimation {
+            to {
+                stroke-dashoffset: -10;
+            }
+        }
+
+        @keyframes quantumFlow {
+            to {
+                stroke-dashoffset: -15;
+            }
+        }
+
+        .arrow-marker {
+            fill: rgba(255, 255, 255, 0.4);
+        }
+
+        .arrow-marker.active {
+            fill: #FFD60A;
+        }
+
+        .arrow-marker.quantum {
+            fill: #8A61FF;
+        }
+
+        /* Quantum Controls */
+        .quantum-toggle {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(138, 97, 255, 0.1);
+            border: 1px solid #8A61FF;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quantum-toggle:hover {
+            background: rgba(138, 97, 255, 0.2);
+        }
+
+        .quantum-toggle.active {
+            background: rgba(138, 97, 255, 0.3);
+            box-shadow: 0 0 30px rgba(138, 97, 255, 0.5);
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 13px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #8A61FF;
+        }
+
+        .toggle-slider {
+            width: 22px;
+            height: 22px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            left: 26px;
+        }
+
+        /* Money Distribution */
+        .distribution-panel {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+        }
+
+        .distribution-toggle {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .distribution-visual {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 214, 10, 0.05);
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            border-radius: 10px;
+        }
+
+        .distribution-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .distribution-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .distribution-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD60A 0%, #FFA500 100%);
+            transition: width 0.5s ease-out;
+        }
+
+        /* Trading Interface */
+        .trading-interface {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 30px;
+        }
+
+        .trading-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #FFD60A;
+        }
+
+        /* Quantum Visualization */
+        .quantum-states {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .quantum-state-card {
+            padding: 15px;
+            background: rgba(138, 97, 255, 0.1);
+            border: 1px solid rgba(138, 97, 255, 0.3);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-state-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(138, 97, 255, 0.3) 0%, transparent 70%);
+            animation: quantumRotate 10s linear infinite;
+        }
+
+        @keyframes quantumRotate {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .quantum-state-card:hover {
+            background: rgba(138, 97, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .quantum-probability {
+            font-size: 24px;
+            font-weight: 600;
+            color: #8A61FF;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Order Animation */
+        .order-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #FFD60A;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            display: none;
+            z-index: 2000;
+            min-width: 500px;
+        }
+
+        .order-animation.show {
+            display: block;
+            animation: orderPulse 0.5s ease-out;
+        }
+
+        @keyframes orderPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-dots {
+            display: inline-block;
+            width: 60px;
+            text-align: left;
+        }
+
+        .loading-dots::after {
+            content: '.';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
+        /* Particles for quantum effects */
+        .quantum-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #8A61FF;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat 3s ease-out infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50px) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0);
+            }
+        }
+
+        .position-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: #FFFFFF;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .trade-btn {
+            width: 100%;
+            padding: 20px;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px 0;
+        }
+
+        .buy-btn {
+            background: #4CD964;
+            color: #000000;
+        }
+
+        .buy-btn:hover {
+            background: #3AB851;
+            transform: scale(1.05);
+        }
+
+        .sell-btn {
+            background: #FF3B30;
+            color: #FFFFFF;
+        }
+
+        .sell-btn:hover {
+            background: #E6251A;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Stage -->
+    <div class="demo-stage">
+        <!-- Market Selection -->
+        <div class="feature-container active" id="marketSelection">
+            <div class="market-selection">
+                <h1 class="selection-title">Quantum Verse Trading</h1>
+                <p style="font-size: 20px; color: rgba(255, 255, 255, 0.6); margin-bottom: 40px;">
+                    Select a market to explore verse hierarchies and quantum superposition
+                </p>
+                
+                <div class="markets-grid">
+                    <!-- Market 1 -->
+                    <div class="market-card" onclick="selectMarket(1)">
+                        <h3>Will AGI be achieved by 2025?</h3>
+                        <p style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin: 15px 0;">
+                            Major AI labs racing toward artificial general intelligence milestone.
+                        </p>
+                        <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+                            <div>
+                                <div style="color: #FFD60A; font-size: 24px; font-weight: 600;">31%</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">YES</div>
+                            </div>
+                            <div>
+                                <div style="color: #FFD60A; font-size: 24px; font-weight: 600;">69%</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">NO</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Market 2 -->
+                    <div class="market-card" onclick="selectMarket(2)">
+                        <h3>Bitcoin above $150k in 2025?</h3>
+                        <p style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin: 15px 0;">
+                            Institutional adoption and ETF flows driving unprecedented demand.
+                        </p>
+                        <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+                            <div>
+                                <div style="color: #FFD60A; font-size: 24px; font-weight: 600;">58%</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">YES</div>
+                            </div>
+                            <div>
+                                <div style="color: #FFD60A; font-size: 24px; font-weight: 600;">42%</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">NO</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Market 3 -->
+                    <div class="market-card" onclick="selectMarket(3)">
+                        <h3>Mars landing in 2025?</h3>
+                        <p style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin: 15px 0;">
+                            SpaceX and NASA competing for first crewed Mars mission.
+                        </p>
+                        <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+                            <div>
+                                <div style="color: #FFD60A; font-size: 24px; font-weight: 600;">22%</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">YES</div>
+                            </div>
+                            <div>
+                                <div style="color: #FFD60A; font-size: 24px; font-weight: 600;">78%</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">NO</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verse Configuration -->
+        <div class="feature-container" id="verseConfig">
+            <div class="verse-config">
+                <div class="config-panel">
+                    <h2 class="panel-title">Verse Configuration</h2>
+                    
+                    <!-- Base Leverage -->
+                    <div style="margin: 20px 0;">
+                        <h3 style="margin-bottom: 15px;">Base Leverage</h3>
+                        <div style="font-size: 48px; font-weight: 700; color: #FFD60A; text-align: center;">
+                            <span id="baseLeverageValue">5</span>x
+                        </div>
+                        <input type="range" class="leverage-slider" id="baseLeverageSlider" 
+                               min="1" max="20" value="5" step="1" 
+                               oninput="updateBaseLeverage(this.value)"
+                               style="width: 100%; margin: 20px 0;">
+                    </div>
+
+                    <!-- Quantum Mode -->
+                    <div class="quantum-toggle" onclick="toggleQuantumMode()">
+                        <div class="toggle-switch" id="quantumSwitch">
+                            <div class="toggle-slider"></div>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600;">Quantum Superposition</div>
+                            <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">
+                                Enable multi-outcome betting
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Money Distribution -->
+                    <div class="distribution-panel">
+                        <div class="distribution-toggle">
+                            <div class="toggle-switch" id="distributionSwitch" onclick="toggleDistribution()">
+                                <div class="toggle-slider"></div>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">Auto-Distribute Funds</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">
+                                    Split position across verses
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="distribution-visual" id="distributionVisual" style="display: none;">
+                            <h4 style="margin-bottom: 15px; color: #FFD60A;">Fund Distribution</h4>
+                            <div id="distributionList"></div>
+                        </div>
+                    </div>
+
+                    <!-- Selected Verses Summary -->
+                    <div style="margin-top: 30px;">
+                        <h3 style="margin-bottom: 15px;">Selected Verses</h3>
+                        <div id="selectedVersesSummary" style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">
+                            No verses selected
+                        </div>
+                    </div>
+
+                    <!-- Total Leverage Display -->
+                    <div style="margin-top: 30px; padding: 20px; background: rgba(255, 214, 10, 0.1); border-radius: 10px; text-align: center;">
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Total Leverage</div>
+                        <div style="font-size: 36px; font-weight: 700; color: #FFD60A;" id="totalLeverageDisplay">5x</div>
+                    </div>
+                </div>
+
+                <div class="verse-tree" id="verseTree">
+                    <svg id="connectionSvg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" class="arrow-marker" />
+                            </marker>
+                            <marker id="arrowhead-active" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" class="arrow-marker active" />
+                            </marker>
+                            <marker id="arrowhead-quantum" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" class="arrow-marker quantum" />
+                            </marker>
+                        </defs>
+                    </svg>
+                    <div class="quantum-particles" id="quantumParticles"></div>
+                    <!-- Verse nodes will be added here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Trading Interface -->
+        <div class="feature-container" id="tradingInterface">
+            <div class="trading-interface">
+                <!-- Left Panel - Quantum States -->
+                <div class="trading-panel">
+                    <h3 class="panel-title">Quantum States</h3>
+                    
+                    <div id="quantumModePanel" style="display: none;">
+                        <p style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin-bottom: 20px;">
+                            Your position exists in superposition across multiple outcomes
+                        </p>
+                        
+                        <div class="quantum-states" id="quantumStates">
+                            <div class="quantum-state-card">
+                                <div>YES Outcome</div>
+                                <div class="quantum-probability" id="yesProb">50%</div>
+                            </div>
+                            <div class="quantum-state-card">
+                                <div>NO Outcome</div>
+                                <div class="quantum-probability" id="noProb">50%</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding: 15px; background: rgba(138, 97, 255, 0.1); border-radius: 10px;">
+                            <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Collapse Trigger</div>
+                            <div style="font-size: 16px; margin-top: 5px;">Market Resolution</div>
+                        </div>
+                    </div>
+                    
+                    <div id="standardModePanel">
+                        <h4 style="margin-bottom: 15px;">Leverage Breakdown</h4>
+                        <div id="leverageBreakdown"></div>
+                    </div>
+                </div>
+
+                <!-- Center Panel - Trading -->
+                <div class="trading-panel" style="text-align: center;">
+                    <h2 style="font-size: 28px; margin-bottom: 30px;" id="tradingMarketTitle">Market Title</h2>
+                    
+                    <input type="number" class="position-input" id="positionSize" placeholder="Position Size ($)" value="1000">
+                    
+                    <div id="distributionPreview" style="display: none; margin: 20px 0;">
+                        <h4 style="margin-bottom: 15px; color: #FFD60A;">Position Distribution</h4>
+                        <div id="distributionDetails"></div>
+                    </div>
+                    
+                    <div style="margin: 20px 0; padding: 20px; background: rgba(255, 255, 255, 0.02); border-radius: 10px;">
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Effective Exposure</div>
+                        <div style="font-size: 36px; font-weight: 700; color: #FFD60A; margin-top: 10px;" id="effectiveExposure">$5,000</div>
+                    </div>
+                    
+                    <button class="trade-btn buy-btn" onclick="executeTrade('buy')">BUY YES</button>
+                    <button class="trade-btn sell-btn" onclick="executeTrade('sell')">BUY NO</button>
+                    
+                    <div id="quantumTradeBtn" style="display: none;">
+                        <button class="trade-btn" style="background: #8A61FF; color: #FFFFFF; width: 100%;" onclick="executeQuantumTrade()">
+                            ENTER QUANTUM POSITION
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Panel - Selected Verses -->
+                <div class="trading-panel">
+                    <h3 class="panel-title">Active Verses</h3>
+                    <div id="activeVersesList" style="margin-top: 20px;">
+                        <p style="color: rgba(255, 255, 255, 0.5); text-align: center;">
+                            No verses selected
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Navigation -->
+    <div class="demo-nav">
+        <button class="demo-btn active" id="btn1" onclick="goToStep(1)">1. Market</button>
+        <button class="demo-btn" id="btn2" onclick="goToStep(2)">2. Verses</button>
+        <button class="demo-btn" id="btn3" onclick="goToStep(3)">3. Trade</button>
+        <button class="play-btn" id="playBtn" onclick="playDemo()">▶</button>
+    </div>
+
+    <!-- Order Animation -->
+    <div class="order-animation" id="orderAnimation">
+        <h2 style="font-size: 32px; margin-bottom: 20px; color: #FFD60A;">Order Executed!</h2>
+        <div id="orderDetails" style="font-size: 18px; line-height: 1.8;"></div>
+    </div>
+
+    <script>
+        // Market data
+        const markets = {
+            1: {
+                title: "AGI by 2025",
+                verses: [
+                    {
+                        id: 'compute-scaling',
+                        name: 'Compute Scaling',
+                        multiplier: 2.0,
+                        description: '10x compute increase',
+                        level: 1,
+                        position: { x: 25, y: 20 },
+                        children: ['breakthrough', 'investment']
+                    },
+                    {
+                        id: 'breakthrough',
+                        name: 'Algorithm Breakthrough',
+                        multiplier: 1.8,
+                        description: 'Novel architectures',
+                        level: 2,
+                        position: { x: 15, y: 40 },
+                        parent: 'compute-scaling'
+                    },
+                    {
+                        id: 'investment',
+                        name: 'Funding Surge',
+                        multiplier: 1.5,
+                        description: '$100B+ investment',
+                        level: 2,
+                        position: { x: 35, y: 40 },
+                        parent: 'compute-scaling'
+                    },
+                    {
+                        id: 'regulation',
+                        name: 'Regulatory Framework',
+                        multiplier: 1.6,
+                        description: 'Global AI governance',
+                        level: 1,
+                        position: { x: 50, y: 20 },
+                        children: ['safety']
+                    },
+                    {
+                        id: 'safety',
+                        name: 'Safety Measures',
+                        multiplier: 1.4,
+                        description: 'Alignment solved',
+                        level: 2,
+                        position: { x: 50, y: 40 },
+                        parent: 'regulation'
+                    },
+                    {
+                        id: 'competition',
+                        name: 'Lab Competition',
+                        multiplier: 1.7,
+                        description: 'OpenAI vs Google vs Anthropic',
+                        level: 1,
+                        position: { x: 75, y: 20 },
+                        children: []
+                    }
+                ]
+            },
+            2: {
+                title: "Bitcoin $150k",
+                verses: [
+                    {
+                        id: 'institutional',
+                        name: 'Institutional FOMO',
+                        multiplier: 2.2,
+                        description: 'Corporate treasuries',
+                        level: 1,
+                        position: { x: 25, y: 20 },
+                        children: ['etf-flows']
+                    },
+                    {
+                        id: 'etf-flows',
+                        name: 'ETF Inflows',
+                        multiplier: 1.7,
+                        description: '$50B+ inflows',
+                        level: 2,
+                        position: { x: 25, y: 40 },
+                        parent: 'institutional'
+                    },
+                    {
+                        id: 'halving',
+                        name: 'Post-Halving Supply Shock',
+                        multiplier: 1.9,
+                        description: 'Supply crunch',
+                        level: 1,
+                        position: { x: 50, y: 20 },
+                        children: ['mining']
+                    },
+                    {
+                        id: 'mining',
+                        name: 'Mining Economics',
+                        multiplier: 1.4,
+                        description: 'Profitable at $150k',
+                        level: 2,
+                        position: { x: 50, y: 40 },
+                        parent: 'halving'
+                    },
+                    {
+                        id: 'macro',
+                        name: 'Macro Environment',
+                        multiplier: 1.8,
+                        description: 'Dollar weakness',
+                        level: 1,
+                        position: { x: 75, y: 20 },
+                        children: ['inflation']
+                    },
+                    {
+                        id: 'inflation',
+                        name: 'Inflation Hedge',
+                        multiplier: 1.5,
+                        description: 'Digital gold narrative',
+                        level: 2,
+                        position: { x: 75, y: 40 },
+                        parent: 'macro'
+                    }
+                ]
+            },
+            3: {
+                title: "Mars Landing 2025",
+                verses: [
+                    {
+                        id: 'starship-ready',
+                        name: 'Starship Operational',
+                        multiplier: 2.5,
+                        description: 'Full stack ready',
+                        level: 1,
+                        position: { x: 25, y: 20 },
+                        children: ['life-support', 'landing-tech']
+                    },
+                    {
+                        id: 'life-support',
+                        name: 'Life Support',
+                        multiplier: 1.8,
+                        description: '6-month capability',
+                        level: 2,
+                        position: { x: 15, y: 40 },
+                        parent: 'starship-ready'
+                    },
+                    {
+                        id: 'landing-tech',
+                        name: 'Landing Technology',
+                        multiplier: 1.7,
+                        description: 'Precision landing',
+                        level: 2,
+                        position: { x: 35, y: 40 },
+                        parent: 'starship-ready'
+                    },
+                    {
+                        id: 'nasa-support',
+                        name: 'NASA Partnership',
+                        multiplier: 1.6,
+                        description: 'Government backing',
+                        level: 1,
+                        position: { x: 50, y: 20 },
+                        children: []
+                    },
+                    {
+                        id: 'crew-training',
+                        name: 'Crew Readiness',
+                        multiplier: 1.5,
+                        description: 'Astronaut preparation',
+                        level: 1,
+                        position: { x: 75, y: 20 },
+                        children: ['psychological']
+                    },
+                    {
+                        id: 'psychological',
+                        name: 'Psychological Prep',
+                        multiplier: 1.3,
+                        description: 'Mental readiness',
+                        level: 2,
+                        position: { x: 75, y: 40 },
+                        parent: 'crew-training'
+                    }
+                ]
+            }
+        };
+
+        let selectedMarket = null;
+        let selectedVerses = new Set();
+        let baseLeverage = 5;
+        let totalLeverage = 5;
+        let quantumMode = false;
+        let autoDistribute = false;
+        let currentStep = 1;
+
+        function selectMarket(marketId) {
+            selectedMarket = marketId;
+            
+            // Visual feedback
+            document.querySelectorAll('.market-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+
+            setTimeout(() => goToStep(2), 800);
+        }
+
+        function goToStep(step) {
+            currentStep = step;
+            
+            // Update navigation
+            document.querySelectorAll('.demo-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn${step}`).classList.add('active');
+            
+            // Hide all containers
+            document.querySelectorAll('.feature-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            
+            // Show appropriate container
+            switch(step) {
+                case 1:
+                    document.getElementById('marketSelection').classList.add('active');
+                    break;
+                case 2:
+                    if (!selectedMarket) {
+                        alert('Please select a market first!');
+                        goToStep(1);
+                        return;
+                    }
+                    document.getElementById('verseConfig').classList.add('active');
+                    buildVerseTree();
+                    break;
+                case 3:
+                    document.getElementById('tradingInterface').classList.add('active');
+                    setupTrading();
+                    break;
+            }
+        }
+
+        function buildVerseTree() {
+            const tree = document.getElementById('verseTree');
+            const svg = document.getElementById('connectionSvg');
+            
+            // Clear existing content (except SVG)
+            tree.querySelectorAll('.verse-node').forEach(node => node.remove());
+            svg.querySelectorAll('path').forEach(path => path.remove());
+            
+            // Add main market node
+            const mainNode = document.createElement('div');
+            mainNode.className = 'verse-node main visible';
+            mainNode.id = 'main-node';
+            mainNode.style.left = '50%';
+            mainNode.style.top = '10%';
+            mainNode.style.transform = 'translateX(-50%)';
+            mainNode.innerHTML = `
+                <div style="font-size: 18px; font-weight: 600;">${markets[selectedMarket].title}</div>
+                <div style="font-size: 12px; margin-top: 5px; color: rgba(255, 255, 255, 0.6);">Base Market</div>
+            `;
+            tree.appendChild(mainNode);
+            
+            // Add verse nodes with delay
+            markets[selectedMarket].verses.forEach((verse, index) => {
+                setTimeout(() => {
+                    const node = document.createElement('div');
+                    node.className = 'verse-node';
+                    node.id = `verse-${verse.id}`;
+                    node.style.left = verse.position.x + '%';
+                    node.style.top = verse.position.y + '%';
+                    node.innerHTML = `
+                        <div style="font-weight: 600;">${verse.name}</div>
+                        <div style="font-size: 14px; color: #FFD60A; margin: 5px 0;">×${verse.multiplier}</div>
+                        <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">${verse.description}</div>
+                    `;
+                    node.onclick = () => toggleVerse(verse);
+                    tree.appendChild(node);
+                    
+                    setTimeout(() => {
+                        node.classList.add('visible');
+                        drawConnections();
+                    }, 50);
+                }, index * 200);
+            });
+        }
+
+        function drawConnections() {
+            const svg = document.getElementById('connectionSvg');
+            svg.querySelectorAll('path').forEach(path => path.remove());
+            
+            const mainNode = document.getElementById('main-node');
+            const mainRect = mainNode.getBoundingClientRect();
+            const svgRect = svg.getBoundingClientRect();
+            
+            markets[selectedMarket].verses.forEach(verse => {
+                const verseNode = document.getElementById(`verse-${verse.id}`);
+                if (!verseNode) return;
+                
+                const verseRect = verseNode.getBoundingClientRect();
+                
+                // Determine parent node
+                let parentRect;
+                if (verse.parent) {
+                    const parentNode = document.getElementById(`verse-${verse.parent}`);
+                    if (parentNode) {
+                        parentRect = parentNode.getBoundingClientRect();
+                    }
+                } else {
+                    parentRect = mainRect;
+                }
+                
+                if (parentRect) {
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    
+                    const x1 = parentRect.left + parentRect.width / 2 - svgRect.left;
+                    const y1 = parentRect.top + parentRect.height - svgRect.top;
+                    const x2 = verseRect.left + verseRect.width / 2 - svgRect.left;
+                    const y2 = verseRect.top - svgRect.top;
+                    
+                    // Create curved path
+                    const midY = (y1 + y2) / 2;
+                    const d = `M ${x1} ${y1} Q ${x1} ${midY}, ${x2} ${y2}`;
+                    
+                    path.setAttribute('d', d);
+                    path.setAttribute('class', `connection-line ${selectedVerses.has(verse.id) ? 'active' : ''} ${quantumMode ? 'quantum' : ''}`);
+                    path.setAttribute('marker-end', `url(#arrowhead${selectedVerses.has(verse.id) ? '-active' : ''}${quantumMode ? '-quantum' : ''})`);
+                    
+                    svg.appendChild(path);
+                }
+            });
+        }
+
+        function toggleVerse(verse) {
+            const node = document.getElementById(`verse-${verse.id}`);
+            
+            if (selectedVerses.has(verse.id)) {
+                selectedVerses.delete(verse.id);
+                node.classList.remove('selected');
+                node.classList.remove('quantum');
+            } else {
+                selectedVerses.add(verse.id);
+                node.classList.add('selected');
+                if (quantumMode) {
+                    node.classList.add('quantum');
+                    createQuantumParticles(node);
+                }
+            }
+            
+            updateTotalLeverage();
+            updateDistribution();
+            drawConnections();
+        }
+
+        function updateBaseLeverage(value) {
+            baseLeverage = parseInt(value);
+            document.getElementById('baseLeverageValue').textContent = baseLeverage;
+            updateTotalLeverage();
+        }
+
+        function updateTotalLeverage() {
+            let verseMultiplier = 1.0;
+            
+            markets[selectedMarket].verses.forEach(verse => {
+                if (selectedVerses.has(verse.id)) {
+                    verseMultiplier *= verse.multiplier;
+                }
+            });
+            
+            totalLeverage = baseLeverage * verseMultiplier;
+            totalLeverage = Math.min(totalLeverage, 100);
+            
+            document.getElementById('totalLeverageDisplay').textContent = totalLeverage.toFixed(1) + 'x';
+            
+            // Update selected verses summary
+            const summary = document.getElementById('selectedVersesSummary');
+            if (selectedVerses.size === 0) {
+                summary.innerHTML = 'No verses selected';
+            } else {
+                summary.innerHTML = '';
+                markets[selectedMarket].verses.forEach(verse => {
+                    if (selectedVerses.has(verse.id)) {
+                        summary.innerHTML += `<div style="margin: 5px 0;">• ${verse.name} (×${verse.multiplier})</div>`;
+                    }
+                });
+            }
+            
+            updateEffectiveExposure();
+        }
+
+        function toggleQuantumMode() {
+            quantumMode = !quantumMode;
+            const switchEl = document.getElementById('quantumSwitch');
+            
+            if (quantumMode) {
+                switchEl.classList.add('active');
+                document.querySelectorAll('.verse-node.selected').forEach(node => {
+                    node.classList.add('quantum');
+                });
+            } else {
+                switchEl.classList.remove('active');
+                document.querySelectorAll('.verse-node').forEach(node => {
+                    node.classList.remove('quantum');
+                });
+            }
+            
+            drawConnections();
+        }
+
+        function toggleDistribution() {
+            autoDistribute = !autoDistribute;
+            const switchEl = document.getElementById('distributionSwitch');
+            const visual = document.getElementById('distributionVisual');
+            
+            if (autoDistribute) {
+                switchEl.classList.add('active');
+                visual.style.display = 'block';
+                updateDistribution();
+            } else {
+                switchEl.classList.remove('active');
+                visual.style.display = 'none';
+            }
+        }
+
+        function updateDistribution() {
+            if (!autoDistribute || selectedVerses.size === 0) return;
+            
+            const list = document.getElementById('distributionList');
+            list.innerHTML = '';
+            
+            const positionSize = parseFloat(document.getElementById('positionSize').value) || 1000;
+            const perVerse = positionSize / selectedVerses.size;
+            
+            markets[selectedMarket].verses.forEach(verse => {
+                if (selectedVerses.has(verse.id)) {
+                    const item = document.createElement('div');
+                    item.className = 'distribution-item';
+                    item.innerHTML = `
+                        <div>
+                            <div style="font-weight: 500;">${verse.name}</div>
+                            <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">×${verse.multiplier} multiplier</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color: #FFD60A; font-weight: 600;">$${perVerse.toFixed(2)}</div>
+                            <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">${(100 / selectedVerses.size).toFixed(1)}%</div>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                    
+                    // Add distribution bar
+                    const bar = document.createElement('div');
+                    bar.className = 'distribution-bar';
+                    bar.innerHTML = `<div class="distribution-fill" style="width: ${100 / selectedVerses.size}%"></div>`;
+                    list.appendChild(bar);
+                }
+            });
+        }
+
+        function updateEffectiveExposure() {
+            const positionSize = parseFloat(document.getElementById('positionSize').value) || 0;
+            const exposure = positionSize * totalLeverage;
+            document.getElementById('effectiveExposure').textContent = '$' + exposure.toLocaleString();
+        }
+
+        function setupTrading() {
+            document.getElementById('tradingMarketTitle').textContent = markets[selectedMarket].title;
+            
+            // Update UI based on quantum mode
+            if (quantumMode) {
+                document.getElementById('quantumModePanel').style.display = 'block';
+                document.getElementById('standardModePanel').style.display = 'none';
+                document.getElementById('quantumTradeBtn').style.display = 'block';
+                document.querySelector('.buy-btn').style.display = 'none';
+                document.querySelector('.sell-btn').style.display = 'none';
+            } else {
+                document.getElementById('quantumModePanel').style.display = 'none';
+                document.getElementById('standardModePanel').style.display = 'block';
+                document.getElementById('quantumTradeBtn').style.display = 'none';
+                document.querySelector('.buy-btn').style.display = 'block';
+                document.querySelector('.sell-btn').style.display = 'block';
+            }
+            
+            // Update distribution preview
+            if (autoDistribute) {
+                document.getElementById('distributionPreview').style.display = 'block';
+                updateDistributionPreview();
+            } else {
+                document.getElementById('distributionPreview').style.display = 'none';
+            }
+            
+            // Update active verses list
+            updateActiveVersesList();
+            
+            // Update leverage breakdown
+            updateLeverageBreakdown();
+        }
+
+        function updateDistributionPreview() {
+            const details = document.getElementById('distributionDetails');
+            const positionSize = parseFloat(document.getElementById('positionSize').value) || 1000;
+            const perVerse = positionSize / selectedVerses.size;
+            
+            details.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    ${Array.from(selectedVerses).map(verseId => {
+                        const verse = markets[selectedMarket].verses.find(v => v.id === verseId);
+                        return `
+                            <div style="padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="font-size: 12px;">${verse.name}</div>
+                                <div style="color: #FFD60A; font-weight: 600;">$${perVerse.toFixed(2)}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function updateActiveVersesList() {
+            const list = document.getElementById('activeVersesList');
+            
+            if (selectedVerses.size === 0) {
+                list.innerHTML = '<p style="color: rgba(255, 255, 255, 0.5); text-align: center;">No verses selected</p>';
+            } else {
+                list.innerHTML = '';
+                markets[selectedMarket].verses.forEach(verse => {
+                    if (selectedVerses.has(verse.id)) {
+                        const item = document.createElement('div');
+                        item.style.cssText = 'margin: 10px 0; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px;';
+                        item.innerHTML = `
+                            <div style="font-weight: 600;">${verse.name}</div>
+                            <div style="font-size: 14px; color: #FFD60A; margin: 5px 0;">×${verse.multiplier}</div>
+                            <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">${verse.description}</div>
+                        `;
+                        list.appendChild(item);
+                    }
+                });
+            }
+        }
+
+        function updateLeverageBreakdown() {
+            const breakdown = document.getElementById('leverageBreakdown');
+            breakdown.innerHTML = `
+                <div style="padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Base Leverage</span>
+                        <span style="color: #FFD60A;">${baseLeverage}x</span>
+                    </div>
+                </div>
+                <div style="padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Verse Multipliers</span>
+                        <span style="color: #FFD60A;">×${(totalLeverage / baseLeverage).toFixed(2)}</span>
+                    </div>
+                </div>
+                <div style="padding: 10px 0; font-weight: 600;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Total Leverage</span>
+                        <span style="color: #FFD60A; font-size: 20px;">${totalLeverage.toFixed(1)}x</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createQuantumParticles(node) {
+            const rect = node.getBoundingClientRect();
+            const particles = document.getElementById('quantumParticles');
+            
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = (rect.left - particles.getBoundingClientRect().left + rect.width / 2) + 'px';
+                    particle.style.top = (rect.top - particles.getBoundingClientRect().top + rect.height / 2) + 'px';
+                    particle.style.animationDelay = (i * 0.2) + 's';
+                    particles.appendChild(particle);
+                    
+                    setTimeout(() => particle.remove(), 3000);
+                }, i * 200);
+            }
+        }
+
+        function executeTrade(side) {
+            const positionSize = parseFloat(document.getElementById('positionSize').value) || 0;
+            if (positionSize <= 0) {
+                alert('Please enter a valid position size!');
+                return;
+            }
+            
+            const exposure = positionSize * totalLeverage;
+            const animation = document.getElementById('orderAnimation');
+            const details = document.getElementById('orderDetails');
+            
+            let detailsHTML = `
+                <div>Market: <span style="color: #FFD60A">${markets[selectedMarket].title}</span></div>
+                <div>Side: <span style="color: ${side === 'buy' ? '#4CD964' : '#FF3B30'}">
+                    ${side === 'buy' ? 'BUY YES' : 'BUY NO'}</span></div>
+                <div>Position: $${positionSize.toLocaleString()}</div>
+                <div>Base Leverage: ${baseLeverage}x</div>
+                <div>Selected Verses: ${selectedVerses.size}</div>
+                <div>Total Leverage: ${totalLeverage.toFixed(1)}x</div>
+                <div>Effective Exposure: <span style="color: #FFD60A; font-size: 24px;">$${exposure.toLocaleString()}</span></div>
+            `;
+            
+            if (autoDistribute) {
+                detailsHTML += `
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="color: #FFD60A; margin-bottom: 10px;">Position Distributed Across ${selectedVerses.size} Verses</div>
+                        <div style="font-size: 14px;">$${(positionSize / selectedVerses.size).toFixed(2)} per verse</div>
+                    </div>
+                `;
+            }
+            
+            detailsHTML += '<div style="margin-top: 20px; color: #4CD964;">✓ Order Executed Successfully</div>';
+            
+            details.innerHTML = detailsHTML;
+            animation.classList.add('show');
+            
+            setTimeout(() => {
+                animation.classList.remove('show');
+            }, 4000);
+        }
+
+        function executeQuantumTrade() {
+            const positionSize = parseFloat(document.getElementById('positionSize').value) || 0;
+            if (positionSize <= 0) {
+                alert('Please enter a valid position size!');
+                return;
+            }
+            
+            const exposure = positionSize * totalLeverage;
+            const animation = document.getElementById('orderAnimation');
+            const details = document.getElementById('orderDetails');
+            
+            details.innerHTML = `
+                <div style="color: #8A61FF; font-size: 24px; margin-bottom: 20px;">⚛️ Quantum Position Created</div>
+                <div>Market: <span style="color: #FFD60A">${markets[selectedMarket].title}</span></div>
+                <div>Position: $${positionSize.toLocaleString()}</div>
+                <div>Total Leverage: ${totalLeverage.toFixed(1)}x</div>
+                <div>Effective Exposure: <span style="color: #FFD60A; font-size: 24px;">$${exposure.toLocaleString()}</span></div>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(138, 97, 255, 0.2); border-radius: 10px;">
+                    <div style="color: #8A61FF; font-weight: 600;">Superposition State</div>
+                    <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>YES: 50%</div>
+                        <div>NO: 50%</div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
+                        Position will collapse upon market resolution
+                    </div>
+                </div>
+                <div style="margin-top: 20px; color: #4CD964;">✓ Quantum Position Active</div>
+            `;
+            
+            animation.classList.add('show');
+            
+            setTimeout(() => {
+                animation.classList.remove('show');
+            }, 5000);
+        }
+
+        async function playDemo() {
+            // Reset
+            selectedMarket = null;
+            selectedVerses.clear();
+            baseLeverage = 5;
+            quantumMode = false;
+            autoDistribute = false;
+            goToStep(1);
+            
+            // Select market
+            await delay(1000);
+            document.querySelectorAll('.market-card')[0].click();
+            
+            // Configure verses
+            await delay(2000);
+            
+            // Adjust base leverage
+            for (let i = 5; i <= 10; i++) {
+                await delay(200);
+                document.getElementById('baseLeverageSlider').value = i;
+                updateBaseLeverage(i);
+            }
+            
+            // Select verses
+            await delay(1000);
+            const versesToSelect = ['compute-scaling', 'breakthrough', 'regulation'];
+            for (let verseId of versesToSelect) {
+                await delay(800);
+                const verse = markets[1].verses.find(v => v.id === verseId);
+                if (verse) toggleVerse(verse);
+            }
+            
+            // Enable quantum mode
+            await delay(1000);
+            toggleQuantumMode();
+            
+            // Enable distribution
+            await delay(800);
+            toggleDistribution();
+            
+            // Go to trading
+            await delay(1500);
+            goToStep(3);
+            
+            // Enter position
+            await delay(1000);
+            animateNumberInput('positionSize', 5000);
+            
+            // Execute quantum trade
+            await delay(1500);
+            executeQuantumTrade();
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function animateNumberInput(inputId, targetValue) {
+            const input = document.getElementById(inputId);
+            input.value = '';
+            const digits = targetValue.toString();
+            let index = 0;
+            
+            const interval = setInterval(() => {
+                if (index < digits.length) {
+                    input.value += digits[index];
+                    index++;
+                    updateEffectiveExposure();
+                    if (autoDistribute) updateDistributionPreview();
+                } else {
+                    clearInterval(interval);
+                }
+            }, 100);
+        }
+
+        // Event listeners
+        document.getElementById('positionSize').addEventListener('input', () => {
+            updateEffectiveExposure();
+            updateDistribution();
+            if (autoDistribute) updateDistributionPreview();
+        });
+
+        // Redraw connections on resize
+        window.addEventListener('resize', drawConnections);
+    </script>
+</body>
+</html>

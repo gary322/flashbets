@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Verse Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #000; color: #fff; padding: 20px; font-family: sans-serif; }
+        .status { background: #111; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+    </style>
+</head>
+<body>
+    <h1>Simple Verse Test</h1>
+    
+    <div class="status" id="status">Loading...</div>
+    
+    <button onclick="testDirectCall()">Test Direct Function Call</button>
+    <button onclick="testInlineVerses()">Test Inline Verses</button>
+    
+    <div class="verses-section" id="versesSection" style="display: block; margin-top: 30px;">
+        <div class="section-title">Test Verses Area</div>
+        <div class="verse-flow-container" id="verseFlowContainer">
+            <div class="verse-levels" id="verseLevels"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize platform state first
+        window.platformState = {
+            selectedVerses: [],
+            markets: new Map(),
+            quantumMode: false
+        };
+    </script>
+    
+    <script src="platform_main.js"></script>
+    
+    <script>
+        const status = document.getElementById('status');
+        
+        // Check on load
+        setTimeout(() => {
+            if (typeof window.updateAvailableVerses === 'function') {
+                status.innerHTML = '<p class="success">✓ updateAvailableVerses is loaded!</p>';
+            } else {
+                status.innerHTML = '<p class="error">✗ updateAvailableVerses NOT found</p>';
+                
+                // Try to find the function
+                console.log('Checking for verse functions...');
+                const functions = ['updateAvailableVerses', 'createVerseCard', 'updateVerseFlow'];
+                functions.forEach(fn => {
+                    console.log(`${fn}:`, typeof window[fn]);
+                });
+            }
+        }, 500);
+        
+        function testDirectCall() {
+            console.log('Testing direct call...');
+            
+            if (typeof window.updateAvailableVerses !== 'function') {
+                alert('Function not found! Check console.');
+                return;
+            }
+            
+            const testVerses = [
+                {
+                    id: "direct1",
+                    name: "Direct Test 1",
+                    description: "Testing direct call",
+                    level: 1,
+                    multiplier: 2.0,
+                    category: "Test",
+                    risk_tier: "Low"
+                }
+            ];
+            
+            try {
+                window.updateAvailableVerses(testVerses);
+                status.innerHTML += '<p class="success">✓ Direct call successful!</p>';
+                
+                setTimeout(() => {
+                    const cards = document.querySelectorAll('.verse-card');
+                    status.innerHTML += `<p>Found ${cards.length} verse cards</p>`;
+                }, 200);
+            } catch (error) {
+                status.innerHTML += `<p class="error">✗ Error: ${error.message}</p>`;
+            }
+        }
+        
+        function testInlineVerses() {
+            console.log('Testing inline verse creation...');
+            
+            const verseLevels = document.getElementById('verseLevels');
+            verseLevels.innerHTML = '';
+            
+            // Create a verse manually
+            const levelDiv = document.createElement('div');
+            levelDiv.className = 'verse-level';
+            levelDiv.innerHTML = `
+                <div class="verse-level-label">Level 1</div>
+                <div class="verse-card">
+                    <div class="verse-header">
+                        <div class="verse-title">Manual Verse</div>
+                        <div class="verse-multiplier">2.5x</div>
+                    </div>
+                    <div class="verse-description">This is a manually created verse</div>
+                    <div class="verse-stats">
+                        <div class="verse-stat">
+                            <div class="verse-stat-label">Level</div>
+                            <div class="verse-stat-value">L1</div>
+                        </div>
+                        <div class="verse-stat">
+                            <div class="verse-stat-label">Risk</div>
+                            <div class="verse-stat-value">Low</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            verseLevels.appendChild(levelDiv);
+            status.innerHTML += '<p class="success">✓ Manual verse created!</p>';
+        }
+    </script>
+</body>
+</html>

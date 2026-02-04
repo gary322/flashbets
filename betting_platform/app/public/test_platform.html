@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Integration Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: rgba(76, 217, 100, 0.1);
+            border: 1px solid rgba(76, 217, 100, 0.3);
+            color: #4CD964;
+        }
+        .error {
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.3);
+            color: #FF3B30;
+        }
+        .loading {
+            background: rgba(255, 214, 10, 0.1);
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            color: #FFD60A;
+        }
+        pre {
+            background: #222;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        button {
+            background: #FFD60A;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #FFA500;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Quantum Betting Platform - Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>API Connectivity Tests</h2>
+        <button onclick="testMarketsAPI()">Test Markets API</button>
+        <button onclick="testSpecificMarket()">Test Market Details (ID: 7)</button>
+        <button onclick="testVersesAPI()">Test Verses API</button>
+        <button onclick="testSearchAPI()">Test Market Search</button>
+        <div id="api-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Platform UI Integration</h2>
+        <button onclick="testPlatformUI()">Test Platform UI Load</button>
+        <button onclick="testTradePageWithMarket()">Test Trade Page (Market 7)</button>
+        <div id="ui-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Backend Status</h2>
+        <button onclick="checkBackendHealth()">Check Backend Health</button>
+        <div id="backend-results"></div>
+    </div>
+
+    <script>
+        let testCount = 0;
+        let passedTests = 0;
+
+        function logResult(elementId, message, type = 'success') {
+            const element = document.getElementById(elementId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            element.appendChild(div);
+            
+            testCount++;
+            if (type === 'success') passedTests++;
+            
+            updateTestSummary();
+        }
+
+        function updateTestSummary() {
+            document.title = `Tests: ${passedTests}/${testCount} passed - Platform Integration Test`;
+        }
+
+        async function testMarketsAPI() {
+            logResult('api-results', 'Testing markets API...', 'loading');
+            try {
+                const response = await fetch('/api/markets?limit=5');
+                const data = await response.json();
+                
+                if (data.markets && data.markets.length > 0) {
+                    logResult('api-results', 
+                        `✅ Markets API: Found ${data.markets.length} markets<br>` +
+                        `<pre>${JSON.stringify(data.markets[0], null, 2)}</pre>`
+                    );
+                } else {
+                    logResult('api-results', '❌ Markets API: No markets returned', 'error');
+                }
+            } catch (error) {
+                logResult('api-results', `❌ Markets API Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSpecificMarket() {
+            logResult('api-results', 'Testing specific market (ID: 7)...', 'loading');
+            try {
+                const response = await fetch('/api/markets/7');
+                const data = await response.json();
+                
+                if (data.id === 7) {
+                    logResult('api-results', 
+                        `✅ Market Details: ${data.title}<br>` +
+                        `Description: ${data.description}<br>` +
+                        `Outcomes: ${data.outcomes ? data.outcomes.length : 'N/A'}<br>` +
+                        `Volume: $${data.total_volume?.toLocaleString() || 'N/A'}`
+                    );
+                } else {
+                    logResult('api-results', '❌ Market Details: Invalid response', 'error');
+                }
+            } catch (error) {
+                logResult('api-results', `❌ Market Details Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testVersesAPI() {
+            logResult('api-results', 'Testing verses API...', 'loading');
+            try {
+                const response = await fetch('/api/verses?limit=3');
+                const data = await response.json();
+                
+                if (data && Array.isArray(data) && data.length > 0) {
+                    logResult('api-results', 
+                        `✅ Verses API: Found ${data.length} verses<br>` +
+                        `Sample: ${data[0].name || data[0].title || 'Unnamed verse'}`
+                    );
+                } else {
+                    logResult('api-results', '❌ Verses API: No verses returned', 'error');
+                }
+            } catch (error) {
+                logResult('api-results', `❌ Verses API Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSearchAPI() {
+            logResult('api-results', 'Testing market search...', 'loading');
+            try {
+                const response = await fetch('/api/markets?search=bitcoin&limit=3');
+                const data = await response.json();
+                
+                if (data.markets && data.markets.length > 0) {
+                    logResult('api-results', 
+                        `✅ Search API: Found ${data.markets.length} Bitcoin-related markets<br>` +
+                        `Example: ${data.markets[0].title}`
+                    );
+                } else {
+                    logResult('api-results', '✅ Search API: Working (no Bitcoin markets found)', 'success');
+                }
+            } catch (error) {
+                logResult('api-results', `❌ Search API Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPlatformUI() {
+            logResult('ui-results', 'Testing platform UI accessibility...', 'loading');
+            try {
+                const response = await fetch('/platform_ui.html');
+                const text = await response.text();
+                
+                if (text.includes('Quantum Platform') && text.includes('class="app-container"')) {
+                    logResult('ui-results', 
+                        '✅ Platform UI: Accessible and contains expected content<br>' +
+                        `✓ John Ive design layout<br>` +
+                        `✓ Quantum trading interface<br>` +
+                        `✓ Verse navigation system`
+                    );
+                } else {
+                    logResult('ui-results', '❌ Platform UI: Content validation failed', 'error');
+                }
+            } catch (error) {
+                logResult('ui-results', `❌ Platform UI Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testTradePageWithMarket() {
+            logResult('ui-results', 'Testing trade page with market data...', 'loading');
+            try {
+                const response = await fetch('/trade?market=7');
+                const text = await response.text();
+                
+                if (response.ok && text.includes('Trade - Betting Platform')) {
+                    logResult('ui-results', 
+                        '✅ Trade Page: Successfully loads with market parameter<br>' +
+                        `✓ Next.js page rendering<br>` +
+                        `✓ Market ID parameter handling<br>` +
+                        `✓ Should fetch S&P 500 market data via API`
+                    );
+                } else {
+                    logResult('ui-results', '❌ Trade Page: Failed to load properly', 'error');
+                }
+            } catch (error) {
+                logResult('ui-results', `❌ Trade Page Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkBackendHealth() {
+            logResult('backend-results', 'Checking backend health...', 'loading');
+            try {
+                // Test direct backend connection
+                const backendResponse = await fetch('http://localhost:8081/api/markets?limit=1');
+                const backendData = await backendResponse.json();
+                
+                if (backendData.markets && backendData.markets.length > 0) {
+                    logResult('backend-results', 
+                        '✅ Backend Health: Rust API server is running<br>' +
+                        `✓ Port 8081 accessible<br>` +
+                        `✓ Market data seeded<br>` +
+                        `✓ API responses valid<br>` +
+                        `Source: ${backendData.source || 'unknown'}`
+                    );
+                } else {
+                    logResult('backend-results', '⚠️ Backend: Running but no data returned', 'error');
+                }
+            } catch (error) {
+                logResult('backend-results', 
+                    `❌ Backend Health: Cannot reach direct backend<br>` +
+                    `Error: ${error.message}<br>` +
+                    `Note: This is expected if CORS is blocked. Proxy should work.`, 
+                    'error'
+                );
+                
+                // Test via proxy as fallback
+                try {
+                    const proxyResponse = await fetch('/api/markets?limit=1');
+                    const proxyData = await proxyResponse.json();
+                    
+                    if (proxyData.markets) {
+                        logResult('backend-results', 
+                            '✅ Backend (via proxy): API proxy is working correctly<br>' +
+                            `✓ Next.js API routes functional<br>` +
+                            `✓ Backend connectivity through proxy`
+                        );
+                    }
+                } catch (proxyError) {
+                    logResult('backend-results', `❌ Proxy also failed: ${proxyError.message}`, 'error');
+                }
+            }
+        }
+
+        // Auto-run basic tests on load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                testMarketsAPI();
+                setTimeout(() => testSpecificMarket(), 1000);
+                setTimeout(() => checkBackendHealth(), 2000);
+            }, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comprehensive Platform Test</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
+        .test-section { background: #111; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        button { background: #FFD60A; color: #000; border: none; padding: 10px 20px; cursor: pointer; margin: 5px; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .log { margin: 10px 0; padding: 10px; background: #222; border-radius: 4px; font-family: monospace; font-size: 12px; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        .warning { color: #ff9500; }
+        .market-item { background: #222; padding: 10px; margin: 5px 0; border-radius: 4px; cursor: pointer; }
+        .market-item:hover { background: #333; }
+        .test-status { display: inline-block; width: 20px; height: 20px; border-radius: 50%; margin-right: 10px; }
+        .test-status.pending { background: #666; }
+        .test-status.running { background: #ff9500; }
+        .test-status.success { background: #4cd964; }
+        .test-status.failed { background: #ff3b30; }
+    </style>
+</head>
+<body>
+    <h1>Comprehensive Platform Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Suite</h2>
+        <div id="testList"></div>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="openPlatform()">Open Platform</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="testResults"></div>
+    </div>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:8081';
+        let platformWindow = null;
+        
+        const tests = [
+            { id: 'api', name: 'Polymarket API Connection', fn: testPolymarketAPI },
+            { id: 'search', name: 'Market Search Functionality', fn: testMarketSearch },
+            { id: 'wallet', name: 'Wallet Connection (Demo Mode)', fn: testWalletConnection },
+            { id: 'positions', name: 'Active Positions Bar', fn: testActivePositions },
+            { id: 'verses', name: 'Verse Flow Visualization', fn: testVerseFlow },
+            { id: 'orders', name: 'Limit Orders', fn: testLimitOrders }
+        ];
+        
+        function log(message, type = '') {
+            const div = document.createElement('div');
+            div.className = 'log ' + type;
+            div.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+            document.getElementById('testResults').appendChild(div);
+            div.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function updateTestStatus(testId, status) {
+            const statusEl = document.getElementById(`status-${testId}`);
+            if (statusEl) {
+                statusEl.className = `test-status ${status}`;
+            }
+        }
+        
+        async function testPolymarketAPI() {
+            updateTestStatus('api', 'running');
+            log('Testing Polymarket API connection...');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/polymarket/markets`);
+                const data = await response.json();
+                
+                if (response.ok && Array.isArray(data) && data.length > 0) {
+                    log(`✓ API connected successfully. Found ${data.length} markets`, 'success');
+                    log(`First market: "${data[0].title || data[0].question}"`, 'success');
+                    updateTestStatus('api', 'success');
+                    return true;
+                } else {
+                    log('✗ API returned invalid data', 'error');
+                    updateTestStatus('api', 'failed');
+                    return false;
+                }
+            } catch (error) {
+                log(`✗ API connection failed: ${error.message}`, 'error');
+                updateTestStatus('api', 'failed');
+                return false;
+            }
+        }
+        
+        async function testMarketSearch() {
+            updateTestStatus('search', 'running');
+            log('Testing market search functionality...');
+            
+            if (!platformWindow || platformWindow.closed) {
+                log('Platform window not open', 'warning');
+                updateTestStatus('search', 'failed');
+                return false;
+            }
+            
+            try {
+                // Trigger search
+                const searchInput = platformWindow.document.getElementById('marketSearchInput');
+                const searchResults = platformWindow.document.getElementById('marketSearchResults');
+                
+                if (!searchInput) {
+                    log('✗ Search input not found', 'error');
+                    updateTestStatus('search', 'failed');
+                    return false;
+                }
+                
+                searchInput.value = 'ETH';
+                searchInput.dispatchEvent(new Event('input'));
+                
+                // Wait for results
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                if (searchResults.style.display !== 'none' && searchResults.children.length > 0) {
+                    log('✓ Search working. Results displayed', 'success');
+                    updateTestStatus('search', 'success');
+                    return true;
+                } else {
+                    log('✗ No search results displayed', 'error');
+                    updateTestStatus('search', 'failed');
+                    return false;
+                }
+            } catch (error) {
+                log(`✗ Search test failed: ${error.message}`, 'error');
+                updateTestStatus('search', 'failed');
+                return false;
+            }
+        }
+        
+        async function testWalletConnection() {
+            updateTestStatus('wallet', 'running');
+            log('Testing wallet connection...');
+            
+            if (!platformWindow || platformWindow.closed) {
+                log('Platform window not open', 'warning');
+                updateTestStatus('wallet', 'failed');
+                return false;
+            }
+            
+            try {
+                const connectBtn = platformWindow.document.getElementById('connectWalletBtn');
+                if (!connectBtn) {
+                    log('✗ Connect button not found', 'error');
+                    updateTestStatus('wallet', 'failed');
+                    return false;
+                }
+                
+                // Click connect button
+                connectBtn.click();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const walletIndicator = platformWindow.document.getElementById('walletIndicator');
+                if (walletIndicator && walletIndicator.classList.contains('connected')) {
+                    log('✓ Wallet connected successfully', 'success');
+                    updateTestStatus('wallet', 'success');
+                    return true;
+                } else {
+                    log('✗ Wallet not connected', 'error');
+                    updateTestStatus('wallet', 'failed');
+                    return false;
+                }
+            } catch (error) {
+                log(`✗ Wallet test failed: ${error.message}`, 'error');
+                updateTestStatus('wallet', 'failed');
+                return false;
+            }
+        }
+        
+        async function testActivePositions() {
+            updateTestStatus('positions', 'running');
+            log('Testing active positions bar...');
+            
+            if (!platformWindow || platformWindow.closed) {
+                log('Platform window not open', 'warning');
+                updateTestStatus('positions', 'failed');
+                return false;
+            }
+            
+            try {
+                // Add test position
+                if (!platformWindow.platformState) {
+                    platformWindow.platformState = { activePositions: [] };
+                }
+                
+                platformWindow.platformState.activePositions = [{
+                    id: 'test-pos-1',
+                    marketTitle: 'Test Market',
+                    outcome: 'Yes',
+                    amount: 100,
+                    leverage: 5,
+                    entryPrice: 0.5,
+                    currentPrice: 0.55,
+                    pnl: 10,
+                    pnlPercent: 10
+                }];
+                
+                if (platformWindow.updateActivePositionsDisplay) {
+                    platformWindow.updateActivePositionsDisplay();
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const positionsBar = platformWindow.document.getElementById('activePositionsBar');
+                if (positionsBar && positionsBar.style.display !== 'none') {
+                    log('✓ Active positions bar displayed', 'success');
+                    updateTestStatus('positions', 'success');
+                    return true;
+                } else {
+                    log('✗ Active positions bar not visible', 'error');
+                    updateTestStatus('positions', 'failed');
+                    return false;
+                }
+            } catch (error) {
+                log(`✗ Positions test failed: ${error.message}`, 'error');
+                updateTestStatus('positions', 'failed');
+                return false;
+            }
+        }
+        
+        async function testVerseFlow() {
+            updateTestStatus('verses', 'running');
+            log('Testing verse flow visualization...');
+            
+            if (!platformWindow || platformWindow.closed) {
+                log('Platform window not open', 'warning');
+                updateTestStatus('verses', 'failed');
+                return false;
+            }
+            
+            try {
+                // Select a market first
+                const searchInput = platformWindow.document.getElementById('marketSearchInput');
+                searchInput.value = 'Fed';
+                searchInput.dispatchEvent(new Event('input'));
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Click first result
+                const firstResult = platformWindow.document.querySelector('.search-result-item');
+                if (firstResult) {
+                    firstResult.click();
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    const verseContainer = platformWindow.document.getElementById('verseFlowContainer');
+                    const connections = platformWindow.document.getElementById('verseConnections');
+                    
+                    if (verseContainer && connections) {
+                        log('✓ Verse flow container found', 'success');
+                        updateTestStatus('verses', 'success');
+                        return true;
+                    }
+                }
+                
+                log('✗ Could not test verse flow', 'error');
+                updateTestStatus('verses', 'failed');
+                return false;
+            } catch (error) {
+                log(`✗ Verse flow test failed: ${error.message}`, 'error');
+                updateTestStatus('verses', 'failed');
+                return false;
+            }
+        }
+        
+        async function testLimitOrders() {
+            updateTestStatus('orders', 'running');
+            log('Testing limit orders...');
+            
+            if (!platformWindow || platformWindow.closed) {
+                log('Platform window not open', 'warning');
+                updateTestStatus('orders', 'failed');
+                return false;
+            }
+            
+            try {
+                const limitOrderBtn = platformWindow.document.querySelector('[onclick*="selectOrderType(\'limit\')"]');
+                if (limitOrderBtn) {
+                    limitOrderBtn.click();
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    const limitPriceInput = platformWindow.document.getElementById('limitPriceDisplay');
+                    if (limitPriceInput && limitPriceInput.style.display !== 'none') {
+                        log('✓ Limit order UI displayed', 'success');
+                        updateTestStatus('orders', 'success');
+                        return true;
+                    }
+                }
+                
+                log('✗ Limit order UI not found', 'error');
+                updateTestStatus('orders', 'failed');
+                return false;
+            } catch (error) {
+                log(`✗ Limit order test failed: ${error.message}`, 'error');
+                updateTestStatus('orders', 'failed');
+                return false;
+            }
+        }
+        
+        async function runAllTests() {
+            log('Starting comprehensive test suite...', 'warning');
+            
+            if (!platformWindow || platformWindow.closed) {
+                log('Opening platform window...', 'warning');
+                openPlatform();
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+            
+            for (const test of tests) {
+                await test.fn();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            log('Test suite completed!', 'warning');
+        }
+        
+        function openPlatform() {
+            platformWindow = window.open('http://localhost:8080/', 'platform', 'width=1400,height=900');
+        }
+        
+        // Initialize test list
+        function initializeTests() {
+            const testList = document.getElementById('testList');
+            tests.forEach(test => {
+                const div = document.createElement('div');
+                div.style.marginBottom = '10px';
+                div.innerHTML = `
+                    <span class="test-status pending" id="status-${test.id}"></span>
+                    <span>${test.name}</span>
+                    <button onclick="${test.fn.name}()" style="float: right; padding: 5px 10px;">Run</button>
+                `;
+                testList.appendChild(div);
+            });
+        }
+        
+        initializeTests();
+    </script>
+</body>
+</html>

@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markets - Quantum Betting Platform</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Main Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                <svg class="navbar-logo" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="15" stroke="var(--color-primary)" stroke-width="2"/>
+                    <path d="M16 8 L16 24 M8 16 L24 16" stroke="var(--color-primary)" stroke-width="2"/>
+                    <circle cx="16" cy="16" r="4" fill="var(--color-primary)"/>
+                </svg>
+                <span>Quantum</span>
+            </a>
+            
+            <div class="navbar-menu">
+                <div class="search-container">
+                    <input type="search" placeholder="Search markets..." class="search-input">
+                </div>
+                
+                <div class="navbar-actions">
+                    <button class="btn btn-icon" onclick="showNotifications()">
+                        <span class="notification-badge">3</span>
+                        🔔
+                    </button>
+                    
+                    <div class="wallet-info">
+                        <div class="wallet-balance">
+                            <span class="balance-label">Balance</span>
+                            <span class="balance-amount">◎ 1,234.56</span>
+                        </div>
+                        <button class="wallet-address" onclick="showWalletMenu()">
+                            0x7g9N...48AU
+                        </button>
+                    </div>
+                    
+                    <button class="btn btn-icon" onclick="showSettings()">⚙️</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- App Tabs -->
+    <div class="app-tabs">
+        <button class="tab" onclick="switchTab('overview')">Overview</button>
+        <button class="tab active" onclick="switchTab('markets')">Markets</button>
+        <button class="tab" onclick="switchTab('create-market')">Create Market</button>
+        <button class="tab" onclick="switchTab('verses')">Verses</button>
+        <button class="tab" onclick="switchTab('portfolio')">Portfolio</button>
+        <button class="tab" onclick="switchTab('trading')">Trading</button>
+        <button class="tab" onclick="switchTab('quantum')">Quantum</button>
+        <button class="tab" onclick="switchTab('defi')">DeFi</button>
+        <button class="tab" onclick="switchTab('analytics')">Analytics</button>
+        <button class="tab" onclick="switchTab('governance')">Governance</button>
+    </div>
+
+    <!-- Markets Content -->
+    <main class="markets-content">
+        <div class="container">
+            <!-- Header -->
+            <section class="markets-header">
+                <h1>Prediction Markets</h1>
+                <p class="markets-subtitle">Trade on future events across all categories</p>
+            </section>
+
+            <!-- Filters Section -->
+            <section class="markets-filters">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label class="filter-label">Category</label>
+                        <select class="filter-select">
+                            <option value="all">All Categories</option>
+                            <option value="politics">Politics</option>
+                            <option value="sports">Sports</option>
+                            <option value="crypto">Crypto</option>
+                            <option value="finance">Finance</option>
+                            <option value="science">Science</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="weather">Weather</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Market Type</label>
+                        <select class="filter-select">
+                            <option value="all">All Types</option>
+                            <option value="binary">Binary (Yes/No)</option>
+                            <option value="multiple">Multiple Choice</option>
+                            <option value="continuous">Continuous</option>
+                            <option value="quantum">Quantum</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select class="filter-select">
+                            <option value="active">Active</option>
+                            <option value="upcoming">Upcoming</option>
+                            <option value="closing-soon">Closing Soon</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Sort By</label>
+                        <select class="filter-select">
+                            <option value="volume">Volume</option>
+                            <option value="created">Newest</option>
+                            <option value="ending">Ending Soon</option>
+                            <option value="liquidity">Liquidity</option>
+                            <option value="traders">Most Traders</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Verse Location</label>
+                        <input type="text" class="filter-input" placeholder="Filter by verse...">
+                    </div>
+                </div>
+                
+                <div class="filters-actions">
+                    <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                    <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                </div>
+            </section>
+
+            <!-- Quick Stats -->
+            <section class="markets-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total Markets</div>
+                    <div class="stat-value">12,456</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Traders</div>
+                    <div class="stat-value">234,567</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">24h Volume</div>
+                    <div class="stat-value">$45.6M</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Liquidity</div>
+                    <div class="stat-value">$128.9M</div>
+                </div>
+            </section>
+
+            <!-- Featured Markets -->
+            <section class="featured-markets">
+                <h2>🔥 Featured Markets</h2>
+                <div class="featured-slider">
+                    <div class="featured-market">
+                        <div class="featured-badge">Featured</div>
+                        <h3>Will AI achieve AGI by 2027?</h3>
+                        <div class="featured-odds">
+                            <div class="odds-display">
+                                <span class="odds-label">YES</span>
+                                <span class="odds-value">34%</span>
+                            </div>
+                            <div class="odds-display">
+                                <span class="odds-label">NO</span>
+                                <span class="odds-value">66%</span>
+                            </div>
+                        </div>
+                        <div class="featured-stats">
+                            <span>Volume: $1.98M</span>
+                            <span>Liquidity: $500K</span>
+                        </div>
+                        <button class="btn btn-primary" onclick="openMarket('featured-1')">Trade Now</button>
+                    </div>
+                    
+                    <div class="featured-market quantum">
+                        <div class="featured-badge">Quantum</div>
+                        <h3>Ethereum > $10K in 2025?</h3>
+                        <div class="quantum-display">
+                            <div class="quantum-state">
+                                <span class="state-label">Universe A</span>
+                                <span class="state-value">68%</span>
+                            </div>
+                            <div class="quantum-state">
+                                <span class="state-label">Universe B</span>
+                                <span class="state-value">25%</span>
+                            </div>
+                        </div>
+                        <div class="featured-stats">
+                            <span>Entangled: 3 markets</span>
+                            <span>Volume: $3.2M</span>
+                        </div>
+                        <button class="btn btn-warning" onclick="openQuantumMarket('featured-2')">Observe State</button>
+                    </div>
+                    
+                    <div class="featured-market">
+                        <div class="featured-badge">High Volume</div>
+                        <h3>2024 US Presidential Election</h3>
+                        <div class="featured-odds">
+                            <div class="odds-display">
+                                <span class="odds-label">DEM</span>
+                                <span class="odds-value">52%</span>
+                            </div>
+                            <div class="odds-display">
+                                <span class="odds-label">REP</span>
+                                <span class="odds-value">48%</span>
+                            </div>
+                        </div>
+                        <div class="featured-stats">
+                            <span>Volume: $8.9M</span>
+                            <span>Traders: 45,678</span>
+                        </div>
+                        <button class="btn btn-primary" onclick="openMarket('featured-3')">Trade Now</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Markets Grid -->
+            <section class="markets-grid-section">
+                <div class="section-header">
+                    <h2>All Markets</h2>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="setView('grid')">⊞ Grid</button>
+                        <button class="view-btn" onclick="setView('list')">☰ List</button>
+                    </div>
+                </div>
+                
+                <div class="markets-grid" id="marketsGrid">
+                    <!-- Market Cards -->
+                    <div class="market-card" onclick="openMarket('market-1')">
+                        <div class="market-card-header">
+                            <h3 class="market-card-title">Will Bitcoin reach $100K by end of 2025?</h3>
+                            <span class="badge badge-success">Crypto</span>
+                        </div>
+                        <div class="market-card-odds">
+                            <div class="odds-button odds-button-yes">
+                                <span class="odds-label">YES</span>
+                                <span class="odds-value">73%</span>
+                            </div>
+                            <div class="odds-button odds-button-no">
+                                <span class="odds-label">NO</span>
+                                <span class="odds-value">27%</span>
+                            </div>
+                        </div>
+                        <div class="market-card-stats">
+                            <span>Volume: $4.2M</span>
+                            <span>Ends in 24 months</span>
+                        </div>
+                        <div class="market-card-verse">
+                            <span class="verse-path">Crypto > Bitcoin > Price</span>
+                        </div>
+                        <div class="market-actions">
+                            <button class="btn btn-sm btn-success" onclick="quickBet(event, 'yes', 'market-1')">Bet YES</button>
+                            <button class="btn btn-sm btn-danger" onclick="quickBet(event, 'no', 'market-1')">Bet NO</button>
+                        </div>
+                    </div>
+
+                    <div class="market-card" onclick="openMarket('market-2')">
+                        <div class="market-card-header">
+                            <h3 class="market-card-title">Next Fed Rate Decision</h3>
+                            <span class="badge badge-primary">Finance</span>
+                        </div>
+                        <div class="market-multi-outcomes">
+                            <div class="outcome">Cut 50bp - 15%</div>
+                            <div class="outcome">Cut 25bp - 22%</div>
+                            <div class="outcome">Hold - 48%</div>
+                            <div class="outcome">Raise - 15%</div>
+                        </div>
+                        <div class="market-card-stats">
+                            <span>Volume: $5.6M</span>
+                            <span>Resolves in 28 days</span>
+                        </div>
+                        <div class="market-card-verse">
+                            <span class="verse-path">Finance > Central Banks > Fed</span>
+                        </div>
+                        <div class="market-actions">
+                            <button class="btn btn-sm btn-primary" onclick="openMarket(event, 'market-2')">View Market</button>
+                        </div>
+                    </div>
+
+                    <div class="market-card" onclick="openMarket('market-3')">
+                        <div class="market-card-header">
+                            <h3 class="market-card-title">SpaceX Mars Landing by 2030?</h3>
+                            <span class="badge badge-info">Science</span>
+                        </div>
+                        <div class="market-card-odds">
+                            <div class="odds-button odds-button-yes">
+                                <span class="odds-label">YES</span>
+                                <span class="odds-value">41%</span>
+                            </div>
+                            <div class="odds-button odds-button-no">
+                                <span class="odds-label">NO</span>
+                                <span class="odds-value">59%</span>
+                            </div>
+                        </div>
+                        <div class="market-card-stats">
+                            <span>Volume: $2.3M</span>
+                            <span>6 years remaining</span>
+                        </div>
+                        <div class="market-card-verse">
+                            <span class="verse-path">Science > Space > Mars</span>
+                        </div>
+                        <div class="market-actions">
+                            <button class="btn btn-sm btn-success" onclick="quickBet(event, 'yes', 'market-3')">Bet YES</button>
+                            <button class="btn btn-sm btn-danger" onclick="quickBet(event, 'no', 'market-3')">Bet NO</button>
+                        </div>
+                    </div>
+
+                    <div class="market-card quantum" onclick="openMarket('market-4')">
+                        <div class="market-card-header">
+                            <h3 class="market-card-title">Quantum Computing Breakthrough 2025</h3>
+                            <span class="badge badge-warning">Quantum</span>
+                        </div>
+                        <div class="quantum-display">
+                            <div class="quantum-state">
+                                <span class="state-label">Timeline A</span>
+                                <span class="state-value">45%</span>
+                            </div>
+                            <div class="quantum-state">
+                                <span class="state-label">Timeline B</span>
+                                <span class="state-value">32%</span>
+                            </div>
+                            <div class="quantum-state">
+                                <span class="state-label">Timeline C</span>
+                                <span class="state-value">23%</span>
+                            </div>
+                        </div>
+                        <div class="market-card-stats">
+                            <span>Superposition: Active</span>
+                            <span>Volume: $1.8M</span>
+                        </div>
+                        <div class="market-card-verse">
+                            <span class="verse-path">Technology > Quantum > Computing</span>
+                        </div>
+                        <div class="market-actions">
+                            <button class="btn btn-sm btn-warning" onclick="observeQuantum(event, 'market-4')">🔬 Observe</button>
+                        </div>
+                    </div>
+
+                    <div class="market-card" onclick="openMarket('market-5')">
+                        <div class="market-card-header">
+                            <h3 class="market-card-title">Champions League Winner 2024</h3>
+                            <span class="badge badge-success">Sports</span>
+                        </div>
+                        <div class="market-multi-outcomes">
+                            <div class="outcome">Real Madrid - 28%</div>
+                            <div class="outcome">Man City - 25%</div>
+                            <div class="outcome">Bayern - 18%</div>
+                            <div class="outcome">Others - 29%</div>
+                        </div>
+                        <div class="market-card-stats">
+                            <span>Volume: $3.4M</span>
+                            <span>Finals in 6 months</span>
+                        </div>
+                        <div class="market-card-verse">
+                            <span class="verse-path">Sports > Football > Champions League</span>
+                        </div>
+                        <div class="market-actions">
+                            <button class="btn btn-sm btn-primary" onclick="openMarket(event, 'market-5')">View Market</button>
+                        </div>
+                    </div>
+
+                    <div class="market-card" onclick="openMarket('market-6')">
+                        <div class="market-card-header">
+                            <h3 class="market-card-title">Apple Stock > $250 by EOY?</h3>
+                            <span class="badge badge-primary">Finance</span>
+                        </div>
+                        <div class="market-card-continuous">
+                            <div class="continuous-display">
+                                <span class="continuous-label">Current Price</span>
+                                <span class="continuous-value">$178.42</span>
+                            </div>
+                            <div class="continuous-chart">
+                                <canvas id="appleChart" width="300" height="100"></canvas>
+                            </div>
+                            <div class="continuous-range">
+                                <span>$150</span>
+                                <div class="range-bar">
+                                    <div class="range-fill" style="width: 65%"></div>
+                                </div>
+                                <span>$250</span>
+                            </div>
+                        </div>
+                        <div class="market-card-stats">
+                            <span>Volume: $7.8M</span>
+                            <span>L2-AMM Market</span>
+                        </div>
+                        <div class="market-card-verse">
+                            <span class="verse-path">Finance > Stocks > Tech > Apple</span>
+                        </div>
+                        <div class="market-actions">
+                            <button class="btn btn-sm btn-primary" onclick="openContinuousMarket(event, 'market-6')">Trade Range</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Load More -->
+                <div class="load-more">
+                    <button class="btn btn-secondary" onclick="loadMoreMarkets()">Load More Markets</button>
+                </div>
+            </section>
+
+            <!-- Market Creation CTA -->
+            <section class="market-creation-cta">
+                <div class="cta-content">
+                    <h2>Don't see the market you want?</h2>
+                    <p>Create your own prediction market in minutes</p>
+                    <button class="btn btn-primary btn-lg" onclick="location.href='create-market.html'">
+                        Create Market
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-items">
+            <a href="dashboard.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">🏠</span>
+                <span class="mobile-nav-label">Home</span>
+            </a>
+            <a href="markets.html" class="mobile-nav-item active">
+                <span class="mobile-nav-icon">📊</span>
+                <span class="mobile-nav-label">Markets</span>
+            </a>
+            <a href="create-market.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">➕</span>
+                <span class="mobile-nav-label">Create</span>
+            </a>
+            <a href="portfolio.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">💼</span>
+                <span class="mobile-nav-label">Portfolio</span>
+            </a>
+            <a href="profile.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">👤</span>
+                <span class="mobile-nav-label">Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Styles specific to markets page -->
+    <style>
+        /* Markets Content */
+        .markets-content {
+            padding: var(--spacing-xl) 0;
+            min-height: calc(100vh - 64px - 48px);
+        }
+        
+        /* Markets Header */
+        .markets-header {
+            text-align: center;
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .markets-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 1.125rem;
+        }
+        
+        /* Filters Section */
+        .markets-filters {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .filters-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+        
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+        
+        .filter-select,
+        .filter-input {
+            padding: var(--spacing-sm) var(--spacing-md);
+            background-color: var(--color-bg-primary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-md);
+            color: var(--color-text-primary);
+            font-size: 0.875rem;
+        }
+        
+        .filter-select:focus,
+        .filter-input:focus {
+            border-color: var(--color-primary);
+            outline: none;
+        }
+        
+        .filters-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+        }
+        
+        /* Markets Stats */
+        .markets-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .stat-card {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+        }
+        
+        /* Featured Markets */
+        .featured-markets {
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .featured-slider {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .featured-market {
+            background-color: var(--color-bg-secondary);
+            border: 2px solid var(--color-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            position: relative;
+            transition: all var(--transition-base);
+        }
+        
+        .featured-market:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .featured-market.quantum {
+            border-color: var(--color-warning);
+        }
+        
+        .featured-badge {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background-color: var(--color-primary);
+            color: white;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .featured-market.quantum .featured-badge {
+            background-color: var(--color-warning);
+        }
+        
+        .featured-market h3 {
+            margin-bottom: var(--spacing-lg);
+            font-size: 1.125rem;
+        }
+        
+        .featured-odds {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .odds-display {
+            flex: 1;
+            text-align: center;
+            padding: var(--spacing-md);
+            background-color: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+        }
+        
+        .featured-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .view-btn {
+            padding: var(--spacing-sm) var(--spacing-md);
+            background-color: transparent;
+            border: 1px solid var(--color-border-primary);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .view-btn:first-child {
+            border-radius: var(--radius-md) 0 0 var(--radius-md);
+        }
+        
+        .view-btn:last-child {
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+        
+        .view-btn.active {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: white;
+        }
+        
+        /* Markets Grid */
+        .markets-grid-section {
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .markets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        /* Market Card Verse */
+        .market-card-verse {
+            margin-top: var(--spacing-sm);
+            padding-top: var(--spacing-sm);
+            border-top: 1px solid var(--color-border-primary);
+        }
+        
+        .verse-path {
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+        }
+        
+        /* Continuous Market Display */
+        .market-card-continuous {
+            padding: var(--spacing-md);
+            background-color: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .continuous-display {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .continuous-label {
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .continuous-value {
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+        
+        .continuous-chart {
+            margin-bottom: var(--spacing-md);
+            opacity: 0.7;
+        }
+        
+        .continuous-range {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+        }
+        
+        .range-bar {
+            flex: 1;
+            height: 4px;
+            background-color: var(--color-bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        
+        .range-fill {
+            height: 100%;
+            background-color: var(--color-primary);
+        }
+        
+        /* Load More */
+        .load-more {
+            text-align: center;
+            margin-top: var(--spacing-xl);
+        }
+        
+        /* Market Creation CTA */
+        .market-creation-cta {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-3xl);
+            text-align: center;
+        }
+        
+        .market-creation-cta h2 {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .market-creation-cta p {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filters-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .markets-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .featured-slider {
+                grid-template-columns: 1fr;
+            }
+            
+            .markets-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+
+    <!-- Markets JavaScript -->
+    <script>
+        // Initialize markets page
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMarkets();
+            drawMiniChart();
+        });
+        
+        // Initialize markets
+        function initializeMarkets() {
+            // Simulate real-time price updates
+            setInterval(updatePrices, 5000);
+        }
+        
+        // Update market prices
+        function updatePrices() {
+            const priceElements = document.querySelectorAll('.odds-value, .state-value');
+            priceElements.forEach(el => {
+                const currentPrice = parseInt(el.textContent);
+                const change = Math.floor(Math.random() * 5) - 2;
+                const newPrice = Math.max(1, Math.min(99, currentPrice + change));
+                el.textContent = newPrice + '%';
+            });
+        }
+        
+        // Switch tabs
+        function switchTab(tabName) {
+            window.location.href = tabName + '.html';
+        }
+        
+        // Clear filters
+        function clearFilters() {
+            document.querySelectorAll('.filter-select').forEach(select => {
+                select.selectedIndex = 0;
+            });
+            document.querySelectorAll('.filter-input').forEach(input => {
+                input.value = '';
+            });
+            showNotification('info', 'Filters Cleared', 'All filters have been reset');
+        }
+        
+        // Apply filters
+        function applyFilters() {
+            showNotification('success', 'Filters Applied', 'Markets have been filtered');
+            // In production, this would actually filter the markets
+        }
+        
+        // Set view mode
+        function setView(mode) {
+            const gridButton = document.querySelector('.view-btn:first-child');
+            const listButton = document.querySelector('.view-btn:last-child');
+            const marketsGrid = document.getElementById('marketsGrid');
+            
+            if (mode === 'grid') {
+                gridButton.classList.add('active');
+                listButton.classList.remove('active');
+                marketsGrid.classList.remove('list-view');
+            } else {
+                gridButton.classList.remove('active');
+                listButton.classList.add('active');
+                marketsGrid.classList.add('list-view');
+            }
+        }
+        
+        // Open market
+        function openMarket(marketId) {
+            window.location.href = `trading.html?market=${marketId}`;
+        }
+        
+        // Open quantum market
+        function openQuantumMarket(marketId) {
+            window.location.href = `trading.html?market=${marketId}&quantum=true`;
+        }
+        
+        // Open continuous market
+        function openContinuousMarket(event, marketId) {
+            event.stopPropagation();
+            window.location.href = `trading.html?market=${marketId}&type=continuous`;
+        }
+        
+        // Quick bet
+        function quickBet(event, side, marketId) {
+            event.stopPropagation();
+            showNotification('success', 'Order Placed', `Placed ${side.toUpperCase()} bet on market`);
+        }
+        
+        // Observe quantum state
+        function observeQuantum(event, marketId) {
+            event.stopPropagation();
+            const states = ['A', 'B', 'C'];
+            const collapsed = states[Math.floor(Math.random() * states.length)];
+            showNotification('warning', 'Quantum Collapsed', `Market collapsed to Timeline ${collapsed}`);
+        }
+        
+        // Load more markets
+        function loadMoreMarkets() {
+            showNotification('info', 'Loading Markets', 'Loading more markets...');
+            // In production, this would load more markets from the API
+        }
+        
+        // Draw mini chart for continuous market
+        function drawMiniChart() {
+            const canvas = document.getElementById('appleChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#1D9BF0';
+            ctx.lineWidth = 2;
+            
+            // Simple line chart
+            ctx.beginPath();
+            ctx.moveTo(0, 80);
+            ctx.lineTo(50, 70);
+            ctx.lineTo(100, 60);
+            ctx.lineTo(150, 40);
+            ctx.lineTo(200, 45);
+            ctx.lineTo(250, 35);
+            ctx.lineTo(300, 30);
+            ctx.stroke();
+        }
+        
+        // Show notification
+        function showNotification(type, title, message) {
+            const container = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification fade-in';
+            notification.innerHTML = `
+                <div class="notification-icon ${type}">${getNotificationIcon(type)}</div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close" onclick="closeNotification(this)">×</button>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+        
+        function getNotificationIcon(type) {
+            switch(type) {
+                case 'success': return '✓';
+                case 'error': return '✗';
+                case 'warning': return '⚠';
+                default: return 'ℹ';
+            }
+        }
+        
+        function closeNotification(button) {
+            button.parentElement.remove();
+        }
+        
+        // Show wallet menu
+        function showWalletMenu() {
+            alert('Wallet Menu:\n\n• Copy Address\n• View on Explorer\n• Disconnect Wallet\n• Export Private Key');
+        }
+        
+        // Show notifications
+        function showNotifications() {
+            showNotification('info', 'Notifications', 'You have 3 new notifications');
+        }
+        
+        // Show settings
+        function showSettings() {
+            window.location.href = 'settings.html';
+        }
+    </script>
+</body>
+</html>

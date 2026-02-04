@@ -1,0 +1,13 @@
+# Ignore local configuration overrides
+config.local.toml
+config.*.local.toml
+
+# Ignore any configuration with secrets
+*secrets*
+*private*
+
+# But track the example files
+!config.default.toml
+!config.development.toml
+!config.production.toml
+!config.test.toml

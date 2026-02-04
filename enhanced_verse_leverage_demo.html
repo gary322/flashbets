@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Betting Platform - Verse Leverage System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Demo Stage */
+        .demo-stage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #0A0A0A 0%, #000000 100%);
+        }
+
+        /* Demo Navigation */
+        .demo-nav {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px 40px;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .demo-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .demo-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .demo-btn.active {
+            background: #FFD60A;
+            color: #000000;
+            border-color: #FFD60A;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #FFD60A;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.5);
+        }
+
+        /* Feature Containers */
+        .feature-container {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .feature-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Search Demo */
+        .search-demo {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 60px;
+            transform: scale(1.2);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 25px 70px 25px 30px;
+            font-size: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: #FFFFFF;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #FFD60A;
+            box-shadow: 0 0 40px rgba(255, 214, 10, 0.3);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: #FFD60A;
+            border: none;
+            border-radius: 15px;
+            color: #000000;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            background: #FFA500;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Verse Generation Animation */
+        .verse-generation {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            margin: 0 auto;
+        }
+
+        .central-market {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, #FFD60A 0%, #FFA500 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #000000;
+            box-shadow: 0 0 60px rgba(255, 214, 10, 0.5);
+            z-index: 10;
+        }
+
+        .verse-node {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            text-align: center;
+            padding: 10px;
+            transition: all 0.3s;
+            cursor: pointer;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .verse-node.visible {
+            opacity: 1;
+            transform: scale(1);
+            animation: verseAppear 0.5s ease-out;
+        }
+
+        .verse-node.selected {
+            background: rgba(255, 214, 10, 0.2);
+            border-color: #FFD60A;
+            box-shadow: 0 0 20px rgba(255, 214, 10, 0.5);
+        }
+
+        @keyframes verseAppear {
+            from {
+                opacity: 0;
+                transform: scale(0) rotate(-180deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        .verse-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform-origin: left center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .verse-line.visible {
+            opacity: 1;
+        }
+
+        /* Leverage Display */
+        .leverage-display {
+            margin-top: 60px;
+            text-align: center;
+        }
+
+        .leverage-meter {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .leverage-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 180deg,
+                #FFD60A 0deg,
+                #FFA500 90deg,
+                #FF6B6B 180deg,
+                #4ECDC4 270deg,
+                #FFD60A 360deg
+            );
+            position: relative;
+            animation: rotateLeverage 20s linear infinite;
+            opacity: 0.2;
+        }
+
+        @keyframes rotateLeverage {
+            to { transform: rotate(360deg); }
+        }
+
+        .leverage-inner {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background: #000000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .leverage-value {
+            font-size: 72px;
+            font-weight: 700;
+            color: #FFD60A;
+            line-height: 1;
+        }
+
+        .leverage-label {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 10px;
+        }
+
+        /* Trading Interface */
+        .trading-interface {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .verse-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #FFD60A;
+        }
+
+        .verse-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .verse-item {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .verse-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        .verse-item.selected {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: #FFD60A;
+        }
+
+        .verse-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .verse-checkbox.checked {
+            background: #FFD60A;
+            border-color: #FFD60A;
+        }
+
+        .verse-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .verse-info {
+            flex: 1;
+        }
+
+        .verse-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .verse-multiplier {
+            font-size: 14px;
+            color: #FFD60A;
+        }
+
+        .market-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .market-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .outcome-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .outcome-btn {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .outcome-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+        }
+
+        .outcome-btn.buy {
+            background: rgba(76, 217, 100, 0.2);
+            border-color: #4CD964;
+        }
+
+        .outcome-btn.sell {
+            background: rgba(255, 59, 48, 0.2);
+            border-color: #FF3B30;
+        }
+
+        .position-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: #FFFFFF;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .leverage-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .leverage-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #FFD60A;
+        }
+
+        /* Animations */
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        .loading-text {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
+            animation: loadingDots 1.5s infinite;
+        }
+
+        @keyframes loadingDots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* Progress Indicator */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD60A 0%, #FFA500 100%);
+            width: 0%;
+            transition: width 0.3s ease-out;
+        }
+
+        /* Floating Elements */
+        .floating-verse {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 214, 10, 0.1);
+            border: 2px solid rgba(255, 214, 10, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- Demo Stage -->
+    <div class="demo-stage">
+        <!-- Search Demo -->
+        <div class="feature-container active" id="searchDemo">
+            <div class="search-demo">
+                <h1 class="search-title">Search Any Market</h1>
+                <div class="search-box">
+                    <input type="text" class="search-input" id="marketSearch" placeholder="Try: Lakers vs Celtics, Bitcoin $100k, Presidential Election..." value="Lakers vs Celtics NBA Finals">
+                    <button class="search-btn" onclick="startVerseGeneration()">→</button>
+                </div>
+                <p class="loading-text" id="searchHint" style="opacity: 0.6;">Press enter or click search to generate verse hierarchy</p>
+            </div>
+        </div>
+
+        <!-- Verse Generation Demo -->
+        <div class="feature-container" id="verseDemo">
+            <div class="verse-generation" id="verseGeneration">
+                <div class="central-market" id="centralMarket">Market</div>
+                <!-- Verse nodes will be dynamically added here -->
+            </div>
+            <div class="leverage-display">
+                <div class="leverage-meter">
+                    <div class="leverage-circle"></div>
+                    <div class="leverage-inner">
+                        <div class="leverage-value" id="leverageValue">1x</div>
+                        <div class="leverage-label">Effective Leverage</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trading Interface Demo -->
+        <div class="feature-container" id="tradingDemo">
+            <div class="trading-interface">
+                <!-- Verse Selection Panel -->
+                <div class="verse-panel">
+                    <h3 class="panel-title">Select Verses</h3>
+                    <div class="verse-list" id="verseList">
+                        <!-- Verses will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Market Panel -->
+                <div class="market-panel">
+                    <h2 class="market-title" id="marketTitle">Lakers vs Celtics</h2>
+                    <div class="outcome-grid">
+                        <button class="outcome-btn buy" onclick="executeTrade('buy')">
+                            <div>BUY</div>
+                            <div style="font-size: 14px; margin-top: 10px; opacity: 0.8;">Lakers Win</div>
+                        </button>
+                        <button class="outcome-btn sell" onclick="executeTrade('sell')">
+                            <div>SELL</div>
+                            <div style="font-size: 14px; margin-top: 10px; opacity: 0.8;">Celtics Win</div>
+                        </button>
+                    </div>
+                    <input type="number" class="position-input" id="positionSize" placeholder="Position Size" value="1000">
+                    <div style="margin-top: 20px; font-size: 14px; opacity: 0.6;">
+                        Effective Exposure: $<span id="effectiveExposure">1,000</span>
+                    </div>
+                </div>
+
+                <!-- Leverage Panel -->
+                <div class="leverage-panel">
+                    <h3 class="panel-title">Leverage Details</h3>
+                    <div class="leverage-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Base Leverage</span>
+                            <span class="stat-value">1x</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Selected Verses</span>
+                            <span class="stat-value" id="selectedCount">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Multiplier</span>
+                            <span class="stat-value" id="totalMultiplier">1x</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Max Potential</span>
+                            <span class="stat-value">100x</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Navigation -->
+    <div class="demo-nav">
+        <button class="demo-btn active" onclick="showDemo('searchDemo')">Search</button>
+        <button class="demo-btn" onclick="showDemo('verseDemo')">Verse Generation</button>
+        <button class="demo-btn" onclick="showDemo('tradingDemo')">Trading</button>
+        <button class="play-btn" onclick="playFullDemo()">▶</button>
+    </div>
+
+    <script>
+        let currentDemo = 'searchDemo';
+        let verses = [];
+        let selectedVerses = new Set();
+        let currentLeverage = 1;
+        let demoPlaying = false;
+
+        // Verse templates by market type
+        const verseTemplates = {
+            sports: {
+                main: ['Game Outcome', 'Live Odds', 'Player Performance'],
+                sub: {
+                    'Game Outcome': ['Winner', 'Margin', 'Total Score'],
+                    'Live Odds': ['Pre-Game', 'In-Play', 'Quarter Odds'],
+                    'Player Performance': ['Points', 'Assists', 'Rebounds']
+                }
+            },
+            finance: {
+                main: ['Price Action', 'Market Sentiment', 'Technical Analysis'],
+                sub: {
+                    'Price Action': ['Support', 'Resistance', 'Breakout'],
+                    'Market Sentiment': ['Fear Index', 'Social Volume', 'News'],
+                    'Technical Analysis': ['RSI', 'MACD', 'Moving Averages']
+                }
+            },
+            politics: {
+                main: ['Polling Data', 'Demographics', 'State Results'],
+                sub: {
+                    'Polling Data': ['National', 'Swing States', 'Approval'],
+                    'Demographics': ['Age Groups', 'Education', 'Income'],
+                    'State Results': ['Urban', 'Suburban', 'Rural']
+                }
+            }
+        };
+
+        // Leverage multipliers
+        const leverageMultipliers = {
+            1: 2.0,
+            2: 1.5,
+            3: 1.3,
+            4: 1.2,
+            5: 1.1
+        };
+
+        function showDemo(demoId) {
+            document.querySelectorAll('.feature-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            document.getElementById(demoId).classList.add('active');
+            
+            document.querySelectorAll('.demo-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentDemo = demoId;
+            updateProgress(getProgressForDemo(demoId));
+        }
+
+        function getProgressForDemo(demoId) {
+            switch(demoId) {
+                case 'searchDemo': return 33;
+                case 'verseDemo': return 66;
+                case 'tradingDemo': return 100;
+                default: return 0;
+            }
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        function startVerseGeneration() {
+            const searchTerm = document.getElementById('marketSearch').value;
+            if (!searchTerm) return;
+
+            // Detect market type
+            const marketType = detectMarketType(searchTerm);
+            
+            // Generate verses
+            generateVerses(searchTerm, marketType);
+            
+            // Show verse demo
+            showDemo('verseDemo');
+            
+            // Animate verse appearance
+            animateVerseGeneration();
+        }
+
+        function detectMarketType(searchTerm) {
+            const term = searchTerm.toLowerCase();
+            if (term.includes('vs') || term.includes('game') || term.includes('match')) {
+                return 'sports';
+            } else if (term.includes('$') || term.includes('bitcoin') || term.includes('stock')) {
+                return 'finance';
+            } else if (term.includes('election') || term.includes('president') || term.includes('vote')) {
+                return 'politics';
+            }
+            return 'sports'; // default
+        }
+
+        function generateVerses(searchTerm, marketType) {
+            verses = [];
+            const template = verseTemplates[marketType];
+            
+            // Create main market
+            document.getElementById('centralMarket').textContent = searchTerm.substring(0, 15) + '...';
+            
+            // Generate verse hierarchy
+            let verseId = 1;
+            template.main.forEach((mainVerse, mainIdx) => {
+                const mainVerseObj = {
+                    id: verseId++,
+                    name: mainVerse,
+                    level: 1,
+                    multiplier: leverageMultipliers[1],
+                    angle: (mainIdx * 120) + 30,
+                    radius: 150
+                };
+                verses.push(mainVerseObj);
+                
+                // Generate sub-verses
+                if (template.sub[mainVerse]) {
+                    template.sub[mainVerse].forEach((subVerse, subIdx) => {
+                        verses.push({
+                            id: verseId++,
+                            name: subVerse,
+                            level: 2,
+                            multiplier: leverageMultipliers[2],
+                            angle: mainVerseObj.angle + (subIdx - 1) * 30,
+                            radius: 250,
+                            parent: mainVerseObj.id
+                        });
+                    });
+                }
+            });
+        }
+
+        function animateVerseGeneration() {
+            const container = document.getElementById('verseGeneration');
+            
+            // Clear existing verses
+            container.querySelectorAll('.verse-node, .verse-line').forEach(el => el.remove());
+            
+            // Create verse nodes
+            verses.forEach((verse, index) => {
+                setTimeout(() => {
+                    // Create node
+                    const node = document.createElement('div');
+                    node.className = 'verse-node';
+                    node.id = `verse-${verse.id}`;
+                    node.innerHTML = `
+                        <div style="font-size: 11px; line-height: 1.2;">
+                            ${verse.name}<br>
+                            <span style="color: #FFD60A; font-size: 10px;">${verse.multiplier}x</span>
+                        </div>
+                    `;
+                    
+                    // Position node
+                    const x = Math.cos(verse.angle * Math.PI / 180) * verse.radius;
+                    const y = Math.sin(verse.angle * Math.PI / 180) * verse.radius;
+                    node.style.left = `calc(50% + ${x}px - 40px)`;
+                    node.style.top = `calc(50% + ${y}px - 40px)`;
+                    
+                    // Add click handler
+                    node.onclick = () => toggleVerse(verse.id);
+                    
+                    container.appendChild(node);
+                    
+                    // Animate appearance
+                    setTimeout(() => {
+                        node.classList.add('visible');
+                        
+                        // Create connection line
+                        if (verse.parent) {
+                            createConnectionLine(verse.parent, verse.id);
+                        } else {
+                            createConnectionLine('central', verse.id);
+                        }
+                    }, 50);
+                    
+                    // Auto-select some verses
+                    if (verse.level === 1 || (verse.level === 2 && Math.random() > 0.5)) {
+                        setTimeout(() => {
+                            toggleVerse(verse.id);
+                        }, 500 + index * 100);
+                    }
+                }, index * 200);
+            });
+            
+            // Update market title
+            document.getElementById('marketTitle').textContent = document.getElementById('marketSearch').value;
+        }
+
+        function createConnectionLine(fromId, toId) {
+            const container = document.getElementById('verseGeneration');
+            const line = document.createElement('div');
+            line.className = 'verse-line';
+            
+            const from = fromId === 'central' ? 
+                document.getElementById('centralMarket') : 
+                document.getElementById(`verse-${fromId}`);
+            const to = document.getElementById(`verse-${toId}`);
+            
+            if (!from || !to) return;
+            
+            const fromRect = from.getBoundingClientRect();
+            const toRect = to.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            const x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
+            const x2 = toRect.left + toRect.width / 2 - containerRect.left;
+            const y2 = toRect.top + toRect.height / 2 - containerRect.top;
+            
+            const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            
+            line.style.width = `${length}px`;
+            line.style.left = `${x1}px`;
+            line.style.top = `${y1}px`;
+            line.style.transform = `rotate(${angle}deg)`;
+            
+            container.appendChild(line);
+            setTimeout(() => line.classList.add('visible'), 50);
+        }
+
+        function toggleVerse(verseId) {
+            const node = document.getElementById(`verse-${verseId}`);
+            if (!node) return;
+            
+            if (selectedVerses.has(verseId)) {
+                selectedVerses.delete(verseId);
+                node.classList.remove('selected');
+            } else {
+                selectedVerses.add(verseId);
+                node.classList.add('selected');
+            }
+            
+            updateLeverage();
+            updateVerseList();
+        }
+
+        function updateLeverage() {
+            currentLeverage = 1;
+            selectedVerses.forEach(verseId => {
+                const verse = verses.find(v => v.id === verseId);
+                if (verse) {
+                    currentLeverage *= verse.multiplier;
+                }
+            });
+            
+            // Cap at 100x
+            currentLeverage = Math.min(currentLeverage, 100);
+            
+            // Update displays
+            document.getElementById('leverageValue').textContent = currentLeverage.toFixed(1) + 'x';
+            document.getElementById('totalMultiplier').textContent = currentLeverage.toFixed(1) + 'x';
+            document.getElementById('selectedCount').textContent = selectedVerses.size;
+            
+            // Update effective exposure
+            const positionSize = parseFloat(document.getElementById('positionSize').value) || 0;
+            document.getElementById('effectiveExposure').textContent = 
+                (positionSize * currentLeverage).toLocaleString();
+        }
+
+        function updateVerseList() {
+            const list = document.getElementById('verseList');
+            list.innerHTML = '';
+            
+            verses.forEach(verse => {
+                const item = document.createElement('div');
+                item.className = 'verse-item';
+                if (selectedVerses.has(verse.id)) {
+                    item.classList.add('selected');
+                }
+                
+                item.innerHTML = `
+                    <div class="verse-checkbox ${selectedVerses.has(verse.id) ? 'checked' : ''}"></div>
+                    <div class="verse-info">
+                        <div class="verse-name">${verse.name}</div>
+                        <div class="verse-multiplier">+${((verse.multiplier - 1) * 100).toFixed(0)}% leverage</div>
+                    </div>
+                `;
+                
+                item.onclick = () => {
+                    toggleVerse(verse.id);
+                    updateVerseList();
+                };
+                
+                list.appendChild(item);
+            });
+        }
+
+        function executeTrade(side) {
+            const positionSize = parseFloat(document.getElementById('positionSize').value) || 0;
+            if (positionSize <= 0) return;
+            
+            const effectiveExposure = positionSize * currentLeverage;
+            alert(`${side.toUpperCase()} Order Executed!\n\nPosition: $${positionSize.toLocaleString()}\nLeverage: ${currentLeverage.toFixed(1)}x\nEffective Exposure: $${effectiveExposure.toLocaleString()}\nSelected Verses: ${selectedVerses.size}`);
+        }
+
+        function playFullDemo() {
+            if (demoPlaying) return;
+            demoPlaying = true;
+            
+            // Reset to search
+            showDemo('searchDemo');
+            
+            // Auto-type search
+            setTimeout(() => {
+                const searchInput = document.getElementById('marketSearch');
+                searchInput.value = '';
+                const searchTerm = 'Bitcoin price above $100k by EOY';
+                let charIndex = 0;
+                
+                const typeInterval = setInterval(() => {
+                    if (charIndex < searchTerm.length) {
+                        searchInput.value += searchTerm[charIndex];
+                        charIndex++;
+                    } else {
+                        clearInterval(typeInterval);
+                        setTimeout(() => {
+                            startVerseGeneration();
+                            
+                            // Show trading after verse generation
+                            setTimeout(() => {
+                                showDemo('tradingDemo');
+                                updateVerseList();
+                                
+                                // Simulate position entry
+                                setTimeout(() => {
+                                    document.getElementById('positionSize').value = '5000';
+                                    updateLeverage();
+                                    demoPlaying = false;
+                                }, 2000);
+                            }, 5000);
+                        }, 500);
+                    }
+                }, 50);
+            }, 1000);
+        }
+
+        // Initialize
+        document.getElementById('marketSearch').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                startVerseGeneration();
+            }
+        });
+
+        // Position size input listener
+        document.getElementById('positionSize').addEventListener('input', updateLeverage);
+    </script>
+</body>
+</html>

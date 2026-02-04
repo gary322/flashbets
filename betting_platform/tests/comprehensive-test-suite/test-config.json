@@ -1,0 +1,106 @@
+{
+  "programId": "5cnuqTxYjzrmYnQ6BtvxEK4bpFJn4kkUCzgMakidheza",
+  "rpcUrl": "http://localhost:8899",
+  "apiUrl": "http://localhost:8081",
+  "uiUrl": "http://localhost:3000",
+  "wsUrl": "ws://localhost:8081/ws",
+  "wallets": [
+    {
+      "name": "newUser",
+      "publicKey": "2Di1FTihsMRQXHuwFZ5TDohVNrBCE7zuLB8ndcsVUy5o",
+      "balance": 0
+    },
+    {
+      "name": "casualTrader",
+      "publicKey": "AFtyWs2nrFnBfdBbYNFMYdYijdzm5tEmRy2QnaTWhQef",
+      "balance": 1000
+    },
+    {
+      "name": "proTrader",
+      "publicKey": "6eEsFsvzFtbGu4HpEgXbjxv81iRcD6XFR3Y16SZ9hnpC",
+      "balance": 50000
+    },
+    {
+      "name": "whale",
+      "publicKey": "9yQ6SCodt16NRJVqDYPzuELKkLCY2qQ4uQDRjTnAnnpA",
+      "balance": 1000000
+    },
+    {
+      "name": "liquidityProvider",
+      "publicKey": "37uwWUmVzLarsS2SJNocQ9fiPkPJpo5xLnhVQ6iwxNLV",
+      "balance": 500000
+    },
+    {
+      "name": "marketMaker",
+      "publicKey": "HUdPnmxmXvZr2gZC5R3oWhYwQvzHKVjsFPcB5Ven5yHU",
+      "balance": 2000000
+    },
+    {
+      "name": "maliciousUser",
+      "publicKey": "6VF5bNVtz38qwHvgichYokeWm14bhr8pFTj5FCdfG4wo",
+      "balance": 10000
+    },
+    {
+      "name": "adminUser",
+      "publicKey": "FY1E5wxF1rJ3Kd2kAP1SwLtEUighDyimp48etkLC4oUT",
+      "balance": 100000
+    }
+  ],
+  "markets": [
+    {
+      "id": "btc-50k-eoy",
+      "title": "Will BTC reach $50k by end of year?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "liquidity": 100000,
+      "endTime": 1756715110689
+    },
+    {
+      "id": "eth-merge",
+      "title": "Will ETH successfully merge?",
+      "outcomes": [
+        "Yes",
+        "No",
+        "Delayed"
+      ],
+      "liquidity": 250000,
+      "endTime": 1759307110689
+    },
+    {
+      "id": "presidential-election",
+      "title": "Who will win the presidential election?",
+      "outcomes": [
+        "Candidate A",
+        "Candidate B",
+        "Other"
+      ],
+      "liquidity": 1000000,
+      "endTime": 1761899110689
+    },
+    {
+      "id": "sports-championship",
+      "title": "Who will win the championship?",
+      "outcomes": [
+        "Team A",
+        "Team B",
+        "Team C",
+        "Team D"
+      ],
+      "liquidity": 500000,
+      "endTime": 1754727910689
+    },
+    {
+      "id": "expired-market",
+      "title": "Test expired market",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "liquidity": 50000,
+      "endTime": 1754036710689
+    }
+  ],
+  "setupTime": "2025-08-02T08:25:24.067Z"
+}

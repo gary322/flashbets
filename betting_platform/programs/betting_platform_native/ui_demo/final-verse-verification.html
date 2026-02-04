@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Final Verse Verification</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; background: #111; border-radius: 8px; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        .warning { color: #FFD60A; }
+        button { background: #FFD60A; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        pre { background: #222; padding: 10px; border-radius: 4px; overflow: auto; font-size: 12px; }
+        .verse { background: #1a1a1a; padding: 10px; margin: 5px 0; border-radius: 4px; border-left: 3px solid #FFD60A; }
+    </style>
+</head>
+<body>
+    <h1>Final Verse System Verification</h1>
+    
+    <div class="test-section">
+        <h2>Quick Verification Steps:</h2>
+        <ol>
+            <li>Click "Test Full Flow" to simulate the complete market selection → verse display process</li>
+            <li>Check that verses appear with correct multipliers and levels</li>
+            <li>Verify the connections between verses are shown</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <button onclick="testFullFlow()">Test Full Flow</button>
+        <button onclick="testAPIOnly()">Test API Only</button>
+        <button onclick="debugVerseFunctions()">Debug Verse Functions</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script src="platform_main.js"></script>
+    <script src="backend_integration.js"></script>
+    <script>
+        const results = document.getElementById('results');
+        
+        function log(msg, type = '') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = msg;
+            results.appendChild(div);
+        }
+        
+        async function testFullFlow() {
+            results.innerHTML = '<h2>Testing Full Flow...</h2>';
+            
+            // Step 1: Initialize platform state
+            log('Step 1: Initializing platform state');
+            if (!window.platformState) {
+                window.platformState = {
+                    markets: new Map(),
+                    selectedMarket: null,
+                    selectedOutcome: null,
+                    selectedVerses: [],
+                    activePositions: []
+                };
+            }
+            log('✓ Platform state initialized', 'success');
+            
+            // Step 2: Fetch markets from API
+            log('\nStep 2: Fetching markets from API');
+            try {
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                log(`✓ Fetched ${markets.length} markets`, 'success');
+                
+                // Check first market for verses
+                if (markets.length > 0) {
+                    const firstMarket = markets[0];
+                    log(`\nFirst market: ${firstMarket.title || firstMarket.question}`);
+                    
+                    if (firstMarket.verses && firstMarket.verses.length > 0) {
+                        log(`✓ Market has ${firstMarket.verses.length} verses`, 'success');
+                        
+                        // Display verses
+                        firstMarket.verses.forEach(verse => {
+                            const verseDiv = document.createElement('div');
+                            verseDiv.className = 'verse';
+                            verseDiv.innerHTML = `
+                                <strong>${verse.name}</strong> (Level ${verse.level})<br>
+                                Multiplier: <strong style="color: #FFD60A">${verse.multiplier}x</strong><br>
+                                ${verse.description}
+                            `;
+                            results.appendChild(verseDiv);
+                        });
+                        
+                        // Step 3: Simulate market selection
+                        log('\nStep 3: Simulating market selection');
+                        
+                        // Store market
+                        window.platformState.markets.set(firstMarket.id, firstMarket);
+                        
+                        // Call selectSearchResult
+                        if (window.selectSearchResult) {
+                            window.selectSearchResult(firstMarket.id);
+                            log('✓ Called selectSearchResult', 'success');
+                            
+                            // Check if verses section is visible
+                            setTimeout(() => {
+                                const versesSection = document.getElementById('versesSection');
+                                if (versesSection) {
+                                    log(`Verses section display: ${versesSection.style.display}`, 
+                                        versesSection.style.display === 'block' ? 'success' : 'error');
+                                }
+                                
+                                // Check verse containers
+                                const verseCards = document.querySelectorAll('.verse-card');
+                                log(`\n✓ Found ${verseCards.length} verse cards in UI`, 
+                                    verseCards.length > 0 ? 'success' : 'warning');
+                            }, 500);
+                        } else {
+                            log('✗ selectSearchResult function not found', 'error');
+                        }
+                        
+                    } else {
+                        log('✗ No verses found in market data', 'error');
+                        log('Market data:', 'warning');
+                        log(`<pre>${JSON.stringify(firstMarket, null, 2)}</pre>`);
+                    }
+                }
+                
+            } catch (error) {
+                log(`✗ API Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAPIOnly() {
+            results.innerHTML = '<h2>Testing API Response...</h2>';
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                
+                log(`API returned ${markets.length} markets`);
+                
+                // Check verses in each market
+                let totalVerses = 0;
+                markets.forEach((market, index) => {
+                    if (market.verses) {
+                        totalVerses += market.verses.length;
+                    }
+                });
+                
+                log(`Total verses across all markets: ${totalVerses}`, totalVerses > 0 ? 'success' : 'error');
+                
+                // Show sample
+                if (markets.length > 0 && markets[0].verses) {
+                    log('\nSample verse structure:');
+                    log(`<pre>${JSON.stringify(markets[0].verses[0], null, 2)}</pre>`);
+                }
+                
+            } catch (error) {
+                log(`✗ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function debugVerseFunctions() {
+            results.innerHTML = '<h2>Debugging Verse Functions...</h2>';
+            
+            const functions = [
+                'getVersesForMarket',
+                'updateAvailableVerses',
+                'updateVerseFlow',
+                'createVerseCard',
+                'toggleVerseSelection'
+            ];
+            
+            functions.forEach(fn => {
+                if (window[fn]) {
+                    log(`✓ window.${fn} exists`, 'success');
+                } else {
+                    log(`✗ window.${fn} not found`, 'error');
+                }
+            });
+            
+            // Check DOM elements
+            log('\n<strong>DOM Elements:</strong>');
+            const elements = {
+                'versesSection': document.getElementById('versesSection'),
+                'verseFlowContainer': document.getElementById('verseFlowContainer'),
+                'verseGrid': document.getElementById('verseGrid'),
+                'verseConnections': document.getElementById('verseConnections'),
+                'verseLevels': document.getElementById('verseLevels')
+            };
+            
+            for (const [name, el] of Object.entries(elements)) {
+                if (el) {
+                    log(`✓ ${name} exists`, 'success');
+                } else {
+                    log(`✗ ${name} not found`, 'error');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

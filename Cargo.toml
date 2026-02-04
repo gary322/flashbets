@@ -1,0 +1,23 @@
+[workspace]
+members = [
+    "programs/verse-classification",
+    "programs/correlation-engine",
+    "programs/leverage-safety",
+    "programs/state-compression",
+]
+resolver = "2"
+
+[workspace.dependencies]
+solana-program = "1.17"
+solana-program-test = "1.17"
+solana-sdk = "1.17"
+borsh = "0.10"
+borsh-derive = "0.10"
+thiserror = "1.0"
+num-derive = "0.3"
+num-traits = "0.2"
+spl-token = "4.0"
+spl-associated-token-account = "2.2"
+arrayref = "0.3"
+bytemuck = "1.13"
+sha3 = "0.10"

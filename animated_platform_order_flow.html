@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Order Flow - Polymarket & Kalshi Perpetuals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Platform Styles */
+        .platform-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .platform-logo.polymarket {
+            background: linear-gradient(135deg, #4B0AFF 0%, #7B3FF2 100%);
+        }
+
+        .platform-logo.kalshi {
+            background: linear-gradient(135deg, #00D4FF 0%, #0099CC 100%);
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 30px;
+            padding: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* Left Panel - Order Configuration */
+        .config-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .panel-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Order Type Selection */
+        .order-types {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .order-type-btn {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-type-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        .order-type-btn.selected {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.1);
+        }
+
+        .order-type-label {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .order-type-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Risk Management */
+        .risk-controls {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 59, 48, 0.05);
+            border: 2px solid rgba(255, 59, 48, 0.2);
+            border-radius: 15px;
+        }
+
+        .risk-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #FF3B30;
+        }
+
+        .risk-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #FFFFFF;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .risk-slider {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        /* Center Panel - Flow Visualization */
+        .flow-panel {
+            position: relative;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        .flow-title {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Order Flow Animation */
+        .order-source {
+            position: absolute;
+            left: 50%;
+            top: 100px;
+            transform: translateX(-50%);
+            width: 200px;
+            padding: 20px;
+            background: rgba(255, 214, 10, 0.1);
+            border: 2px solid #FFD60A;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .platform-destination {
+            position: absolute;
+            width: 250px;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .platform-destination.polymarket {
+            left: 50px;
+            bottom: 100px;
+            background: rgba(75, 10, 255, 0.1);
+            border: 2px solid #4B0AFF;
+        }
+
+        .platform-destination.kalshi {
+            right: 50px;
+            bottom: 100px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 2px solid #00D4FF;
+        }
+
+        .platform-destination:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+
+        .order-count {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+
+        .platform-destination.polymarket .order-count {
+            color: #7B3FF2;
+        }
+
+        .platform-destination.kalshi .order-count {
+            color: #00D4FF;
+        }
+
+        /* Animated Order */
+        .order-particle {
+            position: absolute;
+            width: 180px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .order-particle.active {
+            opacity: 1;
+        }
+
+        @keyframes orderFlow {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 0) scale(0.5);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, 0) scale(1);
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--end-x), var(--end-y)) scale(0.8);
+            }
+        }
+
+        /* Right Panel - Order Book */
+        .orderbook-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .orderbook-section {
+            margin-bottom: 30px;
+        }
+
+        .orderbook-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .order-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .order-item.buy {
+            background: rgba(76, 217, 100, 0.05);
+            border-left: 3px solid #4CD964;
+        }
+
+        .order-item.sell {
+            background: rgba(255, 59, 48, 0.05);
+            border-left: 3px solid #FF3B30;
+        }
+
+        /* Trade Execution */
+        .execute-section {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px 40px;
+            backdrop-filter: blur(20px);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .execute-btn {
+            padding: 15px 40px;
+            background: #FFD60A;
+            border: none;
+            border-radius: 12px;
+            color: #000000;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .execute-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.5);
+        }
+
+        .execute-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Position Details */
+        .position-details {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .position-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .position-label {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .position-value {
+            font-weight: 600;
+            color: #FFD60A;
+        }
+
+        /* Status Messages */
+        .status-message {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            background: rgba(76, 217, 100, 0.1);
+            border: 2px solid #4CD964;
+            border-radius: 12px;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 2000;
+        }
+
+        .status-message.active {
+            opacity: 1;
+        }
+
+        /* Leverage Indicator */
+        .leverage-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .leverage-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .leverage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CD964 0%, #FFD60A 50%, #FF3B30 100%);
+            transition: width 0.3s;
+        }
+
+        /* Order Type Icons */
+        .order-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .flow-panel {
+                min-height: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Status Message -->
+    <div class="status-message" id="statusMessage"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Panel - Order Configuration -->
+        <div class="config-panel">
+            <h2 class="panel-title">Configure Your Orders</h2>
+            
+            <!-- Investment Amount -->
+            <div style="margin-bottom: 20px;">
+                <label style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Investment Amount</label>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                    <span style="font-size: 24px; color: #FFD60A;">$</span>
+                    <input type="number" class="risk-input" id="investmentAmount" value="10000" style="font-size: 24px; font-weight: 600;">
+                </div>
+            </div>
+
+            <!-- Order Types -->
+            <div class="order-types">
+                <div class="order-type-btn selected" onclick="selectOrderType('market', this)">
+                    <div>
+                        <div class="order-type-label">Market Order</div>
+                        <div class="order-type-desc">Execute immediately at best price</div>
+                    </div>
+                    <div class="order-icon">⚡</div>
+                </div>
+                
+                <div class="order-type-btn" onclick="selectOrderType('limit', this)">
+                    <div>
+                        <div class="order-type-label">Limit Order</div>
+                        <div class="order-type-desc">Set your entry price</div>
+                    </div>
+                    <div class="order-icon">🎯</div>
+                </div>
+                
+                <div class="order-type-btn" onclick="selectOrderType('stop', this)">
+                    <div>
+                        <div class="order-type-label">Stop Market</div>
+                        <div class="order-type-desc">Trigger at stop price</div>
+                    </div>
+                    <div class="order-icon">🛑</div>
+                </div>
+            </div>
+
+            <!-- Limit Price Input -->
+            <div id="limitPriceSection" style="display: none; margin-bottom: 20px;">
+                <label style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Limit Price</label>
+                <input type="number" class="risk-input" id="limitPrice" placeholder="0.00" step="0.01">
+            </div>
+
+            <!-- Risk Management -->
+            <div class="risk-controls">
+                <h3 class="risk-title">⚠️ Risk Management</h3>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Stop Loss %</label>
+                    <input type="range" class="risk-slider" id="stopLossSlider" min="1" max="50" value="10" oninput="updateStopLoss(this.value)">
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                        <span style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Loss:</span>
+                        <span style="font-size: 16px; font-weight: 600; color: #FF3B30;">-<span id="stopLossPercent">10</span>%</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Take Profit %</label>
+                    <input type="range" class="risk-slider" id="takeProfitSlider" min="5" max="200" value="50" oninput="updateTakeProfit(this.value)">
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                        <span style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Profit:</span>
+                        <span style="font-size: 16px; font-weight: 600; color: #4CD964;">+<span id="takeProfitPercent">50</span>%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leverage -->
+            <div style="margin-top: 20px;">
+                <label style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Leverage</label>
+                <div class="leverage-indicator">
+                    <span style="font-size: 24px; font-weight: 700; color: #FFD60A;" id="leverageDisplay">5x</span>
+                    <div class="leverage-bar">
+                        <div class="leverage-fill" id="leverageFill" style="width: 25%;"></div>
+                    </div>
+                </div>
+                <input type="range" class="risk-slider" id="leverageSlider" min="1" max="20" value="5" oninput="updateLeverage(this.value)">
+            </div>
+        </div>
+
+        <!-- Center Panel - Flow Visualization -->
+        <div class="flow-panel">
+            <h2 class="flow-title">Live Order Flow</h2>
+            
+            <!-- Order Source -->
+            <div class="order-source">
+                <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Your Orders</div>
+                <div style="font-size: 32px; font-weight: 700; color: #FFD60A;" id="totalOrders">0</div>
+                <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Ready to Route</div>
+            </div>
+
+            <!-- Platform Destinations -->
+            <div class="platform-destination polymarket">
+                <span class="platform-logo polymarket">POLYMARKET</span>
+                <div class="order-count" id="polymarketOrders">0</div>
+                <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Orders Routed</div>
+                
+                <div class="position-details">
+                    <div class="position-row">
+                        <span class="position-label">Markets:</span>
+                        <span class="position-value" id="polymarketMarkets">0</span>
+                    </div>
+                    <div class="position-row">
+                        <span class="position-label">Total Value:</span>
+                        <span class="position-value" id="polymarketValue">$0</span>
+                    </div>
+                    <div class="position-row">
+                        <span class="position-label">Status:</span>
+                        <span class="position-value" style="color: #4CD964;">READY</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="platform-destination kalshi">
+                <span class="platform-logo kalshi">KALSHI</span>
+                <div class="order-count" id="kalshiOrders">0</div>
+                <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Orders Routed</div>
+                
+                <div class="position-details">
+                    <div class="position-row">
+                        <span class="position-label">Markets:</span>
+                        <span class="position-value" id="kalshiMarkets">0</span>
+                    </div>
+                    <div class="position-row">
+                        <span class="position-label">Total Value:</span>
+                        <span class="position-value" id="kalshiValue">$0</span>
+                    </div>
+                    <div class="position-row">
+                        <span class="position-label">Status:</span>
+                        <span class="position-value" style="color: #4CD964;">READY</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Order Book -->
+        <div class="orderbook-panel">
+            <h2 class="panel-title">Order Book</h2>
+            
+            <!-- Pending Orders -->
+            <div class="orderbook-section">
+                <div class="orderbook-header">
+                    <h3 style="font-size: 18px;">Pending Orders</h3>
+                    <span style="color: #FFD60A;" id="pendingCount">0</span>
+                </div>
+                <div id="pendingOrders">
+                    <div style="text-align: center; color: rgba(255, 255, 255, 0.4); padding: 20px;">
+                        No pending orders
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Positions -->
+            <div class="orderbook-section">
+                <div class="orderbook-header">
+                    <h3 style="font-size: 18px;">Active Positions</h3>
+                    <span style="color: #4CD964;" id="activeCount">0</span>
+                </div>
+                <div id="activePositions">
+                    <div style="text-align: center; color: rgba(255, 255, 255, 0.4); padding: 20px;">
+                        No active positions
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Selection -->
+            <div style="margin-top: 30px;">
+                <h3 style="font-size: 18px; margin-bottom: 15px;">Select Markets</h3>
+                <div style="display: grid; gap: 10px;">
+                    <label class="market-option" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="market1" checked onchange="updateOrderCount()">
+                        <span>UK Palestine Recognition</span>
+                        <span class="platform-logo polymarket" style="font-size: 10px; padding: 4px 8px; margin-left: auto;">P</span>
+                    </label>
+                    <label class="market-option" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="market2" checked onchange="updateOrderCount()">
+                        <span>Fed Rate Cut March</span>
+                        <span class="platform-logo kalshi" style="font-size: 10px; padding: 4px 8px; margin-left: auto;">K</span>
+                    </label>
+                    <label class="market-option" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="market3" onchange="updateOrderCount()">
+                        <span>Bitcoin $150k</span>
+                        <span class="platform-logo polymarket" style="font-size: 10px; padding: 4px 8px; margin-left: auto;">P</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Verse Selection -->
+            <div style="margin-top: 20px;">
+                <h3 style="font-size: 18px; margin-bottom: 15px;">Add Verses</h3>
+                <div style="display: grid; gap: 10px;">
+                    <label class="market-option" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="verse1" onchange="updateOrderCount()">
+                        <span>Inflation Target (×1.6)</span>
+                        <span class="platform-logo kalshi" style="font-size: 10px; padding: 4px 8px; margin-left: auto;">K</span>
+                    </label>
+                    <label class="market-option" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="verse2" onchange="updateOrderCount()">
+                        <span>ETF Inflows (×1.8)</span>
+                        <span class="platform-logo polymarket" style="font-size: 10px; padding: 4px 8px; margin-left: auto;">P</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Execute Section -->
+    <div class="execute-section">
+        <div>
+            <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Total Orders</div>
+            <div style="font-size: 24px; font-weight: 700; color: #FFD60A;" id="executeTotalOrders">0</div>
+        </div>
+        <div>
+            <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Total Value</div>
+            <div style="font-size: 24px; font-weight: 700; color: #FFD60A;" id="executeTotalValue">$0</div>
+        </div>
+        <button class="execute-btn" onclick="executeOrders()" id="executeBtn">
+            Execute All Orders
+        </button>
+    </div>
+
+    <script>
+        let selectedOrderType = 'market';
+        let leverage = 5;
+        let stopLoss = 10;
+        let takeProfit = 50;
+        let investment = 10000;
+        let orderQueue = [];
+
+        // Order type selection
+        function selectOrderType(type, element) {
+            selectedOrderType = type;
+            document.querySelectorAll('.order-type-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            // Show/hide limit price input
+            document.getElementById('limitPriceSection').style.display = 
+                type === 'limit' ? 'block' : 'none';
+        }
+
+        // Update leverage
+        function updateLeverage(value) {
+            leverage = parseInt(value);
+            document.getElementById('leverageDisplay').textContent = leverage + 'x';
+            document.getElementById('leverageFill').style.width = (leverage * 5) + '%';
+            updateOrderCount();
+        }
+
+        // Update stop loss
+        function updateStopLoss(value) {
+            stopLoss = parseInt(value);
+            document.getElementById('stopLossPercent').textContent = stopLoss;
+        }
+
+        // Update take profit
+        function updateTakeProfit(value) {
+            takeProfit = parseInt(value);
+            document.getElementById('takeProfitPercent').textContent = takeProfit;
+        }
+
+        // Update order count based on selections
+        function updateOrderCount() {
+            investment = parseFloat(document.getElementById('investmentAmount').value) || 0;
+            
+            let polymarketCount = 0;
+            let kalshiCount = 0;
+            let polymarketValue = 0;
+            let kalshiValue = 0;
+            
+            // Count main market orders
+            if (document.getElementById('market1').checked) {
+                polymarketCount++;
+                polymarketValue += investment * leverage;
+            }
+            if (document.getElementById('market2').checked) {
+                kalshiCount++;
+                kalshiValue += investment * leverage;
+            }
+            if (document.getElementById('market3').checked) {
+                polymarketCount++;
+                polymarketValue += investment * leverage;
+            }
+            
+            // Count verse orders
+            if (document.getElementById('verse1').checked) {
+                kalshiCount++;
+                kalshiValue += investment * leverage * 1.6;
+            }
+            if (document.getElementById('verse2').checked) {
+                polymarketCount++;
+                polymarketValue += investment * leverage * 1.8;
+            }
+            
+            // Update displays
+            document.getElementById('totalOrders').textContent = polymarketCount + kalshiCount;
+            document.getElementById('polymarketOrders').textContent = polymarketCount;
+            document.getElementById('kalshiOrders').textContent = kalshiCount;
+            document.getElementById('polymarketMarkets').textContent = polymarketCount;
+            document.getElementById('kalshiMarkets').textContent = kalshiCount;
+            document.getElementById('polymarketValue').textContent = '$' + polymarketValue.toLocaleString();
+            document.getElementById('kalshiValue').textContent = '$' + kalshiValue.toLocaleString();
+            
+            document.getElementById('executeTotalOrders').textContent = polymarketCount + kalshiCount;
+            document.getElementById('executeTotalValue').textContent = '$' + (polymarketValue + kalshiValue).toLocaleString();
+            
+            // Enable/disable execute button
+            document.getElementById('executeBtn').disabled = (polymarketCount + kalshiCount) === 0;
+        }
+
+        // Create animated order particle
+        function createOrderParticle(market, platform) {
+            const particle = document.createElement('div');
+            particle.className = 'order-particle';
+            
+            // Set content based on order type
+            let orderDetails = `
+                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">${selectedOrderType.toUpperCase()} ORDER</div>
+                <div style="font-size: 16px; font-weight: 600; margin: 5px 0;">${market}</div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 10px;">
+                    <span>Leverage: ${leverage}x</span>
+                    <span>SL: -${stopLoss}%</span>
+                    <span>TP: +${takeProfit}%</span>
+                </div>
+            `;
+            
+            particle.innerHTML = orderDetails;
+            
+            // Position at source
+            const source = document.querySelector('.order-source');
+            const sourceRect = source.getBoundingClientRect();
+            const containerRect = document.querySelector('.flow-panel').getBoundingClientRect();
+            
+            particle.style.left = '50%';
+            particle.style.top = (sourceRect.bottom - containerRect.top) + 'px';
+            
+            // Calculate destination
+            const dest = document.querySelector(`.platform-destination.${platform}`);
+            const destRect = dest.getBoundingClientRect();
+            
+            const endX = (destRect.left + destRect.width/2 - containerRect.left - containerRect.width/2) + 'px';
+            const endY = (destRect.top - sourceRect.bottom) + 'px';
+            
+            particle.style.setProperty('--end-x', endX);
+            particle.style.setProperty('--end-y', endY);
+            
+            // Add to container
+            document.querySelector('.flow-panel').appendChild(particle);
+            
+            // Animate
+            setTimeout(() => {
+                particle.classList.add('active');
+                particle.style.animation = 'orderFlow 2s ease-out forwards';
+            }, 100);
+            
+            // Remove after animation
+            setTimeout(() => {
+                particle.remove();
+            }, 2100);
+        }
+
+        // Execute all orders with animation
+        function executeOrders() {
+            const orders = [];
+            
+            // Collect all orders
+            if (document.getElementById('market1').checked) {
+                orders.push({ market: 'UK Palestine', platform: 'polymarket' });
+            }
+            if (document.getElementById('market2').checked) {
+                orders.push({ market: 'Fed Rate Cut', platform: 'kalshi' });
+            }
+            if (document.getElementById('market3').checked) {
+                orders.push({ market: 'Bitcoin $150k', platform: 'polymarket' });
+            }
+            if (document.getElementById('verse1').checked) {
+                orders.push({ market: 'Inflation Target', platform: 'kalshi' });
+            }
+            if (document.getElementById('verse2').checked) {
+                orders.push({ market: 'ETF Inflows', platform: 'polymarket' });
+            }
+            
+            // Disable button during execution
+            document.getElementById('executeBtn').disabled = true;
+            document.getElementById('executeBtn').textContent = 'Executing...';
+            
+            // Animate orders one by one
+            orders.forEach((order, index) => {
+                setTimeout(() => {
+                    createOrderParticle(order.market, order.platform);
+                    
+                    // Add to pending orders
+                    addToPendingOrders(order);
+                    
+                    // Move to active after delay
+                    setTimeout(() => {
+                        moveToActive(order);
+                    }, 2000);
+                }, index * 500);
+            });
+            
+            // Show success message
+            setTimeout(() => {
+                showStatus('All orders executed successfully! 🎉');
+                document.getElementById('executeBtn').textContent = 'Execute All Orders';
+                document.getElementById('executeBtn').disabled = false;
+            }, orders.length * 500 + 2000);
+        }
+
+        // Add order to pending list
+        function addToPendingOrders(order) {
+            const pendingDiv = document.getElementById('pendingOrders');
+            if (pendingDiv.querySelector('.order-item') === null) {
+                pendingDiv.innerHTML = '';
+            }
+            
+            const orderItem = document.createElement('div');
+            orderItem.className = 'order-item buy';
+            orderItem.innerHTML = `
+                <span>${order.market}</span>
+                <span>${selectedOrderType.toUpperCase()}</span>
+                <span>${leverage}x</span>
+            `;
+            
+            pendingDiv.appendChild(orderItem);
+            document.getElementById('pendingCount').textContent = 
+                pendingDiv.querySelectorAll('.order-item').length;
+        }
+
+        // Move order to active positions
+        function moveToActive(order) {
+            const pendingDiv = document.getElementById('pendingOrders');
+            const activeDiv = document.getElementById('activePositions');
+            
+            // Remove "No active positions" message
+            if (activeDiv.querySelector('.order-item') === null) {
+                activeDiv.innerHTML = '';
+            }
+            
+            // Remove from pending
+            const pendingItems = pendingDiv.querySelectorAll('.order-item');
+            if (pendingItems.length > 0) {
+                pendingItems[0].remove();
+            }
+            
+            // Add to active
+            const activeItem = document.createElement('div');
+            activeItem.className = 'order-item buy';
+            activeItem.innerHTML = `
+                <span>${order.market}</span>
+                <span>PERP</span>
+                <span>+0.5%</span>
+            `;
+            
+            activeDiv.appendChild(activeItem);
+            
+            // Update counts
+            document.getElementById('pendingCount').textContent = 
+                pendingDiv.querySelectorAll('.order-item').length;
+            document.getElementById('activeCount').textContent = 
+                activeDiv.querySelectorAll('.order-item').length;
+            
+            // Reset pending if empty
+            if (pendingDiv.querySelectorAll('.order-item').length === 0) {
+                pendingDiv.innerHTML = '<div style="text-align: center; color: rgba(255, 255, 255, 0.4); padding: 20px;">No pending orders</div>';
+            }
+        }
+
+        // Show status message
+        function showStatus(message) {
+            const status = document.getElementById('statusMessage');
+            status.textContent = message;
+            status.classList.add('active');
+            
+            setTimeout(() => {
+                status.classList.remove('active');
+            }, 3000);
+        }
+
+        // Initialize
+        updateOrderCount();
+        document.getElementById('investmentAmount').addEventListener('input', updateOrderCount);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Platform Trading - Final Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Demo Stage */
+        .demo-stage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #0A0A0A 0%, #000000 100%);
+            overflow-y: auto;
+        }
+
+        /* Demo Navigation */
+        .demo-nav {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px 40px;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .demo-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .demo-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .demo-btn.active {
+            background: #FFD60A;
+            color: #000000;
+            border-color: #FFD60A;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #FFD60A;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.5);
+        }
+
+        /* Step Indicator */
+        .step-indicator {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.4;
+            transition: all 0.3s;
+        }
+
+        .step.active {
+            opacity: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: #FFD60A;
+            border-color: #FFD60A;
+            color: #000000;
+        }
+
+        .step-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Screen Container */
+        .screen-container {
+            width: 90%;
+            max-width: 1400px;
+            height: 80vh;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            display: none;
+            backdrop-filter: blur(20px);
+        }
+
+        .screen-container.active {
+            display: block;
+        }
+
+        /* Market Selection Screen */
+        .market-selection {
+            padding: 40px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .screen-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Quantum Mode Toggle */
+        .quantum-toggle {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 25px;
+            background: rgba(147, 51, 234, 0.1);
+            border: 2px solid rgba(147, 51, 234, 0.3);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quantum-toggle:hover {
+            background: rgba(147, 51, 234, 0.2);
+            border-color: rgba(147, 51, 234, 0.5);
+        }
+
+        .quantum-toggle.active {
+            background: rgba(147, 51, 234, 0.3);
+            border-color: #9333EA;
+            box-shadow: 0 0 30px rgba(147, 51, 234, 0.3);
+        }
+
+        .quantum-icon {
+            width: 30px;
+            height: 30px;
+            position: relative;
+        }
+
+        .quantum-orbit {
+            position: absolute;
+            border: 2px solid #9333EA;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: quantumOrbit 3s linear infinite;
+        }
+
+        .quantum-orbit:nth-child(1) {
+            width: 100%;
+            height: 100%;
+            animation-duration: 3s;
+        }
+
+        .quantum-orbit:nth-child(2) {
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            animation-duration: 2s;
+            animation-direction: reverse;
+        }
+
+        .quantum-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #9333EA;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes quantumOrbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Market Categories */
+        .market-categories {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .category-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .category-tab.active {
+            background: rgba(255, 214, 10, 0.2);
+            border-color: #FFD60A;
+            color: #FFD60A;
+        }
+
+        /* Market Grid */
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .market-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .market-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .market-card.selected {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.05);
+        }
+
+        .platform-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .platform-badge.polymarket {
+            background: linear-gradient(135deg, #4B0AFF 0%, #7B3FF2 100%);
+        }
+
+        .platform-badge.kalshi {
+            background: linear-gradient(135deg, #00D4FF 0%, #0099CC 100%);
+        }
+
+        .market-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .market-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .market-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #FFD60A;
+        }
+
+        /* Multi-outcome display */
+        .market-outcomes {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .outcome-badge {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        /* Verse Selection */
+        .verse-selection {
+            padding: 40px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .selected-market-header {
+            background: rgba(255, 214, 10, 0.05);
+            border: 1px solid rgba(255, 214, 10, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .verse-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .verse-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .verse-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .verse-item.selected {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.05);
+        }
+
+        .verse-info {
+            flex: 1;
+        }
+
+        .verse-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .verse-multiplier {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(76, 217, 100, 0.2);
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4CD964;
+            margin-left: 10px;
+        }
+
+        /* Trading Configuration */
+        .trading-config {
+            padding: 40px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .config-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #FFD60A;
+        }
+
+        /* Quantum Split Display */
+        .quantum-split {
+            background: rgba(147, 51, 234, 0.05);
+            border: 2px solid rgba(147, 51, 234, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .quantum-states {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .quantum-state {
+            background: rgba(147, 51, 234, 0.1);
+            border: 1px solid rgba(147, 51, 234, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .state-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 10px;
+        }
+
+        .state-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #9333EA;
+        }
+
+        .quantum-formula {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #9333EA;
+            font-family: 'SF Mono', monospace;
+            word-wrap: break-word;
+        }
+
+        /* Investment Input */
+        .investment-input {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .investment-input span {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFD60A;
+        }
+
+        .investment-input input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #FFFFFF;
+            width: 200px;
+            text-align: right;
+        }
+
+        /* Leverage Slider */
+        .leverage-control {
+            margin: 30px 0;
+        }
+
+        .leverage-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .leverage-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #FFD60A;
+        }
+
+        .leverage-slider {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .leverage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CD964 0%, #FFD60A 50%, #FF3B30 100%);
+            transition: width 0.3s;
+        }
+
+        /* Order Types */
+        .order-types {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .order-type-btn {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .order-type-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .order-type-btn.selected {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.1);
+        }
+
+        /* Execution Screen */
+        .execution-screen {
+            padding: 40px;
+            height: 100%;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .order-flow-container {
+            position: relative;
+            height: 600px;
+            margin: 40px 0;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        /* Money Flow Visualization */
+        .money-flow-label {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFD60A;
+            text-align: center;
+        }
+
+        .position-source {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 214, 10, 0.1);
+            border: 3px solid #FFD60A;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .platform-destination {
+            position: absolute;
+            width: 250px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .platform-destination.polymarket {
+            left: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-color: #4B0AFF;
+            background: rgba(75, 10, 255, 0.1);
+        }
+
+        .platform-destination.kalshi {
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-color: #00D4FF;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .platform-destination.active {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.3);
+        }
+
+        .platform-logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .platform-amount {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .platform-destination.polymarket .platform-amount {
+            color: #7B3FF2;
+        }
+
+        .platform-destination.kalshi .platform-amount {
+            color: #00D4FF;
+        }
+
+        /* Animated Money Flow */
+        .money-particle {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #FFD60A 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #000;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .money-particle.animate {
+            animation: moneyFlow 2s ease-out forwards;
+        }
+
+        @keyframes moneyFlow {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            80% {
+                opacity: 1;
+                transform: translate(calc(var(--end-x) - 50%), calc(var(--end-y) - 50%)) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(calc(var(--end-x) - 50%), calc(var(--end-y) - 50%)) scale(1.5);
+            }
+        }
+
+        /* Order Trail Effect */
+        .order-trail {
+            position: absolute;
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent 0%, #FFD60A 50%, transparent 100%);
+            opacity: 0;
+            pointer-events: none;
+            transform-origin: left center;
+        }
+
+        @keyframes trailFlow {
+            0% {
+                opacity: 0;
+                transform: scaleX(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scaleX(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scaleX(1);
+            }
+        }
+
+        /* Summary Section */
+        .execution-summary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .summary-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #FFD60A;
+        }
+
+        /* Platform Summary */
+        .platform-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .platform-summary-card {
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .platform-summary-card.polymarket {
+            background: rgba(75, 10, 255, 0.1);
+            border: 2px solid rgba(75, 10, 255, 0.3);
+        }
+
+        .platform-summary-card.kalshi {
+            background: rgba(0, 212, 255, 0.1);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+        }
+
+        /* Risk Indicators */
+        .risk-indicators {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .risk-indicator {
+            flex: 1;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .risk-indicator.stop-loss {
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.3);
+        }
+
+        .risk-indicator.take-profit {
+            background: rgba(76, 217, 100, 0.1);
+            border: 1px solid rgba(76, 217, 100, 0.3);
+        }
+
+        /* Execute Button */
+        .execute-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            border: none;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #000000;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 30px;
+        }
+
+        .execute-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(255, 214, 10, 0.3);
+        }
+
+        .execute-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #FFD60A;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .market-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .screen-container {
+                width: 95%;
+                height: 90vh;
+            }
+            
+            .step-indicator {
+                display: none;
+            }
+            
+            .quantum-toggle {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+        <div class="step active" id="step1">
+            <div class="step-number">1</div>
+            <div class="step-label">Select Market</div>
+        </div>
+        <div class="step" id="step2">
+            <div class="step-number">2</div>
+            <div class="step-label">Choose Verses</div>
+        </div>
+        <div class="step" id="step3">
+            <div class="step-number">3</div>
+            <div class="step-label">Configure Trade</div>
+        </div>
+        <div class="step" id="step4">
+            <div class="step-number">4</div>
+            <div class="step-label">Execute</div>
+        </div>
+    </div>
+
+    <!-- Demo Stage -->
+    <div class="demo-stage">
+        <!-- Market Selection Screen -->
+        <div class="screen-container active" id="marketScreen">
+            <div class="market-selection">
+                <h1 class="screen-title">Select Your Market</h1>
+                
+                <!-- Quantum Mode Toggle -->
+                <div class="quantum-toggle" onclick="toggleQuantumMode()">
+                    <div class="quantum-icon">
+                        <div class="quantum-orbit"></div>
+                        <div class="quantum-orbit"></div>
+                        <div class="quantum-particle"></div>
+                    </div>
+                    <span>Quantum Mode</span>
+                </div>
+
+                <!-- Market Categories -->
+                <div class="market-categories">
+                    <div class="category-tab active" onclick="filterMarkets('all')">All Markets</div>
+                    <div class="category-tab" onclick="filterMarkets('politics')">Politics</div>
+                    <div class="category-tab" onclick="filterMarkets('crypto')">Crypto</div>
+                    <div class="category-tab" onclick="filterMarkets('economics')">Economics</div>
+                    <div class="category-tab" onclick="filterMarkets('sports')">Sports</div>
+                </div>
+
+                <!-- Market Grid -->
+                <div class="market-grid" id="marketGrid">
+                    <!-- Markets will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Verse Selection Screen -->
+        <div class="screen-container" id="verseScreen">
+            <div class="verse-selection">
+                <h1 class="screen-title">Select Verses</h1>
+                
+                <div class="selected-market-header" id="selectedMarketHeader">
+                    <!-- Selected market info will be shown here -->
+                </div>
+
+                <h3 style="margin-bottom: 20px; color: #FFD60A;">Select Related Markets (Verses)</h3>
+                <div class="verse-list" id="verseList">
+                    <!-- Verses will be populated based on selected market -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Trading Configuration Screen -->
+        <div class="screen-container" id="configScreen">
+            <div class="trading-config">
+                <h1 class="screen-title">Configure Your Trade</h1>
+
+                <div class="config-grid">
+                    <!-- Left Column -->
+                    <div>
+                        <!-- Investment Amount -->
+                        <div class="config-section">
+                            <h3 class="section-title">Investment Amount</h3>
+                            <div class="investment-input">
+                                <span>$</span>
+                                <input type="number" id="investmentAmount" value="10000" min="100" step="100" onchange="updateRiskDisplay()">
+                            </div>
+                            
+                            <!-- Quantum Split (if enabled) -->
+                            <div class="quantum-split" id="quantumSplit" style="display: none;">
+                                <h4 style="color: #9333EA; margin-bottom: 15px;">Quantum Superposition Split</h4>
+                                <div class="quantum-states" id="quantumStates">
+                                    <!-- Will be populated based on outcomes -->
+                                </div>
+                                <div class="quantum-formula" id="quantumFormula">|Ψ⟩ = √0.5|YES⟩ + √0.5|NO⟩</div>
+                            </div>
+                        </div>
+
+                        <!-- Leverage Control -->
+                        <div class="config-section">
+                            <h3 class="section-title">Base Leverage</h3>
+                            <div class="leverage-control">
+                                <div class="leverage-display">
+                                    <span>Leverage</span>
+                                    <div class="leverage-value" id="leverageValue">5x</div>
+                                </div>
+                                <div class="leverage-slider" onclick="updateLeverage(event)">
+                                    <div class="leverage-fill" id="leverageFill" style="width: 5%;"></div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: rgba(255, 255, 255, 0.5);">
+                                    <span>1x</span>
+                                    <span>25x</span>
+                                    <span>50x</span>
+                                    <span>75x</span>
+                                    <span>100x</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div>
+                        <!-- Order Type -->
+                        <div class="config-section">
+                            <h3 class="section-title">Order Type</h3>
+                            <div class="order-types">
+                                <div class="order-type-btn selected" onclick="selectOrderType('market', this)">
+                                    <div style="font-weight: 600;">Market Order</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 5px;">Execute immediately</div>
+                                </div>
+                                <div class="order-type-btn" onclick="selectOrderType('limit', this)">
+                                    <div style="font-weight: 600;">Limit Order</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 5px;">Set your price</div>
+                                </div>
+                            </div>
+                            
+                            <div id="limitPriceInput" style="display: none; margin-top: 15px;">
+                                <label style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Limit Price</label>
+                                <input type="number" step="0.01" placeholder="0.00" style="width: 100%; padding: 10px; margin-top: 5px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white;">
+                            </div>
+                        </div>
+
+                        <!-- Risk Management -->
+                        <div class="config-section">
+                            <h3 class="section-title">Risk Management</h3>
+                            <div style="display: grid; gap: 15px;">
+                                <div>
+                                    <label style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Stop Loss %</label>
+                                    <input type="range" id="stopLoss" min="1" max="50" value="10" oninput="updateRiskDisplay()">
+                                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                                        <span style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">Max Loss</span>
+                                        <span style="font-size: 14px; font-weight: 600; color: #FF3B30;" id="maxLoss">-$1,000</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">Take Profit %</label>
+                                    <input type="range" id="takeProfit" min="5" max="500" value="50" oninput="updateRiskDisplay()">
+                                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                                        <span style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">Target Profit</span>
+                                        <span style="font-size: 14px; font-weight: 600; color: #4CD964;" id="targetProfit">+$5,000</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="execute-btn" onclick="nextStep()">
+                    Review & Execute
+                </button>
+            </div>
+        </div>
+
+        <!-- Execution Screen -->
+        <div class="screen-container" id="executionScreen">
+            <div class="execution-screen">
+                <h1 class="screen-title">Execute Your Orders</h1>
+
+                <div class="order-flow-container">
+                    <div class="money-flow-label">All Money Routes to External Platforms</div>
+                    
+                    <div class="position-source">
+                        <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Your Position</div>
+                        <div style="font-size: 32px; font-weight: 700; color: #FFD60A;" id="totalInvestment">$10,000</div>
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);" id="totalLeverage">Total: 5x</div>
+                    </div>
+
+                    <div class="platform-destination polymarket" id="polymarketDest">
+                        <div class="platform-logo">POLYMARKET</div>
+                        <div class="platform-amount" id="polymarketAmount">$0</div>
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">
+                            <span id="polymarketCount">0</span> Orders
+                        </div>
+                        <div style="font-size: 12px; margin-top: 10px; color: rgba(255, 255, 255, 0.8);">
+                            External Platform
+                        </div>
+                    </div>
+
+                    <div class="platform-destination kalshi" id="kalshiDest">
+                        <div class="platform-logo">KALSHI</div>
+                        <div class="platform-amount" id="kalshiAmount">$0</div>
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6);">
+                            <span id="kalshiCount">0</span> Orders
+                        </div>
+                        <div style="font-size: 12px; margin-top: 10px; color: rgba(255, 255, 255, 0.8);">
+                            External Platform
+                        </div>
+                    </div>
+                </div>
+
+                <div class="execution-summary">
+                    <h3 class="section-title">Order Summary</h3>
+                    <div class="summary-grid" id="orderSummary">
+                        <!-- Order details will be populated here -->
+                    </div>
+
+                    <div class="platform-summary">
+                        <div class="platform-summary-card polymarket">
+                            <h4 style="color: #7B3FF2; margin-bottom: 15px;">Polymarket Orders</h4>
+                            <div id="polymarketDetails" style="text-align: left; font-size: 14px;">
+                                <!-- Details populated here -->
+                            </div>
+                        </div>
+                        <div class="platform-summary-card kalshi">
+                            <h4 style="color: #00D4FF; margin-bottom: 15px;">Kalshi Orders</h4>
+                            <div id="kalshiDetails" style="text-align: left; font-size: 14px;">
+                                <!-- Details populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="risk-indicators">
+                        <div class="risk-indicator stop-loss">
+                            <div style="font-size: 14px; margin-bottom: 5px;">Stop Loss</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #FF3B30;" id="stopLossValue">-10%</div>
+                        </div>
+                        <div class="risk-indicator take-profit">
+                            <div style="font-size: 14px; margin-bottom: 5px;">Take Profit</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #4CD964;" id="takeProfitValue">+50%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="execute-btn" onclick="executeOrders()" id="finalExecuteBtn">
+                    Execute All Orders
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Navigation -->
+    <div class="demo-nav">
+        <button class="demo-btn" onclick="previousStep()">← Back</button>
+        <button class="play-btn" onclick="toggleAutoPlay()" id="playBtn">▶</button>
+        <button class="demo-btn active" onclick="nextStep()">Next →</button>
+    </div>
+
+    <script>
+        // Real Market Data from Polymarket/Kalshi
+        const markets = {
+            politics: [
+                {
+                    id: 'trump-win-2024',
+                    title: 'Will Donald Trump win the 2024 presidential election?',
+                    platform: 'polymarket',
+                    volume: '215M',
+                    outcomes: ['Yes', 'No'],
+                    prices: [0.42, 0.58],
+                    category: 'politics'
+                },
+                {
+                    id: 'biden-nominee',
+                    title: 'Will Biden be the Democratic nominee?',
+                    platform: 'kalshi',
+                    volume: '67M',
+                    outcomes: ['Yes', 'No'],
+                    prices: [0.75, 0.25],
+                    category: 'politics'
+                },
+                {
+                    id: 'gop-primary',
+                    title: 'GOP Primary Winner',
+                    platform: 'polymarket',
+                    volume: '89M',
+                    outcomes: ['Trump', 'DeSantis', 'Haley', 'Ramaswamy', 'Other'],
+                    prices: [0.65, 0.12, 0.10, 0.08, 0.05],
+                    category: 'politics'
+                }
+            ],
+            crypto: [
+                {
+                    id: 'btc-150k',
+                    title: 'Will Bitcoin reach $150,000 by Dec 2025?',
+                    platform: 'polymarket',
+                    volume: '125M',
+                    outcomes: ['Yes', 'No'],
+                    prices: [0.35, 0.65],
+                    category: 'crypto'
+                },
+                {
+                    id: 'eth-merge',
+                    title: 'Will Ethereum successfully implement sharding by 2025?',
+                    platform: 'kalshi',
+                    volume: '45M',
+                    outcomes: ['Yes', 'No'],
+                    prices: [0.60, 0.40],
+                    category: 'crypto'
+                },
+                {
+                    id: 'cbdc-launch',
+                    title: 'Will US launch CBDC before 2026?',
+                    platform: 'polymarket',
+                    volume: '34M',
+                    outcomes: ['Yes', 'No'],
+                    prices: [0.28, 0.72],
+                    category: 'crypto'
+                }
+            ],
+            economics: [
+                {
+                    id: 'fed-rates-2025',
+                    title: 'Fed Funds Rate by Dec 2025',
+                    platform: 'kalshi',
+                    volume: '156M',
+                    outcomes: ['<3%', '3-4%', '4-5%', '>5%'],
+                    prices: [0.20, 0.45, 0.25, 0.10],
+                    category: 'economics'
+                },
+                {
+                    id: 'recession-2025',
+                    title: 'Will US enter recession in 2025?',
+                    platform: 'kalshi',
+                    volume: '234M',
+                    outcomes: ['Yes', 'No'],
+                    prices: [0.31, 0.69],
+                    category: 'economics'
+                },
+                {
+                    id: 'inflation-target',
+                    title: 'Will CPI fall below 2% by 2025?',
+                    platform: 'polymarket',
+                    volume: '98M',
+                    outcomes: ['Yes', 'No'],
+                    prices: [0.43, 0.57],
+                    category: 'economics'
+                }
+            ],
+            sports: [
+                {
+                    id: 'superbowl-2025',
+                    title: 'Super Bowl 2025 Winner',
+                    platform: 'kalshi',
+                    volume: '67M',
+                    outcomes: ['Chiefs', '49ers', 'Bills', 'Eagles', 'Cowboys', 'Other'],
+                    prices: [0.18, 0.15, 0.12, 0.10, 0.08, 0.37],
+                    category: 'sports'
+                },
+                {
+                    id: 'world-cup-top',
+                    title: 'Will USA finish top 8 in 2026 World Cup?',
+                    platform: 'polymarket',
+                    volume: '23M',
+                    outcomes: ['Yes', 'No'],
+                    prices: [0.35, 0.65],
+                    category: 'sports'
+                }
+            ]
+        };
+
+        // Real Verse Data based on actual related markets
+        const verseData = {
+            'trump-win-2024': [
+                { id: 'senate-control', title: 'Republicans control Senate', multiplier: 1.5, platform: 'kalshi', actualMarket: true },
+                { id: 'biden-approval', title: 'Biden approval below 40%', multiplier: 1.7, platform: 'polymarket', actualMarket: true },
+                { id: 'swing-state-sweep', title: 'GOP wins PA, MI, WI', multiplier: 2.2, platform: 'kalshi', actualMarket: true },
+                { id: 'economy-recession', title: 'US in recession by election', multiplier: 1.8, platform: 'polymarket', actualMarket: true },
+                { id: 'trump-conviction', title: 'Trump not convicted before election', multiplier: 1.6, platform: 'kalshi', actualMarket: true }
+            ],
+            'btc-150k': [
+                { id: 'btc-etf-flows', title: 'Bitcoin ETF net inflows >$50B', multiplier: 1.7, platform: 'polymarket', actualMarket: true },
+                { id: 'halving-impact', title: 'BTC doubles within year of halving', multiplier: 2.1, platform: 'kalshi', actualMarket: true },
+                { id: 'institutional-adoption', title: 'Fortune 100 company buys BTC', multiplier: 1.9, platform: 'polymarket', actualMarket: true },
+                { id: 'dollar-index', title: 'DXY falls below 95', multiplier: 1.6, platform: 'kalshi', actualMarket: true },
+                { id: 'gold-btc-flip', title: 'BTC market cap exceeds gold', multiplier: 2.5, platform: 'polymarket', actualMarket: true }
+            ],
+            'fed-rates-2025': [
+                { id: 'unemployment-spike', title: 'Unemployment exceeds 5%', multiplier: 1.8, platform: 'kalshi', actualMarket: true },
+                { id: 'bank-crisis', title: 'Major bank failure in 2025', multiplier: 2.0, platform: 'polymarket', actualMarket: true },
+                { id: 'housing-correction', title: 'Home prices fall >10%', multiplier: 1.7, platform: 'kalshi', actualMarket: true },
+                { id: 'yield-curve', title: 'Yield curve remains inverted', multiplier: 1.5, platform: 'polymarket', actualMarket: true }
+            ],
+            'recession-2025': [
+                { id: 'gdp-negative', title: 'Two quarters negative GDP', multiplier: 1.9, platform: 'kalshi', actualMarket: true },
+                { id: 'sp500-bear', title: 'S&P 500 enters bear market', multiplier: 1.7, platform: 'polymarket', actualMarket: true },
+                { id: 'job-losses', title: 'Monthly job losses >200k', multiplier: 1.8, platform: 'kalshi', actualMarket: true },
+                { id: 'consumer-confidence', title: 'Consumer confidence <50', multiplier: 1.6, platform: 'polymarket', actualMarket: true }
+            ],
+            'eth-merge': [
+                { id: 'eth-dominance', title: 'ETH maintains >15% crypto dominance', multiplier: 1.5, platform: 'kalshi', actualMarket: true },
+                { id: 'l2-growth', title: 'L2 TVL exceeds $100B', multiplier: 1.8, platform: 'polymarket', actualMarket: true },
+                { id: 'gas-fees', title: 'ETH gas fees stay <$5 average', multiplier: 1.6, platform: 'kalshi', actualMarket: true }
+            ],
+            'superbowl-2025': [
+                { id: 'afc-winner', title: 'AFC team wins Super Bowl', multiplier: 1.2, platform: 'polymarket', actualMarket: true },
+                { id: 'total-points', title: 'Total points over 48.5', multiplier: 1.5, platform: 'kalshi', actualMarket: true },
+                { id: 'mvp-qb', title: 'QB wins MVP', multiplier: 1.3, platform: 'polymarket', actualMarket: true }
+            ]
+        };
+        
+        // Default verses for markets without specific verses
+        const defaultVerses = [
+            { id: 'market-momentum', title: 'Overall market momentum positive', multiplier: 1.5, platform: 'polymarket' },
+            { id: 'volume-spike', title: 'Trading volume increases 2x', multiplier: 1.6, platform: 'kalshi' },
+            { id: 'social-sentiment', title: 'Social sentiment strongly positive', multiplier: 1.4, platform: 'polymarket' }
+        ];
+
+        // Global State
+        let currentStep = 1;
+        let selectedMarket = null;
+        let selectedVerses = [];
+        let quantumMode = false;
+        let orderType = 'market';
+        let leverage = 5;
+        let autoPlayInterval = null;
+        let currentCategory = 'all';
+
+        // Initialize
+        window.onload = function() {
+            renderMarkets('all');
+            updateStepIndicator();
+        };
+
+        // Render markets
+        function renderMarkets(category) {
+            const grid = document.getElementById('marketGrid');
+            grid.innerHTML = '';
+            
+            let marketsToShow = [];
+            if (category === 'all') {
+                Object.values(markets).forEach(categoryMarkets => {
+                    marketsToShow = marketsToShow.concat(categoryMarkets);
+                });
+            } else {
+                marketsToShow = markets[category] || [];
+            }
+
+            marketsToShow.forEach(market => {
+                const card = document.createElement('div');
+                card.className = 'market-card';
+                card.onclick = () => selectMarket(market);
+                
+                let outcomeDisplay = '';
+                if (market.outcomes.length > 2) {
+                    outcomeDisplay = `
+                        <div class="market-outcomes">
+                            ${market.outcomes.slice(0, 3).map((outcome, i) => 
+                                `<div class="outcome-badge">${outcome}: ${(market.prices[i] * 100).toFixed(0)}¢</div>`
+                            ).join('')}
+                            ${market.outcomes.length > 3 ? `<div class="outcome-badge">+${market.outcomes.length - 3} more</div>` : ''}
+                        </div>
+                    `;
+                }
+                
+                card.innerHTML = `
+                    <div class="platform-badge ${market.platform}">${market.platform.toUpperCase()}</div>
+                    <h3 class="market-title">${market.title}</h3>
+                    <div class="market-stats">
+                        <div class="market-stat">
+                            <div class="stat-label">Volume</div>
+                            <div class="stat-value">$${market.volume}</div>
+                        </div>
+                        <div class="market-stat">
+                            <div class="stat-label">${market.outcomes.length > 2 ? 'Outcomes' : 'Yes Price'}</div>
+                            <div class="stat-value">${market.outcomes.length > 2 ? market.outcomes.length : (market.prices[0] * 100).toFixed(0) + '¢'}</div>
+                        </div>
+                    </div>
+                    ${outcomeDisplay}
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Filter markets by category
+        function filterMarkets(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            renderMarkets(category);
+        }
+
+        // Select market
+        function selectMarket(market) {
+            selectedMarket = market;
+            document.querySelectorAll('.market-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Auto advance after selection
+            setTimeout(() => {
+                nextStep();
+            }, 500);
+        }
+
+        // Render verses
+        function renderVerses() {
+            const verseList = document.getElementById('verseList');
+            const header = document.getElementById('selectedMarketHeader');
+            
+            let outcomeText = selectedMarket.outcomes.length > 2 
+                ? `${selectedMarket.outcomes.length} outcomes` 
+                : `${(selectedMarket.prices[0] * 100).toFixed(0)}% Yes`;
+            
+            header.innerHTML = `
+                <h3 style="font-size: 20px; margin-bottom: 10px;">${selectedMarket.title}</h3>
+                <div style="display: flex; gap: 20px;">
+                    <span>Platform: <span style="color: ${selectedMarket.platform === 'polymarket' ? '#7B3FF2' : '#00D4FF'}">${selectedMarket.platform.toUpperCase()}</span></span>
+                    <span>Volume: <span style="color: #FFD60A">$${selectedMarket.volume}</span></span>
+                    <span>${outcomeText}</span>
+                </div>
+            `;
+            
+            verseList.innerHTML = '';
+            const verses = verseData[selectedMarket.id] || defaultVerses;
+            
+            verses.forEach(verse => {
+                const item = document.createElement('div');
+                item.className = 'verse-item';
+                item.onclick = () => toggleVerse(verse);
+                
+                const actualMarketBadge = verse.actualMarket ? 
+                    '<span style="font-size: 11px; padding: 2px 8px; background: rgba(76, 217, 100, 0.2); border-radius: 10px; margin-left: 10px;">REAL MARKET</span>' : '';
+                
+                item.innerHTML = `
+                    <div class="verse-info">
+                        <div class="verse-title">
+                            ${verse.title}
+                            <span class="verse-multiplier">×${verse.multiplier}</span>
+                            ${actualMarketBadge}
+                        </div>
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin-top: 5px;">
+                            Platform: <span style="color: ${verse.platform === 'polymarket' ? '#7B3FF2' : '#00D4FF'}">${verse.platform.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    <div class="platform-badge ${verse.platform}" style="position: static;">
+                        ${verse.platform === 'polymarket' ? 'P' : 'K'}
+                    </div>
+                `;
+                
+                verseList.appendChild(item);
+            });
+        }
+
+        // Toggle verse selection
+        function toggleVerse(verse) {
+            const index = selectedVerses.findIndex(v => v.id === verse.id);
+            if (index > -1) {
+                selectedVerses.splice(index, 1);
+                event.currentTarget.classList.remove('selected');
+            } else {
+                selectedVerses.push(verse);
+                event.currentTarget.classList.add('selected');
+            }
+        }
+
+        // Toggle quantum mode
+        function toggleQuantumMode() {
+            quantumMode = !quantumMode;
+            document.querySelector('.quantum-toggle').classList.toggle('active');
+            
+            // Update UI based on quantum mode
+            if (quantumMode) {
+                document.getElementById('quantumSplit').style.display = 'block';
+                updateQuantumSplit();
+            } else {
+                document.getElementById('quantumSplit').style.display = 'none';
+            }
+        }
+
+        // Update quantum split display - CORRECTED FORMULA
+        function updateQuantumSplit() {
+            const investment = parseFloat(document.getElementById('investmentAmount').value) || 0;
+            const states = document.getElementById('quantumStates');
+            const formula = document.getElementById('quantumFormula');
+            
+            if (selectedMarket) {
+                // Use actual market probabilities for quantum split
+                states.innerHTML = selectedMarket.outcomes.map((outcome, i) => {
+                    const probability = selectedMarket.prices[i];
+                    const amount = investment * probability;
+                    return `
+                        <div class="quantum-state">
+                            <div class="state-label">|${outcome}⟩</div>
+                            <div class="state-value">$${amount.toLocaleString()}</div>
+                            <div style="font-size: 12px; color: rgba(255, 255, 255, 0.5); margin-top: 5px;">${(probability * 100).toFixed(0)}%</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Generate correct quantum formula
+                const terms = selectedMarket.outcomes.map((outcome, i) => {
+                    const probability = selectedMarket.prices[i];
+                    return `√${probability.toFixed(2)}|${outcome}⟩`;
+                }).join(' + ');
+                formula.textContent = `|Ψ⟩ = ${terms}`;
+            }
+        }
+
+        // Update leverage
+        function updateLeverage(event) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+            leverage = Math.round(1 + (percentage / 100) * 99);
+            
+            document.getElementById('leverageValue').textContent = leverage + 'x';
+            document.getElementById('leverageFill').style.width = percentage + '%';
+            
+            updateRiskDisplay();
+        }
+
+        // Select order type
+        function selectOrderType(type, element) {
+            orderType = type;
+            document.querySelectorAll('.order-type-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            document.getElementById('limitPriceInput').style.display = 
+                type === 'limit' ? 'block' : 'none';
+        }
+
+        // Update risk display
+        function updateRiskDisplay() {
+            const investment = parseFloat(document.getElementById('investmentAmount').value) || 0;
+            const stopLossPercent = parseInt(document.getElementById('stopLoss').value);
+            const takeProfitPercent = parseInt(document.getElementById('takeProfit').value);
+            
+            const maxLoss = investment * (stopLossPercent / 100);
+            const targetProfit = investment * leverage * (takeProfitPercent / 100);
+            
+            document.getElementById('maxLoss').textContent = '-$' + maxLoss.toLocaleString();
+            document.getElementById('targetProfit').textContent = '+$' + targetProfit.toLocaleString();
+            
+            if (quantumMode) {
+                updateQuantumSplit();
+            }
+        }
+
+        // Navigation
+        function nextStep() {
+            if (currentStep < 4) {
+                // Validate current step
+                if (currentStep === 1 && !selectedMarket) {
+                    alert('Please select a market first');
+                    return;
+                }
+                
+                // Hide current screen
+                document.querySelectorAll('.screen-container').forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                
+                currentStep++;
+                
+                // Show next screen
+                switch(currentStep) {
+                    case 2:
+                        document.getElementById('verseScreen').classList.add('active');
+                        renderVerses();
+                        break;
+                    case 3:
+                        document.getElementById('configScreen').classList.add('active');
+                        updateRiskDisplay();
+                        break;
+                    case 4:
+                        document.getElementById('executionScreen').classList.add('active');
+                        prepareExecution();
+                        break;
+                }
+                
+                updateStepIndicator();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                document.querySelectorAll('.screen-container').forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                
+                currentStep--;
+                
+                switch(currentStep) {
+                    case 1:
+                        document.getElementById('marketScreen').classList.add('active');
+                        break;
+                    case 2:
+                        document.getElementById('verseScreen').classList.add('active');
+                        break;
+                    case 3:
+                        document.getElementById('configScreen').classList.add('active');
+                        break;
+                }
+                
+                updateStepIndicator();
+            }
+        }
+
+        function updateStepIndicator() {
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index < currentStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+
+        // Prepare execution screen with proper money distribution
+        function prepareExecution() {
+            const investment = parseFloat(document.getElementById('investmentAmount').value) || 0;
+            const totalLeverage = calculateTotalLeverage();
+            
+            document.getElementById('totalInvestment').textContent = '$' + investment.toLocaleString();
+            document.getElementById('totalLeverage').textContent = 'Total: ' + totalLeverage + 'x';
+            
+            // Calculate platform distribution
+            let polymarketAmount = 0;
+            let kalshiAmount = 0;
+            let polymarketOrders = [];
+            let kalshiOrders = [];
+            
+            if (quantumMode && selectedMarket) {
+                // Quantum mode: split by probability across all outcomes
+                selectedMarket.outcomes.forEach((outcome, i) => {
+                    const probability = selectedMarket.prices[i];
+                    const baseAmount = investment * probability;
+                    
+                    if (selectedMarket.platform === 'polymarket') {
+                        polymarketAmount += baseAmount;
+                        polymarketOrders.push(`${outcome}: $${baseAmount.toFixed(0)}`);
+                    } else {
+                        kalshiAmount += baseAmount;
+                        kalshiOrders.push(`${outcome}: $${baseAmount.toFixed(0)}`);
+                    }
+                });
+                
+                // Add verse amounts
+                selectedVerses.forEach(verse => {
+                    const verseShare = investment / (1 + selectedVerses.length);
+                    if (verse.platform === 'polymarket') {
+                        polymarketAmount += verseShare;
+                        polymarketOrders.push(`${verse.title}: $${verseShare.toFixed(0)}`);
+                    } else {
+                        kalshiAmount += verseShare;
+                        kalshiOrders.push(`${verse.title}: $${verseShare.toFixed(0)}`);
+                    }
+                });
+            } else {
+                // Standard mode: all on selected outcome
+                const marketShare = investment / (1 + selectedVerses.length);
+                
+                if (selectedMarket.platform === 'polymarket') {
+                    polymarketAmount += marketShare;
+                    polymarketOrders.push(`${selectedMarket.title}: $${marketShare.toFixed(0)}`);
+                } else {
+                    kalshiAmount += marketShare;
+                    kalshiOrders.push(`${selectedMarket.title}: $${marketShare.toFixed(0)}`);
+                }
+                
+                // Verse allocations
+                selectedVerses.forEach(verse => {
+                    if (verse.platform === 'polymarket') {
+                        polymarketAmount += marketShare;
+                        polymarketOrders.push(`${verse.title}: $${marketShare.toFixed(0)}`);
+                    } else {
+                        kalshiAmount += marketShare;
+                        kalshiOrders.push(`${verse.title}: $${marketShare.toFixed(0)}`);
+                    }
+                });
+            }
+            
+            // Update platform displays
+            document.getElementById('polymarketAmount').textContent = '$' + polymarketAmount.toLocaleString();
+            document.getElementById('kalshiAmount').textContent = '$' + kalshiAmount.toLocaleString();
+            document.getElementById('polymarketCount').textContent = polymarketOrders.length;
+            document.getElementById('kalshiCount').textContent = kalshiOrders.length;
+            
+            // Update platform details
+            document.getElementById('polymarketDetails').innerHTML = polymarketOrders.map(order => 
+                `• ${order}`
+            ).join('<br>');
+            
+            document.getElementById('kalshiDetails').innerHTML = kalshiOrders.map(order => 
+                `• ${order}`
+            ).join('<br>');
+            
+            // Update risk values
+            const stopLoss = document.getElementById('stopLoss').value;
+            const takeProfit = document.getElementById('takeProfit').value;
+            document.getElementById('stopLossValue').textContent = '-' + stopLoss + '%';
+            document.getElementById('takeProfitValue').textContent = '+' + takeProfit + '%';
+            
+            // Generate order summary
+            generateOrderSummary();
+        }
+
+        // Calculate total leverage
+        function calculateTotalLeverage() {
+            let total = leverage;
+            selectedVerses.forEach(verse => {
+                total *= verse.multiplier;
+            });
+            return total.toFixed(1);
+        }
+
+        // Generate order summary
+        function generateOrderSummary() {
+            const summary = document.getElementById('orderSummary');
+            const investment = parseFloat(document.getElementById('investmentAmount').value) || 0;
+            
+            summary.innerHTML = `
+                <div class="summary-item">
+                    <div class="summary-label">Investment</div>
+                    <div class="summary-value">$${investment.toLocaleString()}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total Leverage</div>
+                    <div class="summary-value">${calculateTotalLeverage()}x</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total Exposure</div>
+                    <div class="summary-value">$${(investment * parseFloat(calculateTotalLeverage())).toLocaleString()}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Order Type</div>
+                    <div class="summary-value">${orderType.toUpperCase()}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Mode</div>
+                    <div class="summary-value" style="color: ${quantumMode ? '#9333EA' : '#FFD60A'}">${quantumMode ? 'QUANTUM' : 'STANDARD'}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total Orders</div>
+                    <div class="summary-value">${quantumMode && selectedMarket ? selectedMarket.outcomes.length + selectedVerses.length : 1 + selectedVerses.length}</div>
+                </div>
+            `;
+        }
+
+        // Execute orders with proper money flow animation
+        function executeOrders() {
+            const btn = document.getElementById('finalExecuteBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading"></div> Executing...';
+            
+            // Highlight platforms
+            document.getElementById('polymarketDest').classList.add('active');
+            document.getElementById('kalshiDest').classList.add('active');
+            
+            // Create animated money flows
+            animateMoneyFlow();
+            
+            // Simulate execution
+            setTimeout(() => {
+                btn.innerHTML = '✓ All Money Routed to Platforms';
+                btn.style.background = 'linear-gradient(135deg, #4CD964 0%, #32D74B 100%)';
+                
+                // Remove highlights
+                setTimeout(() => {
+                    document.getElementById('polymarketDest').classList.remove('active');
+                    document.getElementById('kalshiDest').classList.remove('active');
+                }, 2000);
+            }, 3000);
+        }
+
+        // Enhanced money flow animation
+        function animateMoneyFlow() {
+            const container = document.querySelector('.order-flow-container');
+            const investment = parseFloat(document.getElementById('investmentAmount').value) || 0;
+            
+            if (quantumMode && selectedMarket) {
+                // Animate quantum splits
+                selectedMarket.outcomes.forEach((outcome, index) => {
+                    setTimeout(() => {
+                        const amount = investment * selectedMarket.prices[index];
+                        createMoneyParticle(amount, selectedMarket.platform);
+                        createOrderTrail(selectedMarket.platform);
+                    }, 500 + (index * 300));
+                });
+            } else {
+                // Animate main market money
+                setTimeout(() => {
+                    const marketShare = investment / (1 + selectedVerses.length);
+                    createMoneyParticle(marketShare, selectedMarket.platform);
+                    createOrderTrail(selectedMarket.platform);
+                }, 500);
+            }
+            
+            // Animate verse money
+            selectedVerses.forEach((verse, index) => {
+                setTimeout(() => {
+                    const verseShare = investment / (1 + selectedVerses.length);
+                    createMoneyParticle(verseShare, verse.platform);
+                    createOrderTrail(verse.platform);
+                }, 1000 + (index * 300));
+            });
+        }
+
+        // Create money particle animation
+        function createMoneyParticle(amount, platform) {
+            const container = document.querySelector('.order-flow-container');
+            const particle = document.createElement('div');
+            particle.className = 'money-particle';
+            particle.textContent = '$' + Math.round(amount).toLocaleString();
+            
+            // Calculate source and destination positions
+            const source = document.querySelector('.position-source');
+            const dest = document.querySelector(`.platform-destination.${platform}`);
+            const sourceRect = source.getBoundingClientRect();
+            const destRect = dest.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            // Calculate relative positions
+            const startX = sourceRect.left + sourceRect.width/2 - containerRect.left;
+            const startY = sourceRect.top + sourceRect.height/2 - containerRect.top;
+            const endX = destRect.left + destRect.width/2 - containerRect.left;
+            const endY = destRect.top + destRect.height/2 - containerRect.top;
+            
+            // Set CSS variables for animation
+            particle.style.setProperty('--end-x', (endX - startX) + 'px');
+            particle.style.setProperty('--end-y', (endY - startY) + 'px');
+            
+            container.appendChild(particle);
+            
+            // Force reflow then add animation class
+            particle.offsetHeight;
+            particle.classList.add('animate');
+            
+            // Flash the destination when money arrives
+            setTimeout(() => {
+                dest.classList.add('active');
+                setTimeout(() => {
+                    dest.classList.remove('active');
+                }, 500);
+            }, 1500);
+            
+            // Remove after animation
+            setTimeout(() => {
+                particle.remove();
+            }, 2100);
+        }
+
+        // Create order trail effect
+        function createOrderTrail(platform) {
+            const container = document.querySelector('.order-flow-container');
+            const trail = document.createElement('div');
+            trail.className = 'order-trail';
+            
+            const source = document.querySelector('.position-source');
+            const dest = document.querySelector(`.platform-destination.${platform}`);
+            
+            const sourceRect = source.getBoundingClientRect();
+            const destRect = dest.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            const x1 = sourceRect.left + sourceRect.width/2 - containerRect.left;
+            const y1 = sourceRect.top + sourceRect.height/2 - containerRect.top;
+            const x2 = destRect.left + destRect.width/2 - containerRect.left;
+            const y2 = destRect.top + destRect.height/2 - containerRect.top;
+            
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            
+            trail.style.left = x1 + 'px';
+            trail.style.top = y1 + 'px';
+            trail.style.width = length + 'px';
+            trail.style.transform = `rotate(${angle}deg)`;
+            
+            container.appendChild(trail);
+            
+            // Animate trail
+            setTimeout(() => {
+                trail.style.animation = 'trailFlow 1.5s ease-out forwards';
+                trail.style.opacity = '1';
+            }, 50);
+            
+            // Remove after animation
+            setTimeout(() => {
+                trail.remove();
+            }, 1600);
+        }
+
+        // Auto-play functionality
+        function toggleAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+                document.getElementById('playBtn').innerHTML = '▶';
+            } else {
+                document.getElementById('playBtn').innerHTML = '⏸';
+                autoPlayInterval = setInterval(() => {
+                    if (currentStep === 4) {
+                        // Reset to beginning
+                        currentStep = 0;
+                        document.querySelectorAll('.screen-container').forEach(screen => {
+                            screen.classList.remove('active');
+                        });
+                        document.getElementById('marketScreen').classList.add('active');
+                        selectedMarket = null;
+                        selectedVerses = [];
+                    }
+                    nextStep();
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>

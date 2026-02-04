@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Platform Test</title>
+</head>
+<body>
+    <h1>Testing Platform Access</h1>
+    <h2>Direct Links:</h2>
+    <ul>
+        <li><a href="http://localhost:8080" target="_blank">UI - http://localhost:8080</a></li>
+        <li><a href="http://localhost:8081/health" target="_blank">API Health - http://localhost:8081/health</a></li>
+        <li><a href="http://localhost:8080/index.html" target="_blank">UI Index - http://localhost:8080/index.html</a></li>
+        <li><a href="http://localhost:8080/app/markets.html" target="_blank">Markets - http://localhost:8080/app/markets.html</a></li>
+    </ul>
+    
+    <h2>API Test:</h2>
+    <button onclick="testAPI()">Test API</button>
+    <div id="apiResult"></div>
+    
+    <h2>WebSocket Test:</h2>
+    <button onclick="testWS()">Test WebSocket</button>
+    <div id="wsResult"></div>
+    
+    <script>
+        function testAPI() {
+            fetch('http://localhost:8081/health')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('apiResult').innerHTML = 'API Status: ' + JSON.stringify(data);
+                })
+                .catch(err => {
+                    document.getElementById('apiResult').innerHTML = 'API Error: ' + err;
+                });
+        }
+        
+        function testWS() {
+            const ws = new WebSocket('ws://localhost:8081/ws');
+            ws.onopen = () => {
+                document.getElementById('wsResult').innerHTML = 'WebSocket: Connected!';
+            };
+            ws.onmessage = (e) => {
+                document.getElementById('wsResult').innerHTML += '<br>Message: ' + e.data;
+            };
+            ws.onerror = (e) => {
+                document.getElementById('wsResult').innerHTML = 'WebSocket Error';
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # PostgreSQL (primary database)
+  postgres:
+    image: postgres:16-alpine
+    container_name: betting-postgres
+    environment:
+      - POSTGRES_DB=betting_platform
+      - POSTGRES_USER=betting_user
+      - POSTGRES_PASSWORD=betting_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - betting-network
+
+  # Solana Validator
+  solana-validator:
+    image: solanalabs/solana:v1.17.0
+    container_name: betting-validator
+    command: >
+      solana-test-validator
+      --rpc-port 8899
+      --ws-port 8900
+      --bind-address 0.0.0.0
+      --ledger /ledger
+    ports:
+      - "8899:8899"
+      - "8900:8900"
+    volumes:
+      - ./test-ledger:/ledger
+    networks:
+      - betting-network
+
+  # API Server
+  api-server:
+    build:
+      context: ./api_runner
+      dockerfile: Dockerfile
+    container_name: betting-api
+    environment:
+      - RPC_URL=http://solana-validator:8899
+      - PROGRAM_ID=${PROGRAM_ID:-HKTkR5ubMM2bpjdhEo3auZsF8QAqKg6MZR5iWTosGPca}
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8081
+      - DATABASE_URL=postgresql://betting_user:betting_pass@postgres:5432/betting_platform
+    ports:
+      - "8081:8081"
+    depends_on:
+      - solana-validator
+      - postgres
+    volumes:
+      - ./api-data:/data
+    networks:
+      - betting-network
+
+  # UI Server
+  ui-server:
+    image: node:18-alpine
+    container_name: betting-ui
+    working_dir: /app
+    command: node server.js
+    ports:
+      - "3000:8080"
+    volumes:
+      - ./programs/betting_platform_native/ui_demo:/app
+    networks:
+      - betting-network
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: betting-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - betting-network
+
+  # Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: betting-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - betting-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: betting-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./monitoring/grafana:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - betting-network
+
+networks:
+  betting-network:
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  grafana-data:
+  postgres-data:

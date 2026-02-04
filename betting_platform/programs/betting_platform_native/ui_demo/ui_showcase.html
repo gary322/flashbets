@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Betting Platform - UI Showcase</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0F1419;
+            color: #E7E9EA;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .showcase-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #1D9BF0 0%, #1BB3FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: #71767B;
+            font-size: 1.2rem;
+        }
+        
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .page-preview {
+            background: #16181C;
+            border: 1px solid #2F3336;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .page-preview:hover {
+            border-color: #1D9BF0;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px rgba(29, 155, 240, 0.1);
+        }
+        
+        .preview-iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+            background: #0F1419;
+        }
+        
+        .preview-info {
+            padding: 20px;
+        }
+        
+        .preview-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #E7E9EA;
+        }
+        
+        .preview-description {
+            color: #71767B;
+            margin-bottom: 15px;
+        }
+        
+        .preview-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-tag {
+            background: rgba(29, 155, 240, 0.1);
+            color: #1D9BF0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+        
+        .view-button {
+            display: inline-block;
+            background: #1D9BF0;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 24px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .view-button:hover {
+            background: #1A8ADB;
+        }
+        
+        .tech-stats {
+            background: #16181C;
+            border: 1px solid #2F3336;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1D9BF0;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #71767B;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .instructions {
+            background: rgba(29, 155, 240, 0.1);
+            border: 1px solid rgba(29, 155, 240, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .instructions h3 {
+            color: #1D9BF0;
+            margin-bottom: 10px;
+        }
+        
+        .instructions code {
+            background: #0F1419;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            color: #1BB3FF;
+        }
+    </style>
+</head>
+<body>
+    <div class="showcase-header">
+        <h1>Quantum Betting Platform UI</h1>
+        <p class="subtitle">Complete UI Implementation Showcase</p>
+    </div>
+
+    <div class="instructions">
+        <h3>🚀 How to Run the Full UI</h3>
+        <p>To see the complete interactive UI, run: <code>./run_server.sh</code> and open <code>http://localhost:8080</code></p>
+        <p>Or use Python: <code>python3 -m http.server 8080</code></p>
+    </div>
+
+    <div class="pages-grid">
+        <!-- Landing Page -->
+        <div class="page-preview">
+            <iframe src="index.html" class="preview-iframe"></iframe>
+            <div class="preview-info">
+                <h3 class="preview-title">Landing Page</h3>
+                <p class="preview-description">Professional landing page with hero section, features showcase, and market previews</p>
+                <div class="preview-features">
+                    <span class="feature-tag">Hero Section</span>
+                    <span class="feature-tag">Features Grid</span>
+                    <span class="feature-tag">Market Preview</span>
+                    <span class="feature-tag">CTA Sections</span>
+                </div>
+                <a href="index.html" class="view-button">View Full Page</a>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="page-preview">
+            <iframe src="app/dashboard.html" class="preview-iframe"></iframe>
+            <div class="preview-info">
+                <h3 class="preview-title">Dashboard</h3>
+                <p class="preview-description">Main user interface with portfolio overview, trending markets, and quick actions</p>
+                <div class="preview-features">
+                    <span class="feature-tag">Portfolio Stats</span>
+                    <span class="feature-tag">Quick Actions</span>
+                    <span class="feature-tag">Trending Markets</span>
+                    <span class="feature-tag">DeFi Overview</span>
+                </div>
+                <a href="app/dashboard.html" class="view-button">View Full Page</a>
+            </div>
+        </div>
+
+        <!-- Market Creation -->
+        <div class="page-preview">
+            <iframe src="app/create-market.html" class="preview-iframe"></iframe>
+            <div class="preview-info">
+                <h3 class="preview-title">Create Market</h3>
+                <p class="preview-description">5-step wizard for creating markets with verse selection and AMM configuration</p>
+                <div class="preview-features">
+                    <span class="feature-tag">5-Step Wizard</span>
+                    <span class="feature-tag">Verse Selection</span>
+                    <span class="feature-tag">AMM Types</span>
+                    <span class="feature-tag">Preview</span>
+                </div>
+                <a href="app/create-market.html" class="view-button">View Full Page</a>
+            </div>
+        </div>
+
+        <!-- Verses -->
+        <div class="page-preview">
+            <iframe src="app/verses.html" class="preview-iframe"></iframe>
+            <div class="preview-info">
+                <h3 class="preview-title">Verse Management</h3>
+                <p class="preview-description">Create and manage 32-level verse hierarchies with visual tree representation</p>
+                <div class="preview-features">
+                    <span class="feature-tag">32-Level Tree</span>
+                    <span class="feature-tag">Create Verse</span>
+                    <span class="feature-tag">Permissions</span>
+                    <span class="feature-tag">Analytics</span>
+                </div>
+                <a href="app/verses.html" class="view-button">View Full Page</a>
+            </div>
+        </div>
+
+        <!-- Markets Browser -->
+        <div class="page-preview">
+            <iframe src="app/markets.html" class="preview-iframe"></iframe>
+            <div class="preview-info">
+                <h3 class="preview-title">Markets</h3>
+                <p class="preview-description">Browse all prediction markets with advanced filters and categories</p>
+                <div class="preview-features">
+                    <span class="feature-tag">Advanced Filters</span>
+                    <span class="feature-tag">Categories</span>
+                    <span class="feature-tag">Quantum Markets</span>
+                    <span class="feature-tag">Quick Bet</span>
+                </div>
+                <a href="app/markets.html" class="view-button">View Full Page</a>
+            </div>
+        </div>
+
+        <!-- Trading Terminal -->
+        <div class="page-preview">
+            <iframe src="app/trading.html" class="preview-iframe"></iframe>
+            <div class="preview-info">
+                <h3 class="preview-title">Trading Terminal</h3>
+                <p class="preview-description">Professional trading interface with order book, charts, and up to 100x leverage</p>
+                <div class="preview-features">
+                    <span class="feature-tag">Order Book</span>
+                    <span class="feature-tag">Price Charts</span>
+                    <span class="feature-tag">100x Leverage</span>
+                    <span class="feature-tag">Positions</span>
+                </div>
+                <a href="app/trading.html" class="view-button">View Full Page</a>
+            </div>
+        </div>
+
+        <!-- Portfolio -->
+        <div class="page-preview">
+            <iframe src="app/portfolio.html" class="preview-iframe"></iframe>
+            <div class="preview-info">
+                <h3 class="preview-title">Portfolio</h3>
+                <p class="preview-description">Track positions, analyze performance, and manage risk across all markets</p>
+                <div class="preview-features">
+                    <span class="feature-tag">P&L Tracking</span>
+                    <span class="feature-tag">Performance Chart</span>
+                    <span class="feature-tag">Risk Management</span>
+                    <span class="feature-tag">Trade History</span>
+                </div>
+                <a href="app/portfolio.html" class="view-button">View Full Page</a>
+            </div>
+        </div>
+
+        <!-- DeFi Hub -->
+        <div class="page-preview">
+            <iframe src="app/defi.html" class="preview-iframe"></iframe>
+            <div class="preview-info">
+                <h3 class="preview-title">DeFi Hub</h3>
+                <p class="preview-description">Stake MMT tokens, provide liquidity, access flash loans, and yield farm</p>
+                <div class="preview-features">
+                    <span class="feature-tag">18.7% APY Staking</span>
+                    <span class="feature-tag">Liquidity Pools</span>
+                    <span class="feature-tag">Flash Loans</span>
+                    <span class="feature-tag">Yield Farming</span>
+                </div>
+                <a href="app/defi.html" class="view-button">View Full Page</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="tech-stats">
+        <h2>Technical Implementation</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value">92</div>
+                <div class="stat-label">Smart Contracts</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">5,250</div>
+                <div class="stat-label">TPS Capacity</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">32</div>
+                <div class="stat-label">Verse Levels</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">100x</div>
+                <div class="stat-label">Max Leverage</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">10</div>
+                <div class="stat-label">UI Pages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">18.7%</div>
+                <div class="stat-label">MMT APY</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>✨ Key Features Implemented</h3>
+        <p><strong>Program ID:</strong> <code>HKTkR5ubMM2bpjdhEo3auZsF8QAqKg6MZR5iWTosGPca</code></p>
+        <p>✓ Users can add verses to markets • ✓ Professional color scheme • ✓ Complete product UI • ✓ Native Solana (No Anchor)</p>
+    </div>
+</body>
+</html>

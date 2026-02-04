@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verses - Quantum Betting Platform</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                <svg class="navbar-logo" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="15" stroke="var(--color-primary)" stroke-width="2"/>
+                    <path d="M16 8 L16 24 M8 16 L24 16" stroke="var(--color-primary)" stroke-width="2"/>
+                    <circle cx="16" cy="16" r="4" fill="var(--color-primary)"/>
+                </svg>
+                <span>Quantum</span>
+            </a>
+            
+            <div class="navbar-menu">
+                <div class="navbar-actions">
+                    <div class="wallet-info">
+                        <div class="wallet-balance">
+                            <span class="balance-label">Balance</span>
+                            <span class="balance-amount">◎ 1,234.56</span>
+                        </div>
+                        <button class="wallet-address">0x7g9N...48AU</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="showCreateVerseModal()">
+                        Create Verse
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="verses-page">
+        <div class="container">
+            <!-- Page Header -->
+            <section class="page-header">
+                <h1>Verse Explorer</h1>
+                <p>Navigate and manage the 32-level market hierarchy</p>
+            </section>
+
+            <!-- Verse Stats -->
+            <section class="verse-stats">
+                <div class="stat-card">
+                    <div class="stat-value">1,847</div>
+                    <div class="stat-label">Total Verses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">32</div>
+                    <div class="stat-label">Max Depth</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">45,678</div>
+                    <div class="stat-label">Total Markets</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$2.5B</div>
+                    <div class="stat-label">Total Volume</div>
+                </div>
+            </section>
+
+            <!-- Verse Explorer Section -->
+            <section class="verse-explorer">
+                <div class="explorer-header">
+                    <h2>Verse Hierarchy</h2>
+                    <div class="explorer-controls">
+                        <input type="search" class="form-input" placeholder="Search verses..." 
+                               id="verseSearch" onkeyup="searchVerses()">
+                        <select class="form-select" onchange="filterByCategory(this.value)">
+                            <option value="all">All Categories</option>
+                            <option value="sports">Sports</option>
+                            <option value="politics">Politics</option>
+                            <option value="crypto">Crypto</option>
+                            <option value="science">Science</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="toggleView()">
+                            <span id="viewToggle">Tree View</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Breadcrumb Navigation -->
+                <div class="verse-breadcrumb">
+                    <a href="#" onclick="navigateToVerse('root')">Root Universe</a>
+                    <span>→</span>
+                    <a href="#" onclick="navigateToVerse('crypto')">Crypto</a>
+                    <span>→</span>
+                    <span class="current">Bitcoin</span>
+                </div>
+
+                <!-- Verse Tree Visualization -->
+                <div class="verse-visualization" id="verseVisualization">
+                    <div class="verse-tree">
+                        <!-- Root Verse -->
+                        <div class="verse-node root" onclick="selectVerse('root')">
+                            <div class="node-content">
+                                <h3>🌍 Root Universe</h3>
+                                <p>12,456 markets • Level 0</p>
+                            </div>
+                            <div class="node-stats">
+                                <span>Volume: $890M</span>
+                                <span>Active: 8,234</span>
+                            </div>
+                        </div>
+
+                        <!-- Level 1 Verses -->
+                        <div class="verse-level level-1">
+                            <div class="verse-node" onclick="selectVerse('sports')">
+                                <div class="node-content">
+                                    <h3>⚽ Sports</h3>
+                                    <p>3,456 markets • Level 1</p>
+                                </div>
+                                <div class="node-stats">
+                                    <span>Volume: $234M</span>
+                                </div>
+                            </div>
+                            
+                            <div class="verse-node" onclick="selectVerse('politics')">
+                                <div class="node-content">
+                                    <h3>🗳️ Politics</h3>
+                                    <p>2,345 markets • Level 1</p>
+                                </div>
+                                <div class="node-stats">
+                                    <span>Volume: $456M</span>
+                                </div>
+                            </div>
+                            
+                            <div class="verse-node active" onclick="selectVerse('crypto')">
+                                <div class="node-content">
+                                    <h3>💰 Crypto</h3>
+                                    <p>4,567 markets • Level 1</p>
+                                </div>
+                                <div class="node-stats">
+                                    <span>Volume: $567M</span>
+                                </div>
+                            </div>
+                            
+                            <div class="verse-node" onclick="selectVerse('science')">
+                                <div class="node-content">
+                                    <h3>🔬 Science</h3>
+                                    <p>1,234 markets • Level 1</p>
+                                </div>
+                                <div class="node-stats">
+                                    <span>Volume: $123M</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Level 2 Verses (Crypto Sub-verses) -->
+                        <div class="verse-level level-2">
+                            <div class="verse-node" onclick="selectVerse('bitcoin')">
+                                <div class="node-content">
+                                    <h3>₿ Bitcoin</h3>
+                                    <p>567 markets • Level 2</p>
+                                </div>
+                            </div>
+                            
+                            <div class="verse-node" onclick="selectVerse('ethereum')">
+                                <div class="node-content">
+                                    <h3>Ξ Ethereum</h3>
+                                    <p>432 markets • Level 2</p>
+                                </div>
+                            </div>
+                            
+                            <div class="verse-node" onclick="selectVerse('defi')">
+                                <div class="node-content">
+                                    <h3>🏦 DeFi</h3>
+                                    <p>789 markets • Level 2</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connection Lines -->
+                        <svg class="verse-connections">
+                            <line x1="50%" y1="100" x2="20%" y2="200" stroke="#2F3336" stroke-width="2"/>
+                            <line x1="50%" y1="100" x2="40%" y2="200" stroke="#2F3336" stroke-width="2"/>
+                            <line x1="50%" y1="100" x2="60%" y2="200" stroke="#1D9BF0" stroke-width="2"/>
+                            <line x1="50%" y1="100" x2="80%" y2="200" stroke="#2F3336" stroke-width="2"/>
+                            
+                            <line x1="60%" y1="300" x2="45%" y2="400" stroke="#1D9BF0" stroke-width="2"/>
+                            <line x1="60%" y1="300" x2="60%" y2="400" stroke="#1D9BF0" stroke-width="2"/>
+                            <line x1="60%" y1="300" x2="75%" y2="400" stroke="#1D9BF0" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- List View (Hidden by default) -->
+                <div class="verse-list-view" id="verseListView" style="display: none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Verse Name</th>
+                                <th>Level</th>
+                                <th>Markets</th>
+                                <th>Volume</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="verse-name">
+                                        <span class="verse-icon">💰</span>
+                                        <span>Crypto → Bitcoin → Price Predictions</span>
+                                    </div>
+                                </td>
+                                <td>3</td>
+                                <td>234</td>
+                                <td>$45.6M</td>
+                                <td>2 months ago</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="manageVerse('btc-price')">Manage</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="verse-name">
+                                        <span class="verse-icon">⚽</span>
+                                        <span>Sports → NFL → Super Bowl</span>
+                                    </div>
+                                </td>
+                                <td>3</td>
+                                <td>156</td>
+                                <td>$23.4M</td>
+                                <td>1 month ago</td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary" onclick="manageVerse('nfl-sb')">Manage</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Selected Verse Details -->
+            <section class="verse-details">
+                <h2>Selected Verse Details</h2>
+                <div class="details-grid">
+                    <div class="detail-card">
+                        <h3>📊 Verse Information</h3>
+                        <div class="detail-content">
+                            <div class="detail-row">
+                                <span>Name:</span>
+                                <span>Bitcoin Sub-Verse</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Full Path:</span>
+                                <span class="path">Root → Crypto → Bitcoin</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Level:</span>
+                                <span>2 / 32</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Created:</span>
+                                <span>January 15, 2024</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Owner:</span>
+                                <span class="address">0x1234...5678</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card">
+                        <h3>📈 Performance Metrics</h3>
+                        <div class="detail-content">
+                            <div class="detail-row">
+                                <span>Total Markets:</span>
+                                <span>567</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Active Markets:</span>
+                                <span>423</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Total Volume:</span>
+                                <span>$234.5M</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>24h Volume:</span>
+                                <span class="positive">$12.3M (+15%)</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Unique Traders:</span>
+                                <span>45,678</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card">
+                        <h3>⚛️ Quantum Features</h3>
+                        <div class="detail-content">
+                            <div class="quantum-features">
+                                <div class="quantum-feature">
+                                    <span class="feature-icon">🌀</span>
+                                    <div>
+                                        <h4>Superposition Markets</h4>
+                                        <p>12 active</p>
+                                    </div>
+                                </div>
+                                <div class="quantum-feature">
+                                    <span class="feature-icon">🔗</span>
+                                    <div>
+                                        <h4>Entangled Verses</h4>
+                                        <p>3 connections</p>
+                                    </div>
+                                </div>
+                                <div class="quantum-feature">
+                                    <span class="feature-icon">🌠</span>
+                                    <div>
+                                        <h4>Tunneling Enabled</h4>
+                                        <p>Active</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-card">
+                        <h3>⚙️ Verse Settings</h3>
+                        <div class="detail-content">
+                            <div class="detail-row">
+                                <span>Access Level:</span>
+                                <span>Public</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Market Creation Fee:</span>
+                                <span>◎ 0.5 SOL</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Trading Fee Split:</span>
+                                <span>20% to verse</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Max Child Verses:</span>
+                                <span>100</span>
+                            </div>
+                            <button class="btn btn-secondary" onclick="editVerseSettings()">
+                                Edit Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Top Markets in Verse -->
+            <section class="verse-markets">
+                <div class="section-header">
+                    <h2>Top Markets in This Verse</h2>
+                    <button class="btn btn-secondary" onclick="viewAllMarkets()">View All 567 Markets</button>
+                </div>
+                
+                <div class="markets-grid">
+                    <div class="market-card">
+                        <div class="market-card-header">
+                            <h3 class="market-card-title">Bitcoin > $100K by 2025?</h3>
+                            <span class="badge badge-primary">Price</span>
+                        </div>
+                        <div class="market-card-odds">
+                            <div class="odds-button odds-button-yes">
+                                <span class="odds-label">YES</span>
+                                <span class="odds-value">23%</span>
+                            </div>
+                            <div class="odds-button odds-button-no">
+                                <span class="odds-label">NO</span>
+                                <span class="odds-value">77%</span>
+                            </div>
+                        </div>
+                        <div class="market-card-stats">
+                            <span>Volume: $45.6M</span>
+                            <span>Traders: 12,345</span>
+                        </div>
+                    </div>
+
+                    <div class="market-card">
+                        <div class="market-card-header">
+                            <h3 class="market-card-title">Bitcoin dominance > 60% in 2024?</h3>
+                            <span class="badge badge-success">Market Share</span>
+                        </div>
+                        <div class="market-card-odds">
+                            <div class="odds-button odds-button-yes">
+                                <span class="odds-label">YES</span>
+                                <span class="odds-value">41%</span>
+                            </div>
+                            <div class="odds-button odds-button-no">
+                                <span class="odds-label">NO</span>
+                                <span class="odds-value">59%</span>
+                            </div>
+                        </div>
+                        <div class="market-card-stats">
+                            <span>Volume: $23.4M</span>
+                            <span>Traders: 8,765</span>
+                        </div>
+                    </div>
+
+                    <div class="market-card quantum">
+                        <div class="market-card-header">
+                            <h3 class="market-card-title">Bitcoin halving impact on price</h3>
+                            <span class="badge badge-warning">Quantum</span>
+                        </div>
+                        <div class="quantum-display">
+                            <div class="quantum-state">
+                                <span class="state-label">Bullish</span>
+                                <span class="state-value">68%</span>
+                            </div>
+                            <div class="quantum-state">
+                                <span class="state-label">Bearish</span>
+                                <span class="state-value">32%</span>
+                            </div>
+                        </div>
+                        <div class="market-card-stats">
+                            <span>Superposition Active</span>
+                            <span>Volume: $15.7M</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Create Verse Modal -->
+    <div class="modal" id="createVerseModal">
+        <div class="modal-backdrop" onclick="closeCreateVerseModal()"></div>
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>Create New Verse</h2>
+                <button class="modal-close" onclick="closeCreateVerseModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="create-verse-form">
+                    <div class="form-section">
+                        <h3>Basic Information</h3>
+                        <div class="form-group">
+                            <label class="form-label">Verse Name</label>
+                            <input type="text" class="form-input" id="verseName" 
+                                   placeholder="e.g., DeFi Protocols, NFT Collections">
+                            <div class="form-helper">Choose a descriptive name for your verse</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-textarea" id="verseDescription" rows="3"
+                                      placeholder="Describe what markets will be included in this verse..."></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Parent Verse</label>
+                                <select class="form-select" id="parentVerse">
+                                    <option value="root">Root Universe</option>
+                                    <option value="crypto">Crypto Verse</option>
+                                    <option value="defi">DeFi Verse</option>
+                                    <option value="sports">Sports Verse</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" id="verseCategory">
+                                    <option value="">Select category</option>
+                                    <option value="finance">Finance</option>
+                                    <option value="technology">Technology</option>
+                                    <option value="sports">Sports</option>
+                                    <option value="politics">Politics</option>
+                                    <option value="entertainment">Entertainment</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Access & Permissions</h3>
+                        <div class="form-group">
+                            <label class="form-label">Access Level</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="access" value="public" checked>
+                                    <div>
+                                        <strong>Public</strong>
+                                        <p>Anyone can create markets in this verse</p>
+                                    </div>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="access" value="restricted">
+                                    <div>
+                                        <strong>Restricted</strong>
+                                        <p>Market creation requires approval</p>
+                                    </div>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="access" value="private">
+                                    <div>
+                                        <strong>Private</strong>
+                                        <p>Only invited addresses can create markets</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Market Creation Fee</label>
+                                <input type="number" class="form-input" id="creationFee" 
+                                       value="0.5" min="0" step="0.1" placeholder="SOL">
+                                <div class="form-helper">Fee charged for creating markets</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Fee Distribution</label>
+                                <input type="number" class="form-input" id="feeDistribution" 
+                                       value="20" min="0" max="100" placeholder="%">
+                                <div class="form-helper">% of trading fees to verse treasury</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Advanced Features</h3>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="enableQuantum" checked>
+                                <span>Enable Quantum Features</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="enableCrossVerse">
+                                <span>Allow Cross-Verse Entanglement</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="enableSubVerses" checked>
+                                <span>Allow Sub-Verse Creation</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="creation-cost">
+                        <h3>Creation Cost</h3>
+                        <div class="cost-item">
+                            <span>Verse Creation Fee:</span>
+                            <span>◎ 10.00 SOL</span>
+                        </div>
+                        <div class="cost-item">
+                            <span>Initial Stake (refundable):</span>
+                            <span>◎ 100.00 SOL</span>
+                        </div>
+                        <div class="cost-item total">
+                            <span>Total:</span>
+                            <span>◎ 110.00 SOL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCreateVerseModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="createVerse()">Create Verse</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Styles specific to verses page -->
+    <style>
+        .verses-page {
+            padding: var(--spacing-xl) 0;
+            min-height: calc(100vh - 64px);
+        }
+        
+        .page-header {
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .page-header p {
+            color: var(--color-text-secondary);
+            font-size: 1.125rem;
+        }
+        
+        /* Verse Stats */
+        .verse-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .stat-card {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .stat-label {
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Verse Explorer */
+        .verse-explorer {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .explorer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .explorer-controls {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+        }
+        
+        .explorer-controls .form-input {
+            width: 250px;
+        }
+        
+        /* Verse Breadcrumb */
+        .verse-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background-color: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-xl);
+            font-size: 0.875rem;
+        }
+        
+        .verse-breadcrumb a {
+            color: var(--color-text-secondary);
+            transition: color var(--transition-fast);
+        }
+        
+        .verse-breadcrumb a:hover {
+            color: var(--color-primary);
+        }
+        
+        .verse-breadcrumb .current {
+            color: var(--color-text-primary);
+            font-weight: 600;
+        }
+        
+        /* Verse Visualization */
+        .verse-visualization {
+            position: relative;
+            min-height: 500px;
+            background-color: var(--color-bg-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            overflow: auto;
+        }
+        
+        .verse-tree {
+            position: relative;
+            width: 100%;
+            min-width: 800px;
+        }
+        
+        .verse-node {
+            position: absolute;
+            background-color: var(--color-bg-secondary);
+            border: 2px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            width: 200px;
+        }
+        
+        .verse-node:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            z-index: 10;
+        }
+        
+        .verse-node.active {
+            border-color: var(--color-primary);
+            background-color: var(--color-bg-tertiary);
+        }
+        
+        .verse-node.root {
+            left: 50%;
+            transform: translateX(-50%);
+            top: 20px;
+            width: 250px;
+        }
+        
+        .verse-level {
+            position: relative;
+        }
+        
+        .verse-level.level-1 {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 150px;
+        }
+        
+        .verse-level.level-1 .verse-node {
+            position: relative;
+        }
+        
+        .verse-level.level-2 {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-xl);
+            margin-top: 150px;
+        }
+        
+        .verse-level.level-2 .verse-node {
+            position: relative;
+        }
+        
+        .node-content h3 {
+            font-size: 1.125rem;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .node-content p {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .node-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+            padding-top: var(--spacing-sm);
+            border-top: 1px solid var(--color-border-primary);
+        }
+        
+        /* Verse Connections */
+        .verse-connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* List View */
+        .verse-name {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .verse-icon {
+            font-size: 1.25rem;
+        }
+        
+        /* Verse Details */
+        .verse-details {
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .detail-card {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+        }
+        
+        .detail-card h3 {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--color-border-primary);
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-row span:first-child {
+            color: var(--color-text-secondary);
+        }
+        
+        .detail-row .path {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+        }
+        
+        .detail-row .address {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+        }
+        
+        /* Quantum Features */
+        .quantum-features {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .quantum-feature {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+        }
+        
+        .quantum-feature h4 {
+            font-size: 0.875rem;
+            margin-bottom: 2px;
+        }
+        
+        .quantum-feature p {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin: 0;
+        }
+        
+        /* Markets Grid */
+        .verse-markets .markets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        /* Create Verse Form */
+        .create-verse-form {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: var(--spacing-md);
+        }
+        
+        .form-section {
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-xl);
+            border-bottom: 1px solid var(--color-border-primary);
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        
+        .form-section h3 {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .radio-label {
+            display: flex;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background-color: var(--color-bg-primary);
+            border: 2px solid var(--color-border-primary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .radio-label:hover {
+            border-color: var(--color-border-secondary);
+        }
+        
+        .radio-label input[type="radio"]:checked + div {
+            color: var(--color-primary);
+        }
+        
+        .radio-label input[type="radio"]:checked ~ * {
+            color: var(--color-primary);
+        }
+        
+        .radio-label strong {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .radio-label p {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin: 0;
+        }
+        
+        .creation-cost {
+            background-color: var(--color-bg-primary);
+            border: 2px solid var(--color-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .creation-cost h3 {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            font-family: var(--font-mono);
+        }
+        
+        .cost-item.total {
+            padding-top: var(--spacing-md);
+            border-top: 2px solid var(--color-border-primary);
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .explorer-controls {
+                flex-wrap: wrap;
+            }
+            
+            .explorer-controls .form-input {
+                width: 100%;
+            }
+            
+            .verse-visualization {
+                overflow-x: scroll;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .verse-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+
+    <!-- Verses JavaScript -->
+    <script>
+        // Initialize
+        let currentView = 'tree';
+        let selectedVerse = 'crypto';
+        
+        // Show create verse modal
+        function showCreateVerseModal() {
+            document.getElementById('createVerseModal').classList.add('active');
+        }
+        
+        // Close create verse modal
+        function closeCreateVerseModal() {
+            document.getElementById('createVerseModal').classList.remove('active');
+        }
+        
+        // Create verse
+        function createVerse() {
+            const verseName = document.getElementById('verseName').value;
+            const parentVerse = document.getElementById('parentVerse').value;
+            
+            if (!verseName) {
+                alert('Please enter a verse name');
+                return;
+            }
+            
+            // Simulate verse creation
+            alert(`Verse "${verseName}" created successfully!\n\nVerse ID: VERSE-2024-0089\nParent: ${parentVerse}\nTransaction: 3xZ8m...`);
+            closeCreateVerseModal();
+            
+            // Refresh verse tree
+            location.reload();
+        }
+        
+        // Toggle between tree and list view
+        function toggleView() {
+            const treeView = document.getElementById('verseVisualization');
+            const listView = document.getElementById('verseListView');
+            const toggleBtn = document.getElementById('viewToggle');
+            
+            if (currentView === 'tree') {
+                treeView.style.display = 'none';
+                listView.style.display = 'block';
+                toggleBtn.textContent = 'List View';
+                currentView = 'list';
+            } else {
+                treeView.style.display = 'block';
+                listView.style.display = 'none';
+                toggleBtn.textContent = 'Tree View';
+                currentView = 'tree';
+            }
+        }
+        
+        // Select verse
+        function selectVerse(verseId) {
+            // Remove active class from all nodes
+            document.querySelectorAll('.verse-node').forEach(node => {
+                node.classList.remove('active');
+            });
+            
+            // Add active class to selected node
+            event.currentTarget.classList.add('active');
+            
+            selectedVerse = verseId;
+            
+            // Update verse details
+            updateVerseDetails(verseId);
+        }
+        
+        // Navigate to verse
+        function navigateToVerse(verseId) {
+            // Update breadcrumb and tree view
+            selectVerse(verseId);
+        }
+        
+        // Search verses
+        function searchVerses() {
+            const searchTerm = document.getElementById('verseSearch').value.toLowerCase();
+            // Implement search logic
+        }
+        
+        // Filter by category
+        function filterByCategory(category) {
+            // Implement filter logic
+        }
+        
+        // Update verse details
+        function updateVerseDetails(verseId) {
+            // Update the verse details section based on selected verse
+            console.log('Updating details for verse:', verseId);
+        }
+        
+        // Edit verse settings
+        function editVerseSettings() {
+            alert('Verse settings editor coming soon!');
+        }
+        
+        // View all markets
+        function viewAllMarkets() {
+            window.location.href = `markets.html?verse=${selectedVerse}`;
+        }
+        
+        // Manage verse
+        function manageVerse(verseId) {
+            alert(`Managing verse: ${verseId}`);
+        }
+        
+        // Initialize D3.js for advanced tree visualization
+        function initializeD3Tree() {
+            // D3.js tree visualization would go here
+            console.log('D3.js tree visualization initialized');
+        }
+        
+        // Load verse data
+        function loadVerseData() {
+            // Simulate loading verse data from API
+            console.log('Loading verse data...');
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadVerseData();
+            // initializeD3Tree(); // Would initialize D3.js visualization
+        });
+    </script>
+</body>
+</html>

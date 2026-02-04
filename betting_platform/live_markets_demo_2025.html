@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiverse Aggregator Platform - Live Demo August 2025</title>
+    
+    <style>
+        /* John Ive Design System - From Original */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Main App Container */
+        .app-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 360px;
+            min-height: 100vh;
+            gap: 1px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Left Panel */
+        .left-panel {
+            background: #080808;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Wallet Section */
+        .wallet-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .wallet-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .wallet-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #FF3B30;
+            transition: all 0.3s;
+        }
+
+        .wallet-indicator.connected {
+            background: #4CD964;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .wallet-address {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 8px;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .balance-amount {
+            font-size: 24px;
+            font-weight: 300;
+            transition: all 0.3s;
+        }
+
+        /* Main Panel */
+        .main-panel {
+            background: #0A0A0A;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Market Header */
+        .market-header {
+            padding: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%);
+        }
+
+        .market-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        /* Right Panel - Positions */
+        .right-panel {
+            background: #080808;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Demo Narrator */
+        .demo-narrator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 900px;
+            background: rgba(255, 214, 10, 0.98);
+            color: #000;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(255, 214, 10, 0.5);
+            z-index: 1000;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .demo-narrator.hidden {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.95);
+            pointer-events: none;
+        }
+
+        @keyframes slideUp {
+            from { transform: translate(-50%, -50%) translateY(100px); opacity: 0; }
+            to { transform: translate(-50%, -50%) translateY(0); opacity: 1; }
+        }
+        
+        /* Mini narrator indicator when hidden */
+        .mini-narrator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(255, 214, 10, 0.9);
+            color: #000;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .mini-narrator.visible {
+            opacity: 1;
+        }
+        
+        /* Money flow visualization */
+        .money-flow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 700px;
+            display: none;
+        }
+        
+        .money-flow.active {
+            display: block;
+        }
+        
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+        }
+        
+        .flow-node {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .flow-node.active {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.1);
+            animation: pulseGlow 2s infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 214, 10, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 214, 10, 0.6); }
+        }
+        
+        .flow-arrow {
+            font-size: 24px;
+            color: #FFD60A;
+            animation: moveRight 2s infinite;
+        }
+        
+        @keyframes moveRight {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        .narrator-step {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        .narrator-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .narrator-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .narrator-progress {
+            height: 4px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .narrator-progress-bar {
+            height: 100%;
+            background: #000;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        /* Highlight Effect */
+        .highlight {
+            position: relative;
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 214, 10, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 214, 10, 0.8); }
+        }
+
+        /* Flash Betting Timer */
+        .flash-timer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            display: none;
+        }
+
+        .flash-timer.active {
+            display: block;
+            animation: zoomIn 0.5s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .timer-circle {
+            fill: none;
+            stroke: #FFD60A;
+            stroke-width: 8;
+            stroke-dasharray: 565;
+            stroke-dashoffset: 0;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: 700;
+            color: #FFD60A;
+        }
+
+        /* Quantum Explanation Box */
+        .quantum-explanation {
+            padding: 24px;
+            background: rgba(123, 63, 242, 0.1);
+            border-radius: 12px;
+            margin: 20px;
+            border: 1px solid rgba(123, 63, 242, 0.3);
+        }
+
+        /* Leverage Meter */
+        .leverage-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: none;
+        }
+
+        .leverage-display.active {
+            display: block;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from { transform: translate(-50%, -50%) scale(0); }
+            to { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .leverage-number {
+            font-size: 120px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #4CD964 0%, #FFD60A 50%, #FF3B30 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+
+        .leverage-label {
+            font-size: 24px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Trading Cards */
+        .outcome-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .outcome-card.highlighted {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: #FFD60A;
+            transform: scale(1.02);
+        }
+
+        .outcome-price {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        /* Position List */
+        .position-item {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            opacity: 0;
+            transform: translateX(50px);
+            animation: slideInRight 0.5s forwards;
+        }
+
+        @keyframes slideInRight {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .position-pnl {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .position-pnl.positive {
+            color: #4CD964;
+        }
+
+        .position-pnl.negative {
+            color: #FF3B30;
+        }
+
+        /* Auto-scroll indicator */
+        .auto-scroll-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(255, 214, 10, 0.9);
+            color: #000;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Skip button */
+        .skip-demo {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .skip-demo:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #FFFFFF;
+        }
+        
+        /* Quantum detail box */
+        .quantum-detail {
+            padding: 24px;
+            background: rgba(123, 63, 242, 0.1);
+            border-radius: 12px;
+            margin: 20px;
+        }
+        
+        /* Verse detail box */
+        .verse-detail {
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(255, 214, 10, 0.1), rgba(123, 63, 242, 0.1));
+            border-radius: 12px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Button -->
+    <button class="skip-demo" onclick="skipDemo()">Skip Demo</button>
+    
+    <!-- Auto Scroll Indicator -->
+    <div class="auto-scroll-indicator">🎬 DEMO RUNNING</div>
+
+    <!-- Main App -->
+    <div class="app-container">
+        <!-- Left Panel -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <div class="logo">Multiverse Aggregator</div>
+                <div style="font-size: 11px; color: rgba(255, 214, 10, 0.6); margin-top: 4px;">We route, we don't hold</div>
+            </div>
+            
+            <div class="wallet-section" id="wallet-section">
+                <div class="wallet-card">
+                    <div class="wallet-status">
+                        <div class="wallet-indicator" id="wallet-indicator"></div>
+                        <span id="wallet-status-text">Disconnected</span>
+                    </div>
+                    <div class="wallet-address" id="wallet-address"></div>
+                    <div class="balance-display">
+                        <div class="balance-amount" id="balance">$0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market List -->
+            <div style="padding: 20px;">
+                <div class="section-title" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255, 255, 255, 0.4); margin-bottom: 16px;">LIVE MARKETS - AUGUST 2025</div>
+                <div id="market-list"></div>
+            </div>
+        </div>
+
+        <!-- Main Panel -->
+        <div class="main-panel">
+            <div class="market-header">
+                <div class="market-title" id="market-title">Welcome to Multiverse</div>
+                <div id="market-info" style="margin-top: 16px;"></div>
+            </div>
+            
+            <div class="market-content" id="main-content">
+                <!-- Flash Timer -->
+                <div class="flash-timer" id="flash-timer">
+                    <svg width="200" height="200">
+                        <circle class="timer-circle" cx="100" cy="100" r="90" id="timer-circle"/>
+                    </svg>
+                    <div class="timer-text" id="timer-text">45</div>
+                </div>
+
+                <!-- Quantum Explanation Area -->
+                <div id="quantum-explanation-area"></div>
+
+                <!-- Leverage Display -->
+                <div class="leverage-display" id="leverage-display">
+                    <div class="leverage-number" id="leverage-number">1x</div>
+                    <div class="leverage-label">EFFECTIVE LEVERAGE</div>
+                </div>
+
+                <!-- Trading Cards -->
+                <div id="trading-cards"></div>
+                
+                <!-- Money Flow Diagram -->
+                <div class="money-flow" id="money-flow">
+                    <div class="flow-diagram">
+                        <div class="flow-node" id="flow-wallet">
+                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Your Wallet</div>
+                            <div style="font-size: 24px;">💰</div>
+                            <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin-top: 8px;">$25,000</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" id="flow-multiverse">
+                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Multiverse Router</div>
+                            <div style="font-size: 24px;">🔄</div>
+                            <div style="font-size: 14px; color: rgba(255, 214, 10, 1); margin-top: 8px;">Aggregator Only</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" id="flow-platform">
+                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;" id="platform-name">Polymarket</div>
+                            <div style="font-size: 24px;">🎯</div>
+                            <div style="font-size: 14px; color: rgba(76, 217, 100, 1); margin-top: 8px;">Actual Betting</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Positions -->
+        <div class="right-panel">
+            <div class="panel-header">
+                <div style="font-size: 16px; font-weight: 600;">Portfolio</div>
+                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 4px;">Total P&L: <span id="total-pnl" style="color: #4CD964;">+$0</span></div>
+            </div>
+            
+            <div style="padding: 20px; overflow-y: auto;" id="positions-list">
+                <!-- Positions will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Narrator -->
+    <div class="demo-narrator" id="narrator">
+        <div class="narrator-step" id="narrator-step">STEP 1 OF 30</div>
+        <div class="narrator-title" id="narrator-title">Welcome to Multiverse Aggregator</div>
+        <div class="narrator-text" id="narrator-text">
+            IMPORTANT: Multiverse is an AGGREGATOR platform. We don't hold your funds, manage order books, or run markets. We route your bets to Polymarket, DraftKings, FanDuel and find you the best odds. Think of us as the 'Kayak of betting'.
+        </div>
+        <div class="narrator-progress">
+            <div class="narrator-progress-bar" id="progress-bar" style="width: 0%;"></div>
+        </div>
+    </div>
+    
+    <!-- Mini narrator when main is hidden -->
+    <div class="mini-narrator" id="mini-narrator">Demo Running...</div>
+
+    <script>
+        // Demo Script with 30 detailed steps
+        const demoSteps = [
+            {
+                step: 1,
+                title: "Welcome to Multiverse Aggregator",
+                text: "IMPORTANT: Multiverse is an AGGREGATOR platform. We don't hold your funds, manage order books, or run markets. We route your bets to Polymarket, DraftKings, FanDuel and find you the best odds. Think of us as the 'Kayak of betting' - we search all platforms and route your money directly to them.",
+                action: () => {
+                    document.getElementById('market-title').textContent = 'Multiverse Aggregator Platform';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="color: #FFD60A;">🔄 Routing to: Polymarket • DraftKings • FanDuel • BetMGM • Caesars</div>
+                    `;
+                }
+            },
+            {
+                step: 2,
+                title: "How Money Flows - Never Through Us",
+                text: "Watch this carefully: Your money NEVER sits with us. When you bet, funds flow: Your Wallet → Multiverse Router (instant pass-through) → External Platform (Polymarket/DraftKings). We're just the pipe, not the tank. The actual betting happens on their platforms, with their order books.",
+                action: () => {
+                    document.getElementById('money-flow').classList.add('active');
+                    setTimeout(() => {
+                        document.getElementById('flow-wallet').classList.add('active');
+                    }, 1000);
+                    setTimeout(() => {
+                        document.getElementById('flow-multiverse').classList.add('active');
+                        document.getElementById('flow-wallet').classList.remove('active');
+                    }, 2500);
+                    setTimeout(() => {
+                        document.getElementById('flow-platform').classList.add('active');
+                        document.getElementById('flow-multiverse').classList.remove('active');
+                    }, 4000);
+                }
+            },
+            {
+                step: 3,
+                title: "Connecting Your Wallet",
+                text: "Let's connect your MetaMask wallet. Your funds stay in YOUR wallet until you place a bet. When you bet, they go DIRECTLY to the platform (Polymarket uses USDC on Polygon, DraftKings uses USD). We never custody your funds.",
+                action: () => {
+                    document.getElementById('money-flow').classList.remove('active');
+                    document.getElementById('wallet-section').classList.add('highlight');
+                    setTimeout(() => {
+                        document.getElementById('wallet-indicator').classList.add('connected');
+                        document.getElementById('wallet-status-text').textContent = 'Connected';
+                        document.getElementById('wallet-address').textContent = '0x742d...8963';
+                        animateNumber('balance', 0, 25000, 2000);
+                    }, 2000);
+                }
+            },
+            {
+                step: 4,
+                title: "Live Market: US Recession Q4 2025 (Polymarket)",
+                text: "Here's a LIVE market from Polymarket: 'Will US enter recession by Q4 2025?' Currently 42.8% YES. This market exists on Polymarket's platform, not ours. When you bet, your USDC goes directly to Polymarket's CTF Exchange contract. We just show you their market and route your order.",
+                action: () => {
+                    document.getElementById('wallet-section').classList.remove('highlight');
+                    document.getElementById('market-title').textContent = '📍 POLYMARKET: US Recession Q4 2025?';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: flex; gap: 24px;">
+                            <div><span style="font-size: 36px; font-weight: 300;">42.8%</span> <span style="color: #FF3B30;">-1.2%</span></div>
+                            <div style="padding-top: 8px; color: rgba(255, 255, 255, 0.6);">Volume: $3.4M on Polymarket</div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(255, 214, 10, 0.1); border-radius: 8px;">
+                            <span style="color: #FFD60A;">📍 Funds go to: Polymarket CTF Exchange (0x2749C9f2...)</span>
+                        </div>
+                    `;
+                    addMarketToList('📍 PM: Recession Q4', '42.8%', '-1.2%');
+                }
+            },
+            {
+                step: 5,
+                title: "Placing a Bet - Watch the Money Flow",
+                text: "Let's bet $1,000 on YES. Watch: Your $1,000 USDC leaves your wallet → Routes through our smart contract (0.1% fee) → Arrives at Polymarket CTF Exchange. The order executes on POLYMARKET'S order book, not ours. We don't have an order book!",
+                action: () => {
+                    document.getElementById('money-flow').classList.add('active');
+                    document.getElementById('platform-name').textContent = 'Polymarket CTF';
+                    setTimeout(() => {
+                        document.getElementById('flow-wallet').classList.add('active');
+                    }, 1500);
+                    setTimeout(() => {
+                        document.getElementById('flow-multiverse').classList.add('active');
+                        document.getElementById('flow-wallet').classList.remove('active');
+                    }, 3000);
+                    setTimeout(() => {
+                        document.getElementById('flow-platform').classList.add('active');
+                        document.getElementById('flow-multiverse').classList.remove('active');
+                    }, 4500);
+                    setTimeout(() => {
+                        addPosition('📍 PM: Recession', 'YES', '$1,000', 'PENDING');
+                        document.getElementById('money-flow').classList.remove('active');
+                    }, 6000);
+                }
+            },
+            {
+                step: 6,
+                title: "Flash Betting - DraftKings Live Sports",
+                text: "Flash markets use DRAFTKINGS live data! 'Next goal in Premier League match (45 seconds)?' When you bet here, your money goes to DraftKings Sportsbook. They handle the betting, we just aggregate their odds and route your bet. Resolution comes from their API.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '⚡ DRAFTKINGS: Goal in next 45s?';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="color: #FFD60A;">Arsenal vs Man City - 89th minute LIVE</div>
+                        <div style="margin-top: 12px; padding: 12px; background: rgba(255, 214, 10, 0.1); border-radius: 8px;">
+                            <span style="color: #FFD60A;">📍 Live odds from: DraftKings Sportsbook API</span>
+                        </div>
+                    `;
+                    document.getElementById('flash-timer').classList.add('active');
+                    startFlashCountdown();
+                    addMarketToList('⚡ DK: Goal 45s', '28%', 'LIVE');
+                }
+            },
+            {
+                step: 7,
+                title: "Flash Resolution - DraftKings Pays You",
+                text: "GOAL SCORED! DraftKings confirms via API. Watch the payout flow: DraftKings Treasury → Multiverse Router → Your Wallet. The $825 winnings come FROM DRAFTKINGS, not us! We just routed the winning notification and funds transfer.",
+                action: () => {
+                    document.getElementById('timer-text').textContent = 'GOAL!';
+                    document.getElementById('timer-text').style.color = '#4CD964';
+                    setTimeout(() => {
+                        document.getElementById('flash-timer').classList.remove('active');
+                        document.getElementById('money-flow').classList.add('active');
+                        document.getElementById('platform-name').textContent = 'DraftKings';
+                        document.getElementById('flow-platform').classList.add('active');
+                        setTimeout(() => {
+                            document.getElementById('flow-multiverse').classList.add('active');
+                            document.getElementById('flow-platform').classList.remove('active');
+                        }, 1500);
+                        setTimeout(() => {
+                            document.getElementById('flow-wallet').classList.add('active');
+                            document.getElementById('flow-multiverse').classList.remove('active');
+                        }, 3000);
+                        addPosition('⚡ DK: Goal', 'YES', '$500', '+$325');
+                    }, 2000);
+                }
+            },
+            {
+                step: 8,
+                title: "Withdrawal Process Explained",
+                text: "When you withdraw, funds come DIRECTLY from the platform where you bet. Polymarket sends USDC on Polygon, DraftKings sends USD via ACH, FanDuel via PayPal. We NEVER hold these funds. Each platform has their own treasury and payout system. We just coordinate the withdrawals.",
+                action: () => {
+                    document.getElementById('money-flow').classList.remove('active');
+                    document.getElementById('market-title').textContent = '💸 Direct Platform Withdrawals';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="font-weight: 600; margin-bottom: 8px;">From Polymarket:</div>
+                                <div style="color: #4CD964;">$1,420 USDC → Your Wallet</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 4px;">Via Polygon Network</div>
+                            </div>
+                            <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="font-weight: 600; margin-bottom: 8px;">From DraftKings:</div>
+                                <div style="color: #4CD964;">$825 USD → Your Bank</div>
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 4px;">Via ACH Transfer</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 9,
+                title: "Quantum Explained: Political Markets Example",
+                text: "QUANTUM POSITIONS spread one bet across correlated markets. EXAMPLE 1 - POLITICAL: You want to bet on economic downturn. Instead of one bet, quantum splits it across THREE correlated Polymarket markets: 'US Recession Q4 2025' (42%), 'Fed Emergency Cut September' (68%), and 'Unemployment Exceeds 5%' (51%). Why? If recession hits, Fed WILL cut rates and unemployment WILL rise. Your $1000 splits: $400→Recession, $350→Fed Cut, $250→Unemployment. Each goes DIRECTLY to Polymarket.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🔮 Quantum Example 1: Political Correlation';
+                    document.getElementById('market-info').innerHTML = `
+                        <div class="quantum-explanation">
+                            <div style="font-size: 18px; margin-bottom: 16px; color: #7B3FF2;">LIVE Polymarket Political Quantum Position</div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                                <div style="font-size: 16px; margin-bottom: 12px;">Your Bet: Economic Downturn Package</div>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                                    <div style="padding: 12px; background: rgba(123, 63, 242, 0.1); border-radius: 8px;">
+                                        <div style="color: #7B3FF2; font-size: 12px;">📍 POLYMARKET</div>
+                                        <div style="font-weight: 600;">US Recession Q4</div>
+                                        <div style="font-size: 24px; color: #FF3B30;">42%</div>
+                                        <div style="color: #FFD60A;">$400 allocated</div>
+                                    </div>
+                                    <div style="padding: 12px; background: rgba(123, 63, 242, 0.1); border-radius: 8px;">
+                                        <div style="color: #7B3FF2; font-size: 12px;">📍 POLYMARKET</div>
+                                        <div style="font-weight: 600;">Fed Emergency Cut</div>
+                                        <div style="font-size: 24px; color: #4CD964;">68%</div>
+                                        <div style="color: #FFD60A;">$350 allocated</div>
+                                    </div>
+                                    <div style="padding: 12px; background: rgba(123, 63, 242, 0.1); border-radius: 8px;">
+                                        <div style="color: #7B3FF2; font-size: 12px;">📍 POLYMARKET</div>
+                                        <div style="font-weight: 600;">Unemployment >5%</div>
+                                        <div style="font-size: 24px;">51%</div>
+                                        <div style="color: #FFD60A;">$250 allocated</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="background: rgba(255, 214, 10, 0.1); padding: 16px; border-radius: 8px;">
+                                <div style="font-weight: 600; margin-bottom: 8px;">Why These Correlate:</div>
+                                <div style="font-size: 14px; line-height: 1.6;">
+                                    • Recession CAUSES Fed to cut rates (correlation: 0.82)<br>
+                                    • Recession CAUSES unemployment to rise (correlation: 0.91)<br>
+                                    • Fed cuts INDICATE economic weakness (correlation: 0.73)<br>
+                                    • If recession happens, ALL THREE likely win together!<br>
+                                    • Expected return if all hit: $2,450 (145% profit)
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    addMarketToList('📍 PM: Recession', '42%', 'QUANTUM');
+                    addMarketToList('📍 PM: Fed Cut', '68%', 'QUANTUM');
+                    addMarketToList('📍 PM: Unemployment', '51%', 'QUANTUM');
+                }
+            },
+            {
+                step: 10,
+                title: "Quantum Explained: Sports Markets Example",
+                text: "EXAMPLE 2 - SPORTS: You believe Chiefs dominate NFL. Instead of one bet, quantum splits across THREE correlated DraftKings markets: 'Chiefs Win Super Bowl' (31%), 'Mahomes Wins MVP' (28%), and 'Chiefs #1 Seed AFC' (35%). Why? If Chiefs win Super Bowl, Mahomes likely gets MVP and they probably had #1 seed. Your $1000 splits: $400→Super Bowl, $350→MVP, $250→#1 Seed. Each bet goes DIRECTLY to DraftKings Sportsbook.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🔮 Quantum Example 2: Sports Correlation';
+                    document.getElementById('market-info').innerHTML = `
+                        <div class="quantum-explanation">
+                            <div style="font-size: 18px; margin-bottom: 16px; color: #7B3FF2;">LIVE DraftKings Sports Quantum Position</div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                                <div style="font-size: 16px; margin-bottom: 12px;">Your Bet: Chiefs Dominance Package</div>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                                    <div style="padding: 12px; background: rgba(123, 63, 242, 0.1); border-radius: 8px;">
+                                        <div style="color: #7B3FF2; font-size: 12px;">📍 DRAFTKINGS</div>
+                                        <div style="font-weight: 600;">Super Bowl Win</div>
+                                        <div style="font-size: 24px; color: #FFD60A;">31%</div>
+                                        <div style="color: #FFD60A;">$400 allocated</div>
+                                    </div>
+                                    <div style="padding: 12px; background: rgba(123, 63, 242, 0.1); border-radius: 8px;">
+                                        <div style="color: #7B3FF2; font-size: 12px;">📍 DRAFTKINGS</div>
+                                        <div style="font-weight: 600;">Mahomes MVP</div>
+                                        <div style="font-size: 24px;">28%</div>
+                                        <div style="color: #FFD60A;">$350 allocated</div>
+                                    </div>
+                                    <div style="padding: 12px; background: rgba(123, 63, 242, 0.1); border-radius: 8px;">
+                                        <div style="color: #7B3FF2; font-size: 12px;">📍 DRAFTKINGS</div>
+                                        <div style="font-weight: 600;">Chiefs #1 Seed</div>
+                                        <div style="font-size: 24px; color: #4CD964;">35%</div>
+                                        <div style="color: #FFD60A;">$250 allocated</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="background: rgba(255, 214, 10, 0.1); padding: 16px; border-radius: 8px;">
+                                <div style="font-weight: 600; margin-bottom: 8px;">Why These Correlate:</div>
+                                <div style="font-size: 14px; line-height: 1.6;">
+                                    • Super Bowl winners usually have #1 seed (correlation: 0.71)<br>
+                                    • Super Bowl winning QB often wins MVP (correlation: 0.68)<br>
+                                    • #1 seed teams have best MVP candidates (correlation: 0.64)<br>
+                                    • If Chiefs dominate, ALL THREE likely hit!<br>
+                                    • Expected return if all hit: $3,120 (212% profit)
+                                </div>
+                            </div>
+                            <div style="margin-top: 16px; padding: 12px; background: rgba(76, 217, 100, 0.1); border-radius: 8px;">
+                                <div style="text-align: center; font-size: 14px;">
+                                    <strong>Key Point:</strong> Each $1 goes DIRECTLY to DraftKings. We just coordinate the split!
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    addMarketToList('📍 DK: Super Bowl', '31%', 'QUANTUM');
+                    addMarketToList('📍 DK: Mahomes MVP', '28%', 'QUANTUM');
+                    addMarketToList('📍 DK: #1 Seed', '35%', 'QUANTUM');
+                }
+            },
+            {
+                step: 11,
+                title: "Another Live Market: Super Bowl LX",
+                text: "Here's a current market: 'Kansas City Chiefs to win Super Bowl LX' at 31.5% on multiple platforms. Polymarket has it at 31.5%, DraftKings at 32.8%, FanDuel at 30.2%. We automatically route to DraftKings for best odds. Your bet goes directly to their sportsbook.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🏈 Super Bowl LX Winner';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                            <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Polymarket</div>
+                                <div style="font-size: 24px;">31.5%</div>
+                            </div>
+                            <div style="padding: 16px; background: rgba(76, 217, 100, 0.2); border: 2px solid #4CD964; border-radius: 8px;">
+                                <div style="font-size: 12px; color: #4CD964;">DraftKings ✓</div>
+                                <div style="font-size: 24px; color: #4CD964;">32.8%</div>
+                            </div>
+                            <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">FanDuel</div>
+                                <div style="font-size: 24px;">30.2%</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; text-align: center; color: #FFD60A;">Auto-routed to DraftKings for best price!</div>
+                    `;
+                    addMarketToList('🏈 Chiefs SB LX', '32.8%', 'BEST');
+                }
+            },
+            {
+                step: 12,
+                title: "How Leverage Works - Up to 500x",
+                text: "LEVERAGE amplifies your position size. With $100, trade as if you have $50,000! Here's how: External platforms (DraftKings, FanDuel) offer up to 100x base leverage. We can chain multiple leveraged positions across platforms using DeFi protocols (AAVE for borrowing, Uniswap for liquidity) to reach 500x. Higher leverage = higher risk. A 0.2% move against you means liquidation at 500x!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '📈 Understanding Leverage';
+                    document.getElementById('leverage-display').classList.add('active');
+                    animateLeverage(1, 500, 4000);
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; margin-top: 20px;">
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; color: #4CD964;">10x</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Low Risk</div>
+                                    <div style="font-size: 14px;">$100 → $1,000</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; color: #FFD60A;">100x</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Medium Risk</div>
+                                    <div style="font-size: 14px;">$100 → $10,000</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; color: #FF3B30;">500x</div>
+                                    <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">EXTREME Risk</div>
+                                    <div style="font-size: 14px;">$100 → $50,000</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                                <div style="font-size: 14px; color: #FFD60A;">
+                                    📍 All leverage provided by external platforms (DraftKings, Polymarket, AAVE). We aggregate and coordinate.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        addPosition('📍 Leveraged: BTC Rally', '100x', '$1,000', '+$2,250');
+                    }, 2000);
+                }
+            },
+            {
+                step: 13,
+                title: "Verse Explained: Political Markets Example",
+                text: "VERSES organize markets in hierarchies. EXAMPLE 1 - POLITICAL on Polymarket: 'US Politics 2025' (root) contains '2025 Elections' contains 'California Governor' contains 'Newsom Re-election'. Each level deeper = +10% bonus. Bet at ROOT level? Your $1000 splits across ALL 156 child markets automatically! Bet on 'Newsom' specifically? Get 30% depth bonus. All markets on Polymarket, each allocation goes directly there.",
+                action: () => {
+                    document.getElementById('leverage-display').classList.remove('active');
+                    document.getElementById('market-title').textContent = '🌳 Verse Example 1: Political Hierarchy';
+                    document.getElementById('market-info').innerHTML = `
+                        <div class="verse-detail">
+                            <div style="font-size: 18px; margin-bottom: 16px; color: #FFD60A;">LIVE Polymarket Political Verse Structure</div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                                <div style="padding-left: 0;">
+                                    <div style="padding: 12px; margin: 4px 0; background: rgba(255, 214, 10, 0.1); border-radius: 8px; border: 1px solid rgba(255, 214, 10, 0.3);">
+                                        🏛️ US Politics 2025 (ROOT)
+                                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.8); margin-top: 4px;">
+                                            156 total markets • $47M volume • Base odds
+                                        </div>
+                                        <div style="font-size: 12px; color: #FFD60A;">
+                                            📍 ALL on Polymarket
+                                        </div>
+                                    </div>
+                                    <div style="padding: 12px; margin: 4px 0 4px 30px; background: rgba(255, 255, 255, 0.04); border-radius: 8px;">
+                                        └─ 2025 State Elections (+10% bonus)
+                                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.7); margin-top: 4px;">
+                                            87 markets • $22M volume
+                                        </div>
+                                    </div>
+                                    <div style="padding: 12px; margin: 4px 0 4px 60px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                                        └─ California Governor Race (+20% bonus)
+                                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin-top: 4px;">
+                                            23 markets • $8.3M volume
+                                        </div>
+                                    </div>
+                                    <div style="padding: 12px; margin: 4px 0 4px 90px; background: rgba(255, 214, 10, 0.2); border-radius: 8px; border: 1px solid rgba(255, 214, 10, 0.4);">
+                                        └─ Newsom Re-election (+30% bonus)
+                                        <div style="font-size: 14px; color: #FFD60A; margin-top: 4px;">
+                                            Currently 61% YES • $3.1M volume
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="background: rgba(123, 63, 242, 0.1); padding: 16px; border-radius: 8px;">
+                                <div style="font-weight: 600; margin-bottom: 8px;">How Depth Bonus Works:</div>
+                                <div style="font-size: 14px; line-height: 1.6;">
+                                    • Bet $1000 at ROOT: Splits across all 156 markets proportionally<br>
+                                    • Bet $1000 on California: Splits across 23 CA markets, +20% bonus<br>
+                                    • Bet $1000 on Newsom: Single market, +30% bonus on winnings<br>
+                                    • Deeper = More focused = Higher risk = Higher reward<br>
+                                    • ALL money goes to Polymarket, we just organize the hierarchy
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    addMarketToList('🏛️ PM: US Politics', 'ROOT', '156 mkts');
+                    addMarketToList('├─ State Elections', '+10%', '87 mkts');
+                    addMarketToList('├─ California', '+20%', '23 mkts');
+                    addMarketToList('└─ Newsom', '+30%', '61% YES');
+                }
+            },
+            {
+                step: 14,
+                title: "Verse Explained: Sports Markets Example",
+                text: "EXAMPLE 2 - SPORTS on DraftKings: 'NFL 2025 Season' (root) contains 'Week 11 Games' contains 'Chiefs vs Bills' contains 'Anytime TD Scorer'. Each level = +10% bonus. Bet at ROOT? Your $1000 spreads across ALL 892 NFL markets! Bet on specific 'Kelce Anytime TD'? Get 30% depth bonus at level 3. ALL bets route to DraftKings Sportsbook.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🌳 Verse Example 2: Sports Hierarchy';
+                    document.getElementById('market-info').innerHTML = `
+                        <div class="verse-detail">
+                            <div style="font-size: 18px; margin-bottom: 16px; color: #FFD60A;">LIVE DraftKings Sports Verse Structure</div>
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                                <div style="padding-left: 0;">
+                                    <div style="padding: 12px; margin: 4px 0; background: rgba(255, 214, 10, 0.1); border-radius: 8px; border: 1px solid rgba(255, 214, 10, 0.3);">
+                                        🏈 NFL 2025 Season (ROOT)
+                                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.8); margin-top: 4px;">
+                                            892 total markets • $312M volume • Base odds
+                                        </div>
+                                        <div style="font-size: 12px; color: #FFD60A;">
+                                            📍 ALL on DraftKings Sportsbook
+                                        </div>
+                                    </div>
+                                    <div style="padding: 12px; margin: 4px 0 4px 30px; background: rgba(255, 255, 255, 0.04); border-radius: 8px;">
+                                        └─ Week 11 Games (+10% bonus)
+                                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.7); margin-top: 4px;">
+                                            124 markets • $43M volume
+                                        </div>
+                                    </div>
+                                    <div style="padding: 12px; margin: 4px 0 4px 60px; background: rgba(255, 255, 255, 0.03); border-radius: 8px;">
+                                        └─ Chiefs vs Bills Game (+20% bonus)
+                                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin-top: 4px;">
+                                            38 markets • $12M volume
+                                        </div>
+                                    </div>
+                                    <div style="padding: 12px; margin: 4px 0 4px 90px; background: rgba(255, 214, 10, 0.2); border-radius: 8px; border: 1px solid rgba(255, 214, 10, 0.4);">
+                                        └─ Kelce Anytime TD (+30% bonus)
+                                        <div style="font-size: 14px; color: #FFD60A; margin-top: 4px;">
+                                            Currently -110 (47.6%) • $890K volume
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="background: rgba(123, 63, 242, 0.1); padding: 16px; border-radius: 8px;">
+                                <div style="font-weight: 600; margin-bottom: 8px;">Depth Bonus Example:</div>
+                                <div style="font-size: 14px; line-height: 1.6;">
+                                    • Bet $1000 on Kelce TD at -110 odds (1.91x payout)<br>
+                                    • With 30% depth bonus: 1.91 × 1.30 = 2.48x effective<br>
+                                    • If Kelce scores: DraftKings pays you $2,480<br>
+                                    • The $1000 goes DIRECTLY to DraftKings<br>
+                                    • Bonus comes from our routing optimization
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    addMarketToList('🏈 DK: NFL 2025', 'ROOT', '892 mkts');
+                    addMarketToList('├─ Week 11', '+10%', '124 mkts');
+                    addMarketToList('├─ Chiefs/Bills', '+20%', '38 mkts');
+                    addMarketToList('└─ Kelce TD', '+30%', '-110');
+                }
+            },
+            {
+                step: 15,
+                title: "Live Trading: SpaceX Mars Mission",
+                text: "Let's place a real trade: 'SpaceX Starship reaches Mars by 2026' at 41.2% on Polymarket. Your $5,000 USDC will be sent directly to Polymarket's CTF Exchange. The order executes on their order book. We found you this market and handle the routing.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '📍 POLYMARKET: SpaceX Mars 2026';
+                    document.getElementById('trading-cards').innerHTML = `
+                        <div class="outcome-card highlighted">
+                            <div style="font-size: 16px; margin-bottom: 8px;">YES - Starship Reaches Mars</div>
+                            <div class="outcome-price">41.2%</div>
+                            <div style="color: #FFD60A;">📍 Routing to Polymarket CTF...</div>
+                            <div style="color: #4CD964; font-size: 18px; margin-top: 8px;">EXECUTING ON POLYMARKET...</div>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        addPosition('📍 PM: SpaceX Mars', 'YES 50x', '$5,000', 'PENDING');
+                        document.getElementById('trading-cards').innerHTML = '';
+                    }, 3000);
+                }
+            },
+            {
+                step: 16,
+                title: "Multi-Platform Arbitrage",
+                text: "Same market, different prices! 'Taylor Swift 2025 Tour' is 78% on Polymarket but 82% on BetMGM. We automatically route to BetMGM for 4% better odds. On a $5,000 bet, you save $200! This is the power of aggregation - always getting the best price.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🎤 Taylor Swift 2025 World Tour';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                            <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6);">Polymarket</div>
+                                <div style="font-size: 20px;">78.0%</div>
+                            </div>
+                            <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6);">DraftKings</div>
+                                <div style="font-size: 20px;">79.5%</div>
+                            </div>
+                            <div style="padding: 12px; background: rgba(76, 217, 100, 0.2); border: 2px solid #4CD964; border-radius: 8px;">
+                                <div style="font-size: 11px; color: #4CD964;">BetMGM ✓</div>
+                                <div style="font-size: 20px; color: #4CD964;">82.0%</div>
+                            </div>
+                            <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.6);">FanDuel</div>
+                                <div style="font-size: 20px;">77.5%</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; text-align: center; color: #FFD60A;">
+                            You saved $200 by using Multiverse aggregation!
+                        </div>
+                    `;
+                    addMarketToList('🎤 Swift Tour', '82%', 'BEST');
+                }
+            },
+            {
+                step: 17,
+                title: "Platform Fee Structure",
+                text: "How we make money: Just 0.1% routing fee. That's it! On a $1,000 bet, we earn $1. The platforms (Polymarket, DraftKings) charge their own fees. We're like a travel aggregator - we help you find the best price and take a tiny commission for the service.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '💰 Transparent Fees';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="padding: 24px; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
+                            <div style="font-size: 20px; margin-bottom: 16px;">On a $1,000 bet:</div>
+                            <div style="display: grid; gap: 12px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Your Bet Amount:</span>
+                                    <span>$1,000.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; color: #FFD60A;">
+                                    <span>Multiverse Router Fee (0.1%):</span>
+                                    <span>$1.00</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; color: rgba(255, 255, 255, 0.6);">
+                                    <span>Platform Fees (varies):</span>
+                                    <span>~$20-50</span>
+                                </div>
+                                <div style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 12px; display: flex; justify-content: space-between; font-size: 18px;">
+                                    <span>Sent to Platform:</span>
+                                    <span>$999.00</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 16px; padding: 12px; background: rgba(255, 214, 10, 0.1); border-radius: 8px; text-align: center;">
+                                We never hold your funds. Direct platform-to-wallet transfers only!
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 18,
+                title: "Live Flash: Premier League Goal",
+                text: "Another flash market! 'Next goal in Liverpool vs Chelsea (30 seconds)?' at 22% on FanDuel. These ultra-fast markets resolve in real-time. Your bet goes to FanDuel, resolution comes from their live feed. Watch the countdown!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '⚡ FANDUEL: Goal in 30s?';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="color: #FFD60A;">Liverpool vs Chelsea - 92nd minute</div>
+                        <div style="margin-top: 12px; padding: 12px; background: rgba(255, 214, 10, 0.1); border-radius: 8px;">
+                            <span style="color: #FFD60A;">📍 Live feed: FanDuel Sportsbook</span>
+                        </div>
+                    `;
+                    document.getElementById('flash-timer').classList.add('active');
+                    document.getElementById('timer-text').textContent = '30';
+                    startFlashCountdown30();
+                    addMarketToList('⚡ FD: Goal 30s', '22%', 'LIVE');
+                }
+            },
+            {
+                step: 19,
+                title: "Cross-Platform Hedging",
+                text: "Advanced strategy: Hedge across platforms! Bet YES on 'Bitcoin $100k by December' on Polymarket at 61%. Simultaneously bet NO on 'Crypto Winter 2025' on DraftKings at 38%. If Bitcoin rises, both win! This correlation play works because we aggregate multiple platforms.",
+                action: () => {
+                    document.getElementById('flash-timer').classList.remove('active');
+                    document.getElementById('market-title').textContent = '🔄 Cross-Platform Hedge';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="padding: 16px; background: rgba(76, 217, 100, 0.1); border-radius: 8px;">
+                                <div style="font-weight: 600; margin-bottom: 8px;">📍 Polymarket</div>
+                                <div>BTC $100k: YES @ 61%</div>
+                                <div style="color: #4CD964; margin-top: 8px;">Position: $2,000</div>
+                            </div>
+                            <div style="padding: 16px; background: rgba(76, 217, 100, 0.1); border-radius: 8px;">
+                                <div style="font-weight: 600; margin-bottom: 8px;">📍 DraftKings</div>
+                                <div>Crypto Winter: NO @ 62%</div>
+                                <div style="color: #4CD964; margin-top: 8px;">Position: $2,000</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; text-align: center; color: #FFD60A;">
+                            Both positions win if Bitcoin rallies! 87% probability of profit.
+                        </div>
+                    `;
+                    addPosition('📍 Hedge: BTC+Crypto', 'DUAL', '$4,000', 'ACTIVE');
+                }
+            },
+            {
+                step: 20,
+                title: "AI Market Predictions",
+                text: "Current hot market: 'GPT-5 released by October 2025' at 67% on Polymarket. This prediction market has $5.2M in volume. When you bet, your USDC goes to Polymarket's smart contract. If GPT-5 releases, Polymarket's contract automatically pays winners.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🤖 GPT-5 Release Date';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: flex; gap: 24px;">
+                            <div><span style="font-size: 36px; font-weight: 300;">67.3%</span> <span style="color: #4CD964;">+4.2%</span></div>
+                            <div style="padding-top: 8px; color: rgba(255, 255, 255, 0.6);">Volume: $5.2M on Polymarket</div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(255, 214, 10, 0.1); border-radius: 8px;">
+                            <span style="color: #FFD60A;">📍 Contract: Polymarket CTF (0x2749C9f2...)</span>
+                        </div>
+                    `;
+                    addMarketToList('🤖 GPT-5 Oct', '67.3%', '+4.2%');
+                }
+            },
+            {
+                step: 21,
+                title: "Climate & Weather Markets",
+                text: "Weather betting is huge! 'Hurricane season above average 2025' at 71% across platforms. Best odds on BetMGM at 73%. These markets use NOAA data for resolution. Your bet goes to BetMGM, they handle the payout based on official weather data.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🌪️ Hurricane Season 2025';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                            <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Polymarket</div>
+                                <div style="font-size: 24px;">71.0%</div>
+                            </div>
+                            <div style="padding: 16px; background: rgba(76, 217, 100, 0.2); border: 2px solid #4CD964; border-radius: 8px;">
+                                <div style="font-size: 12px; color: #4CD964;">BetMGM ✓</div>
+                                <div style="font-size: 24px; color: #4CD964;">73.0%</div>
+                            </div>
+                            <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Caesars</div>
+                                <div style="font-size: 24px;">70.5%</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; text-align: center; color: rgba(255, 255, 255, 0.6);">
+                            Resolution source: NOAA official data
+                        </div>
+                    `;
+                    addMarketToList('🌪️ Hurricanes', '73%', 'BEST');
+                }
+            },
+            {
+                step: 22,
+                title: "Entertainment Markets Live",
+                text: "Oscar predictions! 'Oppenheimer sequel announced by 2026' at 45% on Polymarket. Entertainment markets are growing fast. $2.3M volume on this alone. Your bet goes to Polymarket, resolution based on official studio announcements.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🎬 Oppenheimer Sequel';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: flex; gap: 24px;">
+                            <div><span style="font-size: 36px; font-weight: 300;">45.2%</span> <span style="color: #FF3B30;">-0.8%</span></div>
+                            <div style="padding-top: 8px; color: rgba(255, 255, 255, 0.6);">Volume: $2.3M</div>
+                        </div>
+                        <div style="margin-top: 16px; padding: 12px; background: rgba(255, 214, 10, 0.1); border-radius: 8px;">
+                            <span style="color: #FFD60A;">📍 Platform: Polymarket Entertainment Markets</span>
+                        </div>
+                    `;
+                    addMarketToList('🎬 Oppenheimer 2', '45.2%', '-0.8%');
+                }
+            },
+            {
+                step: 23,
+                title: "Portfolio Performance",
+                text: "Your aggregated portfolio across ALL platforms! Total P&L: +$18,420. Positions on Polymarket: $12,000. DraftKings: $8,000. FanDuel: $5,000. Each platform tracks separately, we aggregate the view. One dashboard for everything!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '💼 Aggregated Portfolio';
+                    document.getElementById('total-pnl').textContent = '+$18,420';
+                    document.getElementById('total-pnl').style.fontSize = '20px';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 16px;">
+                            <div>
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4);">POLYMARKET</div>
+                                <div style="font-size: 20px; color: #4CD964;">+$7,230</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4);">DRAFTKINGS</div>
+                                <div style="font-size: 20px; color: #4CD964;">+$6,140</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4);">FANDUEL</div>
+                                <div style="font-size: 20px; color: #4CD964;">+$3,820</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4);">BETMGM</div>
+                                <div style="font-size: 20px; color: #4CD964;">+$1,230</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 24,
+                title: "Risk Management Tools",
+                text: "We provide unified risk management across platforms. Set stop-losses that work on Polymarket AND DraftKings simultaneously. Auto-rebalancing between platforms. Risk alerts when positions correlate too highly. All WITHOUT holding your funds!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🛡️ Risk Management';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: grid; gap: 16px;">
+                            <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Max Drawdown:</span>
+                                    <span style="color: #FFD60A;">-15% (Protected)</span>
+                                </div>
+                            </div>
+                            <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Correlation Risk:</span>
+                                    <span style="color: #4CD964;">Low (0.42)</span>
+                                </div>
+                            </div>
+                            <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Platform Diversification:</span>
+                                    <span style="color: #4CD964;">Excellent (4 platforms)</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 25,
+                title: "Instant Withdrawals",
+                text: "Ready to cash out? Withdraw from all platforms with one click! Polymarket sends USDC to your wallet. DraftKings sends USD to your bank. FanDuel to PayPal. We coordinate it all, but the money comes DIRECTLY from each platform's treasury.",
+                action: () => {
+                    document.getElementById('market-title').textContent = '💸 One-Click Multi-Withdraw';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: grid; gap: 12px;">
+                            <div style="padding: 16px; background: rgba(76, 217, 100, 0.1); border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>📍 Polymarket:</span>
+                                    <span style="color: #4CD964;">$12,230 USDC → Wallet</span>
+                                </div>
+                            </div>
+                            <div style="padding: 16px; background: rgba(76, 217, 100, 0.1); border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>📍 DraftKings:</span>
+                                    <span style="color: #4CD964;">$8,140 USD → Bank</span>
+                                </div>
+                            </div>
+                            <div style="padding: 16px; background: rgba(76, 217, 100, 0.1); border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>📍 FanDuel:</span>
+                                    <span style="color: #4CD964;">$5,820 USD → PayPal</span>
+                                </div>
+                            </div>
+                            <div style="padding: 16px; background: rgba(76, 217, 100, 0.1); border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>📍 BetMGM:</span>
+                                    <span style="color: #4CD964;">$2,230 USD → Bank</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; text-align: center; color: #FFD60A;">
+                            Total incoming: $28,420 from 4 different platforms!
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 26,
+                title: "Why Use Multiverse?",
+                text: "SUMMARY: We aggregate betting platforms like Kayak aggregates flights. Find best odds instantly. Route bets to multiple platforms. Coordinate complex strategies. Unified portfolio view. One-click multi-platform withdrawals. All while NEVER holding your funds. Platforms pay you directly!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '✨ The Multiverse Advantage';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #FFD60A;">What We Do:</div>
+                                <div style="font-size: 14px; line-height: 1.8;">
+                                    ✓ Find best odds across platforms<br>
+                                    ✓ Route bets optimally<br>
+                                    ✓ Coordinate complex strategies<br>
+                                    ✓ Aggregate portfolio views<br>
+                                    ✓ Enable cross-platform features
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #FFD60A;">What We DON'T Do:</div>
+                                <div style="font-size: 14px; line-height: 1.8;">
+                                    ✗ Hold your funds<br>
+                                    ✗ Run order books<br>
+                                    ✗ Manage markets<br>
+                                    ✗ Set odds<br>
+                                    ✗ Process payouts (platforms do)
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            {
+                step: 27,
+                title: "Demo Complete - Start Aggregating!",
+                text: "You've seen everything! Multiverse aggregates Polymarket, DraftKings, FanDuel, and more. We find you the best odds and route your bets. Your money goes directly to these platforms and comes directly from them. Ready to start? Connect your wallet and let's aggregate!",
+                action: () => {
+                    document.getElementById('market-title').textContent = '🚀 Ready to Start!';
+                    document.getElementById('market-info').innerHTML = `
+                        <div style="margin-top: 24px; text-align: center;">
+                            <button style="padding: 16px 32px; background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%); border: none; border-radius: 8px; color: #000; font-weight: 600; font-size: 16px; cursor: pointer;">Start Aggregating Now</button>
+                            <div style="margin-top: 16px; color: rgba(255, 255, 255, 0.6);">
+                                Remember: We route, we don't hold. Your funds, your control.
+                            </div>
+                        </div>
+                    `;
+                    confetti();
+                }
+            }
+        ];
+
+        let currentStep = 0;
+        let skipRequested = false;
+        let stepTimeout;
+
+        // Start demo
+        function startDemo() {
+            console.log('Starting comprehensive demo...');
+            runDemo();
+        }
+
+        function runDemo() {
+            if (skipRequested || currentStep >= demoSteps.length) {
+                endDemo();
+                return;
+            }
+
+            const step = demoSteps[currentStep];
+            console.log(`Running step ${step.step}: ${step.title}`);
+            
+            const narrator = document.getElementById('narrator');
+            const miniNarrator = document.getElementById('mini-narrator');
+            
+            // Show narrator with explanation
+            narrator.classList.remove('hidden');
+            miniNarrator.classList.remove('visible');
+            
+            // Update narrator content
+            document.getElementById('narrator-step').textContent = `STEP ${step.step} OF ${demoSteps.length}`;
+            document.getElementById('narrator-title').textContent = step.title;
+            document.getElementById('narrator-text').textContent = step.text;
+            document.getElementById('progress-bar').style.width = `${(step.step / demoSteps.length) * 100}%`;
+            
+            // Run action immediately
+            if (step.action) {
+                step.action();
+            }
+            
+            // Hide narrator after 5 seconds to show the demo
+            setTimeout(() => {
+                if (!skipRequested) {
+                    narrator.classList.add('hidden');
+                    miniNarrator.classList.add('visible');
+                    miniNarrator.textContent = `Step ${step.step}: Demo Running...`;
+                }
+            }, 5000);
+            
+            // Move to next step after 8 seconds (5 seconds narrator + 3 seconds demo)
+            currentStep++;
+            stepTimeout = setTimeout(runDemo, 8000);
+        }
+
+        function skipDemo() {
+            skipRequested = true;
+            if (stepTimeout) {
+                clearTimeout(stepTimeout);
+            }
+            endDemo();
+        }
+
+        function endDemo() {
+            console.log('Demo complete');
+            document.getElementById('narrator').classList.add('hidden');
+            document.getElementById('mini-narrator').classList.remove('visible');
+            document.querySelector('.auto-scroll-indicator').style.display = 'none';
+            document.querySelector('.skip-demo').style.display = 'none';
+            document.getElementById('market-title').textContent = 'Platform Ready';
+            document.getElementById('market-info').innerHTML = '<div>Demo complete. Explore the aggregator platform.</div>';
+        }
+
+        // Helper functions
+        function animateNumber(elementId, start, end, duration) {
+            const element = document.getElementById(elementId);
+            const increment = (end - start) / (duration / 50);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = `$${current.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }, 50);
+        }
+
+        function animateLeverage(start, end, duration) {
+            const element = document.getElementById('leverage-number');
+            const increment = (end - start) / (duration / 50);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = `${Math.round(current)}x`;
+            }, 50);
+        }
+
+        function startFlashCountdown() {
+            let seconds = 45;
+            const timer = setInterval(() => {
+                seconds--;
+                document.getElementById('timer-text').textContent = seconds;
+                const offset = 565 - (565 * (45 - seconds) / 45);
+                document.getElementById('timer-circle').style.strokeDashoffset = offset;
+                
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                }
+            }, 100);
+        }
+
+        function startFlashCountdown30() {
+            let seconds = 30;
+            const timer = setInterval(() => {
+                seconds--;
+                document.getElementById('timer-text').textContent = seconds;
+                const offset = 565 - (565 * (30 - seconds) / 30);
+                document.getElementById('timer-circle').style.strokeDashoffset = offset;
+                
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                }
+            }, 100);
+        }
+
+        function addMarketToList(name, price, change) {
+            const marketList = document.getElementById('market-list');
+            const item = document.createElement('div');
+            item.className = 'outcome-card';
+            item.style.animationDelay = '0s';
+            item.innerHTML = `
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="font-size: 14px;">${name}</div>
+                    <div style="font-size: 14px; font-weight: 600;">${price}</div>
+                </div>
+                <div style="font-size: 12px; color: ${change.includes('+') ? '#4CD964' : change === 'LIVE' || change === 'BEST' || change === 'QUANTUM' || change === 'SUPER' || change === 'ROOT' ? '#FFD60A' : change.includes('mkts') ? 'rgba(255, 255, 255, 0.6)' : '#FF3B30'}; margin-top: 4px;">${change}</div>
+            `;
+            marketList.appendChild(item);
+        }
+
+        function addPosition(market, side, size, pnl) {
+            const positionsList = document.getElementById('positions-list');
+            const item = document.createElement('div');
+            item.className = 'position-item';
+            item.innerHTML = `
+                <div style="font-size: 14px; font-weight: 500;">${market}</div>
+                <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                    <span style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">${side}</span>
+                    <span style="font-size: 12px;">${size}</span>
+                </div>
+                <div class="position-pnl ${pnl.includes('+') ? 'positive' : pnl.includes('-') ? 'negative' : ''}">${pnl}</div>
+            `;
+            positionsList.appendChild(item);
+        }
+
+        function confetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetto = document.createElement('div');
+                confetto.style.position = 'fixed';
+                confetto.style.width = '10px';
+                confetto.style.height = '10px';
+                confetto.style.background = ['#FFD60A', '#4CD964', '#00D4FF', '#7B3FF2'][Math.floor(Math.random() * 4)];
+                confetto.style.left = Math.random() * window.innerWidth + 'px';
+                confetto.style.top = '-10px';
+                confetto.style.borderRadius = '50%';
+                confetto.style.zIndex = '10000';
+                document.body.appendChild(confetto);
+                
+                const duration = Math.random() * 3 + 2;
+                confetto.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], {
+                    duration: duration * 1000,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                });
+                
+                setTimeout(() => confetto.remove(), duration * 1000);
+            }
+        }
+
+        // Start demo on load
+        window.addEventListener('load', () => {
+            setTimeout(startDemo, 1000);
+        });
+    </script>
+</body>
+</html>

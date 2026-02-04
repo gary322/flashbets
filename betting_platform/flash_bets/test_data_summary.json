@@ -1,0 +1,13 @@
+{
+  "generated": "2025-08-07T19:37:40.050Z",
+  "users": 10000,
+  "markets": 1000,
+  "historicalDays": 30,
+  "edgeCases": 23,
+  "totalSize": {
+    "users": "3.84 MB",
+    "markets": "0.60 MB",
+    "historical": "0.02 MB",
+    "edgeCases": "978.18 KB"
+  }
+}

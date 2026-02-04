@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Verses Display</title>
+    <style>
+        body { background: #000; color: #fff; font-family: monospace; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; background: #111; border-radius: 8px; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        button { background: #FFD60A; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .verse-info { background: #222; padding: 10px; margin: 5px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Testing Verse Display</h1>
+    
+    <div class="section">
+        <h2>Test Controls</h2>
+        <button onclick="testMarketSelection()">Test Market Selection</button>
+        <button onclick="testVerseGeneration()">Test Verse Generation</button>
+        <button onclick="testVerseDisplay()">Test Verse Display</button>
+    </div>
+    
+    <div class="section" id="results">
+        <h2>Results</h2>
+    </div>
+    
+    <script src="platform_main.js"></script>
+    <script>
+        const results = document.getElementById('results');
+        
+        function log(msg, type = '') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = msg;
+            results.appendChild(div);
+        }
+        
+        async function testMarketSelection() {
+            results.innerHTML = '<h2>Testing Market Selection</h2>';
+            
+            // Initialize platform state
+            if (!window.platformState) {
+                window.platformState = {
+                    markets: new Map(),
+                    selectedMarket: null,
+                    selectedOutcome: null,
+                    selectedVerses: [],
+                    activePositions: []
+                };
+            }
+            
+            // Create test market
+            const testMarket = {
+                id: 'test-btc-market',
+                title: 'Will Bitcoin reach $150k by end of 2025?',
+                category: 'Crypto',
+                outcomes: ['Yes', 'No'],
+                yesPrice: 0.35,
+                volume24h: 5000000,
+                liquidity: 2000000
+            };
+            
+            window.platformState.markets.set(testMarket.id, testMarket);
+            log('Created test market: ' + testMarket.title);
+            
+            // Simulate selecting the market
+            window.selectSearchResult(testMarket.id);
+            log('Called selectSearchResult()');
+            
+            // Check if market was selected
+            if (window.platformState.selectedMarket) {
+                log('✓ Market selected successfully', 'success');
+                log('Selected market ID: ' + window.platformState.selectedMarket.id);
+            } else {
+                log('✗ Market not selected', 'error');
+            }
+        }
+        
+        function testVerseGeneration() {
+            results.innerHTML = '<h2>Testing Verse Generation</h2>';
+            
+            if (!window.platformState?.selectedMarket) {
+                log('No market selected. Run "Test Market Selection" first', 'error');
+                return;
+            }
+            
+            const market = window.platformState.selectedMarket;
+            log('Testing verses for: ' + market.title);
+            
+            // Test verse generation
+            if (window.getVersesForMarket) {
+                const verses = window.getVersesForMarket(market);
+                log('✓ getVersesForMarket function exists', 'success');
+                log('Generated ' + verses.length + ' verses');
+                
+                verses.forEach(verse => {
+                    const info = document.createElement('div');
+                    info.className = 'verse-info';
+                    info.innerHTML = `
+                        <strong>${verse.name}</strong> (${verse.multiplier}x)<br>
+                        Level: ${verse.level}<br>
+                        Description: ${verse.description}
+                    `;
+                    results.appendChild(info);
+                });
+            } else {
+                log('✗ getVersesForMarket function not found', 'error');
+            }
+        }
+        
+        function testVerseDisplay() {
+            results.innerHTML = '<h2>Testing Verse Display</h2>';
+            
+            if (!window.platformState?.selectedMarket) {
+                log('No market selected. Run "Test Market Selection" first', 'error');
+                return;
+            }
+            
+            // Check if updateAvailableVerses exists
+            if (window.updateAvailableVerses) {
+                log('✓ updateAvailableVerses function exists', 'success');
+                
+                // Get verses
+                const verses = window.getVersesForMarket(window.platformState.selectedMarket);
+                
+                // Check for verse containers
+                const flowContainer = document.getElementById('verseFlowContainer');
+                const gridContainer = document.getElementById('verseGrid');
+                const versesSection = document.getElementById('versesSection');
+                
+                log('Verse containers:');
+                log('- verseFlowContainer: ' + (flowContainer ? 'found' : 'not found'));
+                log('- verseGrid: ' + (gridContainer ? 'found' : 'not found'));
+                log('- versesSection: ' + (versesSection ? 'found' : 'not found'));
+                
+                // Try to display verses
+                try {
+                    window.updateAvailableVerses(verses);
+                    log('✓ Called updateAvailableVerses successfully', 'success');
+                    
+                    // Check visibility
+                    if (versesSection) {
+                        log('versesSection display: ' + versesSection.style.display);
+                    }
+                } catch (error) {
+                    log('✗ Error updating verses: ' + error.message, 'error');
+                }
+            } else {
+                log('✗ updateAvailableVerses function not found', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

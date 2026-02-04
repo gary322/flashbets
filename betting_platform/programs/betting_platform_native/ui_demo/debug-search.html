@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Market Search</title>
+    <style>
+        body { background: #000; color: #fff; font-family: monospace; padding: 20px; }
+        button { background: #FFD60A; color: #000; border: none; padding: 10px 20px; cursor: pointer; margin: 5px; }
+        .log { margin: 10px 0; padding: 10px; background: #111; border-radius: 4px; }
+        .error { color: #ff3b30; }
+        .success { color: #4cd964; }
+        input { background: #222; color: #fff; border: 1px solid #444; padding: 10px; margin: 10px 0; width: 300px; }
+    </style>
+</head>
+<body>
+    <h1>Debug Market Search</h1>
+    <input type="text" id="searchInput" placeholder="Search markets..." value="ETH">
+    <button onclick="testSearch()">Test Search</button>
+    <button onclick="checkMainWindow()">Check Main Window</button>
+    <div id="logs"></div>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:8081';
+        
+        function log(message, type = '') {
+            const div = document.createElement('div');
+            div.className = 'log ' + type;
+            div.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+            document.getElementById('logs').appendChild(div);
+        }
+        
+        async function testSearch() {
+            const query = document.getElementById('searchInput').value;
+            log(`Searching for: "${query}"`);
+            
+            try {
+                // Test API directly
+                const response = await fetch(`${API_BASE_URL}/api/polymarket/markets`);
+                log(`API Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const markets = await response.json();
+                    log(`Total markets from API: ${markets.length}`, 'success');
+                    
+                    // Filter locally
+                    const filtered = markets.filter(market => {
+                        const searchStr = (
+                            (market.title || '') + ' ' + 
+                            (market.question || '') + ' ' + 
+                            (market.description || '')
+                        ).toLowerCase();
+                        return searchStr.includes(query.toLowerCase());
+                    });
+                    
+                    log(`Filtered results: ${filtered.length}`, 'success');
+                    
+                    // Show first 3 results
+                    filtered.slice(0, 3).forEach((market, i) => {
+                        log(`${i + 1}. ${market.title || market.question} (ID: ${market.id})`);
+                    });
+                } else {
+                    log(`API Error: ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log(`Fetch error: ${error.message}`, 'error');
+                log(`Error details: ${error.stack}`, 'error');
+            }
+        }
+        
+        function checkMainWindow() {
+            if (window.opener) {
+                log('Main window found', 'success');
+                
+                // Check if searchMarkets function exists
+                if (window.opener.searchMarkets) {
+                    log('searchMarkets function exists', 'success');
+                    
+                    // Check API_BASE_URL
+                    if (window.opener.API_BASE_URL) {
+                        log(`API_BASE_URL: ${window.opener.API_BASE_URL}`);
+                    } else {
+                        log('API_BASE_URL not found in main window', 'error');
+                    }
+                    
+                    // Check if backendAPI is initialized
+                    if (window.opener.backendAPI) {
+                        log('backendAPI is initialized', 'success');
+                    } else {
+                        log('backendAPI not initialized', 'error');
+                    }
+                } else {
+                    log('searchMarkets function not found', 'error');
+                }
+                
+                // Check search input
+                const searchInput = window.opener.document.getElementById('marketSearchInput');
+                if (searchInput) {
+                    log(`Search input found. Current value: "${searchInput.value}"`);
+                } else {
+                    log('Search input not found', 'error');
+                }
+            } else {
+                log('Main window not accessible', 'error');
+            }
+        }
+        
+        // Auto-run test on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(testSearch, 500);
+        });
+    </script>
+</body>
+</html>

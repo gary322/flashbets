@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Quantum Toggle</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #000; color: #fff; padding: 20px; }
+        .debug { background: #111; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        button { background: #FFD60A; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Test Quantum Toggle</h1>
+    
+    <div class="debug">
+        <button onclick="testQuantum()">Test Quantum with Market</button>
+        <button onclick="toggleOnly()">Toggle Only</button>
+        <div id="status"></div>
+    </div>
+    
+    <!-- Quantum Toggle -->
+    <div class="quantum-toggle" id="quantumToggle">
+        <span class="toggle-label">Quantum Mode</span>
+        <div class="toggle-switch"></div>
+    </div>
+    
+    <!-- Quantum States -->
+    <div class="quantum-states" id="quantumStates" style="margin-top: 20px;">
+        <div class="section-title">Quantum Distribution</div>
+        <div class="quantum-state-grid" id="quantumStateGrid">
+            <!-- Will be populated -->
+        </div>
+    </div>
+    
+    <!-- Investment Amount (hidden, for testing) -->
+    <input type="hidden" id="investmentAmount" value="100">
+    
+    <script>
+        // Initialize platform state
+        window.platformState = {
+            quantumMode: false,
+            selectedMarket: null
+        };
+    </script>
+    
+    <script src="platform_main.js"></script>
+    
+    <script>
+        const status = document.getElementById('status');
+        
+        function log(msg) {
+            status.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${msg}</div>`;
+            console.log(msg);
+        }
+        
+        function testQuantum() {
+            // Set a test market
+            platformState.selectedMarket = {
+                title: "Test Market",
+                outcomes: [
+                    { name: "Yes", price: 0.6 },
+                    { name: "No", price: 0.4 }
+                ]
+            };
+            
+            log('Market set: ' + JSON.stringify(platformState.selectedMarket));
+            
+            // Toggle quantum mode
+            if (window.toggleQuantumMode) {
+                window.toggleQuantumMode();
+                log('Toggled quantum mode');
+            } else {
+                log('ERROR: toggleQuantumMode not found');
+            }
+            
+            // Check display
+            setTimeout(() => {
+                const qs = document.getElementById('quantumStates');
+                const grid = document.getElementById('quantumStateGrid');
+                log(`Quantum states display: ${qs.style.display}`);
+                log(`Grid children: ${grid.children.length}`);
+            }, 100);
+        }
+        
+        function toggleOnly() {
+            const toggle = document.getElementById('quantumToggle');
+            toggle.classList.toggle('active');
+            
+            const qs = document.getElementById('quantumStates');
+            const isActive = toggle.classList.contains('active');
+            qs.style.display = isActive ? 'block' : 'none';
+            
+            log(`Toggle active: ${isActive}, Display: ${qs.style.display}`);
+        }
+    </script>
+</body>
+</html>

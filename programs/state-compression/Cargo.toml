@@ -1,0 +1,24 @@
+[package]
+name = "state-compression"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+solana-program = "1.17"
+borsh = "0.10"
+thiserror = "1.0"
+bytemuck = { version = "1.13", features = ["derive"] }
+spl-token = { version = "4.0", features = ["no-entrypoint"] }
+
+[dev-dependencies]
+solana-program-test = "1.17"
+solana-sdk = "1.17"
+tokio = { version = "1", features = ["full"] }
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "state_compression"
+
+[features]
+no-entrypoint = []
+test-bpf = []

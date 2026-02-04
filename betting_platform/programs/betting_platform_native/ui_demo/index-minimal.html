@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Betting - Minimalist Platform</title>
+    <link rel="stylesheet" href="yellow-minimal.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="logo">⚡ Quantum</div>
+        <ul class="nav-links">
+            <li><a href="#markets">Markets</a></li>
+            <li><a href="#trading">Trade</a></li>
+            <li><a href="#portfolio">Portfolio</a></li>
+            <li><a href="#defi">DeFi</a></li>
+        </ul>
+        <div class="wallet-status">
+            <button id="connectWallet" class="btn btn-secondary">Connect Wallet</button>
+            <span id="walletAddress" class="wallet-address" style="display: none;"></span>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Prediction Markets on Solana</h1>
+        <p>Trade on future events with up to 500x leverage. Quantum mechanics meets DeFi.</p>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalVolume">$0</div>
+                <div class="stat-label">Total Volume</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeMarkets">0</div>
+                <div class="stat-label">Active Markets</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalLiquidity">$0</div>
+                <div class="stat-label">Liquidity</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeTraders">0</div>
+                <div class="stat-label">Active Traders</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Markets Section -->
+    <section id="markets" style="display: none;">
+        <h2 style="text-align: center; margin: 2rem 0; color: var(--primary);">Live Markets</h2>
+        <div id="marketsGrid" class="markets-grid">
+            <!-- Markets will be loaded here -->
+        </div>
+    </section>
+
+    <!-- Trading Terminal -->
+    <section id="trading" style="display: none;">
+        <div class="terminal">
+            <h2 style="margin-bottom: 2rem; color: var(--primary);">Trading Terminal</h2>
+            <div class="input-group">
+                <label>Market</label>
+                <select id="marketSelect">
+                    <option>Select a market...</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Outcome</label>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="odds-button yes" id="yesBtn">YES</button>
+                    <button class="odds-button no" id="noBtn">NO</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Amount (USDC)</label>
+                <input type="number" id="tradeAmount" placeholder="100" min="1">
+            </div>
+            <div class="input-group">
+                <label>Leverage</label>
+                <select id="leverageSelect">
+                    <option value="1">1x</option>
+                    <option value="5">5x</option>
+                    <option value="10">10x</option>
+                    <option value="25">25x</option>
+                    <option value="50">50x</option>
+                    <option value="100">100x</option>
+                    <option value="250">250x</option>
+                    <option value="500">500x</option>
+                </select>
+            </div>
+            <button id="placeTrade" class="btn" style="width: 100%;">Place Trade</button>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" style="display: none;">
+        <h2 style="text-align: center; margin: 2rem 0; color: var(--primary);">Your Positions</h2>
+        <div id="positionsGrid" class="markets-grid">
+            <!-- Positions will be loaded here -->
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="js/api_client.js"></script>
+    <script src="js/wallet_adapter.js"></script>
+    <script src="minimal-app.js"></script>
+</body>
+</html>

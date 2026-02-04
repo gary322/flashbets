@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Data Integration Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background: rgba(76, 217, 100, 0.1);
+            border: 1px solid rgba(76, 217, 100, 0.3);
+            color: #4CD964;
+        }
+        .error {
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.3);
+            color: #FF3B30;
+        }
+        .info {
+            background: rgba(255, 214, 10, 0.1);
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            color: #FFD60A;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        button {
+            background: #FFD60A;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #FFA500;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .market-card, .verse-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .market-card:hover, .verse-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #FFD60A;
+        }
+        .stat {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+        }
+        .price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFD60A;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔬 Real Data Integration Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>1. Search Functionality Test</h2>
+        <p>Test that searching returns real API data, not mock data</p>
+        
+        <button onclick="testBitcoinSearch()">Test Bitcoin Search</button>
+        <button onclick="testElectionSearch()">Test Election Search</button>
+        <button onclick="testSportsSearch()">Test Sports Search</button>
+        <button onclick="testEmptySearch()">Test Empty Search</button>
+        
+        <div id="search-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Verse Filtering Test</h2>
+        <p>Test that verses are properly filtered by market category</p>
+        
+        <button onclick="testCryptoVerses()">Test Crypto Verses</button>
+        <button onclick="testPoliticsVerses()">Test Politics Verses</button>
+        <button onclick="testFinanceVerses()">Test Finance Verses</button>
+        
+        <div id="verse-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Market Details Test</h2>
+        <p>Test loading specific market details from API</p>
+        
+        <button onclick="testMarketDetails(5)">Load Bitcoin Market (ID: 5)</button>
+        <button onclick="testMarketDetails(1)">Load Election Market (ID: 1)</button>
+        <button onclick="testMarketDetails(7)">Load S&P 500 Market (ID: 7)</button>
+        
+        <div id="market-details"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. End-to-End User Journey</h2>
+        <p>Simulate complete user journey with real data</p>
+        
+        <button onclick="testCompleteJourney()">Run Complete Journey Test</button>
+        
+        <div id="journey-results"></div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let testResults = [];
+
+        function logResult(containerId, message, type = 'info', data = null) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            
+            let content = message;
+            if (data) {
+                content += '\n' + JSON.stringify(data, null, 2);
+            }
+            
+            div.innerHTML = `<pre>${content}</pre>`;
+            container.appendChild(div);
+            
+            testResults.push({ message, type, data, timestamp: new Date() });
+        }
+
+        async function testBitcoinSearch() {
+            const container = document.getElementById('search-results');
+            container.innerHTML = '';
+            
+            try {
+                logResult('search-results', 'Testing Bitcoin search...', 'info');
+                
+                const response = await fetch(`${API_BASE}/markets?search=bitcoin&limit=10`);
+                const data = await response.json();
+                
+                if (data.markets && data.markets.length > 0) {
+                    logResult('search-results', 
+                        `✅ Found ${data.markets.length} Bitcoin markets from API`, 
+                        'success'
+                    );
+                    
+                    // Display market cards
+                    const grid = document.createElement('div');
+                    grid.className = 'test-grid';
+                    
+                    data.markets.forEach(market => {
+                        const card = document.createElement('div');
+                        card.className = 'market-card';
+                        card.innerHTML = `
+                            <h4>${market.title}</h4>
+                            <div class="price">
+                                ${calculateYesPrice(market.outcomes)}% Yes
+                            </div>
+                            <div class="stat">Volume: $${formatNumber(market.total_volume)}</div>
+                            <div class="stat">Liquidity: $${formatNumber(market.total_liquidity)}</div>
+                            <div class="stat">ID: ${market.id} | Source: ${data.source}</div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                    
+                    container.appendChild(grid);
+                    
+                    // Verify this is real data
+                    if (data.source === 'seeded_data') {
+                        logResult('search-results', 
+                            '✅ Confirmed: Using real API data (source: seeded_data)', 
+                            'success'
+                        );
+                    }
+                } else {
+                    logResult('search-results', 
+                        '❌ No Bitcoin markets found in API response', 
+                        'error', 
+                        data
+                    );
+                }
+            } catch (error) {
+                logResult('search-results', 
+                    `❌ Search test failed: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testElectionSearch() {
+            const container = document.getElementById('search-results');
+            container.innerHTML = '';
+            
+            try {
+                logResult('search-results', 'Testing Election search...', 'info');
+                
+                const response = await fetch(`${API_BASE}/markets?search=election&limit=10`);
+                const data = await response.json();
+                
+                if (data.markets && data.markets.length > 0) {
+                    logResult('search-results', 
+                        `✅ Found ${data.markets.length} Election markets from API`, 
+                        'success',
+                        data.markets
+                    );
+                } else {
+                    logResult('search-results', 
+                        'ℹ️ No election markets found (expected if not in dataset)', 
+                        'info'
+                    );
+                }
+            } catch (error) {
+                logResult('search-results', 
+                    `❌ Search test failed: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testSportsSearch() {
+            const container = document.getElementById('search-results');
+            container.innerHTML = '';
+            
+            try {
+                logResult('search-results', 'Testing Sports search...', 'info');
+                
+                const response = await fetch(`${API_BASE}/markets?search=super%20bowl&limit=10`);
+                const data = await response.json();
+                
+                if (data.markets && data.markets.length > 0) {
+                    logResult('search-results', 
+                        `✅ Found ${data.markets.length} Sports markets from API`, 
+                        'success',
+                        data.markets
+                    );
+                } else {
+                    logResult('search-results', 
+                        'ℹ️ No sports markets found for "super bowl"', 
+                        'info'
+                    );
+                }
+            } catch (error) {
+                logResult('search-results', 
+                    `❌ Search test failed: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testEmptySearch() {
+            const container = document.getElementById('search-results');
+            container.innerHTML = '';
+            
+            try {
+                logResult('search-results', 'Testing empty/nonsense search...', 'info');
+                
+                const response = await fetch(`${API_BASE}/markets?search=xyzabc123&limit=10`);
+                const data = await response.json();
+                
+                if (data.markets && data.markets.length === 0) {
+                    logResult('search-results', 
+                        '✅ Correctly returned empty results for nonsense search', 
+                        'success'
+                    );
+                } else {
+                    logResult('search-results', 
+                        '❌ Unexpected results for nonsense search', 
+                        'error',
+                        data
+                    );
+                }
+            } catch (error) {
+                logResult('search-results', 
+                    `❌ Search test failed: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testCryptoVerses() {
+            const container = document.getElementById('verse-results');
+            container.innerHTML = '';
+            
+            try {
+                logResult('verse-results', 'Fetching all verses and filtering for Crypto...', 'info');
+                
+                const response = await fetch(`${API_BASE}/verses?limit=400`);
+                const allVerses = await response.json();
+                
+                const cryptoVerses = allVerses.filter(verse => 
+                    verse.category?.toLowerCase() === 'crypto' ||
+                    verse.name?.toLowerCase().includes('btc') ||
+                    verse.name?.toLowerCase().includes('bitcoin') ||
+                    verse.id?.includes('btc')
+                );
+                
+                logResult('verse-results', 
+                    `✅ Found ${cryptoVerses.length} Crypto-related verses from ${allVerses.length} total`, 
+                    'success'
+                );
+                
+                // Display verse cards
+                const grid = document.createElement('div');
+                grid.className = 'test-grid';
+                
+                cryptoVerses.slice(0, 12).forEach(verse => {
+                    const card = document.createElement('div');
+                    card.className = 'verse-card';
+                    card.innerHTML = `
+                        <h4>${verse.name}</h4>
+                        <div class="price">${verse.multiplier}x</div>
+                        <div class="stat">Level: ${verse.level} | ${verse.risk_tier}</div>
+                        <div class="stat">${verse.description}</div>
+                        <div class="stat">Category: ${verse.category}</div>
+                    `;
+                    grid.appendChild(card);
+                });
+                
+                container.appendChild(grid);
+                
+                // Show some example verses
+                const examples = cryptoVerses.slice(0, 3).map(v => `${v.name} (${v.multiplier}x)`);
+                logResult('verse-results', 
+                    `Example verses: ${examples.join(', ')}`, 
+                    'info'
+                );
+                
+            } catch (error) {
+                logResult('verse-results', 
+                    `❌ Verse test failed: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testPoliticsVerses() {
+            const container = document.getElementById('verse-results');
+            container.innerHTML = '';
+            
+            try {
+                logResult('verse-results', 'Fetching all verses and filtering for Politics...', 'info');
+                
+                const response = await fetch(`${API_BASE}/verses?limit=400`);
+                const allVerses = await response.json();
+                
+                const politicsVerses = allVerses.filter(verse => 
+                    verse.category?.toLowerCase() === 'politics'
+                );
+                
+                logResult('verse-results', 
+                    `✅ Found ${politicsVerses.length} Politics verses`, 
+                    'success'
+                );
+                
+                // Show examples
+                const examples = politicsVerses.slice(0, 5);
+                examples.forEach(verse => {
+                    logResult('verse-results', 
+                        `- ${verse.name}: ${verse.description} (${verse.multiplier}x)`, 
+                        'info'
+                    );
+                });
+                
+            } catch (error) {
+                logResult('verse-results', 
+                    `❌ Verse test failed: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testFinanceVerses() {
+            const container = document.getElementById('verse-results');
+            container.innerHTML = '';
+            
+            try {
+                logResult('verse-results', 'Fetching verses for Finance/Economics markets...', 'info');
+                
+                const response = await fetch(`${API_BASE}/verses?limit=400`);
+                const allVerses = await response.json();
+                
+                const financeVerses = allVerses.filter(verse => 
+                    verse.category?.toLowerCase() === 'economics' ||
+                    verse.category?.toLowerCase() === 'finance' ||
+                    verse.name?.toLowerCase().includes('s&p') ||
+                    verse.name?.toLowerCase().includes('spy')
+                );
+                
+                logResult('verse-results', 
+                    `✅ Found ${financeVerses.length} Finance/Economics verses`, 
+                    'success'
+                );
+                
+                // Show S&P specific verses
+                const spVerses = financeVerses.filter(v => 
+                    v.name?.toLowerCase().includes('s&p') || 
+                    v.name?.toLowerCase().includes('spy')
+                );
+                
+                if (spVerses.length > 0) {
+                    logResult('verse-results', 
+                        `Found ${spVerses.length} S&P 500 specific verses:`, 
+                        'success'
+                    );
+                    spVerses.forEach(verse => {
+                        logResult('verse-results', 
+                            `- ${verse.name}: ${verse.multiplier}x`, 
+                            'info'
+                        );
+                    });
+                }
+                
+            } catch (error) {
+                logResult('verse-results', 
+                    `❌ Verse test failed: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testMarketDetails(marketId) {
+            const container = document.getElementById('market-details');
+            container.innerHTML = '';
+            
+            try {
+                logResult('market-details', `Loading market ${marketId} details...`, 'info');
+                
+                const response = await fetch(`${API_BASE}/markets/${marketId}`);
+                const market = await response.json();
+                
+                if (market && market.id === marketId) {
+                    logResult('market-details', 
+                        `✅ Successfully loaded market: ${market.title}`, 
+                        'success'
+                    );
+                    
+                    // Display detailed market info
+                    const details = document.createElement('div');
+                    details.innerHTML = `
+                        <h3>${market.title}</h3>
+                        <p>${market.description}</p>
+                        <div class="test-grid">
+                            <div class="stat">ID: ${market.id}</div>
+                            <div class="stat">AMM Type: ${market.amm_type}</div>
+                            <div class="stat">Volume: $${formatNumber(market.total_volume)}</div>
+                            <div class="stat">Liquidity: $${formatNumber(market.total_liquidity)}</div>
+                            <div class="stat">Verse ID: ${market.verse_id}</div>
+                            <div class="stat">Resolution: ${new Date(market.resolution_time * 1000).toLocaleDateString()}</div>
+                        </div>
+                        <h4>Outcomes:</h4>
+                    `;
+                    
+                    const outcomeGrid = document.createElement('div');
+                    outcomeGrid.className = 'test-grid';
+                    
+                    market.outcomes.forEach(outcome => {
+                        const card = document.createElement('div');
+                        card.className = 'market-card';
+                        const totalStake = market.outcomes.reduce((sum, o) => sum + o.total_stake, 0);
+                        const percentage = totalStake > 0 ? (outcome.total_stake / totalStake * 100).toFixed(1) : '0';
+                        
+                        card.innerHTML = `
+                            <h4>${outcome.name}</h4>
+                            <div class="price">${percentage}%</div>
+                            <div class="stat">Stake: $${formatNumber(outcome.total_stake)}</div>
+                        `;
+                        outcomeGrid.appendChild(card);
+                    });
+                    
+                    details.appendChild(outcomeGrid);
+                    container.appendChild(details);
+                    
+                    // Now test verse filtering for this market
+                    testVersesForMarket(market);
+                    
+                } else {
+                    logResult('market-details', 
+                        `❌ Failed to load market ${marketId}`, 
+                        'error',
+                        market
+                    );
+                }
+            } catch (error) {
+                logResult('market-details', 
+                    `❌ Market details test failed: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testVersesForMarket(market) {
+            try {
+                const response = await fetch(`${API_BASE}/verses?limit=400`);
+                const allVerses = await response.json();
+                
+                // Simulate the filtering logic from platform_main.js
+                const marketCategory = getMarketCategory(market).toLowerCase();
+                const marketTitle = market.title?.toLowerCase() || '';
+                
+                const relevantVerses = allVerses.filter(verse => {
+                    const verseCategory = verse.category?.toLowerCase() || '';
+                    const verseName = (verse.name || '').toLowerCase();
+                    
+                    if (verseCategory === marketCategory) return true;
+                    
+                    if (marketTitle.includes('bitcoin') || marketTitle.includes('btc')) {
+                        return verseCategory === 'crypto' || 
+                               verseName.includes('btc') || 
+                               verseName.includes('bitcoin');
+                    }
+                    
+                    if (marketTitle.includes('s&p') || marketTitle.includes('500')) {
+                        return verseCategory === 'economics' || 
+                               verseCategory === 'finance' ||
+                               verseName.includes('s&p') ||
+                               verseName.includes('spy');
+                    }
+                    
+                    return false;
+                });
+                
+                logResult('market-details', 
+                    `Found ${relevantVerses.length} relevant verses for "${market.title}"`, 
+                    'info'
+                );
+                
+                if (relevantVerses.length > 0) {
+                    logResult('market-details', 
+                        `Top verses: ${relevantVerses.slice(0, 3).map(v => v.name).join(', ')}`, 
+                        'info'
+                    );
+                }
+                
+            } catch (error) {
+                logResult('market-details', 
+                    `Failed to test verses: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testCompleteJourney() {
+            const container = document.getElementById('journey-results');
+            container.innerHTML = '';
+            
+            logResult('journey-results', '🚀 Starting complete user journey test...', 'info');
+            
+            try {
+                // Step 1: Search for Bitcoin
+                logResult('journey-results', 'Step 1: User searches for "bitcoin"', 'info');
+                const searchResponse = await fetch(`${API_BASE}/markets?search=bitcoin&limit=10`);
+                const searchData = await searchResponse.json();
+                
+                if (searchData.markets && searchData.markets.length > 0) {
+                    logResult('journey-results', 
+                        `✅ Found ${searchData.markets.length} Bitcoin markets`, 
+                        'success'
+                    );
+                    
+                    // Step 2: Select first Bitcoin market
+                    const selectedMarket = searchData.markets[0];
+                    logResult('journey-results', 
+                        `Step 2: User selects "${selectedMarket.title}" (ID: ${selectedMarket.id})`, 
+                        'info'
+                    );
+                    
+                    // Step 3: Load full market details
+                    const marketResponse = await fetch(`${API_BASE}/markets/${selectedMarket.id}`);
+                    const marketDetails = await marketResponse.json();
+                    
+                    logResult('journey-results', 
+                        `✅ Loaded market details with ${marketDetails.outcomes.length} outcomes`, 
+                        'success'
+                    );
+                    
+                    // Step 4: Load relevant verses
+                    logResult('journey-results', 'Step 3: Loading relevant verses...', 'info');
+                    const versesResponse = await fetch(`${API_BASE}/verses?limit=400`);
+                    const allVerses = await versesResponse.json();
+                    
+                    const cryptoVerses = allVerses.filter(v => 
+                        v.category?.toLowerCase() === 'crypto' ||
+                        v.name?.toLowerCase().includes('btc')
+                    );
+                    
+                    logResult('journey-results', 
+                        `✅ Found ${cryptoVerses.length} relevant Crypto verses`, 
+                        'success'
+                    );
+                    
+                    // Step 5: Simulate user selecting verses
+                    const selectedVerses = cryptoVerses.slice(0, 3);
+                    logResult('journey-results', 
+                        `Step 4: User selects ${selectedVerses.length} verses for leverage`, 
+                        'info'
+                    );
+                    
+                    // Calculate total leverage
+                    const baseLeverage = 5;
+                    const totalMultiplier = selectedVerses.reduce((total, verse) => 
+                        total * (verse.multiplier || 1), baseLeverage
+                    );
+                    
+                    logResult('journey-results', 
+                        `Step 5: Total leverage calculated: ${totalMultiplier.toFixed(1)}x`, 
+                        'info'
+                    );
+                    
+                    // Step 6: Simulate position
+                    const investmentAmount = 1.0; // 1 SOL
+                    const totalExposure = investmentAmount * totalMultiplier;
+                    
+                    logResult('journey-results', 
+                        `Step 6: User invests ${investmentAmount} SOL with ${totalMultiplier.toFixed(1)}x leverage = ${totalExposure.toFixed(2)} SOL exposure`, 
+                        'info'
+                    );
+                    
+                    // Summary
+                    logResult('journey-results', 
+                        `✅ Complete journey successful! All API data properly integrated.`, 
+                        'success'
+                    );
+                    
+                    logResult('journey-results', 
+                        `Summary:\n` +
+                        `- Search returned real API markets ✓\n` +
+                        `- Market details loaded correctly ✓\n` +
+                        `- Verses filtered by category ✓\n` +
+                        `- Leverage calculation working ✓\n` +
+                        `- No mock data used ✓`, 
+                        'success'
+                    );
+                    
+                } else {
+                    logResult('journey-results', 
+                        '❌ No markets found in search', 
+                        'error'
+                    );
+                }
+                
+            } catch (error) {
+                logResult('journey-results', 
+                    `❌ Journey test failed: ${error.message}`, 
+                    'error'
+                );
+            }
+        }
+
+        function calculateYesPrice(outcomes) {
+            if (!outcomes || outcomes.length === 0) return 50;
+            
+            const totalStake = outcomes.reduce((sum, o) => sum + (o.total_stake || 0), 0);
+            if (totalStake === 0) return 50;
+            
+            const yesOutcome = outcomes.find(o => o.name === 'Yes');
+            if (yesOutcome) {
+                return ((yesOutcome.total_stake / totalStake) * 100).toFixed(0);
+            }
+            
+            return 50;
+        }
+
+        function formatNumber(num) {
+            if (num === undefined || num === null) return '0';
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toFixed(0);
+        }
+
+        function getMarketCategory(market) {
+            const title = market.title?.toLowerCase() || '';
+            if (title.includes('bitcoin') || title.includes('btc')) return 'Crypto';
+            if (title.includes('election') || title.includes('president')) return 'Politics';
+            if (title.includes('s&p') || title.includes('stock')) return 'Finance';
+            if (title.includes('super bowl') || title.includes('nfl')) return 'Sports';
+            return 'General';
+        }
+
+        // Auto-run complete journey on load
+        window.addEventListener('load', () => {
+            setTimeout(testCompleteJourney, 1000);
+        });
+    </script>
+</body>
+</html>

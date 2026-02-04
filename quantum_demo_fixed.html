@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Platform Trading - Fixed Animation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Demo Stage */
+        .demo-stage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #0A0A0A 0%, #000000 100%);
+            overflow-y: auto;
+        }
+
+        /* Step Indicator */
+        .step-indicator {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .step.active {
+            background: rgba(255, 214, 10, 0.1);
+            border-color: #FFD60A;
+        }
+
+        .step.quantum.active {
+            background: rgba(147, 51, 234, 0.1);
+            border-color: #9333EA;
+        }
+
+        /* Screen Container */
+        .screen-container {
+            width: 90%;
+            max-width: 1400px;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .screen-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Market Selection */
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .market-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .market-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .market-card.selected {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.05);
+        }
+
+        .platform-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .platform-badge.polymarket {
+            background: rgba(123, 63, 242, 0.2);
+            color: #7B3FF2;
+            border: 1px solid #7B3FF2;
+        }
+
+        .platform-badge.kalshi {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00D4FF;
+            border: 1px solid #00D4FF;
+        }
+
+        /* Configuration Section */
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 20px;
+        }
+
+        .config-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        /* Quantum Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch {
+            width: 60px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .mode-toggle.active .toggle-switch {
+            background: #9333EA;
+        }
+
+        .mode-toggle.active .toggle-switch::after {
+            transform: translateX(30px);
+        }
+
+        /* Quantum States */
+        .quantum-states {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .quantum-state {
+            padding: 15px;
+            background: rgba(147, 51, 234, 0.1);
+            border: 1px solid rgba(147, 51, 234, 0.3);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        /* Execution Screen */
+        .execution-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000000;
+            display: none;
+            z-index: 2000;
+            overflow: hidden;
+        }
+
+        .execution-screen.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Platform Destinations */
+        .platform-destinations {
+            display: flex;
+            justify-content: space-around;
+            width: 80%;
+            margin: 60px 0;
+        }
+
+        .platform-destination {
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .platform-destination.active {
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.05);
+            transform: scale(1.05);
+        }
+
+        /* Money Particle Animation */
+        .money-particle {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #FFD60A 0%, #FFA500 40%, transparent 70%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #000;
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.8);
+            pointer-events: none;
+            z-index: 2100;
+        }
+
+        /* Execute Button */
+        .execute-btn {
+            padding: 20px 60px;
+            background: linear-gradient(135deg, #FFD60A 0%, #FFA500 100%);
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .execute-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(255, 214, 10, 0.3);
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Leverage Slider */
+        .leverage-control {
+            margin: 20px 0;
+        }
+
+        .leverage-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .leverage-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #FFD60A;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Investment Input */
+        .investment-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: #FFD60A;
+            text-align: center;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+        <div class="step active" id="step1">
+            <span>1</span>
+            <span>Select Market</span>
+        </div>
+        <div class="step" id="step2">
+            <span>2</span>
+            <span>Choose Verses</span>
+        </div>
+        <div class="step" id="step3">
+            <span>3</span>
+            <span>Configure</span>
+        </div>
+        <div class="step" id="step4">
+            <span>4</span>
+            <span>Execute</span>
+        </div>
+    </div>
+
+    <!-- Demo Stage -->
+    <div class="demo-stage">
+        <!-- Market Selection Screen -->
+        <div class="screen-container active" id="marketScreen">
+            <h2 style="text-align: center; font-size: 32px; margin-bottom: 30px;">Select a Market</h2>
+            <div class="market-grid" id="marketGrid">
+                <!-- Markets will be populated here -->
+            </div>
+        </div>
+
+        <!-- Verse Selection Screen -->
+        <div class="screen-container" id="verseScreen">
+            <h2 style="text-align: center; font-size: 32px; margin-bottom: 30px;">Select Verses</h2>
+            <div class="market-grid" id="verseGrid">
+                <!-- Verses will be populated here -->
+            </div>
+        </div>
+
+        <!-- Configuration Screen -->
+        <div class="screen-container" id="configScreen">
+            <h2 style="text-align: center; font-size: 32px; margin-bottom: 30px;">Configure Your Position</h2>
+            <div class="config-grid">
+                <div class="config-section">
+                    <h3>Investment Amount</h3>
+                    <input type="number" class="investment-input" id="investmentAmount" value="10000" />
+                    
+                    <div class="mode-toggle" id="quantumToggle" onclick="toggleQuantumMode()">
+                        <div>
+                            <h4>Quantum Mode</h4>
+                            <p style="color: rgba(255, 255, 255, 0.6); font-size: 14px;">Split position across all outcomes</p>
+                        </div>
+                        <div class="toggle-switch"></div>
+                    </div>
+                    
+                    <div id="quantumSplit" style="display: none; margin-top: 20px;">
+                        <h4 style="color: #9333EA;">Quantum Superposition</h4>
+                        <div class="quantum-states" id="quantumStates"></div>
+                        <div style="text-align: center; margin-top: 15px; color: #9333EA; font-family: monospace;" id="quantumFormula"></div>
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <h3>Leverage Settings</h3>
+                    <div class="leverage-control">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Base Leverage</span>
+                            <span id="leverageValue">5x</span>
+                        </div>
+                        <input type="range" class="leverage-slider" id="leverageSlider" min="1" max="100" value="5" oninput="updateLeverage(this.value)">
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h4>Risk Management</h4>
+                        <div style="margin-top: 15px;">
+                            <label>Stop Loss: <span id="stopLossValue">-20%</span></label>
+                            <input type="range" min="5" max="50" value="20" style="width: 100%; margin-top: 5px;">
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <label>Take Profit: <span id="takeProfitValue">+50%</span></label>
+                            <input type="range" min="10" max="200" value="50" style="width: 100%; margin-top: 5px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Execution Screen -->
+        <div class="execution-screen" id="executionScreen">
+            <h2 style="font-size: 36px; margin-bottom: 20px;">Executing Orders...</h2>
+            <p style="color: rgba(255, 255, 255, 0.6); margin-bottom: 40px;">Money is being routed to respective platforms</p>
+            
+            <div class="platform-destinations">
+                <div class="platform-destination polymarket" id="polymarketDest">
+                    <h3 style="color: #7B3FF2;">Polymarket</h3>
+                    <div style="font-size: 36px; font-weight: 700; margin: 20px 0;" id="polymarketTotal">$0</div>
+                    <div style="color: rgba(255, 255, 255, 0.6);" id="polymarketOrders">0 Orders</div>
+                </div>
+                
+                <div class="platform-destination kalshi" id="kalshiDest">
+                    <h3 style="color: #00D4FF;">Kalshi</h3>
+                    <div style="font-size: 36px; font-weight: 700; margin: 20px 0;" id="kalshiTotal">$0</div>
+                    <div style="color: rgba(255, 255, 255, 0.6);" id="kalshiOrders">0 Orders</div>
+                </div>
+            </div>
+            
+            <button class="execute-btn" onclick="completeExecution()" style="margin-top: 40px;">Complete</button>
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="previousStep()">Previous</button>
+        <button class="nav-btn" onclick="nextStep()" style="background: #FFD60A; color: #000;">Next</button>
+    </div>
+
+    <script>
+        // Market data
+        const markets = [
+            {
+                id: 1,
+                title: "Will Elon Musk tweet about Dogecoin by end of January 2025?",
+                platform: "polymarket",
+                outcomes: ["Yes", "No"],
+                prices: [0.65, 0.35],
+                probability: 65,
+                volume: "$2.4M"
+            },
+            {
+                id: 2,
+                title: "Will Bitcoin reach $150,000 in Q1 2025?",
+                platform: "kalshi",
+                outcomes: ["Yes", "No"],
+                prices: [0.28, 0.72],
+                probability: 28,
+                volume: "$5.1M"
+            },
+            {
+                id: 3,
+                title: "Will Taylor Swift announce a 2025 world tour?",
+                platform: "polymarket",
+                outcomes: ["Yes", "No"],
+                prices: [0.82, 0.18],
+                probability: 82,
+                volume: "$890K"
+            },
+            {
+                id: 4,
+                title: "Will SpaceX successfully land on Mars in 2025?",
+                platform: "kalshi",
+                outcomes: ["Yes", "No"],
+                prices: [0.15, 0.85],
+                probability: 15,
+                volume: "$3.2M"
+            },
+            {
+                id: 5,
+                title: "Fed Rate Decision March 2025",
+                platform: "kalshi",
+                outcomes: ["Cut 50bps", "Cut 25bps", "No Change", "Raise 25bps"],
+                prices: [0.20, 0.45, 0.30, 0.05],
+                probability: 45,
+                volume: "$12.3M"
+            }
+        ];
+
+        const verses = [
+            {
+                id: 101,
+                title: "Crypto Market Sentiment",
+                platform: "polymarket",
+                multiplier: 2.5,
+                description: "Overall crypto market direction"
+            },
+            {
+                id: 102,
+                title: "Tech Earnings Beat",
+                platform: "kalshi",
+                multiplier: 1.8,
+                description: "Major tech companies beat earnings"
+            },
+            {
+                id: 103,
+                title: "Social Media Virality",
+                platform: "polymarket",
+                multiplier: 3.2,
+                description: "Trending topics amplification"
+            },
+            {
+                id: 104,
+                title: "Economic Indicators",
+                platform: "kalshi",
+                multiplier: 2.0,
+                description: "GDP and inflation metrics"
+            }
+        ];
+
+        let currentStep = 1;
+        let selectedMarket = null;
+        let selectedVerses = [];
+        let quantumMode = false;
+        let leverage = 5;
+
+        // Initialize markets
+        function initializeMarkets() {
+            const grid = document.getElementById('marketGrid');
+            markets.forEach(market => {
+                const card = createMarketCard(market);
+                grid.appendChild(card);
+            });
+        }
+
+        // Create market card
+        function createMarketCard(market) {
+            const card = document.createElement('div');
+            card.className = 'market-card';
+            card.onclick = () => selectMarket(market);
+            
+            card.innerHTML = `
+                <span class="platform-badge ${market.platform}">${market.platform.toUpperCase()}</span>
+                <h3 style="margin-bottom: 15px;">${market.title}</h3>
+                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                    <div>
+                        <div style="color: rgba(255, 255, 255, 0.6); font-size: 14px;">Probability</div>
+                        <div style="font-size: 24px; font-weight: 600; color: #FFD60A;">${market.probability}%</div>
+                    </div>
+                    <div>
+                        <div style="color: rgba(255, 255, 255, 0.6); font-size: 14px;">Volume</div>
+                        <div style="font-size: 24px; font-weight: 600;">${market.volume}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    ${market.outcomes.map((outcome, i) => `
+                        <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                            <span>${outcome}</span>
+                            <span style="color: ${market.prices[i] > 0.5 ? '#4CD964' : '#FF3B30'};">${(market.prices[i] * 100).toFixed(0)}%</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Select market
+        function selectMarket(market) {
+            selectedMarket = market;
+            document.querySelectorAll('.market-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+
+        // Toggle quantum mode
+        function toggleQuantumMode() {
+            quantumMode = !quantumMode;
+            const toggle = document.getElementById('quantumToggle');
+            toggle.classList.toggle('active');
+            
+            const quantumSplit = document.getElementById('quantumSplit');
+            quantumSplit.style.display = quantumMode ? 'block' : 'none';
+            
+            // Update step indicator
+            document.querySelectorAll('.step').forEach(step => {
+                if (quantumMode) {
+                    step.classList.add('quantum');
+                } else {
+                    step.classList.remove('quantum');
+                }
+            });
+            
+            updateQuantumDisplay();
+        }
+
+        // Update quantum display
+        function updateQuantumDisplay() {
+            if (!selectedMarket || !quantumMode) return;
+            
+            const investment = parseFloat(document.getElementById('investmentAmount').value) || 0;
+            const states = document.getElementById('quantumStates');
+            const formula = document.getElementById('quantumFormula');
+            
+            // Display quantum states
+            states.innerHTML = selectedMarket.outcomes.map((outcome, i) => {
+                const prob = selectedMarket.prices[i];
+                const amount = investment * prob;
+                return `
+                    <div class="quantum-state">
+                        <div style="font-weight: 600;">${outcome}</div>
+                        <div style="font-size: 20px; color: #9333EA;">${(prob * 100).toFixed(0)}%</div>
+                        <div style="color: #FFD60A;">$${amount.toFixed(0)}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Display quantum formula
+            // The formula uses square root of probabilities as quantum amplitudes
+            const terms = selectedMarket.outcomes.map((outcome, i) => {
+                const prob = selectedMarket.prices[i];
+                return `√${prob.toFixed(2)}|${outcome}⟩`;
+            }).join(' + ');
+            formula.textContent = `|Ψ⟩ = ${terms}`;
+        }
+
+        // Update leverage
+        function updateLeverage(value) {
+            leverage = value;
+            document.getElementById('leverageValue').textContent = value + 'x';
+        }
+
+        // Navigation
+        function nextStep() {
+            if (currentStep === 1 && !selectedMarket) {
+                alert('Please select a market first');
+                return;
+            }
+            
+            if (currentStep === 2 && selectedVerses.length === 0) {
+                alert('Please select at least one verse');
+                return;
+            }
+            
+            if (currentStep < 4) {
+                currentStep++;
+                updateScreen();
+            }
+            
+            if (currentStep === 4) {
+                showExecutionScreen();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateScreen();
+            }
+        }
+
+        function updateScreen() {
+            // Hide all screens
+            document.querySelectorAll('.screen-container').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show current screen
+            switch(currentStep) {
+                case 1:
+                    document.getElementById('marketScreen').classList.add('active');
+                    break;
+                case 2:
+                    document.getElementById('verseScreen').classList.add('active');
+                    showVerses();
+                    break;
+                case 3:
+                    document.getElementById('configScreen').classList.add('active');
+                    updateQuantumDisplay();
+                    break;
+            }
+            
+            // Update step indicator
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index < currentStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+
+        // Show verses
+        function showVerses() {
+            const grid = document.getElementById('verseGrid');
+            grid.innerHTML = '';
+            
+            verses.forEach(verse => {
+                const card = document.createElement('div');
+                card.className = 'market-card';
+                if (selectedVerses.includes(verse)) {
+                    card.classList.add('selected');
+                }
+                
+                card.onclick = () => toggleVerse(verse);
+                
+                card.innerHTML = `
+                    <span class="platform-badge ${verse.platform}">${verse.platform.toUpperCase()}</span>
+                    <h3 style="margin-bottom: 15px;">${verse.title}</h3>
+                    <p style="color: rgba(255, 255, 255, 0.6); margin-bottom: 20px;">${verse.description}</p>
+                    <div style="text-align: center;">
+                        <div style="font-size: 48px; font-weight: 700; color: #FFD60A;">${verse.multiplier}x</div>
+                        <div style="color: rgba(255, 255, 255, 0.6);">Multiplier</div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Toggle verse selection
+        function toggleVerse(verse) {
+            const index = selectedVerses.findIndex(v => v.id === verse.id);
+            if (index > -1) {
+                selectedVerses.splice(index, 1);
+            } else {
+                selectedVerses.push(verse);
+            }
+            showVerses();
+        }
+
+        // Show execution screen with animation
+        function showExecutionScreen() {
+            const screen = document.getElementById('executionScreen');
+            screen.classList.add('active');
+            
+            // Calculate amounts
+            const investment = parseFloat(document.getElementById('investmentAmount').value) || 0;
+            let polymarketTotal = 0;
+            let kalshiTotal = 0;
+            let polymarketOrders = 0;
+            let kalshiOrders = 0;
+            
+            // Main market allocation
+            const marketShare = investment / (1 + selectedVerses.length);
+            if (selectedMarket.platform === 'polymarket') {
+                polymarketTotal += marketShare;
+                polymarketOrders += quantumMode ? selectedMarket.outcomes.length : 1;
+            } else {
+                kalshiTotal += marketShare;
+                kalshiOrders += quantumMode ? selectedMarket.outcomes.length : 1;
+            }
+            
+            // Verse allocations
+            selectedVerses.forEach(verse => {
+                const verseShare = investment / (1 + selectedVerses.length);
+                if (verse.platform === 'polymarket') {
+                    polymarketTotal += verseShare;
+                    polymarketOrders++;
+                } else {
+                    kalshiTotal += verseShare;
+                    kalshiOrders++;
+                }
+            });
+            
+            // Update displays
+            document.getElementById('polymarketTotal').textContent = '$' + polymarketTotal.toFixed(0);
+            document.getElementById('kalshiTotal').textContent = '$' + kalshiTotal.toFixed(0);
+            document.getElementById('polymarketOrders').textContent = polymarketOrders + ' Orders';
+            document.getElementById('kalshiOrders').textContent = kalshiOrders + ' Orders';
+            
+            // Start animation
+            setTimeout(() => animateMoneyFlow(), 500);
+        }
+
+        // Animate money flow
+        function animateMoneyFlow() {
+            const investment = parseFloat(document.getElementById('investmentAmount').value) || 0;
+            const screen = document.getElementById('executionScreen');
+            
+            // Create particles for each allocation
+            let delay = 0;
+            
+            // Main market particle
+            if (quantumMode && selectedMarket) {
+                selectedMarket.outcomes.forEach((outcome, i) => {
+                    setTimeout(() => {
+                        const amount = investment * selectedMarket.prices[i] / (1 + selectedVerses.length);
+                        createMoneyParticle(amount, selectedMarket.platform);
+                    }, delay);
+                    delay += 300;
+                });
+            } else {
+                setTimeout(() => {
+                    const amount = investment / (1 + selectedVerses.length);
+                    createMoneyParticle(amount, selectedMarket.platform);
+                }, delay);
+                delay += 300;
+            }
+            
+            // Verse particles
+            selectedVerses.forEach(verse => {
+                setTimeout(() => {
+                    const amount = investment / (1 + selectedVerses.length);
+                    createMoneyParticle(amount * verse.multiplier, verse.platform);
+                }, delay);
+                delay += 300;
+            });
+        }
+
+        // Create money particle
+        function createMoneyParticle(amount, platform) {
+            const screen = document.getElementById('executionScreen');
+            const particle = document.createElement('div');
+            particle.className = 'money-particle';
+            particle.textContent = '$' + Math.round(amount);
+            
+            // Start at center
+            particle.style.left = '50%';
+            particle.style.top = '50%';
+            particle.style.transform = 'translate(-50%, -50%) scale(0)';
+            particle.style.opacity = '0';
+            
+            screen.appendChild(particle);
+            
+            // Animate to destination
+            requestAnimationFrame(() => {
+                particle.style.transition = 'all 2s cubic-bezier(0.4, 0, 0.2, 1)';
+                particle.style.opacity = '1';
+                particle.style.transform = 'translate(-50%, -50%) scale(1)';
+                
+                setTimeout(() => {
+                    const dest = document.getElementById(platform === 'polymarket' ? 'polymarketDest' : 'kalshiDest');
+                    const destRect = dest.getBoundingClientRect();
+                    const screenRect = screen.getBoundingClientRect();
+                    
+                    const x = destRect.left + destRect.width/2 - screenRect.left;
+                    const y = destRect.top + destRect.height/2 - screenRect.top;
+                    
+                    particle.style.left = x + 'px';
+                    particle.style.top = y + 'px';
+                    particle.style.transform = 'translate(-50%, -50%) scale(0.5)';
+                    particle.style.opacity = '0';
+                    
+                    // Highlight destination
+                    dest.classList.add('active');
+                    setTimeout(() => dest.classList.remove('active'), 500);
+                }, 100);
+            });
+            
+            // Remove particle
+            setTimeout(() => particle.remove(), 2500);
+        }
+
+        // Complete execution
+        function completeExecution() {
+            document.getElementById('executionScreen').classList.remove('active');
+            alert('All orders have been successfully routed to Polymarket and Kalshi!');
+            
+            // Reset to start
+            currentStep = 1;
+            selectedMarket = null;
+            selectedVerses = [];
+            quantumMode = false;
+            updateScreen();
+        }
+
+        // Initialize
+        initializeMarkets();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Quantum Betting Platform</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Main Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard.html" class="navbar-brand">
+                <svg class="navbar-logo" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="15" stroke="var(--color-primary)" stroke-width="2"/>
+                    <path d="M16 8 L16 24 M8 16 L24 16" stroke="var(--color-primary)" stroke-width="2"/>
+                    <circle cx="16" cy="16" r="4" fill="var(--color-primary)"/>
+                </svg>
+                <span>Quantum</span>
+            </a>
+            
+            <div class="navbar-menu">
+                <div class="search-container">
+                    <input type="search" placeholder="Search positions..." class="search-input">
+                </div>
+                
+                <div class="navbar-actions">
+                    <button class="btn btn-icon" onclick="showNotifications()">
+                        <span class="notification-badge">3</span>
+                        🔔
+                    </button>
+                    
+                    <div class="wallet-info">
+                        <div class="wallet-balance">
+                            <span class="balance-label">Balance</span>
+                            <span class="balance-amount">◎ 1,234.56</span>
+                        </div>
+                        <button class="wallet-address" onclick="showWalletMenu()">
+                            0x7g9N...48AU
+                        </button>
+                    </div>
+                    
+                    <button class="btn btn-icon" onclick="showSettings()">⚙️</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- App Tabs -->
+    <div class="app-tabs">
+        <button class="tab" onclick="switchTab('overview')">Overview</button>
+        <button class="tab" onclick="switchTab('markets')">Markets</button>
+        <button class="tab" onclick="switchTab('create-market')">Create Market</button>
+        <button class="tab" onclick="switchTab('verses')">Verses</button>
+        <button class="tab active" onclick="switchTab('portfolio')">Portfolio</button>
+        <button class="tab" onclick="switchTab('trading')">Trading</button>
+        <button class="tab" onclick="switchTab('quantum')">Quantum</button>
+        <button class="tab" onclick="switchTab('defi')">DeFi</button>
+        <button class="tab" onclick="switchTab('analytics')">Analytics</button>
+        <button class="tab" onclick="switchTab('governance')">Governance</button>
+    </div>
+
+    <!-- Portfolio Content -->
+    <main class="portfolio-content">
+        <div class="container">
+            <!-- Portfolio Header -->
+            <section class="portfolio-header">
+                <h1>Portfolio Management</h1>
+                <p class="portfolio-subtitle">Track and manage all your positions and performance</p>
+            </section>
+
+            <!-- Portfolio Overview -->
+            <section class="portfolio-overview">
+                <div class="overview-card primary">
+                    <div class="overview-icon">💰</div>
+                    <div class="overview-content">
+                        <div class="overview-label">Total Portfolio Value</div>
+                        <div class="overview-value">$45,678.90</div>
+                        <div class="overview-change positive">+$2,345.67 (+5.4%) Today</div>
+                    </div>
+                </div>
+                
+                <div class="overview-card">
+                    <div class="overview-icon">📊</div>
+                    <div class="overview-content">
+                        <div class="overview-label">Open Positions</div>
+                        <div class="overview-value">12</div>
+                        <div class="overview-subtext">8 winning, 4 losing</div>
+                    </div>
+                </div>
+                
+                <div class="overview-card">
+                    <div class="overview-icon">📈</div>
+                    <div class="overview-content">
+                        <div class="overview-label">Total P&L</div>
+                        <div class="overview-value positive">+$8,234.56</div>
+                        <div class="overview-subtext">+18.5% All Time</div>
+                    </div>
+                </div>
+                
+                <div class="overview-card">
+                    <div class="overview-icon">🎯</div>
+                    <div class="overview-content">
+                        <div class="overview-label">Win Rate</div>
+                        <div class="overview-value">67.3%</div>
+                        <div class="overview-subtext">145 wins / 71 losses</div>
+                    </div>
+                </div>
+                
+                <div class="overview-card">
+                    <div class="overview-icon">💎</div>
+                    <div class="overview-content">
+                        <div class="overview-label">Best Trade</div>
+                        <div class="overview-value">+$3,456</div>
+                        <div class="overview-subtext">BTC > $100K</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Chart -->
+            <section class="performance-section">
+                <div class="section-header">
+                    <h2>Performance History</h2>
+                    <div class="chart-controls">
+                        <button class="period-btn active">1D</button>
+                        <button class="period-btn">1W</button>
+                        <button class="period-btn">1M</button>
+                        <button class="period-btn">3M</button>
+                        <button class="period-btn">1Y</button>
+                        <button class="period-btn">All</button>
+                    </div>
+                </div>
+                
+                <div class="performance-chart">
+                    <canvas id="performanceChart" width="1200" height="300"></canvas>
+                </div>
+                
+                <div class="performance-stats">
+                    <div class="perf-stat">
+                        <span class="stat-label">Sharpe Ratio</span>
+                        <span class="stat-value">2.34</span>
+                    </div>
+                    <div class="perf-stat">
+                        <span class="stat-label">Max Drawdown</span>
+                        <span class="stat-value">-12.5%</span>
+                    </div>
+                    <div class="perf-stat">
+                        <span class="stat-label">Avg Trade</span>
+                        <span class="stat-value">+$234.56</span>
+                    </div>
+                    <div class="perf-stat">
+                        <span class="stat-label">Total Trades</span>
+                        <span class="stat-value">216</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Positions -->
+            <section class="positions-section">
+                <div class="section-header">
+                    <h2>Active Positions</h2>
+                    <div class="position-filters">
+                        <select class="filter-select">
+                            <option>All Markets</option>
+                            <option>Politics</option>
+                            <option>Crypto</option>
+                            <option>Sports</option>
+                            <option>Finance</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>All Types</option>
+                            <option>Long</option>
+                            <option>Short</option>
+                            <option>Quantum</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="exportPositions()">Export CSV</button>
+                    </div>
+                </div>
+                
+                <div class="positions-table-container">
+                    <table class="table positions-table">
+                        <thead>
+                            <tr>
+                                <th>Market</th>
+                                <th>Type</th>
+                                <th>Side</th>
+                                <th>Size</th>
+                                <th>Entry Price</th>
+                                <th>Current Price</th>
+                                <th>P&L</th>
+                                <th>ROI</th>
+                                <th>Time Held</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="position-row">
+                                <td>
+                                    <div class="market-info">
+                                        <span class="market-name">Bitcoin > $100K by 2025</span>
+                                        <span class="market-category">Crypto</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-primary">Binary</span></td>
+                                <td><span class="position-side long">LONG</span></td>
+                                <td>$5,000</td>
+                                <td>$0.12</td>
+                                <td>$0.15</td>
+                                <td class="positive">+$1,250</td>
+                                <td class="positive">+25%</td>
+                                <td>45 days</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-secondary" onclick="managePosition('pos-1')">Manage</button>
+                                        <button class="btn btn-sm btn-danger" onclick="closePosition('pos-1')">Close</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr class="position-row">
+                                <td>
+                                    <div class="market-info">
+                                        <span class="market-name">2024 Election - Democrat</span>
+                                        <span class="market-category">Politics</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-primary">Binary</span></td>
+                                <td><span class="position-side short">SHORT</span></td>
+                                <td>$3,000</td>
+                                <td>$0.48</td>
+                                <td>$0.52</td>
+                                <td class="negative">-$250</td>
+                                <td class="negative">-8.3%</td>
+                                <td>12 days</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-secondary" onclick="managePosition('pos-2')">Manage</button>
+                                        <button class="btn btn-sm btn-danger" onclick="closePosition('pos-2')">Close</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr class="position-row quantum">
+                                <td>
+                                    <div class="market-info">
+                                        <span class="market-name">ETH > $10K Quantum</span>
+                                        <span class="market-category">Quantum</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-warning">Quantum</span></td>
+                                <td><span class="position-side quantum">SUPERPOSITION</span></td>
+                                <td>$2,000</td>
+                                <td>A:0.68 B:0.25</td>
+                                <td>A:0.72 B:0.23</td>
+                                <td class="positive">+$145</td>
+                                <td class="positive">+7.3%</td>
+                                <td>8 days</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-warning" onclick="observePosition('pos-3')">Observe</button>
+                                        <button class="btn btn-sm btn-danger" onclick="closePosition('pos-3')">Exit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr class="position-row">
+                                <td>
+                                    <div class="market-info">
+                                        <span class="market-name">SpaceX Mars Landing</span>
+                                        <span class="market-category">Science</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-primary">Binary</span></td>
+                                <td><span class="position-side long">LONG</span></td>
+                                <td>$2,000</td>
+                                <td>$0.41</td>
+                                <td>$0.41</td>
+                                <td class="neutral">$0</td>
+                                <td class="neutral">0%</td>
+                                <td>23 days</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-secondary" onclick="managePosition('pos-4')">Manage</button>
+                                        <button class="btn btn-sm btn-danger" onclick="closePosition('pos-4')">Close</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr class="position-row">
+                                <td>
+                                    <div class="market-info">
+                                        <span class="market-name">Fed Rate Decision</span>
+                                        <span class="market-category">Finance</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge badge-success">Multiple</span></td>
+                                <td><span class="position-side long">CUT 25BP</span></td>
+                                <td>$4,000</td>
+                                <td>$0.18</td>
+                                <td>$0.22</td>
+                                <td class="positive">+$888</td>
+                                <td class="positive">+22.2%</td>
+                                <td>5 days</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-secondary" onclick="managePosition('pos-5')">Manage</button>
+                                        <button class="btn btn-sm btn-danger" onclick="closePosition('pos-5')">Close</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Closed Positions -->
+            <section class="history-section">
+                <div class="section-header">
+                    <h2>Trade History</h2>
+                    <button class="btn btn-secondary" onclick="showAllHistory()">View All History</button>
+                </div>
+                
+                <div class="history-summary">
+                    <div class="summary-card">
+                        <h3>Recent Closed Positions</h3>
+                        <div class="history-list">
+                            <div class="history-item win">
+                                <div class="history-info">
+                                    <span class="history-market">Super Bowl Winner</span>
+                                    <span class="history-result">Won: Chiefs</span>
+                                </div>
+                                <div class="history-pnl positive">+$1,234</div>
+                                <div class="history-date">2 days ago</div>
+                            </div>
+                            
+                            <div class="history-item loss">
+                                <div class="history-info">
+                                    <span class="history-market">Oil > $100 by March</span>
+                                    <span class="history-result">Lost: NO</span>
+                                </div>
+                                <div class="history-pnl negative">-$567</div>
+                                <div class="history-date">5 days ago</div>
+                            </div>
+                            
+                            <div class="history-item win">
+                                <div class="history-info">
+                                    <span class="history-market">Tesla Stock Price</span>
+                                    <span class="history-result">Won: >$200</span>
+                                </div>
+                                <div class="history-pnl positive">+$2,345</div>
+                                <div class="history-date">1 week ago</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>Performance by Category</h3>
+                        <div class="category-performance">
+                            <div class="category-row">
+                                <span class="category-name">Crypto</span>
+                                <div class="category-bar">
+                                    <div class="bar-fill positive" style="width: 75%"></div>
+                                </div>
+                                <span class="category-pnl positive">+$5,234</span>
+                            </div>
+                            <div class="category-row">
+                                <span class="category-name">Politics</span>
+                                <div class="category-bar">
+                                    <div class="bar-fill positive" style="width: 60%"></div>
+                                </div>
+                                <span class="category-pnl positive">+$3,456</span>
+                            </div>
+                            <div class="category-row">
+                                <span class="category-name">Sports</span>
+                                <div class="category-bar">
+                                    <div class="bar-fill negative" style="width: 30%"></div>
+                                </div>
+                                <span class="category-pnl negative">-$1,234</span>
+                            </div>
+                            <div class="category-row">
+                                <span class="category-name">Finance</span>
+                                <div class="category-bar">
+                                    <div class="bar-fill positive" style="width: 45%"></div>
+                                </div>
+                                <span class="category-pnl positive">+$890</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Risk Management -->
+            <section class="risk-section">
+                <div class="section-header">
+                    <h2>Risk Management</h2>
+                    <button class="btn btn-secondary" onclick="showRiskSettings()">Settings</button>
+                </div>
+                
+                <div class="risk-cards">
+                    <div class="risk-card">
+                        <div class="risk-metric">
+                            <span class="risk-label">Total Exposure</span>
+                            <span class="risk-value">$16,000</span>
+                        </div>
+                        <div class="risk-bar">
+                            <div class="risk-fill" style="width: 64%"></div>
+                        </div>
+                        <span class="risk-status">64% of max exposure</span>
+                    </div>
+                    
+                    <div class="risk-card">
+                        <div class="risk-metric">
+                            <span class="risk-label">Value at Risk (95%)</span>
+                            <span class="risk-value danger">-$2,456</span>
+                        </div>
+                        <div class="risk-info">
+                            <span>Max potential 1-day loss</span>
+                        </div>
+                    </div>
+                    
+                    <div class="risk-card">
+                        <div class="risk-metric">
+                            <span class="risk-label">Leverage Used</span>
+                            <span class="risk-value">8.5x</span>
+                        </div>
+                        <div class="risk-bar">
+                            <div class="risk-fill warning" style="width: 42.5%"></div>
+                        </div>
+                        <span class="risk-status">Average across positions</span>
+                    </div>
+                    
+                    <div class="risk-card">
+                        <div class="risk-metric">
+                            <span class="risk-label">Liquidation Risk</span>
+                            <span class="risk-value safe">Low</span>
+                        </div>
+                        <div class="risk-info">
+                            <span>Nearest: -23% from current</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-items">
+            <a href="dashboard.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">🏠</span>
+                <span class="mobile-nav-label">Home</span>
+            </a>
+            <a href="markets.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">📊</span>
+                <span class="mobile-nav-label">Markets</span>
+            </a>
+            <a href="create-market.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">➕</span>
+                <span class="mobile-nav-label">Create</span>
+            </a>
+            <a href="portfolio.html" class="mobile-nav-item active">
+                <span class="mobile-nav-icon">💼</span>
+                <span class="mobile-nav-label">Portfolio</span>
+            </a>
+            <a href="profile.html" class="mobile-nav-item">
+                <span class="mobile-nav-icon">👤</span>
+                <span class="mobile-nav-label">Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Position Management Modal -->
+    <div class="modal hidden" id="positionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Manage Position</h2>
+                <button class="modal-close" onclick="closePositionModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="position-details">
+                    <h3>Bitcoin > $100K by 2025</h3>
+                    <div class="position-stats">
+                        <div class="stat-row">
+                            <span>Current Size</span>
+                            <span>$5,000</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Current P&L</span>
+                            <span class="positive">+$1,250 (+25%)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="position-actions">
+                    <h4>Actions</h4>
+                    <button class="btn btn-secondary btn-block" onclick="addToPosition()">Add to Position</button>
+                    <button class="btn btn-secondary btn-block" onclick="reducePosition()">Reduce Position</button>
+                    <button class="btn btn-secondary btn-block" onclick="setStopLoss()">Set Stop Loss</button>
+                    <button class="btn btn-secondary btn-block" onclick="setTakeProfit()">Set Take Profit</button>
+                    <button class="btn btn-danger btn-block" onclick="closePositionConfirm()">Close Position</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Styles specific to portfolio page -->
+    <style>
+        /* Portfolio Content */
+        .portfolio-content {
+            padding: var(--spacing-xl) 0;
+            min-height: calc(100vh - 64px - 48px);
+        }
+        
+        /* Portfolio Header */
+        .portfolio-header {
+            text-align: center;
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .portfolio-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 1.125rem;
+        }
+        
+        /* Portfolio Overview */
+        .portfolio-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .overview-card {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            transition: all var(--transition-base);
+        }
+        
+        .overview-card:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+        }
+        
+        .overview-card.primary {
+            border-color: var(--color-primary);
+            background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(29, 155, 240, 0.1) 100%);
+        }
+        
+        .overview-icon {
+            font-size: 2.5rem;
+        }
+        
+        .overview-content {
+            flex: 1;
+        }
+        
+        .overview-label {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .overview-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .overview-change {
+            font-size: 0.875rem;
+        }
+        
+        .overview-subtext {
+            font-size: 0.875rem;
+            color: var(--color-text-tertiary);
+        }
+        
+        /* Performance Section */
+        .performance-section {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .chart-controls {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .period-btn {
+            padding: var(--spacing-xs) var(--spacing-md);
+            background-color: transparent;
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-md);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .period-btn:hover,
+        .period-btn.active {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: white;
+        }
+        
+        .performance-chart {
+            margin: var(--spacing-xl) 0;
+            padding: var(--spacing-lg);
+            background-color: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+        }
+        
+        .performance-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .perf-stat {
+            text-align: center;
+        }
+        
+        .perf-stat .stat-label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .perf-stat .stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        /* Positions Section */
+        .positions-section {
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .position-filters {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+        }
+        
+        .positions-table-container {
+            overflow-x: auto;
+            margin-top: var(--spacing-xl);
+        }
+        
+        .positions-table {
+            width: 100%;
+        }
+        
+        .position-row.quantum {
+            background-color: rgba(251, 191, 36, 0.05);
+        }
+        
+        .market-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+        
+        .market-name {
+            font-weight: 500;
+        }
+        
+        .market-category {
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+        }
+        
+        .position-side {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .position-side.long {
+            background-color: var(--color-success-bg);
+            color: var(--color-success);
+        }
+        
+        .position-side.short {
+            background-color: var(--color-danger-bg);
+            color: var(--color-danger);
+        }
+        
+        .position-side.quantum {
+            background-color: var(--color-warning-bg);
+            color: var(--color-warning);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        /* History Section */
+        .history-section {
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .history-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--spacing-xl);
+        }
+        
+        .summary-card {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+        }
+        
+        .summary-card h3 {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md);
+            background-color: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+            border-left: 3px solid;
+        }
+        
+        .history-item.win {
+            border-left-color: var(--color-success);
+        }
+        
+        .history-item.loss {
+            border-left-color: var(--color-danger);
+        }
+        
+        .history-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+        
+        .history-market {
+            font-weight: 500;
+        }
+        
+        .history-result {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .history-pnl {
+            font-weight: 600;
+            margin-right: var(--spacing-lg);
+        }
+        
+        .history-date {
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+        }
+        
+        /* Category Performance */
+        .category-performance {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .category-row {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .category-name {
+            width: 80px;
+            font-size: 0.875rem;
+        }
+        
+        .category-bar {
+            flex: 1;
+            height: 8px;
+            background-color: var(--color-bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            transition: width var(--transition-base);
+        }
+        
+        .bar-fill.positive {
+            background-color: var(--color-success);
+        }
+        
+        .bar-fill.negative {
+            background-color: var(--color-danger);
+        }
+        
+        .category-pnl {
+            font-weight: 600;
+            font-size: 0.875rem;
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        /* Risk Section */
+        .risk-section {
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+        }
+        
+        .risk-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .risk-card {
+            background-color: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+        }
+        
+        .risk-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .risk-label {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .risk-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .risk-value.danger {
+            color: var(--color-danger);
+        }
+        
+        .risk-value.safe {
+            color: var(--color-success);
+        }
+        
+        .risk-bar {
+            height: 6px;
+            background-color: var(--color-bg-tertiary);
+            border-radius: var(--radius-full);
+            margin-bottom: var(--spacing-sm);
+            overflow: hidden;
+        }
+        
+        .risk-fill {
+            height: 100%;
+            background-color: var(--color-primary);
+            transition: width var(--transition-base);
+        }
+        
+        .risk-fill.warning {
+            background-color: var(--color-warning);
+        }
+        
+        .risk-status,
+        .risk-info {
+            font-size: 0.75rem;
+            color: var(--color-text-tertiary);
+        }
+        
+        /* Position Modal */
+        .position-details {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .position-stats {
+            background-color: var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+        }
+        
+        .stat-row:not(:last-child) {
+            border-bottom: 1px solid var(--color-border-primary);
+        }
+        
+        .position-actions h4 {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .portfolio-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .position-filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .history-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .risk-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <!-- Portfolio JavaScript -->
+    <script>
+        // Initialize portfolio page
+        document.addEventListener('DOMContentLoaded', () => {
+            initializePortfolio();
+            drawPerformanceChart();
+        });
+        
+        // Initialize portfolio
+        function initializePortfolio() {
+            // Update real-time values
+            setInterval(updatePortfolioValues, 5000);
+        }
+        
+        // Update portfolio values
+        function updatePortfolioValues() {
+            // Simulate price changes
+            const pnlElements = document.querySelectorAll('td.positive, td.negative');
+            pnlElements.forEach(el => {
+                const currentValue = parseFloat(el.textContent.replace(/[$,+]/g, ''));
+                const change = (Math.random() - 0.5) * 50;
+                const newValue = currentValue + change;
+                
+                el.textContent = (newValue >= 0 ? '+' : '') + '$' + Math.abs(newValue).toFixed(0);
+                el.className = newValue >= 0 ? 'positive' : 'negative';
+            });
+        }
+        
+        // Draw performance chart
+        function drawPerformanceChart() {
+            const canvas = document.getElementById('performanceChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 300;
+            
+            // Draw grid
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            
+            for (let i = 0; i <= 5; i++) {
+                const y = (canvas.height / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Draw performance line
+            ctx.strokeStyle = '#1D9BF0';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            let prevX = 0;
+            let prevY = canvas.height / 2;
+            
+            for (let i = 0; i < 100; i++) {
+                const x = (canvas.width / 100) * i;
+                const y = canvas.height / 2 + (Math.random() - 0.5) * 50 - i * 0.5;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+                
+                prevX = x;
+                prevY = y;
+            }
+            
+            ctx.stroke();
+            
+            // Fill area under line
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.lineTo(0, canvas.height);
+            ctx.closePath();
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, 'rgba(29, 155, 240, 0.3)');
+            gradient.addColorStop(1, 'rgba(29, 155, 240, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        }
+        
+        // Switch tabs
+        function switchTab(tabName) {
+            window.location.href = tabName + '.html';
+        }
+        
+        // Manage position
+        function managePosition(positionId) {
+            document.getElementById('positionModal').classList.remove('hidden');
+        }
+        
+        // Close position modal
+        function closePositionModal() {
+            document.getElementById('positionModal').classList.add('hidden');
+        }
+        
+        // Position actions
+        function closePosition(positionId) {
+            if (confirm('Are you sure you want to close this position?')) {
+                showNotification('success', 'Position Closed', 'Position closed successfully');
+            }
+        }
+        
+        function observePosition(positionId) {
+            const states = ['A', 'B'];
+            const collapsed = states[Math.floor(Math.random() * states.length)];
+            showNotification('warning', 'Quantum Collapsed', `Position collapsed to Universe ${collapsed}`);
+        }
+        
+        function addToPosition() {
+            showNotification('info', 'Add to Position', 'Feature coming soon');
+        }
+        
+        function reducePosition() {
+            showNotification('info', 'Reduce Position', 'Feature coming soon');
+        }
+        
+        function setStopLoss() {
+            showNotification('info', 'Stop Loss', 'Feature coming soon');
+        }
+        
+        function setTakeProfit() {
+            showNotification('info', 'Take Profit', 'Feature coming soon');
+        }
+        
+        function closePositionConfirm() {
+            closePositionModal();
+            closePosition('current');
+        }
+        
+        // Export positions
+        function exportPositions() {
+            showNotification('success', 'Export Started', 'Downloading positions as CSV...');
+        }
+        
+        // Show all history
+        function showAllHistory() {
+            showNotification('info', 'History', 'Full history view coming soon');
+        }
+        
+        // Show risk settings
+        function showRiskSettings() {
+            showNotification('info', 'Risk Settings', 'Risk management settings coming soon');
+        }
+        
+        // Show notification
+        function showNotification(type, title, message) {
+            const container = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification fade-in';
+            notification.innerHTML = `
+                <div class="notification-icon ${type}">${getNotificationIcon(type)}</div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close" onclick="closeNotification(this)">×</button>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+        
+        function getNotificationIcon(type) {
+            switch(type) {
+                case 'success': return '✓';
+                case 'error': return '✗';
+                case 'warning': return '⚠';
+                default: return 'ℹ';
+            }
+        }
+        
+        function closeNotification(button) {
+            button.parentElement.remove();
+        }
+        
+        // Show wallet menu
+        function showWalletMenu() {
+            alert('Wallet Menu:\n\n• Copy Address\n• View on Explorer\n• Disconnect Wallet\n• Export Private Key');
+        }
+        
+        // Show notifications
+        function showNotifications() {
+            showNotification('info', 'Notifications', 'You have 3 new notifications');
+        }
+        
+        // Show settings
+        function showSettings() {
+            window.location.href = 'settings.html';
+        }
+    </script>
+</body>
+</html>

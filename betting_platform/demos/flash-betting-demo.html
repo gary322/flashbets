@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM - Flash Betting Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 20px;
+            color: #888;
+            -webkit-text-fill-color: #888;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFA500, #FFD700);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .main-content {
+            display: grid;
+            gap: 30px;
+        }
+
+        .flash-header {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.1), rgba(255, 165, 0, 0.1));
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 0, 0, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flash-title {
+            font-size: 36px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #FF0000, #FFA500, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: flashGradient 2s linear infinite;
+        }
+
+        @keyframes flashGradient {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        .countdown-timer {
+            font-size: 72px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .flash-markets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .flash-card {
+            background: rgba(255, 0, 0, 0.05);
+            border: 2px solid rgba(255, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .flash-card.active {
+            animation: flashPulse 1s ease infinite;
+            border-color: #FF0000;
+        }
+
+        @keyframes flashPulse {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 20px 5px rgba(255, 0, 0, 0.2);
+                transform: scale(1.02);
+            }
+        }
+
+        .flash-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #FF0000, #FFA500);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            animation: blink 1s ease infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .flash-market-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #FFA500;
+        }
+
+        .flash-timer {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .timer-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .timer-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #FF0000;
+            font-family: 'Courier New', monospace;
+        }
+
+        .flash-odds {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .odds-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .odds-btn:hover {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: #FFA500;
+            transform: translateY(-2px);
+        }
+
+        .odds-btn.selected {
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            border-color: #FFD700;
+            color: #1a1a2e;
+        }
+
+        .bet-amount {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .amount-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #FFD700;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            outline: none;
+        }
+
+        .quick-amounts {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quick-btn {
+            flex: 1;
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid rgba(255, 165, 0, 0.4);
+            border-radius: 5px;
+            padding: 8px;
+            color: #FFA500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover {
+            background: rgba(255, 165, 0, 0.3);
+        }
+
+        .place-bet-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #FF0000, #FFA500);
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .place-bet-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.3);
+        }
+
+        .place-bet-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .flash-stats {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .live-feed {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .feed-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 165, 0, 0.05);
+            border-left: 3px solid #FFA500;
+            border-radius: 5px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .feed-time {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .feed-content {
+            color: #fff;
+        }
+
+        .zk-proof {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(255, 0, 0, 0.1));
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            margin-top: 20px;
+        }
+
+        .proof-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #8A2BE2, #FF0000);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .proof-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .proof-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .lightning-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .lightning {
+            position: absolute;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(transparent, #FFD700, transparent);
+            animation: lightning 3s linear infinite;
+        }
+
+        @keyframes lightning {
+            0% {
+                transform: translateX(-100vw) rotate(15deg);
+            }
+            100% {
+                transform: translateX(100vw) rotate(15deg);
+            }
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 165, 0, 0.3);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .step-indicator {
+            background: rgba(255, 165, 0, 0.2);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        .narrator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #FFA500;
+            border-radius: 20px;
+            padding: 30px 40px;
+            max-width: 600px;
+            z-index: 2000;
+            display: none;
+        }
+
+        .narrator.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .narrator-title {
+            font-size: 24px;
+            color: #FFA500;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .narrator-content {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #fff;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -45%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .highlight {
+            animation: highlightPulse 1.5s ease infinite;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        @keyframes highlightPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="header">
+            <h1>⚡ BOOM Flash Betting Demo</h1>
+            <p>5-Second to 5-Minute Ultra-Fast Markets</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div class="main-content">
+            <!-- Flash Header -->
+            <div class="flash-header" id="flashHeader">
+                <div class="lightning-effect">
+                    <div class="lightning"></div>
+                </div>
+                <div class="flash-title">FLASH BETTING ACTIVE</div>
+                <div class="countdown-timer" id="mainTimer">00:00:00</div>
+                <p style="color: #888;">Next market batch in <span id="batchTimer">30</span> seconds</p>
+            </div>
+
+            <!-- Active Flash Markets -->
+            <div class="flash-markets" id="flashMarkets"></div>
+
+            <!-- Stats Dashboard -->
+            <div class="flash-stats" id="flashStats">
+                <h3 style="color: #FFA500; margin-bottom: 20px;">⚡ Flash Stats</h3>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value" id="totalMarkets">0</div>
+                        <div class="stat-label">Active Markets</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="totalVolume">$0</div>
+                        <div class="stat-label">Total Volume</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="avgResolution">0s</div>
+                        <div class="stat-label">Avg Resolution</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="winRate">0%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Feed -->
+            <div class="live-feed" id="liveFeed">
+                <h3 style="color: #FFA500; margin-bottom: 15px;">📡 Live Feed</h3>
+                <div id="feedContent"></div>
+            </div>
+
+            <!-- ZK Proof Status -->
+            <div class="zk-proof" id="zkProof" style="display: none;">
+                <div class="proof-badge">ZK PROOF SYSTEM</div>
+                <div class="proof-status">
+                    <div class="proof-indicator"></div>
+                    <span>Zero-Knowledge Proof Resolution Active</span>
+                </div>
+                <div style="margin-top: 15px; color: #888; font-size: 14px;">
+                    All flash markets resolved within 10 seconds using ZK proofs from verified data sources
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="control-btn" id="prevBtn" disabled>Previous</button>
+            <div class="step-indicator">
+                <span>Step</span>
+                <span id="currentStep">1</span>
+                <span>/</span>
+                <span id="totalSteps">70</span>
+            </div>
+            <button class="control-btn" id="nextBtn">Next</button>
+            <button class="control-btn" id="playBtn">Auto Play</button>
+            <div class="speed-control">
+                <label>Speed:</label>
+                <select id="speedSelect">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Narrator -->
+        <div class="narrator" id="narrator">
+            <div class="narrator-title" id="narratorTitle"></div>
+            <div class="narrator-content" id="narratorContent"></div>
+        </div>
+    </div>
+
+    <script>
+        class FlashBettingDemo {
+            constructor() {
+                this.currentStep = 1;
+                this.totalSteps = 70;
+                this.isPlaying = false;
+                this.speed = 1;
+                this.playInterval = null;
+                this.narratorTimer = null;
+                this.countdownInterval = null;
+                
+                this.flashMarkets = document.getElementById('flashMarkets');
+                this.feedContent = document.getElementById('feedContent');
+                
+                this.init();
+            }
+
+            init() {
+                this.setupControls();
+                this.startMainTimer();
+                this.showStep(1);
+            }
+
+            setupControls() {
+                document.getElementById('nextBtn').addEventListener('click', () => this.nextStep());
+                document.getElementById('prevBtn').addEventListener('click', () => this.prevStep());
+                document.getElementById('playBtn').addEventListener('click', () => this.togglePlay());
+                document.getElementById('speedSelect').addEventListener('change', (e) => {
+                    this.speed = parseFloat(e.target.value);
+                });
+            }
+
+            startMainTimer() {
+                let seconds = 0;
+                setInterval(() => {
+                    seconds++;
+                    const hours = Math.floor(seconds / 3600);
+                    const mins = Math.floor((seconds % 3600) / 60);
+                    const secs = seconds % 60;
+                    document.getElementById('mainTimer').textContent = 
+                        `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                }, 1000);
+            }
+
+            showNarrator(title, content) {
+                const narrator = document.getElementById('narrator');
+                document.getElementById('narratorTitle').textContent = title;
+                document.getElementById('narratorContent').textContent = content;
+                narrator.classList.add('active');
+
+                clearTimeout(this.narratorTimer);
+                this.narratorTimer = setTimeout(() => {
+                    this.hideNarrator();
+                }, 5000 / this.speed);
+            }
+
+            hideNarrator() {
+                const narrator = document.getElementById('narrator');
+                narrator.classList.remove('active');
+                
+                if (this.isPlaying) {
+                    setTimeout(() => this.nextStep(), 3000 / this.speed);
+                }
+            }
+
+            createFlashCard(data) {
+                const card = document.createElement('div');
+                card.className = 'flash-card';
+                if (data.active) card.classList.add('active');
+                
+                card.innerHTML = `
+                    <div class="flash-badge">⚡ FLASH</div>
+                    <div class="flash-market-title">${data.title}</div>
+                    <div class="flash-timer">
+                        <div class="timer-label">Closes In</div>
+                        <div class="timer-value" id="timer-${data.id}">${data.time}</div>
+                    </div>
+                    <div class="flash-odds">
+                        <div class="odds-btn ${data.selected === 'yes' ? 'selected' : ''}">
+                            <div style="font-size: 14px; color: #888;">YES</div>
+                            <div style="font-size: 24px; font-weight: bold; color: #FFA500;">${data.yesOdds}%</div>
+                        </div>
+                        <div class="odds-btn ${data.selected === 'no' ? 'selected' : ''}">
+                            <div style="font-size: 14px; color: #888;">NO</div>
+                            <div style="font-size: 24px; font-weight: bold; color: #FFA500;">${data.noOdds}%</div>
+                        </div>
+                    </div>
+                    <div class="bet-amount">
+                        <input type="text" class="amount-input" value="$${data.amount || '100'}" readonly>
+                        <div class="quick-amounts">
+                            <button class="quick-btn">$10</button>
+                            <button class="quick-btn">$50</button>
+                            <button class="quick-btn">$100</button>
+                            <button class="quick-btn">$500</button>
+                        </div>
+                    </div>
+                    <button class="place-bet-btn ${data.placed ? 'disabled' : ''}" ${data.placed ? 'disabled' : ''}>
+                        ${data.placed ? '✓ BET PLACED' : 'PLACE FLASH BET'}
+                    </button>
+                `;
+                
+                return card;
+            }
+
+            addFeedItem(content, type = 'info') {
+                const item = document.createElement('div');
+                item.className = 'feed-item';
+                const time = new Date().toLocaleTimeString();
+                item.innerHTML = `
+                    <div class="feed-time">${time}</div>
+                    <div class="feed-content">${content}</div>
+                `;
+                this.feedContent.insertBefore(item, this.feedContent.firstChild);
+                
+                // Keep only last 10 items
+                while (this.feedContent.children.length > 10) {
+                    this.feedContent.removeChild(this.feedContent.lastChild);
+                }
+            }
+
+            updateStats(markets, volume, resolution, winRate) {
+                document.getElementById('totalMarkets').textContent = markets;
+                document.getElementById('totalVolume').textContent = volume;
+                document.getElementById('avgResolution').textContent = resolution;
+                document.getElementById('winRate').textContent = winRate;
+            }
+
+            startCountdown(elementId, seconds) {
+                let remaining = seconds;
+                const interval = setInterval(() => {
+                    const element = document.getElementById(elementId);
+                    if (!element) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    
+                    if (remaining <= 0) {
+                        element.textContent = 'CLOSED';
+                        clearInterval(interval);
+                    } else {
+                        const mins = Math.floor(remaining / 60);
+                        const secs = remaining % 60;
+                        element.textContent = `${mins}:${String(secs).padStart(2, '0')}`;
+                        remaining--;
+                    }
+                }, 1000);
+            }
+
+            showStep(step) {
+                this.currentStep = step;
+                this.updateProgress();
+                this.updateControls();
+
+                // Clear highlights
+                document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+
+                switch(step) {
+                    case 1:
+                        this.showNarrator("Welcome to BOOM Flash Betting", 
+                            "Experience the adrenaline of ultra-fast betting markets that resolve in seconds to minutes!");
+                        break;
+
+                    case 2:
+                        this.showNarrator("What is Flash Betting?", 
+                            "Flash markets are micro-duration betting opportunities lasting from 5 seconds to 5 minutes, perfect for live sports and rapid market movements");
+                        document.getElementById('flashHeader').classList.add('highlight');
+                        break;
+
+                    case 3:
+                        this.showNarrator("Live Timer System", 
+                            "The main timer tracks your session, while each market has its own countdown showing exactly when it closes");
+                        break;
+
+                    case 4:
+                        this.showNarrator("First Flash Market", 
+                            "Let's look at a live soccer flash market - 'Next Goal in 60 Seconds?'");
+                        this.flashMarkets.innerHTML = '';
+                        this.flashMarkets.appendChild(this.createFlashCard({
+                            id: 'soccer-1',
+                            title: "Liverpool vs Chelsea - Goal in Next 60s?",
+                            time: "0:60",
+                            yesOdds: 15,
+                            noOdds: 85,
+                            active: true
+                        }));
+                        this.startCountdown('timer-soccer-1', 60);
+                        break;
+
+                    case 5:
+                        this.showNarrator("Ultra-Short Duration", 
+                            "This market will resolve in just 60 seconds based on real-time game data");
+                        this.addFeedItem("⚽ New flash market created: Liverpool vs Chelsea goal market");
+                        break;
+
+                    case 6:
+                        this.showNarrator("Dynamic Odds", 
+                            "Odds update in real-time based on game flow - corner kick increases goal probability!");
+                        setTimeout(() => {
+                            document.querySelector('.odds-btn').innerHTML = `
+                                <div style="font-size: 14px; color: #888;">YES</div>
+                                <div style="font-size: 24px; font-weight: bold; color: #FFA500;">22% ↑</div>
+                            `;
+                        }, 1000 / this.speed);
+                        break;
+
+                    case 7:
+                        this.showNarrator("Quick Bet Placement", 
+                            "Select your position and amount - flash markets require instant decisions");
+                        document.querySelector('.odds-btn').classList.add('selected');
+                        break;
+
+                    case 8:
+                        this.showNarrator("Instant Execution", 
+                            "Flash bets execute immediately with no delay - you're locked in!");
+                        document.querySelector('.place-bet-btn').textContent = '✓ BET PLACED';
+                        document.querySelector('.place-bet-btn').disabled = true;
+                        this.addFeedItem("💰 Bet placed: $100 on YES @ 22% odds");
+                        break;
+
+                    case 9:
+                        this.showNarrator("Market Resolution", 
+                            "Market resolves in real-time - NO GOAL! Market closes");
+                        document.getElementById('timer-soccer-1').textContent = 'RESOLVED';
+                        this.addFeedItem("❌ Market resolved: No goal scored - NO wins");
+                        break;
+
+                    case 10:
+                        this.showNarrator("Multiple Flash Markets", 
+                            "BOOM runs hundreds of flash markets simultaneously across different sports");
+                        this.flashMarkets.innerHTML = '';
+                        this.flashMarkets.appendChild(this.createFlashCard({
+                            id: 'nba-1',
+                            title: "Lakers - 3-Pointer in Next 24s?",
+                            time: "0:24",
+                            yesOdds: 35,
+                            noOdds: 65,
+                            active: true
+                        }));
+                        this.flashMarkets.appendChild(this.createFlashCard({
+                            id: 'tennis-1',
+                            title: "Djokovic - Ace on Next Serve?",
+                            time: "0:30",
+                            yesOdds: 28,
+                            noOdds: 72
+                        }));
+                        this.flashMarkets.appendChild(this.createFlashCard({
+                            id: 'crypto-1',
+                            title: "Bitcoin Moves $50 in 30s?",
+                            time: "0:30",
+                            yesOdds: 42,
+                            noOdds: 58
+                        }));
+                        this.startCountdown('timer-nba-1', 24);
+                        this.startCountdown('timer-tennis-1', 30);
+                        this.startCountdown('timer-crypto-1', 30);
+                        break;
+
+                    case 11:
+                        this.showNarrator("NBA Shot Clock Markets", 
+                            "Basketball flash markets sync with the 24-second shot clock for perfect timing");
+                        document.querySelector('#timer-nba-1').parentElement.parentElement.classList.add('highlight');
+                        break;
+
+                    case 12:
+                        this.showNarrator("Tennis Point Markets", 
+                            "Bet on individual tennis points - ace, double fault, or rally length");
+                        document.querySelector('#timer-tennis-1').parentElement.parentElement.classList.add('highlight');
+                        break;
+
+                    case 13:
+                        this.showNarrator("Crypto Flash Markets", 
+                            "Ultra-volatile crypto movements create perfect flash betting opportunities");
+                        document.querySelector('#timer-crypto-1').parentElement.parentElement.classList.add('highlight');
+                        break;
+
+                    case 14:
+                        this.showNarrator("Live Statistics", 
+                            "Track your flash betting performance in real-time");
+                        this.updateStats('3', '$450K', '8.2s', '47%');
+                        document.getElementById('flashStats').classList.add('highlight');
+                        break;
+
+                    case 15:
+                        this.showNarrator("Average Resolution Time", 
+                            "Flash markets resolve in average 8.2 seconds after closing - near instant!");
+                        break;
+
+                    case 16:
+                        this.showNarrator("5-Second Markets", 
+                            "The fastest flash markets - 5-second crypto price movements!");
+                        this.flashMarkets.innerHTML = '';
+                        this.flashMarkets.appendChild(this.createFlashCard({
+                            id: 'btc-5s',
+                            title: "⚡ BTC Up in Next 5 Seconds?",
+                            time: "0:05",
+                            yesOdds: 50,
+                            noOdds: 50,
+                            active: true
+                        }));
+                        this.startCountdown('timer-btc-5s', 5);
+                        this.addFeedItem("⚡ ULTRA-FLASH: 5-second BTC market created!");
+                        break;
+
+                    case 17:
+                        this.showNarrator("Instant Resolution", 
+                            "5-second markets resolve instantly using real-time price feeds");
+                        setTimeout(() => {
+                            document.getElementById('timer-btc-5s').textContent = 'RESOLVED';
+                            this.addFeedItem("✅ 5-second market resolved: BTC UP - YES wins!");
+                        }, 5000 / this.speed);
+                        break;
+
+                    case 18:
+                        this.showNarrator("ZK Proof System", 
+                            "All flash markets use Zero-Knowledge proofs for instant, verifiable resolution");
+                        document.getElementById('zkProof').style.display = 'block';
+                        document.getElementById('zkProof').classList.add('highlight');
+                        break;
+
+                    case 19:
+                        this.showNarrator("Proof Generation", 
+                            "ZK proofs generated in ~2 seconds, verified on-chain in ~3 seconds");
+                        this.addFeedItem("🔐 ZK Proof generated for market resolution");
+                        break;
+
+                    case 20:
+                        this.showNarrator("Data Sources", 
+                            "Flash markets pull from DraftKings, FanDuel, and official sports APIs");
+                        this.addFeedItem("📡 Connected to DraftKings live feed");
+                        this.addFeedItem("📡 Connected to FanDuel real-time API");
+                        break;
+
+                    case 21:
+                        this.showNarrator("Micro-Tau AMM", 
+                            "Special AMM formula optimized for ultra-short duration markets");
+                        const tauDisplay = document.createElement('div');
+                        tauDisplay.innerHTML = `
+                            <div style="background: rgba(138,43,226,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <div style="color: #8A2BE2; font-weight: 600; margin-bottom: 10px;">Micro-Tau Formula</div>
+                                <div style="font-family: monospace; color: #FFD700;">tau = 0.0001 * (time_left / 60)</div>
+                                <div style="color: #888; margin-top: 10px;">30-second market: tau = 0.00005</div>
+                            </div>
+                        `;
+                        document.getElementById('flashStats').appendChild(tauDisplay);
+                        break;
+
+                    case 22:
+                        this.showNarrator("Batch Market Creation", 
+                            "New flash market batches every 30 seconds during live games");
+                        document.getElementById('batchTimer').textContent = '10';
+                        let batchCountdown = 10;
+                        const batchInterval = setInterval(() => {
+                            batchCountdown--;
+                            document.getElementById('batchTimer').textContent = batchCountdown;
+                            if (batchCountdown <= 0) {
+                                clearInterval(batchInterval);
+                                this.addFeedItem("🎯 New batch: 5 flash markets created!");
+                            }
+                        }, 1000 / this.speed);
+                        break;
+
+                    case 23:
+                        this.showNarrator("Chain Betting", 
+                            "Link multiple flash bets together for multiplied returns!");
+                        this.flashMarkets.innerHTML = `
+                            <div style="background: linear-gradient(135deg, rgba(255,0,0,0.1), rgba(255,165,0,0.1)); padding: 20px; border-radius: 15px; grid-column: 1/-1;">
+                                <div style="color: #FF0000; font-weight: 600; margin-bottom: 15px;">🔗 Flash Chain Active</div>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; flex: 1; text-align: center;">
+                                        <div style="color: #888; font-size: 12px;">Step 1</div>
+                                        <div style="color: #FFA500;">Goal in 30s</div>
+                                        <div style="color: #4CAF50;">✓ WON</div>
+                                    </div>
+                                    <div style="color: #FFD700;">→</div>
+                                    <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; flex: 1; text-align: center;">
+                                        <div style="color: #888; font-size: 12px;">Step 2</div>
+                                        <div style="color: #FFA500;">3-Pointer</div>
+                                        <div style="color: #FFD700;">ACTIVE</div>
+                                    </div>
+                                    <div style="color: #FFD700;">→</div>
+                                    <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; flex: 1; text-align: center;">
+                                        <div style="color: #888; font-size: 12px;">Step 3</div>
+                                        <div style="color: #FFA500;">Ace Serve</div>
+                                        <div style="color: #888;">PENDING</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 15px; color: #FFD700; font-size: 20px; text-align: center;">
+                                    Potential Return: 8.4x
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 24:
+                        this.showNarrator("Auto-Chain Mode", 
+                            "Enable auto-chain to automatically roll winnings into next flash market");
+                        break;
+
+                    case 25:
+                        this.showNarrator("Flash Leverage", 
+                            "Combine flash betting with leverage for up to 500x effective exposure!");
+                        this.flashMarkets.innerHTML = '';
+                        this.flashMarkets.appendChild(this.createFlashCard({
+                            id: 'lev-1',
+                            title: "100x LEVERAGE: Goal in 45s?",
+                            time: "0:45",
+                            yesOdds: 18,
+                            noOdds: 82,
+                            amount: '10',
+                            active: true
+                        }));
+                        this.addFeedItem("⚡ 100x leverage flash bet: $10 controls $1000 position!");
+                        break;
+
+                    case 26:
+                        this.showNarrator("Effective Leverage Calculation", 
+                            "100x base leverage × 5x chain multiplier = 500x effective leverage!");
+                        break;
+
+                    case 27:
+                        this.showNarrator("E-Sports Flash Markets", 
+                            "Flash betting on League of Legends, CS:GO, and Valorant rounds");
+                        this.flashMarkets.innerHTML = '';
+                        this.flashMarkets.appendChild(this.createFlashCard({
+                            id: 'esports-1',
+                            title: "T1 - First Blood in 60s?",
+                            time: "1:00",
+                            yesOdds: 45,
+                            noOdds: 55
+                        }));
+                        this.flashMarkets.appendChild(this.createFlashCard({
+                            id: 'csgo-1',
+                            title: "FaZe - Bomb Plant This Round?",
+                            time: "1:45",
+                            yesOdds: 62,
+                            noOdds: 38
+                        }));
+                        break;
+
+                    case 28:
+                        this.showNarrator("Political Flash Markets", 
+                            "Flash markets during debates - 'Next speaker to mention economy?'");
+                        this.flashMarkets.innerHTML = '';
+                        this.flashMarkets.appendChild(this.createFlashCard({
+                            id: 'debate-1',
+                            title: "Next Topic: Healthcare? (2 min)",
+                            time: "2:00",
+                            yesOdds: 33,
+                            noOdds: 67
+                        }));
+                        break;
+
+                    case 29:
+                        this.showNarrator("Weather Flash Markets", 
+                            "Bet on temperature changes, rain start/stop in next 5 minutes");
+                        this.flashMarkets.innerHTML = '';
+                        this.flashMarkets.appendChild(this.createFlashCard({
+                            id: 'weather-1',
+                            title: "Rain Starts in Miami (5 min)?",
+                            time: "5:00",
+                            yesOdds: 71,
+                            noOdds: 29
+                        }));
+                        break;
+
+                    case 30:
+                        this.showNarrator("Stock Flash Markets", 
+                            "During market hours - 'S&P 500 up in next 60 seconds?'");
+                        this.flashMarkets.innerHTML = '';
+                        this.flashMarkets.appendChild(this.createFlashCard({
+                            id: 'spx-1',
+                            title: "SPX Green in 60s?",
+                            time: "1:00",
+                            yesOdds: 52,
+                            noOdds: 48
+                        }));
+                        break;
+
+                    case 31:
+                        this.showNarrator("Flash Market Limits", 
+                            "Maximum bet size: $10,000 per flash market to ensure liquidity");
+                        break;
+
+                    case 32:
+                        this.showNarrator("Minimum Duration", 
+                            "Shortest markets: 5 seconds. Longest: 5 minutes (300 seconds)");
+                        break;
+
+                    case 33:
+                        this.showNarrator("Rate Limiting", 
+                            "API ingests 200 markets/hour from DraftKings, batched for efficiency");
+                        this.addFeedItem("📊 Rate limit status: 187/200 markets this hour");
+                        break;
+
+                    case 34:
+                        this.showNarrator("Failover System", 
+                            "If DraftKings fails, instantly switches to FanDuel or BetMGM feeds");
+                        this.addFeedItem("⚠️ DraftKings timeout - switching to FanDuel");
+                        this.addFeedItem("✅ FanDuel connected - flash markets resumed");
+                        break;
+
+                    case 35:
+                        this.showNarrator("Multi-Provider Consensus", 
+                            "Critical markets require 3+ providers to agree on outcome");
+                        break;
+
+                    case 36:
+                        this.showNarrator("Flash Verse Integration", 
+                            "Flash markets automatically link to parent verse for bonus depth");
+                        const verseInfo = document.createElement('div');
+                        verseInfo.innerHTML = `
+                            <div style="background: rgba(255,165,0,0.1); padding: 15px; border-radius: 10px; margin-top: 15px;">
+                                <div style="color: #FFA500; font-weight: 600;">🌳 Verse: Sports > Soccer > Premier League > Liverpool</div>
+                                <div style="color: #888; margin-top: 5px;">Depth Level 4: +40% bonus on flash markets!</div>
+                            </div>
+                        `;
+                        document.getElementById('flashHeader').appendChild(verseInfo);
+                        break;
+
+                    case 37:
+                        this.showNarrator("Flash Quantum Bundles", 
+                            "Combine multiple flash markets into quantum superposition");
+                        this.flashMarkets.innerHTML = `
+                            <div style="background: linear-gradient(135deg, rgba(138,43,226,0.1), rgba(255,0,0,0.1)); padding: 20px; border-radius: 15px; grid-column: 1/-1;">
+                                <div style="color: #8A2BE2; font-weight: 600; margin-bottom: 15px;">⚛️ Flash Quantum Bundle</div>
+                                <div style="display: grid; gap: 10px;">
+                                    <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+                                        <div style="color: #FFA500;">• Goal in 30s (18% probability)</div>
+                                        <div style="color: #FFA500;">• 3-Pointer in 24s (35% probability)</div>
+                                        <div style="color: #FFA500;">• Ace serve in 20s (28% probability)</div>
+                                    </div>
+                                    <div style="color: #FFD700; font-size: 18px;">Combined Flash Quantum: 1.76% all happen | 12.4x payout</div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 38:
+                        this.showNarrator("Mobile Flash Interface", 
+                            "Optimized mobile UI for one-thumb flash betting on the go");
+                        break;
+
+                    case 39:
+                        this.showNarrator("Voice Flash Betting", 
+                            "Say 'Yes on Liverpool goal' for hands-free flash betting");
+                        this.addFeedItem("🎤 Voice command: 'Yes on next goal' - Bet placed!");
+                        break;
+
+                    case 40:
+                        this.showNarrator("Flash Notifications", 
+                            "Push notifications 10 seconds before markets close");
+                        const notification = document.createElement('div');
+                        notification.innerHTML = `
+                            <div style="position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #FF0000, #FFA500); padding: 15px 20px; border-radius: 10px; color: white; font-weight: bold; animation: slideIn 0.5s ease;">
+                                ⚡ Flash Market Closing: Liverpool Goal - 10s left!
+                            </div>
+                        `;
+                        document.body.appendChild(notification);
+                        setTimeout(() => notification.remove(), 3000);
+                        break;
+
+                    case 41:
+                        this.showNarrator("Flash Market History", 
+                            "Track all your flash bets with detailed resolution history");
+                        const history = document.createElement('div');
+                        history.innerHTML = `
+                            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <div style="color: #FFA500; font-weight: 600; margin-bottom: 15px;">📜 Recent Flash Bets</div>
+                                <div style="display: grid; gap: 10px;">
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                                        <span>Liverpool Goal (30s)</span>
+                                        <span style="color: #4CAF50;">WON +$180</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                                        <span>BTC Up (5s)</span>
+                                        <span style="color: #FF4444;">LOST -$50</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                                        <span>3-Pointer (24s)</span>
+                                        <span style="color: #4CAF50;">WON +$285</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('flashStats').appendChild(history);
+                        break;
+
+                    case 42:
+                        this.showNarrator("Flash PnL Tracking", 
+                            "Real-time profit/loss tracking for flash betting session");
+                        this.updateStats('47', '$1.2M', '7.8s', '52%');
+                        const pnl = document.createElement('div');
+                        pnl.innerHTML = `
+                            <div style="background: linear-gradient(135deg, rgba(76,175,80,0.1), rgba(255,165,0,0.1)); padding: 20px; border-radius: 15px; margin-top: 20px; text-align: center;">
+                                <div style="color: #4CAF50; font-size: 14px;">Session P&L</div>
+                                <div style="color: #4CAF50; font-size: 36px; font-weight: bold;">+$415</div>
+                                <div style="color: #888; font-size: 14px;">ROI: 41.5%</div>
+                            </div>
+                        `;
+                        document.getElementById('flashStats').appendChild(pnl);
+                        break;
+
+                    case 43:
+                        this.showNarrator("Flash API Access", 
+                            "Developers can build flash betting bots via WebSocket API");
+                        const apiCode = document.createElement('div');
+                        apiCode.innerHTML = `
+                            <div style="background: #000; padding: 20px; border-radius: 10px; margin-top: 20px; font-family: monospace;">
+                                <div style="color: #4CAF50;">// Flash WebSocket Connection</div>
+                                <div style="color: #fff;">ws.connect('wss://boom.flash/v1')</div>
+                                <div style="color: #fff;">ws.on('market', (m) => {</div>
+                                <div style="color: #fff;">  if (m.duration < 30 && m.odds.yes > 0.7)</div>
+                                <div style="color: #fff;">    ws.send({bet: 'yes', amount: 100})</div>
+                                <div style="color: #fff;">})</div>
+                            </div>
+                        `;
+                        document.getElementById('liveFeed').appendChild(apiCode);
+                        break;
+
+                    case 44:
+                        this.showNarrator("Flash Market Creation", 
+                            "Advanced users can create custom flash markets with approval");
+                        break;
+
+                    case 45:
+                        this.showNarrator("Geographic Restrictions", 
+                            "Flash betting availability depends on local regulations");
+                        break;
+
+                    case 46:
+                        this.showNarrator("Flash Tournaments", 
+                            "Weekly flash betting tournaments with leaderboards and prizes");
+                        const tournament = document.createElement('div');
+                        tournament.innerHTML = `
+                            <div style="background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,0,0,0.1)); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <div style="color: #FFD700; font-weight: 600; margin-bottom: 15px;">🏆 Flash Tournament - Live Now!</div>
+                                <div style="display: grid; gap: 10px;">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>1. FlashKing99</span>
+                                        <span style="color: #FFD700;">2,847 pts</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>2. SpeedBettor</span>
+                                        <span style="color: #C0C0C0;">2,623 pts</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>3. QuickWins</span>
+                                        <span style="color: #CD7F32;">2,445 pts</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; color: #FFA500;">
+                                        <span>24. You</span>
+                                        <span>1,215 pts</span>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 15px; text-align: center; color: #888;">Prize Pool: $50,000</div>
+                            </div>
+                        `;
+                        document.getElementById('flashStats').appendChild(tournament);
+                        break;
+
+                    case 47:
+                        this.showNarrator("Flash Combo Markets", 
+                            "Combine related flash events - 'Goal AND Yellow Card in 60s'");
+                        this.flashMarkets.innerHTML = '';
+                        this.flashMarkets.appendChild(this.createFlashCard({
+                            id: 'combo-1',
+                            title: "Goal + Card in 90s?",
+                            time: "1:30",
+                            yesOdds: 8,
+                            noOdds: 92
+                        }));
+                        break;
+
+                    case 48:
+                        this.showNarrator("High Frequency Trading", 
+                            "Some users place 100+ flash bets per hour using algorithms");
+                        this.addFeedItem("🤖 HFT Bot: 127 flash bets placed this hour");
+                        break;
+
+                    case 49:
+                        this.showNarrator("Flash Market Depth", 
+                            "View order book depth for high-volume flash markets");
+                        break;
+
+                    case 50:
+                        this.showNarrator("Conditional Flash Orders", 
+                            "Set conditions: 'Auto-bet NO if odds > 80%'");
+                        break;
+
+                    case 51:
+                        this.showNarrator("Flash Market Making", 
+                            "Provide liquidity to flash markets and earn fees");
+                        break;
+
+                    case 52:
+                        this.showNarrator("Cross-Platform Flash", 
+                            "Same flash market available on multiple platforms for arbitrage");
+                        this.flashMarkets.innerHTML = `
+                            <div style="background: rgba(255,165,0,0.05); padding: 20px; border-radius: 15px; grid-column: 1/-1;">
+                                <div style="color: #FFA500; font-weight: 600; margin-bottom: 15px;">🔄 Arbitrage Opportunity!</div>
+                                <div style="display: grid; gap: 10px;">
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                                        <span>BOOM Flash: Goal in 30s</span>
+                                        <span style="color: #4CAF50;">YES: 22%</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                                        <span>DraftKings: Same Market</span>
+                                        <span style="color: #4CAF50;">YES: 28%</span>
+                                    </div>
+                                    <div style="color: #FFD700; margin-top: 10px; text-align: center;">6% Spread - Guaranteed Profit!</div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 53:
+                        this.showNarrator("Flash Insurance", 
+                            "Buy insurance on flash bets - get 50% back if you lose by narrow margin");
+                        break;
+
+                    case 54:
+                        this.showNarrator("Flash Cashout", 
+                            "Cash out flash bets early if odds move in your favor");
+                        this.flashMarkets.innerHTML = '';
+                        const card = this.createFlashCard({
+                            id: 'cashout-1',
+                            title: "Goal in 45s?",
+                            time: "0:22",
+                            yesOdds: 35,
+                            noOdds: 65,
+                            placed: true
+                        });
+                        this.flashMarkets.appendChild(card);
+                        const cashoutBtn = document.createElement('button');
+                        cashoutBtn.style.cssText = 'width: 100%; background: linear-gradient(135deg, #4CAF50, #45a049); border: none; border-radius: 10px; padding: 12px; color: white; font-weight: bold; margin-top: 10px; cursor: pointer;';
+                        cashoutBtn.textContent = 'CASH OUT: $142 (42% profit)';
+                        card.appendChild(cashoutBtn);
+                        break;
+
+                    case 55:
+                        this.showNarrator("Flash Social Features", 
+                            "Follow top flash bettors and copy their strategies");
+                        break;
+
+                    case 56:
+                        this.showNarrator("Flash Market Analytics", 
+                            "Detailed analytics on flash market performance and patterns");
+                        const analytics = document.createElement('div');
+                        analytics.innerHTML = `
+                            <div style="background: rgba(138,43,226,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <div style="color: #8A2BE2; font-weight: 600; margin-bottom: 15px;">📊 Flash Analytics</div>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                    <div>
+                                        <div style="color: #888; font-size: 14px;">Most Profitable</div>
+                                        <div style="color: #4CAF50;">NBA 3-Pointers (+28%)</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #888; font-size: 14px;">Highest Volume</div>
+                                        <div style="color: #FFA500;">Soccer Goals ($8.2M/day)</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #888; font-size: 14px;">Best Win Rate</div>
+                                        <div style="color: #4CAF50;">Tennis Aces (61%)</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #888; font-size: 14px;">Avg Duration</div>
+                                        <div style="color: #FFD700;">42 seconds</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('flashStats').appendChild(analytics);
+                        break;
+
+                    case 57:
+                        this.showNarrator("Flash Predictions AI", 
+                            "AI model trained on millions of flash markets for better predictions");
+                        this.addFeedItem("🤖 AI Prediction: 73% confidence on NO for next market");
+                        break;
+
+                    case 58:
+                        this.showNarrator("Flash Market Replay", 
+                            "Watch replays of flash markets with live odds movements");
+                        break;
+
+                    case 59:
+                        this.showNarrator("Flash Bonus System", 
+                            "Earn bonuses for flash betting streaks and volume milestones");
+                        const bonus = document.createElement('div');
+                        bonus.innerHTML = `
+                            <div style="background: linear-gradient(135deg, rgba(76,175,80,0.2), rgba(255,215,0,0.2)); padding: 15px; border-radius: 10px; margin-top: 15px; text-align: center;">
+                                <div style="color: #4CAF50; font-weight: 600;">🎁 5-Win Streak Bonus Unlocked!</div>
+                                <div style="color: #FFD700; font-size: 24px; margin-top: 10px;">+$50 Bonus</div>
+                            </div>
+                        `;
+                        document.getElementById('flashHeader').appendChild(bonus);
+                        break;
+
+                    case 60:
+                        this.showNarrator("Flash Market Limits", 
+                            "Daily limits: 500 flash bets per user, $100K total volume");
+                        break;
+
+                    case 61:
+                        this.showNarrator("Emergency Stop", 
+                            "One-click emergency stop to cancel all pending flash bets");
+                        const stopBtn = document.createElement('button');
+                        stopBtn.style.cssText = 'position: fixed; top: 20px; left: 20px; background: #FF0000; color: white; border: none; border-radius: 50%; width: 80px; height: 80px; font-weight: bold; cursor: pointer; font-size: 14px;';
+                        stopBtn.textContent = 'EMERGENCY STOP';
+                        document.body.appendChild(stopBtn);
+                        setTimeout(() => stopBtn.remove(), 3000);
+                        break;
+
+                    case 62:
+                        this.showNarrator("Flash Market Seasons", 
+                            "Special flash markets during major events - World Cup, Super Bowl");
+                        break;
+
+                    case 63:
+                        this.showNarrator("Flash VIP Tiers", 
+                            "VIP users get exclusive access to premium flash markets");
+                        const vip = document.createElement('div');
+                        vip.innerHTML = `
+                            <div style="background: linear-gradient(135deg, #FFD700, #FFA500); padding: 2px; border-radius: 15px; margin-top: 20px;">
+                                <div style="background: #1a1a2e; padding: 20px; border-radius: 13px;">
+                                    <div style="color: #FFD700; font-weight: 600; margin-bottom: 10px;">👑 VIP Flash Markets</div>
+                                    <div style="color: #888;">• Higher limits ($50K max)</div>
+                                    <div style="color: #888;">• Exclusive 3-second markets</div>
+                                    <div style="color: #888;">• Priority resolution</div>
+                                    <div style="color: #888;">• No fees on winnings</div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('flashStats').appendChild(vip);
+                        break;
+
+                    case 64:
+                        this.showNarrator("Flash Market Innovation", 
+                            "Coming soon: 1-second markets, brain-computer interface betting!");
+                        break;
+
+                    case 65:
+                        this.showNarrator("Performance Metrics", 
+                            "Flash system handles 10,000 bets/second at peak load");
+                        const performance = document.createElement('div');
+                        performance.innerHTML = `
+                            <div style="background: rgba(0,255,0,0.1); padding: 20px; border-radius: 15px; margin-top: 20px;">
+                                <div style="color: #4CAF50; font-weight: 600; margin-bottom: 15px;">⚡ System Performance</div>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center;">
+                                    <div>
+                                        <div style="color: #FFD700; font-size: 24px;">10K/s</div>
+                                        <div style="color: #888; font-size: 12px;">Peak TPS</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #FFD700; font-size: 24px;">8.2s</div>
+                                        <div style="color: #888; font-size: 12px;">Avg Resolution</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #FFD700; font-size: 24px;">99.99%</div>
+                                        <div style="color: #888; font-size: 12px;">Uptime</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('flashStats').appendChild(performance);
+                        break;
+
+                    case 66:
+                        this.showNarrator("Flash Market Governance", 
+                            "Community votes on new flash market types and rules");
+                        break;
+
+                    case 67:
+                        this.showNarrator("Flash Beta Features", 
+                            "Test new flash features: voice betting, AR overlays, haptic feedback");
+                        break;
+
+                    case 68:
+                        this.showNarrator("Flash Market Education", 
+                            "Interactive tutorials and simulations for learning flash betting");
+                        break;
+
+                    case 69:
+                        this.showNarrator("Flash Responsible Gaming", 
+                            "Built-in cooldowns and limits to promote responsible flash betting");
+                        break;
+
+                    case 70:
+                        this.showNarrator("Flash Demo Complete! ⚡", 
+                            "You've mastered BOOM's revolutionary flash betting system! From 5-second crypto movements to chained sports bets with 500x leverage, flash markets bring unprecedented speed and excitement to prediction markets!");
+                        
+                        // Final summary
+                        this.flashMarkets.innerHTML = `
+                            <div style="background: linear-gradient(135deg, #FF0000, #FFA500, #FFD700); padding: 30px; border-radius: 20px; text-align: center; grid-column: 1/-1;">
+                                <div style="color: #1a1a2e; font-size: 32px; font-weight: bold; margin-bottom: 20px;">⚡ BOOM Flash Features</div>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; color: #1a1a2e; text-align: left;">
+                                    <div>✅ 5-second to 5-minute markets</div>
+                                    <div>✅ ZK proof resolution < 10s</div>
+                                    <div>✅ Multi-sport coverage</div>
+                                    <div>✅ Chain betting (8x multiplier)</div>
+                                    <div>✅ 500x effective leverage</div>
+                                    <div>✅ Real-time odds updates</div>
+                                    <div>✅ Cross-platform arbitrage</div>
+                                    <div>✅ Micro-tau AMM optimization</div>
+                                    <div>✅ API & bot support</div>
+                                    <div>✅ 10,000 TPS capacity</div>
+                                </div>
+                                <div style="margin-top: 20px; font-size: 20px; font-weight: 600;">Bet Fast. Win Faster. ⚡</div>
+                            </div>
+                        `;
+                        this.updateStats('1,247', '$28.4M', '7.8s', '52%');
+                        break;
+                }
+            }
+
+            updateProgress() {
+                const progress = (this.currentStep / this.totalSteps) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+                document.getElementById('currentStep').textContent = this.currentStep;
+            }
+
+            updateControls() {
+                document.getElementById('prevBtn').disabled = this.currentStep === 1;
+                document.getElementById('nextBtn').disabled = this.currentStep === this.totalSteps;
+            }
+
+            nextStep() {
+                if (this.currentStep < this.totalSteps) {
+                    this.showStep(this.currentStep + 1);
+                }
+            }
+
+            prevStep() {
+                if (this.currentStep > 1) {
+                    this.showStep(this.currentStep - 1);
+                }
+            }
+
+            togglePlay() {
+                this.isPlaying = !this.isPlaying;
+                const playBtn = document.getElementById('playBtn');
+                
+                if (this.isPlaying) {
+                    playBtn.textContent = 'Pause';
+                    this.showStep(this.currentStep);
+                } else {
+                    playBtn.textContent = 'Auto Play';
+                    clearTimeout(this.narratorTimer);
+                }
+            }
+        }
+
+        // Initialize demo
+        new FlashBettingDemo();
+    </script>
+</body>
+</html>

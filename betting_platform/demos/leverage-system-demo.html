@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOM - Leverage System Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .header {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 2px solid #FFD60A;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Bungee', cursive;
+            font-size: 36px;
+            background: linear-gradient(45deg, #FFD60A, #FFA500, #FF6B35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-btn {
+            padding: 8px 16px;
+            background: rgba(255, 214, 10, 0.1);
+            border: 1px solid #FFD60A;
+            color: #FFD60A;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 214, 10, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .speed-selector {
+            display: flex;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .speed-btn {
+            padding: 4px 8px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .speed-btn.active {
+            background: #FFD60A;
+            color: #0a0a0a;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 999;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD60A, #FFA500);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(255, 214, 10, 0.5);
+        }
+
+        .step-indicator {
+            position: fixed;
+            top: 90px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 214, 10, 0.3);
+            font-size: 14px;
+            z-index: 998;
+        }
+
+        .main-content {
+            margin-top: 100px;
+            padding: 20px;
+            min-height: calc(100vh - 100px);
+            position: relative;
+        }
+
+        .narrator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(255, 214, 10, 0.95), rgba(255, 165, 0, 0.95));
+            color: #0a0a0a;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(255, 214, 10, 0.3);
+            z-index: 2000;
+            animation: slideIn 0.5s ease;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .narrator.hidden {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+            pointer-events: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .narrator-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .narrator-content {
+            font-size: 16px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .narrator-timer {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Leverage specific styles */
+        .leverage-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .leverage-slider {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .slider-track {
+            height: 8px;
+            background: linear-gradient(90deg, 
+                #4CAF50 0%, 
+                #8BC34A 20%, 
+                #FFC107 40%, 
+                #FF9800 60%, 
+                #FF5252 80%, 
+                #D32F2F 100%);
+            border-radius: 4px;
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .slider-thumb {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 3px solid #FFD60A;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .slider-thumb:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .leverage-display {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .leverage-value {
+            font-size: 72px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFD60A, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .leverage-label {
+            font-size: 18px;
+            color: #888;
+        }
+
+        .leverage-chain {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .chain-link {
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .chain-link.active {
+            background: linear-gradient(135deg, rgba(255, 214, 10, 0.2), rgba(255, 165, 0, 0.1));
+            border-color: #FFD60A;
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 214, 10, 0.3);
+        }
+
+        .chain-multiplier {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFD60A;
+            margin-bottom: 5px;
+        }
+
+        .chain-source {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .chain-operator {
+            font-size: 24px;
+            color: #666;
+        }
+
+        .position-calculator {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .calc-row {
+            display: grid;
+            grid-template-columns: 150px 1fr 150px;
+            gap: 20px;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .calc-label {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .calc-input {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .calc-value {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .risk-meter {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .risk-bar {
+            flex: 1;
+            height: 40px;
+            background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 25%, #FFC107 50%, #FF9800 75%, #FF5252 100%);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .risk-indicator {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: left 0.5s ease;
+        }
+
+        .risk-label {
+            min-width: 100px;
+            font-weight: 600;
+        }
+
+        .liquidation-warning {
+            background: rgba(255, 82, 82, 0.1);
+            border: 2px solid #FF5252;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .warning-icon {
+            font-size: 32px;
+            color: #FF5252;
+        }
+
+        .health-factor {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .health-value {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .health-good {
+            color: #4CAF50;
+        }
+
+        .health-warning {
+            color: #FFC107;
+        }
+
+        .health-danger {
+            color: #FF5252;
+        }
+
+        .leverage-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFD60A;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .platform-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-5px);
+            border-color: #FFD60A;
+            box-shadow: 0 10px 30px rgba(255, 214, 10, 0.2);
+        }
+
+        .platform-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .platform-leverage {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FFD60A;
+            margin: 10px 0;
+        }
+
+        .platform-type {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .pnl-chart {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            position: relative;
+            height: 400px;
+        }
+
+        .chart-line {
+            position: absolute;
+            bottom: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .profit-zone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 50%;
+            background: linear-gradient(to bottom, rgba(76, 175, 80, 0.2), transparent);
+        }
+
+        .loss-zone {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(255, 82, 82, 0.2), transparent);
+        }
+
+        @keyframes leveragePulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .leverage-animation {
+            animation: leveragePulse 2s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .leverage-value {
+                font-size: 48px;
+            }
+
+            .leverage-chain {
+                flex-direction: column;
+            }
+
+            .calc-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">BOOM</div>
+        <div class="controls">
+            <button class="control-btn" id="playPauseBtn">⏸ Pause</button>
+            <button class="control-btn" id="restartBtn">↺ Restart</button>
+            <div class="speed-selector">
+                <button class="speed-btn" data-speed="0.5">0.5x</button>
+                <button class="speed-btn active" data-speed="1">1x</button>
+                <button class="speed-btn" data-speed="2">2x</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+        <span id="stepIndicator">Step 1 of 80</span>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="leverage-container" id="leverageContainer">
+            <!-- Dynamic content will be inserted here -->
+        </div>
+    </div>
+
+    <!-- Narrator -->
+    <div class="narrator hidden" id="narrator">
+        <div class="narrator-timer" id="narratorTimer">5s</div>
+        <div class="narrator-title">
+            <span>🚀</span>
+            <span id="narratorTitle">Leverage System</span>
+        </div>
+        <div class="narrator-content" id="narratorContent">
+            Understanding leverage and margin trading on BOOM.
+        </div>
+    </div>
+
+    <script>
+        // Leverage System Demo Implementation
+        class LeverageSystemDemo {
+            constructor() {
+                this.currentStep = 0;
+                this.isPlaying = true;
+                this.speed = 1;
+                this.totalSteps = 80;
+                this.stepTimer = null;
+                this.narratorTimer = null;
+
+                this.leverageData = {
+                    currentLeverage: 1,
+                    maxLeverage: 500,
+                    position: 0,
+                    collateral: 1000,
+                    healthFactor: 2.5
+                };
+
+                this.initialize();
+            }
+
+            initialize() {
+                this.bindControls();
+                this.start();
+            }
+
+            bindControls() {
+                document.getElementById('playPauseBtn').addEventListener('click', () => this.togglePlayPause());
+                document.getElementById('restartBtn').addEventListener('click', () => this.restart());
+
+                document.querySelectorAll('.speed-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.speed = parseFloat(e.target.dataset.speed);
+                    });
+                });
+            }
+
+            start() {
+                this.currentStep = 0;
+                this.runStep();
+            }
+
+            runStep() {
+                if (this.currentStep >= this.totalSteps) {
+                    this.complete();
+                    return;
+                }
+
+                this.updateProgress();
+                this.updateStepIndicator();
+
+                // Execute current step
+                const steps = [
+                    // Introduction (5 steps)
+                    () => this.introductionStep(),
+                    () => this.explainLeverageConcept(),
+                    () => this.showLeverageBenefits(),
+                    () => this.showLeverageRisks(),
+                    () => this.introduceLeverageTypes(),
+                    
+                    // Basic Leverage (10 steps)
+                    () => this.startBasicLeverage(),
+                    () => this.show1xPosition(),
+                    () => this.increase5xLeverage(),
+                    () => this.show5xEffect(),
+                    () => this.increase10xLeverage(),
+                    () => this.show10xEffect(),
+                    () => this.increase25xLeverage(),
+                    () => this.show25xRisk(),
+                    () => this.increase50xLeverage(),
+                    () => this.show50xDanger(),
+                    
+                    // 100x Base Leverage (10 steps)
+                    () => this.start100xLeverage(),
+                    () => this.show100xSetup(),
+                    () => this.calculate100xPosition(),
+                    () => this.show100xPotential(),
+                    () => this.demonstrate100xProfit(),
+                    () => this.demonstrate100xLoss(),
+                    () => this.showLiquidationPrice(),
+                    () => this.triggerMarginCall(),
+                    () => this.addCollateral(),
+                    () => this.recover100xPosition(),
+                    
+                    // Leverage Chaining (15 steps)
+                    () => this.introduceLeverageChaining(),
+                    () => this.explainChainConcept(),
+                    () => this.showFirstChain(),
+                    () => this.addSecondChain(),
+                    () => this.addThirdChain(),
+                    () => this.calculateChainEffect(),
+                    () => this.show500xResult(),
+                    () => this.demonstrateChainRisk(),
+                    () => this.showCascadeLiquidation(),
+                    () => this.explainChainStrategy(),
+                    () => this.optimizeChain(),
+                    () => this.showChainProfits(),
+                    () => this.manageChainRisk(),
+                    () => this.completeChainExample(),
+                    () => this.showChainSummary(),
+                    
+                    // Cross-Platform Leverage (10 steps)
+                    () => this.startCrossPlatform(),
+                    () => this.showPlatformOptions(),
+                    () => this.selectDraftKings(),
+                    () => this.addAAVELeverage(),
+                    () => this.addUniswapPosition(),
+                    () => this.combinePlatforms(),
+                    () => this.calculateCombinedLeverage(),
+                    () => this.showCrossPlatformRisk(),
+                    () => this.manageCrossPlatform(),
+                    () => this.completeCrossPlatform(),
+                    
+                    // Risk Management (10 steps)
+                    () => this.startRiskManagement(),
+                    () => this.showHealthFactor(),
+                    () => this.explainHealthCalculation(),
+                    () => this.demonstrateHealthDecline(),
+                    () => this.showWarningZone(),
+                    () => this.showDangerZone(),
+                    () => this.triggerEmergencyDeleverage(),
+                    () => this.executeDeleverage(),
+                    () => this.stabilizePosition(),
+                    () => this.completeRiskManagement(),
+                    
+                    // Advanced Strategies (10 steps)
+                    () => this.startAdvancedStrategies(),
+                    () => this.showProgressiveLeverage(),
+                    () => this.demonstrateProgressive(),
+                    () => this.showLeverageDecay(),
+                    () => this.demonstrateDecay(),
+                    () => this.showDynamicLeverage(),
+                    () => this.demonstrateDynamic(),
+                    () => this.showHedgedLeverage(),
+                    () => this.demonstrateHedged(),
+                    () => this.completeAdvanced(),
+                    
+                    // Performance Analysis (5 steps)
+                    () => this.startPerformanceAnalysis(),
+                    () => this.showPnLChart(),
+                    () => this.analyzeReturns(),
+                    () => this.compareStrategies(),
+                    () => this.showOptimalLeverage(),
+                    
+                    // Summary (5 steps)
+                    () => this.startSummary(),
+                    () => this.recapLeverageTypes(),
+                    () => this.recapRiskManagement(),
+                    () => this.recapBestPractices(),
+                    () => this.finalConclusion()
+                ];
+
+                if (steps[this.currentStep]) {
+                    steps[this.currentStep]();
+                }
+
+                if (this.isPlaying) {
+                    this.stepTimer = setTimeout(() => {
+                        this.currentStep++;
+                        this.runStep();
+                    }, 8000 / this.speed);
+                }
+            }
+
+            // Step implementations
+            introductionStep() {
+                this.showNarrator('Welcome to Leverage System', 
+                    'Learn how to amplify your positions up to 500x through our advanced leverage system.');
+                
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div style="text-align: center; padding: 100px 20px;">
+                        <h1 style="font-size: 48px; margin-bottom: 30px; color: #FFD60A;">Leverage System</h1>
+                        <p style="font-size: 20px; color: #888; margin-bottom: 40px;">
+                            Amplify Your Positions • Maximize Returns • Manage Risk
+                        </p>
+                        <div class="leverage-stats">
+                            <div class="stat-card">
+                                <div class="stat-value">100x</div>
+                                <div class="stat-label">Base Leverage</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">500x</div>
+                                <div class="stat-label">Max w/ Chaining</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value"><100ms</div>
+                                <div class="stat-label">Execution</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">24/7</div>
+                                <div class="stat-label">Monitoring</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            explainLeverageConcept() {
+                this.showNarrator('What is Leverage?', 
+                    'Leverage lets you control a larger position with less capital. 10x leverage means $100 controls $1,000.');
+
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h2 style="text-align: center; color: #FFD60A; margin-bottom: 40px;">
+                            Understanding Leverage
+                        </h2>
+                        <div style="max-width: 800px; margin: 0 auto;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); 
+                                     border-radius: 12px; padding: 20px;">
+                                    <h3 style="color: #4CAF50; margin-bottom: 15px;">Without Leverage (1x)</h3>
+                                    <div style="margin-bottom: 10px;">Capital: $1,000</div>
+                                    <div style="margin-bottom: 10px;">Position: $1,000</div>
+                                    <div style="margin-bottom: 10px;">10% Move = $100 profit</div>
+                                    <div style="color: #888;">Return: 10%</div>
+                                </div>
+                                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); 
+                                     border-radius: 12px; padding: 20px;">
+                                    <h3 style="color: #FFD60A; margin-bottom: 15px;">With 10x Leverage</h3>
+                                    <div style="margin-bottom: 10px;">Capital: $1,000</div>
+                                    <div style="margin-bottom: 10px;">Position: $10,000</div>
+                                    <div style="margin-bottom: 10px;">10% Move = $1,000 profit</div>
+                                    <div style="color: #4CAF50;">Return: 100%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showLeverageBenefits() {
+                this.showNarrator('Leverage Benefits', 
+                    'Multiply profits, capital efficiency, and ability to take larger positions with less money.');
+
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                            Benefits of Leverage
+                        </h3>
+                        <div style="max-width: 800px; margin: 0 auto;">
+                            <div style="display: flex; align-items: center; margin-bottom: 25px;">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #4CAF50, #8BC34A); 
+                                     border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                                     color: white; font-size: 24px; margin-right: 20px;">💰</div>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Amplified Returns</div>
+                                    <div style="color: #888;">Small market moves create large profits</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 25px;">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #03A9F4, #00BCD4); 
+                                     border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                                     color: white; font-size: 24px; margin-right: 20px;">📊</div>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Capital Efficiency</div>
+                                    <div style="color: #888;">Control large positions with small capital</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 25px;">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #FFD60A, #FFA500); 
+                                     border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                                     color: white; font-size: 24px; margin-right: 20px;">🎯</div>
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">More Opportunities</div>
+                                    <div style="color: #888;">Take multiple positions with same capital</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showLeverageRisks() {
+                this.showNarrator('Leverage Risks', 
+                    'Higher leverage means higher risk. Losses are amplified just like profits.');
+
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FF5252; margin-bottom: 30px;">
+                            Risks of Leverage
+                        </h3>
+                        <div class="liquidation-warning">
+                            <div class="warning-icon">⚠️</div>
+                            <div>
+                                <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">
+                                    Leverage Amplifies Losses Too!
+                                </div>
+                                <div style="color: #ccc; line-height: 1.6;">
+                                    • 10x leverage: 10% drop = 100% loss<br>
+                                    • 100x leverage: 1% drop = 100% loss<br>
+                                    • Liquidation wipes out entire collateral<br>
+                                    • Higher leverage = faster liquidation
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            introduceLeverageTypes() {
+                this.showNarrator('Types of Leverage', 
+                    'BOOM offers multiple leverage types: Basic, Chained, Cross-Platform, and Dynamic.');
+
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div style="padding: 40px;">
+                        <h3 style="text-align: center; color: #FFD60A; margin-bottom: 30px;">
+                            Leverage Types on BOOM
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); 
+                                 border-radius: 12px; padding: 20px;">
+                                <div style="font-size: 20px; font-weight: 600; color: #4CAF50; margin-bottom: 10px;">
+                                    Basic Leverage
+                                </div>
+                                <div style="color: #888; font-size: 14px;">
+                                    1x to 100x on single positions
+                                </div>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); 
+                                 border-radius: 12px; padding: 20px;">
+                                <div style="font-size: 20px; font-weight: 600; color: #FFD60A; margin-bottom: 10px;">
+                                    Chained Leverage
+                                </div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Multiple layers up to 500x total
+                                </div>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); 
+                                 border-radius: 12px; padding: 20px;">
+                                <div style="font-size: 20px; font-weight: 600; color: #03A9F4; margin-bottom: 10px;">
+                                    Cross-Platform
+                                </div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Combine leverage from multiple sources
+                                </div>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); 
+                                 border-radius: 12px; padding: 20px;">
+                                <div style="font-size: 20px; font-weight: 600; color: #9C27B0; margin-bottom: 10px;">
+                                    Dynamic Leverage
+                                </div>
+                                <div style="color: #888; font-size: 14px;">
+                                    Auto-adjusts based on volatility
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            startBasicLeverage() {
+                this.showNarrator('Basic Leverage Demo', 
+                    'Let\'s start with basic leverage from 1x to 100x on a single position.');
+
+                this.showLeverageSlider(1);
+            }
+
+            show1xPosition() {
+                this.showNarrator('No Leverage (1x)', 
+                    '$1,000 bet controls $1,000 position. This is standard betting without leverage.');
+
+                this.updateLeverageDisplay(1, 1000, 1000);
+            }
+
+            increase5xLeverage() {
+                this.showNarrator('5x Leverage', 
+                    'Increasing to 5x. Your $1,000 now controls $5,000 position.');
+
+                this.animateLeverageIncrease(1, 5);
+            }
+
+            show5xEffect() {
+                this.showNarrator('5x Effect', 
+                    'With 5x: 10% market move = 50% profit. But also 50% loss if wrong direction.');
+
+                this.showPnLComparison(5);
+            }
+
+            increase10xLeverage() {
+                this.showNarrator('10x Leverage', 
+                    'At 10x, you\'re controlling $10,000 with just $1,000 collateral.');
+
+                this.animateLeverageIncrease(5, 10);
+            }
+
+            show10xEffect() {
+                this.showNarrator('10x Impact', 
+                    '10% move = 100% profit or loss. You can double or lose everything.');
+
+                this.showPnLComparison(10);
+            }
+
+            increase25xLeverage() {
+                this.showNarrator('25x Leverage', 
+                    'Getting risky! 25x means $25,000 position. 4% adverse move = liquidation.');
+
+                this.animateLeverageIncrease(10, 25);
+            }
+
+            show25xRisk() {
+                this.showNarrator('25x Risk Zone', 
+                    'Liquidation price is now very close. Small moves can wipe out position.');
+
+                this.showRiskMeter(25);
+            }
+
+            increase50xLeverage() {
+                this.showNarrator('50x Leverage', 
+                    'High risk territory! 2% move against you triggers liquidation.');
+
+                this.animateLeverageIncrease(25, 50);
+            }
+
+            show50xDanger() {
+                this.showNarrator('50x Danger', 
+                    'Extreme volatility zone. Only for experienced traders with stop losses.');
+
+                this.showRiskMeter(50);
+            }
+
+            start100xLeverage() {
+                this.showNarrator('100x Maximum', 
+                    'Maximum single position leverage. 1% adverse move = instant liquidation.');
+
+                this.animateLeverageIncrease(50, 100);
+            }
+
+            show100xSetup() {
+                this.showNarrator('100x Setup', 
+                    '$1,000 controls $100,000 position. Massive profit potential but extreme risk.');
+
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div class="leverage-display">
+                        <div class="leverage-value leverage-animation">100x</div>
+                        <div class="leverage-label">MAXIMUM LEVERAGE</div>
+                    </div>
+                    <div class="position-calculator">
+                        <div class="calc-row">
+                            <div class="calc-label">Your Collateral</div>
+                            <div>$1,000</div>
+                            <div class="calc-value">Base</div>
+                        </div>
+                        <div class="calc-row">
+                            <div class="calc-label">Leverage</div>
+                            <div>×100</div>
+                            <div class="calc-value" style="color: #FFD60A;">Multiplier</div>
+                        </div>
+                        <div class="calc-row" style="border-top: 2px solid rgba(255, 255, 255, 0.2); padding-top: 15px;">
+                            <div class="calc-label">Position Size</div>
+                            <div></div>
+                            <div class="calc-value" style="color: #4CAF50; font-size: 28px;">$100,000</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            calculate100xPosition() {
+                this.showNarrator('100x Calculation', 
+                    'Entry: $0.65. Position: 153,846 shares. Liquidation: $0.6435 (just 1% below!).');
+            }
+
+            show100xPotential() {
+                this.showNarrator('100x Potential', 
+                    'If price rises 5% to $0.6825, profit is $7,692 on $1,000 (769% return!).');
+            }
+
+            demonstrate100xProfit() {
+                this.showNarrator('100x Win Scenario', 
+                    'Price hits $0.70! Position worth $107,692. Profit: $7,692 (769% gain).');
+
+                this.showProfitAnimation(100, 7.69);
+            }
+
+            demonstrate100xLoss() {
+                this.showNarrator('100x Loss Scenario', 
+                    'Price drops to $0.643. LIQUIDATION! Entire $1,000 collateral lost instantly.');
+
+                this.showLiquidationAnimation();
+            }
+
+            showLiquidationPrice() {
+                this.showNarrator('Liquidation Price', 
+                    'At 100x, liquidation is always 1% away. Constant danger zone.');
+
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div class="liquidation-warning">
+                        <div class="warning-icon">🚨</div>
+                        <div>
+                            <div style="font-size: 20px; font-weight: 600; margin-bottom: 10px;">
+                                Liquidation Price: $0.6435
+                            </div>
+                            <div style="color: #ccc;">
+                                Current Price: $0.6500<br>
+                                Distance to Liquidation: 1%<br>
+                                <span style="color: #FF5252; font-weight: 600;">EXTREME RISK</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            triggerMarginCall() {
+                this.showNarrator('Margin Call!', 
+                    'Price approaching liquidation! Add collateral or reduce position immediately!');
+            }
+
+            addCollateral() {
+                this.showNarrator('Adding Collateral', 
+                    'Adding $500 more collateral. Liquidation price moves to $0.6400. Slightly safer.');
+            }
+
+            recover100xPosition() {
+                this.showNarrator('Position Recovered', 
+                    'Additional collateral saved position. But still extremely risky at 100x.');
+            }
+
+            introduceLeverageChaining() {
+                this.showNarrator('Leverage Chaining', 
+                    'Now the advanced technique: Chain multiple leverages to reach up to 500x!');
+
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <h2 style="color: #FFD60A; margin-bottom: 30px;">Leverage Chaining</h2>
+                        <p style="font-size: 18px; color: #888; margin-bottom: 40px;">
+                            Multiply leverage layers to achieve extreme amplification
+                        </p>
+                        <div style="font-size: 48px; margin-bottom: 20px;">
+                            100x × 1.5 × 1.2 × 1.1 × 2.5 = 
+                            <span style="color: #FFD60A; font-weight: 700;">495x</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            explainChainConcept() {
+                this.showNarrator('Chain Concept', 
+                    'Start with base leverage, then add multiplier layers from different sources.');
+            }
+
+            showFirstChain() {
+                this.showNarrator('First Chain Link', 
+                    'Base: 100x leverage from BOOM platform. This is our foundation.');
+
+                this.renderLeverageChain([
+                    { value: 100, source: 'BOOM Base', active: true }
+                ]);
+            }
+
+            addSecondChain() {
+                this.showNarrator('Second Chain Link', 
+                    'Add 1.5x multiplier from flash betting speed bonus.');
+
+                this.renderLeverageChain([
+                    { value: 100, source: 'BOOM Base', active: true },
+                    { value: 1.5, source: 'Flash Bonus', active: true }
+                ]);
+            }
+
+            addThirdChain() {
+                this.showNarrator('Third Chain Link', 
+                    'Add 1.2x from verse depth bonus at Level 3.');
+
+                this.renderLeverageChain([
+                    { value: 100, source: 'BOOM Base', active: true },
+                    { value: 1.5, source: 'Flash Bonus', active: true },
+                    { value: 1.2, source: 'Verse Depth', active: true }
+                ]);
+            }
+
+            calculateChainEffect() {
+                this.showNarrator('Chain Calculation', 
+                    'Continue adding: 1.1x quantum bonus, 2.5x from external platform leverage.');
+
+                this.renderLeverageChain([
+                    { value: 100, source: 'BOOM Base', active: true },
+                    { value: 1.5, source: 'Flash Bonus', active: true },
+                    { value: 1.2, source: 'Verse Depth', active: true },
+                    { value: 1.1, source: 'Quantum', active: true },
+                    { value: 2.5, source: 'DraftKings', active: true }
+                ]);
+            }
+
+            show500xResult() {
+                this.showNarrator('495x Total!', 
+                    '$1,000 now controls $495,000 position! Insane amplification but extreme risk.');
+
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div class="leverage-display">
+                        <div class="leverage-value" style="font-size: 120px; color: #FF5252;">495x</div>
+                        <div class="leverage-label">MAXIMUM CHAINED LEVERAGE</div>
+                    </div>
+                    <div style="text-align: center; margin-top: 40px;">
+                        <div style="display: inline-block; padding: 20px 40px; background: rgba(255, 82, 82, 0.1); 
+                             border: 2px solid #FF5252; border-radius: 12px;">
+                            <div style="font-size: 24px; margin-bottom: 10px;">⚠️ EXTREME DANGER ⚠️</div>
+                            <div style="color: #ccc;">
+                                0.2% adverse move = Total loss<br>
+                                0.5% favorable move = 247% profit
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            demonstrateChainRisk() {
+                this.showNarrator('Chain Risk', 
+                    'With 495x leverage, liquidation is just 0.2% away. Microscopic moves matter.');
+            }
+
+            showCascadeLiquidation() {
+                this.showNarrator('Cascade Risk', 
+                    'If one chain link breaks, entire position collapses. Domino effect liquidation.');
+            }
+
+            explainChainStrategy() {
+                this.showNarrator('Chain Strategy', 
+                    'Only use for ultra-short term, high-conviction plays with strict stop losses.');
+            }
+
+            optimizeChain() {
+                this.showNarrator('Optimize Chain', 
+                    'Better approach: Use 200-300x max with protective hedges.');
+            }
+
+            showChainProfits() {
+                this.showNarrator('Chain Profits', 
+                    '1% favorable move with 300x = 300% profit. More reasonable risk/reward.');
+            }
+
+            manageChainRisk() {
+                this.showNarrator('Managing Chain', 
+                    'Set stop loss at 0.1% below entry. Take profits quickly. Never hold overnight.');
+            }
+
+            completeChainExample() {
+                this.showNarrator('Chain Complete', 
+                    'Leverage chaining enables extreme positions but requires expert risk management.');
+            }
+
+            showChainSummary() {
+                this.showNarrator('Chain Summary', 
+                    'Chaining: High risk, high reward. Only for pros who understand liquidation.');
+            }
+
+            startCrossPlatform() {
+                this.showNarrator('Cross-Platform Leverage', 
+                    'Combine leverage from multiple platforms for enhanced positions.');
+            }
+
+            showPlatformOptions() {
+                this.showNarrator('Platform Options', 
+                    'DraftKings, AAVE, Uniswap, Compound - each offers leverage we can combine.');
+
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div class="platform-grid">
+                        <div class="platform-card">
+                            <div class="platform-name">DraftKings</div>
+                            <div class="platform-leverage">10x</div>
+                            <div class="platform-type">Sports Leverage</div>
+                        </div>
+                        <div class="platform-card">
+                            <div class="platform-name">AAVE</div>
+                            <div class="platform-leverage">5x</div>
+                            <div class="platform-type">DeFi Lending</div>
+                        </div>
+                        <div class="platform-card">
+                            <div class="platform-name">Uniswap</div>
+                            <div class="platform-leverage">3x</div>
+                            <div class="platform-type">LP Leverage</div>
+                        </div>
+                        <div class="platform-card">
+                            <div class="platform-name">Compound</div>
+                            <div class="platform-leverage">4x</div>
+                            <div class="platform-type">Lending Protocol</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            selectDraftKings() {
+                this.showNarrator('DraftKings 10x', 
+                    'Start with 10x leverage on DraftKings for sports bet.');
+            }
+
+            addAAVELeverage() {
+                this.showNarrator('Add AAVE 5x', 
+                    'Borrow on AAVE for additional 5x. Total: 10x × 5x = 50x combined.');
+            }
+
+            addUniswapPosition() {
+                this.showNarrator('Uniswap 3x', 
+                    'LP position with 3x leverage. Total: 50x × 3x = 150x cross-platform.');
+            }
+
+            combinePlatforms() {
+                this.showNarrator('Combined Power', 
+                    'Three platforms working together for 150x total leverage.');
+            }
+
+            calculateCombinedLeverage() {
+                this.showNarrator('Combined Math', 
+                    '$1,000 → $10,000 (DraftKings) → $50,000 (AAVE) → $150,000 (Uniswap).');
+            }
+
+            showCrossPlatformRisk() {
+                this.showNarrator('Platform Risks', 
+                    'Each platform has own liquidation rules. Monitor all simultaneously.');
+            }
+
+            manageCrossPlatform() {
+                this.showNarrator('Management Tools', 
+                    'BOOM dashboard shows all positions and health factors in one view.');
+            }
+
+            completeCrossPlatform() {
+                this.showNarrator('Cross-Platform Complete', 
+                    'Multi-platform leverage offers flexibility but adds complexity.');
+            }
+
+            startRiskManagement() {
+                this.showNarrator('Risk Management', 
+                    'Critical: Understanding health factor and liquidation mechanics.');
+            }
+
+            showHealthFactor() {
+                this.showNarrator('Health Factor', 
+                    'Health Factor measures position safety. Above 1.5 = safe, Below 1.0 = liquidation.');
+
+                this.renderHealthFactor(2.5);
+            }
+
+            explainHealthCalculation() {
+                this.showNarrator('Health Calculation', 
+                    'Health = (Collateral × Liquidation Threshold) / Borrowed. Higher = safer.');
+            }
+
+            demonstrateHealthDecline() {
+                this.showNarrator('Health Declining', 
+                    'As price moves against you, health factor drops. Watch it closely!');
+
+                this.animateHealthDecline(2.5, 1.5);
+            }
+
+            showWarningZone() {
+                this.showNarrator('Warning Zone', 
+                    'Health Factor 1.2: Warning zone! Consider adding collateral or reducing position.');
+
+                this.renderHealthFactor(1.2, 'warning');
+            }
+
+            showDangerZone() {
+                this.showNarrator('Danger Zone!', 
+                    'Health Factor 1.05: CRITICAL! Liquidation imminent! Act immediately!');
+
+                this.renderHealthFactor(1.05, 'danger');
+            }
+
+            triggerEmergencyDeleverage() {
+                this.showNarrator('Emergency Deleverage', 
+                    'Auto-deleverage triggered! System reducing position to save collateral.');
+            }
+
+            executeDeleverage() {
+                this.showNarrator('Deleveraging...', 
+                    'Reducing from 100x to 25x. Some losses but avoiding total liquidation.');
+            }
+
+            stabilizePosition() {
+                this.showNarrator('Position Stabilized', 
+                    'Health factor back to 1.8. Position saved but at reduced leverage.');
+            }
+
+            completeRiskManagement() {
+                this.showNarrator('Risk Tools Complete', 
+                    'Always monitor health factor. Set alerts. Have exit plan ready.');
+            }
+
+            startAdvancedStrategies() {
+                this.showNarrator('Advanced Strategies', 
+                    'Progressive leverage, decay management, and dynamic adjustments.');
+            }
+
+            showProgressiveLeverage() {
+                this.showNarrator('Progressive Leverage', 
+                    'Start small, increase as position profits. 5x → 10x → 25x → 50x.');
+            }
+
+            demonstrateProgressive() {
+                this.showNarrator('Progressive Demo', 
+                    'Win at 5x, add profits to increase to 10x. Compound success safely.');
+            }
+
+            showLeverageDecay() {
+                this.showNarrator('Leverage Decay', 
+                    'Reduce leverage over time to lock profits. 100x → 50x → 25x → 10x → 1x.');
+            }
+
+            demonstrateDecay() {
+                this.showNarrator('Decay Demo', 
+                    'As position profits, reduce leverage to protect gains from reversal.');
+            }
+
+            showDynamicLeverage() {
+                this.showNarrator('Dynamic Leverage', 
+                    'AI adjusts leverage based on volatility. High vol = lower leverage.');
+            }
+
+            demonstrateDynamic() {
+                this.showNarrator('Dynamic Demo', 
+                    'Volatility spikes: Auto-reduce from 50x to 20x. Volatility drops: Increase back.');
+            }
+
+            showHedgedLeverage() {
+                this.showNarrator('Hedged Leverage', 
+                    'Use opposite positions to hedge. Long 100x + Short 20x = net 80x with protection.');
+            }
+
+            demonstrateHedged() {
+                this.showNarrator('Hedge Demo', 
+                    'Main position 100x long, hedge 20x short. Limits downside while keeping upside.');
+            }
+
+            completeAdvanced() {
+                this.showNarrator('Advanced Complete', 
+                    'Master these strategies for professional leverage trading.');
+            }
+
+            startPerformanceAnalysis() {
+                this.showNarrator('Performance Analysis', 
+                    'Analyzing returns at different leverage levels.');
+            }
+
+            showPnLChart() {
+                this.showNarrator('P&L Chart', 
+                    'Profit/Loss curves for various leverage levels. Higher leverage = steeper curve.');
+
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div class="pnl-chart">
+                        <div class="profit-zone"></div>
+                        <div class="loss-zone"></div>
+                        <div class="chart-line"></div>
+                        <div style="position: absolute; top: 20px; left: 20px; color: #4CAF50;">
+                            Profit Zone
+                        </div>
+                        <div style="position: absolute; bottom: 20px; left: 20px; color: #FF5252;">
+                            Loss Zone
+                        </div>
+                        <div style="position: absolute; top: 50%; right: 20px; transform: translateY(-50%); 
+                             text-align: right;">
+                            <div style="margin-bottom: 10px;">100x: ±1% = ±100%</div>
+                            <div style="margin-bottom: 10px;">50x: ±2% = ±100%</div>
+                            <div style="margin-bottom: 10px;">25x: ±4% = ±100%</div>
+                            <div>10x: ±10% = ±100%</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            analyzeReturns() {
+                this.showNarrator('Return Analysis', 
+                    'Historical: 25-50x optimal for risk/reward. 100x+ for experts only.');
+            }
+
+            compareStrategies() {
+                this.showNarrator('Strategy Comparison', 
+                    'Conservative (5-10x): 65% win rate. Aggressive (50-100x): 35% win rate but higher returns.');
+            }
+
+            showOptimalLeverage() {
+                this.showNarrator('Optimal Leverage', 
+                    'Kelly Criterion suggests 15-25x for most traders based on win rate and edge.');
+            }
+
+            startSummary() {
+                this.showNarrator('Leverage Summary', 
+                    'Let\'s recap leverage types and best practices.');
+            }
+
+            recapLeverageTypes() {
+                this.showNarrator('Types Recap', 
+                    'Basic (1-100x), Chained (up to 500x), Cross-Platform, Dynamic. Each has uses.');
+            }
+
+            recapRiskManagement() {
+                this.showNarrator('Risk Recap', 
+                    'Monitor health factor, set stop losses, never risk more than you can afford to lose.');
+            }
+
+            recapBestPractices() {
+                this.showNarrator('Best Practices', 
+                    'Start small, use stops, take profits, reduce leverage as you win, never revenge trade.');
+            }
+
+            finalConclusion() {
+                this.showNarrator('Leverage Mastery!', 
+                    'You understand leverage! Use it wisely to amplify returns while managing risk.');
+
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px;">
+                        <h1 style="font-size: 48px; margin-bottom: 30px; color: #FFD60A;">
+                            Leverage System Mastered! 🚀
+                        </h1>
+                        <p style="font-size: 20px; color: #888; margin-bottom: 40px;">
+                            Amplify positions up to 500x on BOOM platform
+                        </p>
+                        <div class="leverage-stats">
+                            <div class="stat-card">
+                                <div class="stat-value">✓</div>
+                                <div class="stat-label">Basic Leverage</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">✓</div>
+                                <div class="stat-label">Chaining</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">✓</div>
+                                <div class="stat-label">Risk Management</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">✓</div>
+                                <div class="stat-label">Strategies</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 40px;">
+                            <button onclick="location.reload()" style="padding: 15px 30px; 
+                                 background: linear-gradient(135deg, #FFD60A, #FFA500); 
+                                 color: #0a0a0a; border: none; border-radius: 12px; 
+                                 font-size: 18px; font-weight: 600; cursor: pointer;">
+                                REPLAY DEMO
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Helper methods
+            showNarrator(title, content) {
+                const narrator = document.getElementById('narrator');
+                const narratorTitle = document.getElementById('narratorTitle');
+                const narratorContent = document.getElementById('narratorContent');
+                const narratorTimer = document.getElementById('narratorTimer');
+
+                narratorTitle.textContent = title;
+                narratorContent.innerHTML = content;
+                narrator.classList.remove('hidden');
+
+                let timeLeft = Math.floor(5000 / this.speed / 1000);
+                narratorTimer.textContent = `${timeLeft}s`;
+                
+                const updateTimer = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeft > 0) {
+                        narratorTimer.textContent = `${timeLeft}s`;
+                    } else {
+                        clearInterval(updateTimer);
+                    }
+                }, 1000);
+
+                clearTimeout(this.narratorTimer);
+                this.narratorTimer = setTimeout(() => {
+                    narrator.classList.add('hidden');
+                    clearInterval(updateTimer);
+                    
+                    setTimeout(() => {
+                        if (this.isPlaying) {
+                            narrator.classList.remove('hidden');
+                        }
+                    }, 3000 / this.speed);
+                }, 5000 / this.speed);
+            }
+
+            showLeverageSlider(value) {
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div class="leverage-slider">
+                        <div class="leverage-display">
+                            <div class="leverage-value" id="leverageValue">${value}x</div>
+                            <div class="leverage-label">Current Leverage</div>
+                        </div>
+                        <div class="slider-track">
+                            <div class="slider-thumb" id="sliderThumb" style="left: ${value}%;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 10px; color: #888; font-size: 12px;">
+                            <span>1x</span>
+                            <span>25x</span>
+                            <span>50x</span>
+                            <span>75x</span>
+                            <span>100x</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            animateLeverageIncrease(from, to) {
+                const steps = 20;
+                const increment = (to - from) / steps;
+                let current = from;
+                let step = 0;
+
+                const animate = () => {
+                    if (step < steps) {
+                        current += increment;
+                        this.updateLeverageDisplay(current, 1000, 1000 * current);
+                        step++;
+                        setTimeout(animate, 50 / this.speed);
+                    }
+                };
+                animate();
+            }
+
+            updateLeverageDisplay(leverage, collateral, position) {
+                const leverageElement = document.getElementById('leverageValue');
+                if (leverageElement) {
+                    leverageElement.textContent = `${Math.round(leverage)}x`;
+                }
+
+                const thumb = document.getElementById('sliderThumb');
+                if (thumb) {
+                    thumb.style.left = `${leverage}%`;
+                }
+            }
+
+            showPnLComparison(leverage) {
+                document.getElementById('leverageContainer').innerHTML += `
+                    <div style="margin-top: 30px; padding: 20px; background: rgba(255, 255, 255, 0.02); 
+                         border-radius: 12px;">
+                        <h4 style="text-align: center; margin-bottom: 20px;">P&L at ${leverage}x Leverage</h4>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: center;">
+                            <div>
+                                <div style="color: #888; font-size: 12px;">5% Move</div>
+                                <div style="font-size: 20px; color: #4CAF50;">+${leverage * 5}%</div>
+                            </div>
+                            <div>
+                                <div style="color: #888; font-size: 12px;">10% Move</div>
+                                <div style="font-size: 20px; color: #4CAF50;">+${leverage * 10}%</div>
+                            </div>
+                            <div>
+                                <div style="color: #888; font-size: 12px;">Liquidation</div>
+                                <div style="font-size: 20px; color: #FF5252;">-${(100/leverage).toFixed(1)}%</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showRiskMeter(leverage) {
+                const riskLevel = leverage / 100;
+                document.getElementById('leverageContainer').innerHTML += `
+                    <div class="risk-meter">
+                        <div class="risk-label">Risk Level:</div>
+                        <div class="risk-bar">
+                            <div class="risk-indicator" style="left: ${riskLevel * 100}%;"></div>
+                        </div>
+                        <div class="risk-label" style="color: ${riskLevel > 0.5 ? '#FF5252' : '#FFC107'};">
+                            ${riskLevel > 0.75 ? 'EXTREME' : riskLevel > 0.5 ? 'HIGH' : riskLevel > 0.25 ? 'MEDIUM' : 'LOW'}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderLeverageChain(links) {
+                const total = links.reduce((acc, link) => acc * link.value, 1);
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div class="leverage-chain">
+                        ${links.map((link, index) => `
+                            <div class="chain-link ${link.active ? 'active' : ''}">
+                                <div class="chain-multiplier">${link.value}x</div>
+                                <div class="chain-source">${link.source}</div>
+                            </div>
+                            ${index < links.length - 1 ? '<div class="chain-operator">×</div>' : ''}
+                        `).join('')}
+                        <div class="chain-operator">=</div>
+                        <div class="chain-link active" style="background: linear-gradient(135deg, rgba(255, 82, 82, 0.2), rgba(255, 82, 82, 0.1)); 
+                             border-color: #FF5252;">
+                            <div class="chain-multiplier" style="color: #FF5252;">${total.toFixed(0)}x</div>
+                            <div class="chain-source">Total</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showProfitAnimation(leverage, multiplier) {
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 60px; margin-bottom: 20px;">💰</div>
+                        <div style="font-size: 36px; color: #4CAF50; font-weight: 700; margin-bottom: 10px;">
+                            +${(multiplier * 100).toFixed(0)}% PROFIT!
+                        </div>
+                        <div style="color: #888;">
+                            $1,000 → $${(1000 * (1 + multiplier)).toFixed(0)}
+                        </div>
+                    </div>
+                `;
+            }
+
+            showLiquidationAnimation() {
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 60px; margin-bottom: 20px; color: #FF5252;">💀</div>
+                        <div style="font-size: 36px; color: #FF5252; font-weight: 700; margin-bottom: 10px;">
+                            LIQUIDATED!
+                        </div>
+                        <div style="color: #888;">
+                            $1,000 → $0 (Total Loss)
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderHealthFactor(value, status = 'good') {
+                const color = status === 'danger' ? '#FF5252' : status === 'warning' ? '#FFC107' : '#4CAF50';
+                document.getElementById('leverageContainer').innerHTML = `
+                    <div class="health-factor">
+                        <div style="font-size: 18px; color: #888; margin-bottom: 10px;">Health Factor</div>
+                        <div class="health-value ${status === 'danger' ? 'health-danger' : status === 'warning' ? 'health-warning' : 'health-good'}">
+                            ${value.toFixed(2)}
+                        </div>
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(255, 255, 255, 0.05); 
+                             border-radius: 8px;">
+                            <div style="color: ${color}; font-weight: 600;">
+                                ${status === 'danger' ? 'CRITICAL - LIQUIDATION IMMINENT' : 
+                                  status === 'warning' ? 'WARNING - ADD COLLATERAL' : 
+                                  'SAFE - Position Healthy'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            animateHealthDecline(from, to) {
+                const steps = 20;
+                const decrement = (from - to) / steps;
+                let current = from;
+                let step = 0;
+
+                const animate = () => {
+                    if (step < steps) {
+                        current -= decrement;
+                        const status = current < 1.2 ? 'danger' : current < 1.5 ? 'warning' : 'good';
+                        this.renderHealthFactor(current, status);
+                        step++;
+                        setTimeout(animate, 100 / this.speed);
+                    }
+                };
+                animate();
+            }
+
+            updateProgress() {
+                const progress = ((this.currentStep + 1) / this.totalSteps) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+            }
+
+            updateStepIndicator() {
+                document.getElementById('stepIndicator').textContent = 
+                    `Step ${this.currentStep + 1} of ${this.totalSteps}`;
+            }
+
+            togglePlayPause() {
+                this.isPlaying = !this.isPlaying;
+                document.getElementById('playPauseBtn').innerHTML = this.isPlaying ? '⏸ Pause' : '▶ Play';
+                
+                if (this.isPlaying) {
+                    this.runStep();
+                } else {
+                    clearTimeout(this.stepTimer);
+                    clearTimeout(this.narratorTimer);
+                }
+            }
+
+            restart() {
+                clearTimeout(this.stepTimer);
+                clearTimeout(this.narratorTimer);
+                this.currentStep = 0;
+                this.isPlaying = true;
+                document.getElementById('playPauseBtn').innerHTML = '⏸ Pause';
+                this.runStep();
+            }
+
+            complete() {
+                this.showNarrator('Demo Complete!', 
+                    'You\'ve mastered the leverage system. Use it wisely to amplify your returns!');
+                this.isPlaying = false;
+                document.getElementById('playPauseBtn').innerHTML = '▶ Play';
+            }
+        }
+
+        // Initialize demo
+        const demo = new LeverageSystemDemo();
+    </script>
+</body>
+</html>

@@ -1,0 +1,468 @@
+// Quantum Betting Platform - Main Application with Real Backend Integration
+
+// Global State
+let currentUser = null;
+let currentPage = 'landing';
+let currentTab = 'dashboard';
+let walletConnected = false;
+let userBalance = { sol: 0, demo_usdc: 0, mmt: 0 };
+let positions = [];
+let markets = [];
+
+// Initialize app
+document.addEventListener('DOMContentLoaded', () => {
+    initializeApp();
+});
+
+async function initializeApp() {
+    // Initialize API and WebSocket
+    window.bettingAPI.initWebSocket();
+    
+    // Set up WebSocket listeners
+    setupWebSocketListeners();
+    
+    // Check for existing demo wallet
+    const demoWallet = localStorage.getItem('demoWallet');
+    if (demoWallet) {
+        try {
+            await window.walletAdapter.connectDemo();
+            walletConnected = true;
+            currentUser = {
+                address: demoWallet,
+                walletType: 'demo'
+            };
+            await loadUserData();
+        } catch (err) {
+            console.error('Failed to restore demo wallet:', err);
+        }
+    }
+    
+    // Hide loading screen
+    setTimeout(() => {
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+            loadingScreen.classList.add('hidden');
+        }
+    }, 1000);
+    
+    // Load initial data
+    await loadMarkets();
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Update UI
+    updateUI();
+}
+
+function setupWebSocketListeners() {
+    // Market updates
+    window.bettingAPI.on('marketUpdate', (data) => {
+        updateMarketPrice(data);
+    });
+    
+    // Position updates
+    window.bettingAPI.on('positionUpdate', (data) => {
+        updatePositionPnL(data);
+    });
+    
+    // Notifications
+    window.bettingAPI.on('notification', (data) => {
+        showNotification(data.title, data.message, data.level);
+    });
+}
+
+// Real wallet connection
+async function connectWallet(walletType) {
+    const modalContent = document.querySelector('#walletModal .modal-content');
+    modalContent.innerHTML = `
+        <div style="text-align: center; padding: 60px;">
+            <div class="quantum-loader" style="margin: 0 auto;">
+                <div class="orbit orbit-1"></div>
+                <div class="orbit orbit-2"></div>
+                <div class="quantum-symbol">⚛️</div>
+            </div>
+            <h2 style="margin-top: 30px;">Connecting to ${walletType}...</h2>
+        </div>
+    `;
+    
+    try {
+        const result = await window.walletAdapter.connect(walletType);
+        
+        walletConnected = true;
+        currentUser = {
+            address: result.publicKey,
+            walletType: result.walletType
+        };
+        
+        // Load user data
+        await loadUserData();
+        
+        closeWalletModal();
+        showMainApp();
+        
+        showNotification('Wallet Connected', `Successfully connected ${walletType} wallet`, 'success');
+    } catch (err) {
+        console.error('Wallet connection failed:', err);
+        modalContent.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <h2 style="color: var(--color-danger);">Connection Failed</h2>
+                <p>${err.message}</p>
+                <button class="btn btn-primary" onclick="closeWalletModal()">Close</button>
+            </div>
+        `;
+    }
+}
+
+// Load user data from blockchain
+async function loadUserData() {
+    try {
+        // Get balance
+        const balance = await window.walletAdapter.getBalance();
+        userBalance = balance;
+        
+        // Get positions
+        const userPositions = await window.walletAdapter.getPositions();
+        positions = userPositions;
+        
+        updateUI();
+    } catch (err) {
+        console.error('Failed to load user data:', err);
+    }
+}
+
+// Load markets from blockchain
+async function loadMarkets() {
+    try {
+        const marketsData = await window.bettingAPI.getMarkets();
+        markets = marketsData;
+        
+        // Update market display if on markets tab
+        if (currentTab === 'markets') {
+            displayMarkets();
+        }
+    } catch (err) {
+        console.error('Failed to load markets:', err);
+        // Fall back to mock data for demo
+        generateMockMarkets();
+    }
+}
+
+// Display real markets
+function displayMarkets() {
+    const marketsGrid = document.getElementById('marketsGrid');
+    if (!marketsGrid) return;
+    
+    marketsGrid.innerHTML = '';
+    
+    markets.forEach(market => {
+        const marketCard = createRealMarketCard(market);
+        marketsGrid.appendChild(marketCard);
+    });
+}
+
+function createRealMarketCard(market) {
+    const card = document.createElement('div');
+    card.className = 'market-card';
+    card.onclick = () => openMarket(market.id);
+    
+    // Calculate prices (simplified for demo)
+    const totalStake = market.outcomes.reduce((sum, o) => sum + o.total_stake, 1);
+    const yesPrice = market.outcomes[0].total_stake / totalStake;
+    const noPrice = market.outcomes[1].total_stake / totalStake;
+    
+    card.innerHTML = `
+        <div class="market-header">
+            <h3>${market.title}</h3>
+            <span class="volume-badge">$${formatNumber(market.total_volume / 1_000_000)} Vol</span>
+        </div>
+        <div class="market-probability">
+            <div class="prob-bar">
+                <div class="yes-side" style="width: ${yesPrice * 100}%">
+                    <span>YES ${Math.round(yesPrice * 100)}%</span>
+                </div>
+                <div class="no-side" style="width: ${noPrice * 100}%">
+                    <span>NO ${Math.round(noPrice * 100)}%</span>
+                </div>
+            </div>
+        </div>
+        <div class="market-info">
+            <span>Liquidity: $${formatNumber(market.total_liquidity / 1_000_000)}</span>
+            <span>Ends: ${getTimeRemaining(new Date(market.resolution_time * 1000))}</span>
+        </div>
+        <div class="market-actions">
+            <button class="btn-yes" onclick="quickBet(event, 'yes', ${market.id})">Bet YES</button>
+            <button class="btn-no" onclick="quickBet(event, 'no', ${market.id})">Bet NO</button>
+        </div>
+    `;
+    
+    return card;
+}
+
+// Execute real trade
+async function executeTrade(side, marketId) {
+    const amount = parseFloat(document.getElementById('tradeAmount').value) * 1_000_000; // Convert to lamports
+    const leverage = parseInt(document.querySelector('.leverage-btn.active').dataset.leverage);
+    const outcome = side === 'yes' ? 0 : 1;
+    
+    try {
+        const result = await window.walletAdapter.placeTrade(marketId, amount, outcome, leverage);
+        
+        closeTradeModal();
+        
+        showNotification('Trade Executed', `Successfully placed ${side.toUpperCase()} bet`, 'success');
+        
+        // Reload user data
+        await loadUserData();
+        
+        // Switch to portfolio
+        switchTab('portfolio');
+    } catch (err) {
+        console.error('Trade execution failed:', err);
+        showNotification('Trade Failed', err.message, 'error');
+    }
+}
+
+// Update market price from WebSocket
+function updateMarketPrice(data) {
+    const market = markets.find(m => m.id === data.market_id);
+    if (market) {
+        // Update market data
+        market.total_volume += data.volume;
+        
+        // Update UI if market card is visible
+        const marketCard = document.querySelector(`[data-market-id="${data.market_id}"]`);
+        if (marketCard) {
+            // Update price display
+            const yesSpan = marketCard.querySelector('.yes-side span');
+            const noSpan = marketCard.querySelector('.no-side span');
+            if (yesSpan) yesSpan.textContent = `YES ${Math.round(data.yes_price * 100)}%`;
+            if (noSpan) noSpan.textContent = `NO ${Math.round(data.no_price * 100)}%`;
+        }
+    }
+}
+
+// Update position P&L from WebSocket
+function updatePositionPnL(data) {
+    const position = positions.find(p => p.id === data.position_id);
+    if (position) {
+        // Update position data
+        position.current_pnl = data.pnl;
+        position.current_price = data.current_price;
+        
+        // Update UI if portfolio is visible
+        if (currentTab === 'portfolio') {
+            updatePortfolioDisplay();
+        }
+    }
+}
+
+// Show notification
+function showNotification(title, message, level = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${level}`;
+    notification.innerHTML = `
+        <strong>${title}</strong>
+        <p>${message}</p>
+    `;
+    
+    // Add to notification container
+    let container = document.getElementById('notificationContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'notificationContainer';
+        container.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        `;
+        document.body.appendChild(container);
+    }
+    
+    container.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+
+// Update UI with real data
+function updateUI() {
+    // Update balance displays
+    document.querySelectorAll('.balance-amount').forEach(el => {
+        if (userBalance.sol) {
+            el.textContent = `◎ ${(userBalance.sol / 1e9).toFixed(2)}`;
+        } else if (userBalance.demo_usdc) {
+            el.textContent = `$ ${(userBalance.demo_usdc / 1e6).toFixed(2)}`;
+        }
+    });
+    
+    // Update wallet address
+    if (currentUser) {
+        document.querySelectorAll('.wallet-address').forEach(el => {
+            el.textContent = currentUser.address.slice(0, 4) + '...' + currentUser.address.slice(-4);
+        });
+    }
+    
+    // Update portfolio stats
+    updatePortfolioStats();
+}
+
+function updatePortfolioStats() {
+    const totalValue = positions.reduce((sum, pos) => sum + pos.size, 0);
+    const totalPnL = positions.reduce((sum, pos) => sum + (pos.current_pnl || 0), 0);
+    
+    // Update dashboard if visible
+    if (currentTab === 'dashboard') {
+        const portfolioValueEl = document.getElementById('portfolioValue');
+        if (portfolioValueEl) {
+            portfolioValueEl.textContent = `$${(totalValue / 1e6).toFixed(2)}`;
+        }
+        
+        const totalPnLEl = document.getElementById('totalPnL');
+        if (totalPnLEl) {
+            totalPnLEl.textContent = `${totalPnL >= 0 ? '+' : ''}$${(Math.abs(totalPnL) / 1e6).toFixed(2)}`;
+            totalPnLEl.className = totalPnL >= 0 ? 'text-success' : 'text-danger';
+        }
+    }
+}
+
+// Navigation Functions
+function showAbout() {
+    alert('Quantum Betting Platform v1.0.0\n\nNative Solana • 92 Smart Contracts • 5,250 TPS\n32-Level Verses • Quantum Mechanics • 100x Leverage');
+}
+
+function showMarkets() {
+    if (!walletConnected) {
+        showWalletModal();
+    } else {
+        showMainApp();
+        switchTab('markets');
+    }
+}
+
+function connectFirst() {
+    showWalletModal();
+}
+
+function showWalletModal() {
+    document.getElementById('walletModal').classList.add('active');
+}
+
+function closeWalletModal() {
+    document.getElementById('walletModal').classList.remove('active');
+}
+
+function showMainApp() {
+    document.getElementById('landingPage').classList.remove('active');
+    document.getElementById('mainApp').classList.add('active');
+    updateUI();
+}
+
+function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+}
+
+// Tab Switching
+function switchTab(tabName) {
+    // Update active tab button
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Show selected tab
+    document.getElementById(`${tabName}Tab`).classList.add('active');
+    currentTab = tabName;
+    
+    // Load tab-specific content
+    loadTabContent(tabName);
+}
+
+async function loadTabContent(tabName) {
+    switch(tabName) {
+        case 'markets':
+            await loadMarkets();
+            displayMarkets();
+            break;
+        case 'portfolio':
+            await loadUserData();
+            displayPortfolio();
+            break;
+        case 'verses':
+            await loadVerses();
+            break;
+        case 'defi':
+            await loadDeFiData();
+            break;
+    }
+}
+
+// Helper functions
+function formatNumber(num) {
+    if (num >= 1000000) {
+        return (num / 1000000).toFixed(1) + 'M';
+    } else if (num >= 1000) {
+        return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toFixed(0);
+}
+
+function getTimeRemaining(endDate) {
+    const now = new Date();
+    const diff = endDate - now;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    
+    if (days > 365) {
+        return Math.floor(days / 365) + ' years';
+    } else if (days > 30) {
+        return Math.floor(days / 30) + ' months';
+    } else {
+        return days + ' days';
+    }
+}
+
+// Mock data generators (fallback)
+function generateMockMarkets() {
+    markets = [
+        {
+            id: 1,
+            title: "Will global temperature rise >1.5°C by 2030?",
+            outcomes: [
+                { name: "YES", total_stake: 730000 },
+                { name: "NO", total_stake: 270000 }
+            ],
+            total_volume: 3150000 * 1e6,
+            total_liquidity: 890000 * 1e6,
+            resolution_time: new Date('2030-12-31').getTime() / 1000,
+        },
+        {
+            id: 2,
+            title: "Will SpaceX land on Mars before 2030?",
+            outcomes: [
+                { name: "YES", total_stake: 410000 },
+                { name: "NO", total_stake: 590000 }
+            ],
+            total_volume: 2890000 * 1e6,
+            total_liquidity: 1200000 * 1e6,
+            resolution_time: new Date('2030-01-01').getTime() / 1000,
+        },
+    ];
+}
+
+// Export for testing
+window.quantumBetting = {
+    connectWallet,
+    executeTrade,
+    markets,
+    positions,
+    userBalance
+};

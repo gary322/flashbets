@@ -1,0 +1,215 @@
+config:
+  target: "ws://localhost:8081"
+  ws:
+    # WebSocket specific settings
+    rejectUnauthorized: false
+    
+  phases:
+    # Phase 1: Warm up
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm up"
+    
+    # Phase 2: Ramp up
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 50
+      name: "Ramp up load"
+    
+    # Phase 3: Sustained load
+    - duration: 300
+      arrivalRate: 50
+      name: "Sustained load"
+    
+    # Phase 4: Spike test
+    - duration: 60
+      arrivalRate: 200
+      name: "Spike test"
+    
+    # Phase 5: Recovery
+    - duration: 120
+      arrivalRate: 50
+      name: "Recovery"
+    
+    # Phase 6: Ramp down
+    - duration: 60
+      arrivalRate: 50
+      rampTo: 5
+      name: "Ramp down"
+  
+  processor: "./websocket_processor.js"
+  
+  # Payload configuration
+  payload:
+    - path: "./test_data/markets.csv"
+      fields:
+        - "marketId"
+      order: sequence
+    - path: "./test_data/wallets.csv"
+      fields:
+        - "walletAddress"
+      order: random
+
+scenarios:
+  - name: "Market Updates Subscriber"
+    weight: 40
+    engine: "ws"
+    flow:
+      # Connect to WebSocket
+      - send:
+          json:
+            type: "connect"
+            clientId: "{{ $randomString() }}"
+      
+      # Subscribe to multiple markets
+      - think: 1
+      - send:
+          json:
+            type: "subscribe"
+            markets: ["{{ marketId }}", "1001", "1002"]
+      
+      # Maintain connection and receive updates
+      - loop:
+        - think: 5
+        - send:
+            json:
+              type: "ping"
+        - think: 25
+        - send:
+            json:
+              type: "subscribe"
+              markets: ["{{ $randomNumber(1000, 1009) }}"]
+        count: 20
+      
+      # Unsubscribe and disconnect
+      - send:
+          json:
+            type: "unsubscribe"
+            markets: ["{{ marketId }}"]
+      - think: 1
+      - send:
+          json:
+            type: "disconnect"
+
+  - name: "Position Updates Subscriber"
+    weight: 30
+    engine: "ws"
+    flow:
+      # Connect and authenticate
+      - send:
+          json:
+            type: "connect"
+            wallet: "{{ walletAddress }}"
+      
+      # Subscribe to position updates
+      - think: 1
+      - send:
+          json:
+            type: "subscribe_positions"
+            wallet: "{{ walletAddress }}"
+      
+      # Periodic position checks
+      - loop:
+        - think: 10
+        - send:
+            json:
+              type: "get_positions"
+              wallet: "{{ walletAddress }}"
+        - think: 20
+        count: 15
+      
+      # Disconnect
+      - send:
+          json:
+            type: "disconnect"
+
+  - name: "Real-time Trading"
+    weight: 20
+    engine: "ws"
+    flow:
+      # Connect with trading intent
+      - send:
+          json:
+            type: "connect"
+            wallet: "{{ walletAddress }}"
+            trading: true
+      
+      # Subscribe to orderbook
+      - think: 1
+      - send:
+          json:
+            type: "subscribe_orderbook"
+            market_id: "{{ marketId }}"
+      
+      # Place orders via WebSocket
+      - loop:
+        - think: 5
+        - send:
+            json:
+              type: "place_order"
+              market_id: "{{ marketId }}"
+              side: "{{ $randomString(['buy', 'sell']) }}"
+              amount: "{{ $randomNumber(10, 1000) }}"
+              price: "{{ $randomNumber(1, 99) / 100 }}"
+        - think: 10
+        count: 10
+      
+      # Cancel some orders
+      - think: 2
+      - send:
+          json:
+            type: "cancel_all_orders"
+            market_id: "{{ marketId }}"
+      
+      # Disconnect
+      - send:
+          json:
+            type: "disconnect"
+
+  - name: "High Frequency Updates"
+    weight: 10
+    engine: "ws"
+    flow:
+      # Connect for HFT
+      - send:
+          json:
+            type: "connect"
+            clientType: "hft"
+            wallet: "{{ walletAddress }}"
+      
+      # Subscribe to all market data
+      - send:
+          json:
+            type: "subscribe_all"
+            dataTypes: ["trades", "orderbook", "ticker"]
+      
+      # Rapid fire requests
+      - loop:
+        - send:
+            json:
+              type: "get_ticker"
+              market_id: "{{ $randomNumber(1000, 1009) }}"
+        - think: 0.1
+        count: 100
+      
+      # Disconnect
+      - send:
+          json:
+            type: "disconnect"
+
+# Custom metrics to track
+customMetrics:
+  - name: "WebSocket Message Latency"
+    type: "histogram"
+  - name: "Subscription Success Rate"
+    type: "counter"
+  - name: "Connection Drops"
+    type: "counter"
+  - name: "Messages Per Second"
+    type: "rate"
+
+# Ensure proper cleanup
+ensure:
+  maxErrorRate: 10
+  p95: 1000
+  p99: 2000

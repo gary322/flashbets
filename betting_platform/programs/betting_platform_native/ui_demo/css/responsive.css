@@ -1,0 +1,531 @@
+/* Quantum Betting Platform - Responsive Styles */
+
+/* ===== Breakpoints ===== */
+/* 
+  - Mobile: < 640px
+  - Tablet: 640px - 1024px
+  - Desktop: 1024px - 1440px
+  - Large: > 1440px
+*/
+
+/* ===== Mobile First Base Styles ===== */
+/* Default styles are mobile-first in main.css */
+
+/* ===== Small Tablets (640px+) ===== */
+@media (min-width: 640px) {
+  .container {
+    padding: 0 var(--spacing-xl);
+  }
+  
+  .grid-sm-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-sm-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  
+  .card {
+    padding: var(--spacing-xl);
+  }
+  
+  .modal-content {
+    max-width: 500px;
+  }
+  
+  .market-card-odds {
+    flex-direction: row;
+  }
+  
+  .portfolio-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===== Tablets (768px+) ===== */
+@media (min-width: 768px) {
+  /* Typography */
+  h1 { font-size: 3rem; }
+  h2 { font-size: 2.25rem; }
+  h3 { font-size: 1.75rem; }
+  
+  /* Navigation */
+  .navbar-container {
+    height: 72px;
+  }
+  
+  .mobile-nav {
+    display: none;
+  }
+  
+  .navbar-nav {
+    display: flex;
+  }
+  
+  /* Grid adjustments */
+  .grid-md-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-md-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .grid-md-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  
+  /* Market cards */
+  .markets-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Trading layout */
+  .order-entry {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+  }
+  
+  /* Modals */
+  .modal-content {
+    max-width: 600px;
+  }
+  
+  .modal-content.large {
+    max-width: 900px;
+  }
+  
+  /* Forms */
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+  }
+  
+  /* Portfolio */
+  .portfolio-summary {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* DeFi cards */
+  .defi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===== Small Desktops (1024px+) ===== */
+@media (min-width: 1024px) {
+  /* Container */
+  .container {
+    max-width: 1024px;
+  }
+  
+  /* Grid adjustments */
+  .grid-lg-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .grid-lg-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid-lg-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  
+  /* Sidebar layouts */
+  .layout-with-sidebar {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--spacing-xl);
+  }
+  
+  .sidebar {
+    position: sticky;
+    top: 88px;
+    height: calc(100vh - 88px);
+    overflow-y: auto;
+  }
+  
+  /* Market cards */
+  .markets-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* Trading terminal */
+  .trading-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr 300px;
+    grid-template-rows: 60px 1fr;
+  }
+  
+  .trading-sidebar-left,
+  .trading-sidebar-right {
+    display: block;
+  }
+  
+  /* Portfolio */
+  .portfolio-summary {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  /* DeFi */
+  .defi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* Verse tree */
+  .verse-tree-container {
+    height: 700px;
+  }
+  
+  /* Tables */
+  .table-responsive {
+    overflow-x: visible;
+  }
+}
+
+/* ===== Desktops (1280px+) ===== */
+@media (min-width: 1280px) {
+  /* Container */
+  .container {
+    max-width: 1280px;
+  }
+  
+  /* Grid adjustments */
+  .grid-xl-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid-xl-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .grid-xl-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 320px;
+  }
+  
+  .layout-with-sidebar {
+    grid-template-columns: 320px 1fr;
+  }
+  
+  /* Trading terminal */
+  .trading-layout {
+    grid-template-columns: 350px 1fr 350px;
+  }
+  
+  /* Market creation wizard */
+  .wizard-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+}
+
+/* ===== Large Desktops (1440px+) ===== */
+@media (min-width: 1440px) {
+  /* Container */
+  .container {
+    max-width: 1440px;
+  }
+  
+  /* Markets grid */
+  .markets-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  /* Portfolio */
+  .portfolio-summary {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  
+  /* Advanced layouts */
+  .analytics-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto 1fr;
+    gap: var(--spacing-xl);
+  }
+  
+  .analytics-main {
+    grid-row: span 2;
+  }
+}
+
+/* ===== Ultra Wide (1920px+) ===== */
+@media (min-width: 1920px) {
+  /* Base font size increase */
+  html {
+    font-size: 18px;
+  }
+  
+  /* Container */
+  .container {
+    max-width: 1600px;
+  }
+  
+  /* Grid adjustments */
+  .grid-2xl-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .grid-2xl-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  
+  /* Trading terminal */
+  .trading-layout {
+    grid-template-columns: 400px 1fr 400px;
+  }
+  
+  /* Market cards */
+  .markets-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* ===== Mobile Specific Overrides ===== */
+@media (max-width: 639px) {
+  /* Reduce padding/spacing */
+  :root {
+    --spacing-lg: 20px;
+    --spacing-xl: 28px;
+    --spacing-2xl: 40px;
+    --spacing-3xl: 52px;
+  }
+  
+  /* Typography */
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  
+  /* Navigation */
+  .navbar-container {
+    padding: 0 var(--spacing-md);
+  }
+  
+  .navbar-actions .btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.875rem;
+  }
+  
+  /* Cards */
+  .card {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+  }
+  
+  /* Market cards */
+  .market-card {
+    padding: var(--spacing-md);
+  }
+  
+  .market-card-odds {
+    flex-direction: column;
+  }
+  
+  .odds-button {
+    padding: var(--spacing-sm);
+  }
+  
+  /* Forms */
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  /* Modals */
+  .modal-content {
+    width: 95%;
+    max-height: 95vh;
+    border-radius: var(--radius-lg);
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: var(--spacing-md);
+  }
+  
+  /* Tables */
+  .table-container {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+  
+  .table {
+    font-size: 0.875rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: var(--spacing-sm);
+  }
+  
+  /* Hide non-essential columns */
+  .table .hide-mobile {
+    display: none;
+  }
+  
+  /* Trading */
+  .trading-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 250px 1fr;
+    height: calc(100vh - 64px - 56px); /* Account for mobile nav */
+  }
+  
+  .chart-area {
+    min-height: 250px;
+  }
+  
+  .order-type-selector {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Portfolio */
+  .portfolio-summary {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .position-table {
+    display: block;
+  }
+  
+  .position-table thead {
+    display: none;
+  }
+  
+  .position-table tr {
+    display: block;
+    margin-bottom: var(--spacing-md);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+  }
+  
+  .position-table td {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-xs) 0;
+    border: none;
+  }
+  
+  .position-table td:before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+  }
+  
+  /* Bottom padding for mobile nav */
+  body {
+    padding-bottom: 56px;
+  }
+  
+  /* Floating action button */
+  .fab {
+    position: fixed;
+    bottom: 76px;
+    right: var(--spacing-lg);
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full);
+    background: var(--gradient-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+    z-index: var(--z-fixed);
+  }
+}
+
+/* ===== Touch Device Optimizations ===== */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase touch targets */
+  .btn,
+  .form-input,
+  .form-select,
+  .navbar-link,
+  .market-card,
+  .odds-button {
+    min-height: 44px;
+  }
+  
+  /* Remove hover effects */
+  .btn:hover,
+  .card:hover,
+  .market-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  
+  /* Add touch feedback */
+  .btn:active,
+  .card:active,
+  .market-card:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+/* ===== Print Styles ===== */
+@media print {
+  /* Hide navigation and controls */
+  .navbar,
+  .mobile-nav,
+  .sidebar,
+  .btn,
+  .modal {
+    display: none !important;
+  }
+  
+  /* Reset colors for print */
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .card,
+  .table {
+    border: 1px solid #ddd;
+  }
+  
+  /* Page breaks */
+  .page-break {
+    page-break-after: always;
+  }
+  
+  .no-break {
+    page-break-inside: avoid;
+  }
+}
+
+/* ===== Accessibility - Reduced Motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== High Contrast Mode ===== */
+@media (prefers-contrast: high) {
+  :root {
+    --color-primary: #0066FF;
+    --color-success: #00AA00;
+    --color-danger: #FF0000;
+    --color-warning: #FFAA00;
+  }
+  
+  .btn,
+  .card,
+  .form-input {
+    border-width: 2px;
+  }
+}
+
+/* ===== Utility Classes for Responsive ===== */
+/* Hide/Show utilities */
+.mobile-only { display: block; }
+.tablet-only { display: none; }
+.desktop-only { display: none; }
+
+@media (min-width: 768px) {
+  .mobile-only { display: none; }
+  .tablet-only { display: block; }
+}
+
+@media (min-width: 1024px) {
+  .tablet-only { display: none; }
+  .desktop-only { display: block; }
+}
+
+/* Text alignment responsive */
+.text-mobile-center { text-align: center; }
+.text-tablet-left { text-align: center; }
+.text-desktop-right { text-align: center; }
+
+@media (min-width: 768px) {
+  .text-tablet-left { text-align: left; }
+}
+
+@media (min-width: 1024px) {
+  .text-desktop-right { text-align: right; }
+}

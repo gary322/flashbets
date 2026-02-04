@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify Market Selection</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; background: #111; border-radius: 8px; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        .info { color: #FFD60A; }
+        button { background: #FFD60A; color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        pre { background: #222; padding: 10px; border-radius: 4px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>Market Selection Verification</h1>
+    
+    <div class="test-section">
+        <h2>Steps to Test:</h2>
+        <ol>
+            <li>Open the main platform at <a href="index.html" style="color: #FFD60A;">index.html</a></li>
+            <li>Search for "Bitcoin" or "ETH" in the search box</li>
+            <li>Click on any search result</li>
+            <li>Verify the following appears:
+                <ul>
+                    <li>Market title and details (volume, liquidity)</li>
+                    <li>Outcome cards (Yes/No with prices)</li>
+                    <li>Verses section with connected arrows</li>
+                    <li>Position controls on the right</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h2>Automated Verification</h2>
+        <button onclick="runAutomatedTest()">Run Automated Test</button>
+        <div id="results"></div>
+    </div>
+    
+    <script>
+        async function runAutomatedTest() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Running tests...</p>';
+            
+            const tests = [];
+            
+            // Test 1: Check if all required elements exist
+            tests.push({
+                name: 'DOM Elements Check',
+                run: () => {
+                    const elements = {
+                        'Market Search Input': document.getElementById('marketSearchInput'),
+                        'Market Search Results': document.getElementById('marketSearchResults'),
+                        'Welcome State': document.getElementById('welcomeState'),
+                        'Market Header': document.querySelector('.market-header'),
+                        'Market Title': document.getElementById('marketTitle'),
+                        'Market Volume': document.getElementById('marketVolume'),
+                        'Market Liquidity': document.getElementById('marketLiquidity'),
+                        'Outcome Grid': document.getElementById('outcomeGrid'),
+                        'Verses Section': document.getElementById('versesSection'),
+                        'Verse Flow Container': document.getElementById('verseFlowContainer'),
+                        'Verse Grid': document.getElementById('verseGrid'),
+                        'Position Section': document.querySelector('.position-section')
+                    };
+                    
+                    const missing = [];
+                    for (const [name, el] of Object.entries(elements)) {
+                        if (!el) missing.push(name);
+                    }
+                    
+                    return {
+                        passed: missing.length === 0,
+                        message: missing.length === 0 ? 
+                            'All required elements found' : 
+                            'Missing elements: ' + missing.join(', ')
+                    };
+                }
+            });
+            
+            // Test 2: Check if functions are available
+            tests.push({
+                name: 'Function Availability',
+                run: () => {
+                    const functions = [
+                        'searchMarkets',
+                        'selectSearchResult',
+                        'selectOutcome',
+                        'getVersesForMarket',
+                        'updateAvailableVerses',
+                        'toggleVerseSelection'
+                    ];
+                    
+                    const missing = functions.filter(fn => !window[fn]);
+                    
+                    return {
+                        passed: missing.length === 0,
+                        message: missing.length === 0 ? 
+                            'All required functions available' : 
+                            'Missing functions: ' + missing.join(', ')
+                    };
+                }
+            });
+            
+            // Test 3: Check platform state
+            tests.push({
+                name: 'Platform State',
+                run: () => {
+                    if (!window.platformState) {
+                        return { passed: false, message: 'platformState not initialized' };
+                    }
+                    
+                    const required = ['markets', 'selectedMarket', 'selectedOutcome', 'selectedVerses', 'activePositions'];
+                    const missing = required.filter(prop => !(prop in window.platformState));
+                    
+                    return {
+                        passed: missing.length === 0,
+                        message: missing.length === 0 ? 
+                            'Platform state properly initialized' : 
+                            'Missing state properties: ' + missing.join(', ')
+                    };
+                }
+            });
+            
+            // Run all tests
+            let html = '<h3>Test Results:</h3>';
+            for (const test of tests) {
+                const result = test.run();
+                html += `
+                    <div style="margin: 10px 0;">
+                        <strong>${test.name}:</strong> 
+                        <span class="${result.passed ? 'success' : 'error'}">
+                            ${result.passed ? '✓ PASSED' : '✗ FAILED'}
+                        </span>
+                        <br>
+                        <small>${result.message}</small>
+                    </div>
+                `;
+            }
+            
+            // Show what verses would be generated for a Bitcoin market
+            if (window.getVersesForMarket) {
+                const testMarket = {
+                    id: 'test-btc',
+                    title: 'Will Bitcoin reach $150k by 2025?',
+                    category: 'Crypto',
+                    outcomes: ['Yes', 'No'],
+                    yesPrice: 0.35
+                };
+                
+                const verses = window.getVersesForMarket(testMarket);
+                html += `
+                    <div style="margin-top: 20px;">
+                        <h3>Sample Verses for Bitcoin Market:</h3>
+                        <pre>${JSON.stringify(verses, null, 2)}</pre>
+                    </div>
+                `;
+            }
+            
+            results.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

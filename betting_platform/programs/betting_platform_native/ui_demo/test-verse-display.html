@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Verse Display</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #000; color: #fff; padding: 20px; }
+        .status { margin: 20px 0; padding: 10px; background: #111; border-radius: 8px; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+        
+        /* Basic verse styling to ensure visibility */
+        .verse-flow-container {
+            position: relative;
+            min-height: 400px;
+            background: #111;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .verse-levels {
+            display: flex;
+            gap: 50px;
+            min-height: 300px;
+        }
+        
+        .verse-level {
+            flex: 1;
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .verse-card {
+            background: #222;
+            border: 1px solid #FFD60A;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .verse-card:hover {
+            background: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Verse Display</h1>
+    
+    <div class="status" id="status">Loading...</div>
+    
+    <button onclick="testVerseDisplay()">Test Verse Display</button>
+    <button onclick="fetchAndDisplay()">Fetch and Display Markets</button>
+    
+    <!-- Verse display container -->
+    <div class="verses-section" id="versesSection" style="display: block; margin-top: 30px;">
+        <div class="section-title">Related Stages - Chain Your Leverage</div>
+        <div class="verse-flow-container" id="verseFlowContainer">
+            <svg class="verse-connections" id="verseConnections">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="10" 
+                            refX="9" refY="5" orient="auto">
+                        <polygon points="0 0, 10 5, 0 10" class="verse-arrow" />
+                    </marker>
+                    <marker id="arrowhead-active" markerWidth="10" markerHeight="10" 
+                            refX="9" refY="5" orient="auto">
+                        <polygon points="0 0, 10 5, 0 10" class="verse-arrow active" />
+                    </marker>
+                </defs>
+            </svg>
+            <div class="verse-levels" id="verseLevels">
+                <!-- Dynamic verse levels -->
+            </div>
+        </div>
+        <div class="verse-grid" id="verseGrid" style="display: none;">
+            <!-- Dynamic verses for mobile -->
+        </div>
+    </div>
+    
+    <script src="platform_main.js"></script>
+    <script>
+        const status = document.getElementById('status');
+        
+        // Initialize platform state
+        window.platformState = {
+            markets: new Map(),
+            selectedMarket: null,
+            selectedOutcome: null,
+            selectedVerses: [],
+            activePositions: []
+        };
+        
+        function testVerseDisplay() {
+            status.innerHTML = '<p>Testing verse display with mock data...</p>';
+            
+            // Mock verse data
+            const mockVerses = [
+                {
+                    id: "verse_cat_general",
+                    name: "General Markets",
+                    description: "Various prediction markets across different topics",
+                    level: 1,
+                    multiplier: 1.2,
+                    category: "General",
+                    risk_tier: "Low",
+                    parent_id: null,
+                    market_count: 5
+                },
+                {
+                    id: "verse_topic_economic",
+                    name: "Economic Indicators",
+                    description: "Federal Reserve and economic data",
+                    level: 2,
+                    multiplier: 2.64,
+                    category: "Topic",
+                    risk_tier: "Medium",
+                    parent_id: "verse_cat_general",
+                    market_count: 3
+                }
+            ];
+            
+            console.log('Calling updateAvailableVerses with mock data');
+            if (window.updateAvailableVerses) {
+                window.updateAvailableVerses(mockVerses);
+                status.innerHTML = '<p class="success">✓ Called updateAvailableVerses</p>';
+                
+                // Check results
+                setTimeout(() => {
+                    const verseCards = document.querySelectorAll('.verse-card');
+                    const verseLevels = document.getElementById('verseLevels');
+                    status.innerHTML += `<p>Found ${verseCards.length} verse cards</p>`;
+                    status.innerHTML += `<p>verseLevels has ${verseLevels.children.length} children</p>`;
+                }, 100);
+            } else {
+                status.innerHTML = '<p class="error">✗ updateAvailableVerses not found</p>';
+            }
+        }
+        
+        async function fetchAndDisplay() {
+            status.innerHTML = '<p>Fetching markets from API...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const markets = await response.json();
+                
+                status.innerHTML = `<p class="success">✓ Fetched ${markets.length} markets</p>`;
+                
+                if (markets.length > 0 && markets[0].verses) {
+                    status.innerHTML += `<p>First market has ${markets[0].verses.length} verses</p>`;
+                    console.log('Displaying verses from first market');
+                    window.updateAvailableVerses(markets[0].verses);
+                    
+                    // Check display
+                    setTimeout(() => {
+                        const verseCards = document.querySelectorAll('.verse-card');
+                        const verseLevels = document.getElementById('verseLevels');
+                        status.innerHTML += `<p>Displayed ${verseCards.length} verse cards</p>`;
+                        status.innerHTML += `<p>verseLevels has ${verseLevels.children.length} level columns</p>`;
+                    }, 100);
+                } else {
+                    status.innerHTML += '<p class="error">✗ No verses found in markets</p>';
+                }
+                
+            } catch (error) {
+                status.innerHTML = `<p class="error">✗ Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Check if functions are loaded
+        window.addEventListener('load', () => {
+            const functions = ['updateAvailableVerses', 'createVerseCard', 'updateVerseFlow'];
+            let allLoaded = true;
+            
+            functions.forEach(fn => {
+                if (window[fn]) {
+                    console.log(`✓ ${fn} is loaded`);
+                } else {
+                    console.error(`✗ ${fn} is NOT loaded`);
+                    allLoaded = false;
+                }
+            });
+            
+            if (allLoaded) {
+                status.innerHTML = '<p class="success">✓ All functions loaded</p>';
+            } else {
+                status.innerHTML = '<p class="error">✗ Some functions are missing</p>';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+{
+  "totalEndpoints": 30,
+  "testedEndpoints": 23,
+  "totalFeatures": 40,
+  "implementedFeatures": 40,
+  "testCategories": {
+    "system": {
+      "total": 2,
+      "tested": 2,
+      "endpoints": [
+        {
+          "path": "/health",
+          "method": "GET",
+          "category": "system",
+          "tested": true
+        },
+        {
+          "path": "/api/program/info",
+          "method": "GET",
+          "category": "system",
+          "tested": true
+        }
+      ]
+    },
+    "trading": {
+      "total": 6,
+      "tested": 4,
+      "endpoints": [
+        {
+          "path": "/api/markets",
+          "method": "GET",
+          "category": "trading",
+          "tested": true
+        },
+        {
+          "path": "/api/markets/:id",
+          "method": "GET",
+          "category": "trading",
+          "tested": true
+        },
+        {
+          "path": "/api/markets/create",
+          "method": "POST",
+          "category": "trading",
+          "tested": false
+        },
+        {
+          "path": "/api/markets/:id/orderbook",
+          "method": "GET",
+          "category": "trading",
+          "tested": true
+        },
+        {
+          "path": "/api/trade/place",
+          "method": "POST",
+          "category": "trading",
+          "tested": true
+        },
+        {
+          "path": "/api/trade/close",
+          "method": "POST",
+          "category": "trading",
+          "tested": false
+        }
+      ]
+    },
+    "orders": {
+      "total": 4,
+      "tested": 4,
+      "endpoints": [
+        {
+          "path": "/api/orders/limit",
+          "method": "POST",
+          "category": "orders",
+          "tested": true
+        },
+        {
+          "path": "/api/orders/stop",
+          "method": "POST",
+          "category": "orders",
+          "tested": true
+        },
+        {
+          "path": "/api/orders/:id/cancel",
+          "method": "POST",
+          "category": "orders",
+          "tested": true
+        },
+        {
+          "path": "/api/orders/:wallet",
+          "method": "GET",
+          "category": "orders",
+          "tested": true
+        }
+      ]
+    },
+    "portfolio": {
+      "total": 5,
+      "tested": 5,
+      "endpoints": [
+        {
+          "path": "/api/positions/:wallet",
+          "method": "GET",
+          "category": "portfolio",
+          "tested": true
+        },
+        {
+          "path": "/api/portfolio/:wallet",
+          "method": "GET",
+          "category": "portfolio",
+          "tested": true
+        },
+        {
+          "path": "/api/risk/:wallet",
+          "method": "GET",
+          "category": "portfolio",
+          "tested": true
+        },
+        {
+          "path": "/api/wallet/balance/:wallet",
+          "method": "GET",
+          "category": "portfolio",
+          "tested": true
+        },
+        {
+          "path": "/api/wallet/demo/create",
+          "method": "POST",
+          "category": "portfolio",
+          "tested": true
+        }
+      ]
+    },
+    "verses": {
+      "total": 3,
+      "tested": 3,
+      "endpoints": [
+        {
+          "path": "/api/verses",
+          "method": "GET",
+          "category": "verses",
+          "tested": true
+        },
+        {
+          "path": "/api/verses/:id",
+          "method": "GET",
+          "category": "verses",
+          "tested": true
+        },
+        {
+          "path": "/api/test/verse-match",
+          "method": "POST",
+          "category": "verses",
+          "tested": true
+        }
+      ]
+    },
+    "quantum": {
+      "total": 3,
+      "tested": 3,
+      "endpoints": [
+        {
+          "path": "/api/quantum/positions/:wallet",
+          "method": "GET",
+          "category": "quantum",
+          "tested": true
+        },
+        {
+          "path": "/api/quantum/create",
+          "method": "POST",
+          "category": "quantum",
+          "tested": true
+        },
+        {
+          "path": "/api/quantum/states/:market_id",
+          "method": "GET",
+          "category": "quantum",
+          "tested": true
+        }
+      ]
+    },
+    "defi": {
+      "total": 2,
+      "tested": 0,
+      "endpoints": [
+        {
+          "path": "/api/defi/stake",
+          "method": "POST",
+          "category": "defi",
+          "tested": false
+        },
+        {
+          "path": "/api/defi/pools",
+          "method": "GET",
+          "category": "defi",
+          "tested": false
+        }
+      ]
+    },
+    "integration": {
+      "total": 3,
+      "tested": 1,
+      "endpoints": [
+        {
+          "path": "/api/polymarket/markets",
+          "method": "GET",
+          "category": "integration",
+          "tested": true
+        },
+        {
+          "path": "/api/integration/status",
+          "method": "GET",
+          "category": "integration",
+          "tested": false
+        },
+        {
+          "path": "/api/integration/sync",
+          "method": "POST",
+          "category": "integration",
+          "tested": false
+        }
+      ]
+    },
+    "realtime": {
+      "total": 2,
+      "tested": 1,
+      "endpoints": [
+        {
+          "path": "/ws",
+          "method": "WS",
+          "category": "realtime",
+          "tested": true
+        },
+        {
+          "path": "/ws/v2",
+          "method": "WS",
+          "category": "realtime",
+          "tested": false
+        }
+      ]
+    }
+  },
+  "performanceMetrics": {
+    "healthCheckLatency": 9,
+    "status": "excellent"
+  },
+  "codeMetrics": {
+    "totalSourceFiles": 9,
+    "totalLines": 9476,
+    "fileBreakdown": {
+      "src/main.rs": {
+        "totalLines": 264,
+        "codeLines": 184,
+        "commentLines": 37,
+        "emptyLines": 43
+      },
+      "src/handlers.rs": {
+        "totalLines": 1354,
+        "codeLines": 1146,
+        "commentLines": 92,
+        "emptyLines": 116
+      },
+      "src/order_types.rs": {
+        "totalLines": 907,
+        "codeLines": 729,
+        "commentLines": 61,
+        "emptyLines": 117
+      },
+      "src/quantum_engine.rs": {
+        "totalLines": 473,
+        "codeLines": 363,
+        "commentLines": 37,
+        "emptyLines": 73
+      },
+      "src/risk_engine.rs": {
+        "totalLines": 561,
+        "codeLines": 436,
+        "commentLines": 42,
+        "emptyLines": 83
+      },
+      "src/verse_catalog.rs": {
+        "totalLines": 5186,
+        "codeLines": 4584,
+        "commentLines": 168,
+        "emptyLines": 434
+      },
+      "src/rpc_client.rs": {
+        "totalLines": 361,
+        "codeLines": 286,
+        "commentLines": 26,
+        "emptyLines": 49
+      },
+      "src/websocket.rs": {
+        "totalLines": 110,
+        "codeLines": 80,
+        "commentLines": 9,
+        "emptyLines": 21
+      },
+      "src/types.rs": {
+        "totalLines": 260,
+        "codeLines": 219,
+        "commentLines": 17,
+        "emptyLines": 24
+      }
+    }
+  },
+  "timestamp": "2025-08-01T12:49:47.098Z"
+}

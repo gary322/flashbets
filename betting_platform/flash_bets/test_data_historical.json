@@ -1,0 +1,1157 @@
+[
+  {
+    "date": "2025-07-08",
+    "metrics": {
+      "totalVolume": 2233785,
+      "totalBets": 80210,
+      "uniqueUsers": 5707,
+      "avgBetSize": 69,
+      "winRate": 0.4803681209199575,
+      "topMarket": "Soccer",
+      "peakHour": 0,
+      "liquidations": 21,
+      "newUsers": 552
+    },
+    "events": [
+      {
+        "type": "high_volume",
+        "time": "23:50",
+        "impact": "low",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "9:57",
+        "impact": "high",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "promotion",
+        "time": "6:37",
+        "impact": "high",
+        "details": "Event 3 details"
+      },
+      {
+        "type": "high_volume",
+        "time": "18:2",
+        "impact": "high",
+        "details": "Event 4 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "ASIA",
+      "trendDirection": "stable",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-09",
+    "metrics": {
+      "totalVolume": 3105448,
+      "totalBets": 26261,
+      "uniqueUsers": 5659,
+      "avgBetSize": 160,
+      "winRate": 0.5067236665124258,
+      "topMarket": "Soccer",
+      "peakHour": 11,
+      "liquidations": 12,
+      "newUsers": 205
+    },
+    "events": [
+      {
+        "type": "tournament",
+        "time": "3:21",
+        "impact": "low",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "12:55",
+        "impact": "low",
+        "details": "Event 2 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "ASIA",
+      "trendDirection": "up",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-10",
+    "metrics": {
+      "totalVolume": 5817363,
+      "totalBets": 20266,
+      "uniqueUsers": 8782,
+      "avgBetSize": 93,
+      "winRate": 0.48224006555282306,
+      "topMarket": "Tennis",
+      "peakHour": 12,
+      "liquidations": 42,
+      "newUsers": 591
+    },
+    "events": [
+      {
+        "type": "large_win",
+        "time": "2:28",
+        "impact": "medium",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "new_whale",
+        "time": "8:30",
+        "impact": "low",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "milestone",
+        "time": "22:23",
+        "impact": "low",
+        "details": "Event 3 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "EU",
+      "trendDirection": "stable",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-11",
+    "metrics": {
+      "totalVolume": 8163144,
+      "totalBets": 54529,
+      "uniqueUsers": 5522,
+      "avgBetSize": 144,
+      "winRate": 0.48101726866745875,
+      "topMarket": "Soccer",
+      "peakHour": 17,
+      "liquidations": 97,
+      "newUsers": 393
+    },
+    "events": [
+      {
+        "type": "system_update",
+        "time": "14:59",
+        "impact": "medium",
+        "details": "Event 1 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "EU",
+      "trendDirection": "stable",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-12",
+    "metrics": {
+      "totalVolume": 3585533,
+      "totalBets": 98324,
+      "uniqueUsers": 4624,
+      "avgBetSize": 320,
+      "winRate": 0.5097417224059576,
+      "topMarket": "Soccer",
+      "peakHour": 18,
+      "liquidations": 4,
+      "newUsers": 306
+    },
+    "events": [
+      {
+        "type": "promotion",
+        "time": "9:52",
+        "impact": "high",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "23:57",
+        "impact": "low",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "11:43",
+        "impact": "medium",
+        "details": "Event 3 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekend",
+      "peakPeriods": [
+        "afternoon",
+        "evening"
+      ],
+      "dominantRegion": "EU",
+      "trendDirection": "stable",
+      "volatility": "high",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-13",
+    "metrics": {
+      "totalVolume": 5842947,
+      "totalBets": 71125,
+      "uniqueUsers": 2074,
+      "avgBetSize": 446,
+      "winRate": 0.5114741812375545,
+      "topMarket": "Basketball",
+      "peakHour": 23,
+      "liquidations": 45,
+      "newUsers": 224
+    },
+    "events": [],
+    "patterns": {
+      "dayType": "weekend",
+      "peakPeriods": [
+        "afternoon",
+        "evening"
+      ],
+      "dominantRegion": "NA",
+      "trendDirection": "stable",
+      "volatility": "high",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-14",
+    "metrics": {
+      "totalVolume": 6885954,
+      "totalBets": 14831,
+      "uniqueUsers": 3467,
+      "avgBetSize": 217,
+      "winRate": 0.506040395493444,
+      "topMarket": "Tennis",
+      "peakHour": 21,
+      "liquidations": 57,
+      "newUsers": 397
+    },
+    "events": [],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "ASIA",
+      "trendDirection": "down",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-15",
+    "metrics": {
+      "totalVolume": 3299144,
+      "totalBets": 88693,
+      "uniqueUsers": 9085,
+      "avgBetSize": 357,
+      "winRate": 0.5074212736923952,
+      "topMarket": "Basketball",
+      "peakHour": 3,
+      "liquidations": 56,
+      "newUsers": 513
+    },
+    "events": [
+      {
+        "type": "system_update",
+        "time": "21:38",
+        "impact": "medium",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "system_update",
+        "time": "18:37",
+        "impact": "high",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "15:44",
+        "impact": "medium",
+        "details": "Event 3 details"
+      },
+      {
+        "type": "promotion",
+        "time": "8:59",
+        "impact": "medium",
+        "details": "Event 4 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "NA",
+      "trendDirection": "stable",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-16",
+    "metrics": {
+      "totalVolume": 4722541,
+      "totalBets": 38486,
+      "uniqueUsers": 1804,
+      "avgBetSize": 79,
+      "winRate": 0.5115226259778042,
+      "topMarket": "Tennis",
+      "peakHour": 6,
+      "liquidations": 30,
+      "newUsers": 239
+    },
+    "events": [
+      {
+        "type": "new_whale",
+        "time": "4:4",
+        "impact": "high",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "milestone",
+        "time": "16:8",
+        "impact": "medium",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "large_win",
+        "time": "22:21",
+        "impact": "high",
+        "details": "Event 3 details"
+      },
+      {
+        "type": "tournament",
+        "time": "14:39",
+        "impact": "low",
+        "details": "Event 4 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "ASIA",
+      "trendDirection": "up",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-17",
+    "metrics": {
+      "totalVolume": 9905047,
+      "totalBets": 54568,
+      "uniqueUsers": 4682,
+      "avgBetSize": 386,
+      "winRate": 0.5180310828298068,
+      "topMarket": "Soccer",
+      "peakHour": 6,
+      "liquidations": 88,
+      "newUsers": 319
+    },
+    "events": [],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "ASIA",
+      "trendDirection": "stable",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-18",
+    "metrics": {
+      "totalVolume": 5400194,
+      "totalBets": 84671,
+      "uniqueUsers": 9621,
+      "avgBetSize": 139,
+      "winRate": 0.5098270820339018,
+      "topMarket": "Tennis",
+      "peakHour": 8,
+      "liquidations": 73,
+      "newUsers": 269
+    },
+    "events": [
+      {
+        "type": "new_whale",
+        "time": "5:43",
+        "impact": "low",
+        "details": "Event 1 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "NA",
+      "trendDirection": "stable",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-19",
+    "metrics": {
+      "totalVolume": 8106517,
+      "totalBets": 48434,
+      "uniqueUsers": 8613,
+      "avgBetSize": 147,
+      "winRate": 0.49452384805843597,
+      "topMarket": "Tennis",
+      "peakHour": 8,
+      "liquidations": 88,
+      "newUsers": 446
+    },
+    "events": [
+      {
+        "type": "high_volume",
+        "time": "10:50",
+        "impact": "medium",
+        "details": "Event 1 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekend",
+      "peakPeriods": [
+        "afternoon",
+        "evening"
+      ],
+      "dominantRegion": "NA",
+      "trendDirection": "up",
+      "volatility": "high",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-20",
+    "metrics": {
+      "totalVolume": 2346319,
+      "totalBets": 62625,
+      "uniqueUsers": 7643,
+      "avgBetSize": 214,
+      "winRate": 0.5147026407612867,
+      "topMarket": "Tennis",
+      "peakHour": 17,
+      "liquidations": 86,
+      "newUsers": 231
+    },
+    "events": [
+      {
+        "type": "system_update",
+        "time": "15:24",
+        "impact": "low",
+        "details": "Event 1 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekend",
+      "peakPeriods": [
+        "afternoon",
+        "evening"
+      ],
+      "dominantRegion": "EU",
+      "trendDirection": "up",
+      "volatility": "high",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-21",
+    "metrics": {
+      "totalVolume": 9524005,
+      "totalBets": 33111,
+      "uniqueUsers": 3591,
+      "avgBetSize": 230,
+      "winRate": 0.5111415524835323,
+      "topMarket": "Soccer",
+      "peakHour": 11,
+      "liquidations": 88,
+      "newUsers": 356
+    },
+    "events": [
+      {
+        "type": "large_loss",
+        "time": "23:9",
+        "impact": "medium",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "milestone",
+        "time": "0:19",
+        "impact": "high",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "18:45",
+        "impact": "medium",
+        "details": "Event 3 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "EU",
+      "trendDirection": "down",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-22",
+    "metrics": {
+      "totalVolume": 9362746,
+      "totalBets": 64093,
+      "uniqueUsers": 3429,
+      "avgBetSize": 357,
+      "winRate": 0.5148406420077696,
+      "topMarket": "Basketball",
+      "peakHour": 8,
+      "liquidations": 20,
+      "newUsers": 595
+    },
+    "events": [
+      {
+        "type": "high_volume",
+        "time": "20:17",
+        "impact": "high",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "milestone",
+        "time": "15:42",
+        "impact": "medium",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "new_whale",
+        "time": "14:30",
+        "impact": "low",
+        "details": "Event 3 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "19:11",
+        "impact": "high",
+        "details": "Event 4 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "NA",
+      "trendDirection": "down",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-23",
+    "metrics": {
+      "totalVolume": 8536511,
+      "totalBets": 44662,
+      "uniqueUsers": 6963,
+      "avgBetSize": 296,
+      "winRate": 0.5198184388017614,
+      "topMarket": "Soccer",
+      "peakHour": 21,
+      "liquidations": 87,
+      "newUsers": 312
+    },
+    "events": [],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "EU",
+      "trendDirection": "stable",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-24",
+    "metrics": {
+      "totalVolume": 8192869,
+      "totalBets": 47024,
+      "uniqueUsers": 9579,
+      "avgBetSize": 343,
+      "winRate": 0.5084581608532581,
+      "topMarket": "Basketball",
+      "peakHour": 3,
+      "liquidations": 41,
+      "newUsers": 558
+    },
+    "events": [],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "NA",
+      "trendDirection": "up",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-25",
+    "metrics": {
+      "totalVolume": 9752652,
+      "totalBets": 24242,
+      "uniqueUsers": 9707,
+      "avgBetSize": 255,
+      "winRate": 0.4944849484789699,
+      "topMarket": "Soccer",
+      "peakHour": 7,
+      "liquidations": 31,
+      "newUsers": 117
+    },
+    "events": [
+      {
+        "type": "new_whale",
+        "time": "13:2",
+        "impact": "low",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "high_volume",
+        "time": "12:41",
+        "impact": "low",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "new_whale",
+        "time": "9:25",
+        "impact": "low",
+        "details": "Event 3 details"
+      },
+      {
+        "type": "milestone",
+        "time": "8:11",
+        "impact": "high",
+        "details": "Event 4 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "ASIA",
+      "trendDirection": "up",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-26",
+    "metrics": {
+      "totalVolume": 8303287,
+      "totalBets": 72793,
+      "uniqueUsers": 3124,
+      "avgBetSize": 429,
+      "winRate": 0.5094544236192227,
+      "topMarket": "Soccer",
+      "peakHour": 4,
+      "liquidations": 36,
+      "newUsers": 307
+    },
+    "events": [],
+    "patterns": {
+      "dayType": "weekend",
+      "peakPeriods": [
+        "afternoon",
+        "evening"
+      ],
+      "dominantRegion": "EU",
+      "trendDirection": "up",
+      "volatility": "high",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-27",
+    "metrics": {
+      "totalVolume": 4292063,
+      "totalBets": 64281,
+      "uniqueUsers": 5697,
+      "avgBetSize": 336,
+      "winRate": 0.49012220575714666,
+      "topMarket": "Basketball",
+      "peakHour": 0,
+      "liquidations": 55,
+      "newUsers": 345
+    },
+    "events": [
+      {
+        "type": "tournament",
+        "time": "22:39",
+        "impact": "high",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "4:9",
+        "impact": "high",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "large_win",
+        "time": "8:52",
+        "impact": "low",
+        "details": "Event 3 details"
+      },
+      {
+        "type": "promotion",
+        "time": "20:44",
+        "impact": "medium",
+        "details": "Event 4 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekend",
+      "peakPeriods": [
+        "afternoon",
+        "evening"
+      ],
+      "dominantRegion": "NA",
+      "trendDirection": "up",
+      "volatility": "high",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-28",
+    "metrics": {
+      "totalVolume": 2892147,
+      "totalBets": 32580,
+      "uniqueUsers": 4386,
+      "avgBetSize": 258,
+      "winRate": 0.4914856690114343,
+      "topMarket": "Basketball",
+      "peakHour": 11,
+      "liquidations": 6,
+      "newUsers": 211
+    },
+    "events": [
+      {
+        "type": "large_loss",
+        "time": "2:54",
+        "impact": "low",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "14:27",
+        "impact": "medium",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "promotion",
+        "time": "18:4",
+        "impact": "low",
+        "details": "Event 3 details"
+      },
+      {
+        "type": "high_volume",
+        "time": "2:46",
+        "impact": "low",
+        "details": "Event 4 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "EU",
+      "trendDirection": "down",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-29",
+    "metrics": {
+      "totalVolume": 9438152,
+      "totalBets": 57661,
+      "uniqueUsers": 9438,
+      "avgBetSize": 414,
+      "winRate": 0.5046991473686815,
+      "topMarket": "Basketball",
+      "peakHour": 4,
+      "liquidations": 65,
+      "newUsers": 409
+    },
+    "events": [],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "EU",
+      "trendDirection": "up",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-30",
+    "metrics": {
+      "totalVolume": 4507536,
+      "totalBets": 49748,
+      "uniqueUsers": 4104,
+      "avgBetSize": 379,
+      "winRate": 0.5061142934264184,
+      "topMarket": "Soccer",
+      "peakHour": 16,
+      "liquidations": 18,
+      "newUsers": 578
+    },
+    "events": [
+      {
+        "type": "promotion",
+        "time": "10:45",
+        "impact": "medium",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "new_whale",
+        "time": "2:2",
+        "impact": "low",
+        "details": "Event 2 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "NA",
+      "trendDirection": "down",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-07-31",
+    "metrics": {
+      "totalVolume": 4053459,
+      "totalBets": 31841,
+      "uniqueUsers": 3067,
+      "avgBetSize": 166,
+      "winRate": 0.5123580013186322,
+      "topMarket": "Basketball",
+      "peakHour": 18,
+      "liquidations": 56,
+      "newUsers": 125
+    },
+    "events": [
+      {
+        "type": "milestone",
+        "time": "15:16",
+        "impact": "low",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "milestone",
+        "time": "15:6",
+        "impact": "low",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "22:39",
+        "impact": "high",
+        "details": "Event 3 details"
+      },
+      {
+        "type": "new_whale",
+        "time": "20:1",
+        "impact": "low",
+        "details": "Event 4 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "ASIA",
+      "trendDirection": "down",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-08-01",
+    "metrics": {
+      "totalVolume": 6932635,
+      "totalBets": 68192,
+      "uniqueUsers": 6688,
+      "avgBetSize": 340,
+      "winRate": 0.5146330587825013,
+      "topMarket": "Tennis",
+      "peakHour": 18,
+      "liquidations": 61,
+      "newUsers": 556
+    },
+    "events": [
+      {
+        "type": "promotion",
+        "time": "23:12",
+        "impact": "high",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "2:20",
+        "impact": "high",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "tournament",
+        "time": "17:41",
+        "impact": "medium",
+        "details": "Event 3 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "ASIA",
+      "trendDirection": "stable",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-08-02",
+    "metrics": {
+      "totalVolume": 7195573,
+      "totalBets": 27491,
+      "uniqueUsers": 5667,
+      "avgBetSize": 173,
+      "winRate": 0.49509140793477735,
+      "topMarket": "Basketball",
+      "peakHour": 0,
+      "liquidations": 38,
+      "newUsers": 103
+    },
+    "events": [
+      {
+        "type": "large_loss",
+        "time": "7:47",
+        "impact": "high",
+        "details": "Event 1 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekend",
+      "peakPeriods": [
+        "afternoon",
+        "evening"
+      ],
+      "dominantRegion": "NA",
+      "trendDirection": "up",
+      "volatility": "high",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-08-03",
+    "metrics": {
+      "totalVolume": 9102026,
+      "totalBets": 64476,
+      "uniqueUsers": 8994,
+      "avgBetSize": 351,
+      "winRate": 0.5008967437907663,
+      "topMarket": "Soccer",
+      "peakHour": 22,
+      "liquidations": 18,
+      "newUsers": 107
+    },
+    "events": [],
+    "patterns": {
+      "dayType": "weekend",
+      "peakPeriods": [
+        "afternoon",
+        "evening"
+      ],
+      "dominantRegion": "NA",
+      "trendDirection": "down",
+      "volatility": "high",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-08-04",
+    "metrics": {
+      "totalVolume": 9293851,
+      "totalBets": 43445,
+      "uniqueUsers": 8825,
+      "avgBetSize": 377,
+      "winRate": 0.5089440911476569,
+      "topMarket": "Soccer",
+      "peakHour": 15,
+      "liquidations": 20,
+      "newUsers": 216
+    },
+    "events": [
+      {
+        "type": "high_volume",
+        "time": "8:17",
+        "impact": "medium",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "tournament",
+        "time": "23:7",
+        "impact": "high",
+        "details": "Event 2 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "EU",
+      "trendDirection": "down",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-08-05",
+    "metrics": {
+      "totalVolume": 5535914,
+      "totalBets": 39168,
+      "uniqueUsers": 9087,
+      "avgBetSize": 176,
+      "winRate": 0.5182120196995493,
+      "topMarket": "Tennis",
+      "peakHour": 14,
+      "liquidations": 24,
+      "newUsers": 146
+    },
+    "events": [
+      {
+        "type": "large_loss",
+        "time": "15:52",
+        "impact": "low",
+        "details": "Event 1 details"
+      },
+      {
+        "type": "promotion",
+        "time": "3:14",
+        "impact": "medium",
+        "details": "Event 2 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "7:18",
+        "impact": "medium",
+        "details": "Event 3 details"
+      },
+      {
+        "type": "large_loss",
+        "time": "3:20",
+        "impact": "low",
+        "details": "Event 4 details"
+      }
+    ],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "EU",
+      "trendDirection": "up",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  },
+  {
+    "date": "2025-08-06",
+    "metrics": {
+      "totalVolume": 1212242,
+      "totalBets": 28944,
+      "uniqueUsers": 5342,
+      "avgBetSize": 76,
+      "winRate": 0.49850498205088356,
+      "topMarket": "Tennis",
+      "peakHour": 19,
+      "liquidations": 20,
+      "newUsers": 179
+    },
+    "events": [],
+    "patterns": {
+      "dayType": "weekday",
+      "peakPeriods": [
+        "lunch",
+        "evening"
+      ],
+      "dominantRegion": "EU",
+      "trendDirection": "stable",
+      "volatility": "medium",
+      "seasonality": "summer"
+    }
+  }
+]

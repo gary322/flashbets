@@ -1,0 +1,2759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiverse Betting Platform - Comprehensive Live Demo</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    
+    <style>
+        /* ==================== CORE STYLES ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #00D4FF;
+            --secondary-color: #FF00FF;
+            --success-color: #00FF88;
+            --danger-color: #FF0044;
+            --warning-color: #FFD700;
+            --bg-primary: #0A0A0F;
+            --bg-secondary: #12121A;
+            --bg-tertiary: #1A1A25;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0B0B0;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ==================== LAYOUT ==================== */
+        #demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .demo-header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border-radius: 20px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--primary-color) 0%, transparent 70%);
+            opacity: 0.1;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .logo-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(0, 212, 255, 0.5); }
+            to { text-shadow: 0 0 30px rgba(255, 0, 255, 0.5), 0 0 40px rgba(0, 212, 255, 0.5); }
+        }
+
+        .tagline {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        /* ==================== NAVIGATION ==================== */
+        .demo-nav {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .nav-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .nav-btn.active {
+            background: var(--success-color);
+        }
+
+        /* ==================== SECTIONS ==================== */
+        .demo-section {
+            margin-bottom: 60px;
+            padding: 40px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            display: none;
+        }
+
+        .demo-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* ==================== WALLET CONNECTION ==================== */
+        .wallet-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .wallet-card {
+            flex: 1;
+            padding: 25px;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .wallet-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+
+        .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--danger-color);
+            animation: blink 2s infinite;
+        }
+
+        .status-indicator.connected {
+            background: var(--success-color);
+            animation: none;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .connect-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .connect-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .connect-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ==================== MARKET GRID ==================== */
+        .markets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .market-card {
+            padding: 25px;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .market-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .market-card:hover::before {
+            left: 100%;
+        }
+
+        .market-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+
+        .market-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .market-odds {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .odds-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .odds-btn.yes {
+            border-color: var(--success-color);
+        }
+
+        .odds-btn.no {
+            border-color: var(--danger-color);
+        }
+
+        .odds-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .odds-btn.yes:hover {
+            background: rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .odds-btn.no:hover {
+            background: rgba(255, 0, 68, 0.1);
+            box-shadow: 0 0 15px rgba(255, 0, 68, 0.3);
+        }
+
+        .market-volume {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* ==================== FLASH BETTING ==================== */
+        .flash-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .flash-market {
+            padding: 30px;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            border: 2px solid var(--warning-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flash-timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+        }
+
+        .timer-circle {
+            fill: none;
+            stroke: var(--warning-color);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            animation: countdown 30s linear;
+        }
+
+        @keyframes countdown {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: 251; }
+        }
+
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--warning-color);
+        }
+
+        .flash-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-right: 100px;
+        }
+
+        .leverage-slider {
+            margin: 20px 0;
+        }
+
+        .leverage-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .leverage-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-tertiary);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        /* ==================== QUANTUM VISUALIZATION ==================== */
+        .quantum-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .quantum-viz {
+            padding: 30px;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            height: 400px;
+        }
+
+        .quantum-particle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary-color), transparent);
+            animation: quantum-float 3s ease-in-out infinite;
+        }
+
+        @keyframes quantum-float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.2); }
+            66% { transform: translate(-20px, 20px) scale(0.8); }
+        }
+
+        .superposition-state {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 100%;
+        }
+
+        .state-box {
+            width: 120px;
+            height: 120px;
+            border: 2px dashed var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+            position: relative;
+            animation: quantum-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes quantum-pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .collapse-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 30px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .collapse-btn:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 5px 20px rgba(255, 0, 255, 0.4);
+        }
+
+        /* ==================== VERSE HIERARCHY ==================== */
+        .verse-tree {
+            padding: 30px;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .verse-node {
+            position: relative;
+            padding: 20px;
+            margin: 10px 0;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .verse-node:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .verse-children {
+            margin-left: 40px;
+            margin-top: 10px;
+            border-left: 2px solid var(--border-color);
+            padding-left: 20px;
+        }
+
+        .verse-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .verse-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* ==================== ORDER BOOK ==================== */
+        .orderbook-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .orderbook-side {
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .orderbook-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .orderbook-header.bids {
+            color: var(--success-color);
+        }
+
+        .orderbook-header.asks {
+            color: var(--danger-color);
+        }
+
+        .order-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s ease;
+        }
+
+        .order-row:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .order-price {
+            font-weight: 600;
+        }
+
+        .order-size {
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .order-total {
+            text-align: right;
+            color: var(--text-secondary);
+        }
+
+        /* ==================== TRADING TERMINAL ==================== */
+        .trading-terminal {
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .terminal-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .terminal-tab {
+            padding: 10px 20px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .terminal-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .order-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .form-input {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .form-select {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .submit-order-btn {
+            padding: 15px;
+            background: linear-gradient(135deg, var(--success-color), var(--primary-color));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-order-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        /* ==================== PORTFOLIO ==================== */
+        .portfolio-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .positions-table {
+            width: 100%;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .positions-table thead {
+            background: var(--bg-tertiary);
+        }
+
+        .positions-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .positions-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .positions-table tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .pnl-positive {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .pnl-negative {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+
+        /* ==================== CHARTS ==================== */
+        .chart-container {
+            padding: 30px;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            margin-top: 30px;
+            height: 400px;
+            position: relative;
+        }
+
+        /* ==================== NOTIFICATIONS ==================== */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+
+        .notification.success {
+            border-left-color: var(--success-color);
+        }
+
+        .notification.error {
+            border-left-color: var(--danger-color);
+        }
+
+        /* ==================== LOADING STATES ==================== */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--bg-tertiary);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .demo-nav {
+                flex-direction: column;
+            }
+            
+            .markets-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .flash-container,
+            .quantum-container,
+            .orderbook-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .portfolio-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ==================== ANIMATIONS ==================== */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .zoom-in {
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* ==================== SPECIAL EFFECTS ==================== */
+        .glow-effect {
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .rainbow-border {
+            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+            background-size: 200% 200%;
+            animation: rainbow 3s linear infinite;
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .pulse-effect {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* ==================== ACTION BUTTONS ==================== */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px 24px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+        }
+
+        .action-btn.success {
+            background: var(--success-color);
+            border: none;
+        }
+
+        .action-btn.danger {
+            background: var(--danger-color);
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="demo-container">
+        <!-- HEADER -->
+        <div class="demo-header">
+            <div class="logo-container">
+                <h1 class="logo">MULTIVERSE</h1>
+            </div>
+            <p class="tagline">Next-Gen Prediction Markets with Quantum Mechanics & Flash Betting</p>
+            
+            <!-- Key Metrics Dashboard -->
+            <div class="portfolio-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total Volume</div>
+                    <div class="stat-value" id="totalVolume">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Markets</div>
+                    <div class="stat-value" id="activeMarkets">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Flash Markets</div>
+                    <div class="stat-value" id="flashMarkets">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Users Online</div>
+                    <div class="stat-value" id="usersOnline">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NAVIGATION -->
+        <nav class="demo-nav">
+            <button class="nav-btn active" onclick="showSection('intro')">🏠 Introduction</button>
+            <button class="nav-btn" onclick="showSection('wallet')">👛 Wallet Setup</button>
+            <button class="nav-btn" onclick="showSection('polymarket')">📊 Polymarket</button>
+            <button class="nav-btn" onclick="showSection('flash')">⚡ Flash Betting</button>
+            <button class="nav-btn" onclick="showSection('quantum')">🌌 Quantum</button>
+            <button class="nav-btn" onclick="showSection('verses')">🌳 Verses</button>
+            <button class="nav-btn" onclick="showSection('trading')">📈 Trading</button>
+            <button class="nav-btn" onclick="showSection('leverage')">💰 Leverage</button>
+            <button class="nav-btn" onclick="showSection('mmt')">🪙 MMT Token</button>
+            <button class="nav-btn" onclick="showSection('defi')">🏦 DeFi</button>
+            <button class="nav-btn" onclick="showSection('portfolio')">💼 Portfolio</button>
+            <button class="nav-btn" onclick="showSection('analytics')">📊 Analytics</button>
+            <button class="nav-btn" onclick="showSection('api')">🔌 API</button>
+            <button class="nav-btn" onclick="showSection('security')">🔐 Security</button>
+            <button class="nav-btn" onclick="showSection('finale')">🎯 Grand Finale</button>
+        </nav>
+
+        <!-- SECTION 1: INTRODUCTION -->
+        <section id="intro-section" class="demo-section active">
+            <div class="section-header">
+                <h2 class="section-title">Welcome to the Multiverse</h2>
+                <p class="section-description">
+                    Experience the future of prediction markets where traditional betting meets quantum mechanics 
+                    and ultra-fast flash markets. This comprehensive demo showcases our platform's revolutionary 
+                    features including 500x leverage through chaining, sub-minute markets, and quantum superposition betting.
+                </p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="startDemo()">🚀 Start Interactive Demo</button>
+                <button class="action-btn" onclick="playVideo()">▶️ Watch Video Tour</button>
+                <button class="action-btn" onclick="viewDocs()">📚 Documentation</button>
+            </div>
+
+            <div style="margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div class="stat-card">
+                    <div class="stat-label">Platform Features</div>
+                    <div style="font-size: 16px; color: var(--text-secondary); margin-top: 10px;">
+                        ✓ Polymarket Integration<br>
+                        ✓ Flash Betting (5-60s)<br>
+                        ✓ 500x Leverage<br>
+                        ✓ Quantum Positions<br>
+                        ✓ Cross-Chain Support
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Supported Chains</div>
+                    <div style="font-size: 16px; color: var(--text-secondary); margin-top: 10px;">
+                        🔷 Polygon<br>
+                        ☀️ Solana<br>
+                        🔜 Arbitrum<br>
+                        🔜 Base<br>
+                        🔜 zkSync
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Trading Options</div>
+                    <div style="font-size: 16px; color: var(--text-secondary); margin-top: 10px;">
+                        • Market Orders<br>
+                        • Limit Orders<br>
+                        • Stop Loss<br>
+                        • Iceberg Orders<br>
+                        • TWAP Execution
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: WALLET CONNECTION -->
+        <section id="wallet-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">Connect Your Wallet</h2>
+                <p class="section-description">
+                    Connect your wallet to start trading. We support MetaMask for Polygon markets and Phantom for Solana programs.
+                </p>
+            </div>
+
+            <div class="wallet-section">
+                <div class="wallet-card">
+                    <h3>🦊 MetaMask (Polygon)</h3>
+                    <div class="wallet-status">
+                        <div class="status-indicator" id="metamask-status"></div>
+                        <span id="metamask-address">Not Connected</span>
+                    </div>
+                    <div style="margin: 15px 0;">
+                        <div style="font-size: 14px; color: var(--text-secondary);">Balance:</div>
+                        <div style="font-size: 20px; font-weight: bold;" id="metamask-balance">0 MATIC</div>
+                    </div>
+                    <button class="connect-btn" onclick="connectMetaMask()">Connect MetaMask</button>
+                </div>
+
+                <div class="wallet-card">
+                    <h3>👻 Phantom (Solana)</h3>
+                    <div class="wallet-status">
+                        <div class="status-indicator" id="phantom-status"></div>
+                        <span id="phantom-address">Not Connected</span>
+                    </div>
+                    <div style="margin: 15px 0;">
+                        <div style="font-size: 14px; color: var(--text-secondary);">Balance:</div>
+                        <div style="font-size: 20px; font-weight: bold;" id="phantom-balance">0 SOL</div>
+                    </div>
+                    <button class="connect-btn" onclick="connectPhantom()">Connect Phantom</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; padding: 20px; background: var(--bg-secondary); border-radius: 15px;">
+                <h3>Demo Mode Available</h3>
+                <p style="color: var(--text-secondary); margin: 10px 0;">
+                    Don't have a wallet? Try our demo mode with virtual funds to explore all features risk-free.
+                </p>
+                <button class="action-btn success" onclick="enableDemoMode()">🎮 Enable Demo Mode</button>
+            </div>
+        </section>
+
+        <!-- SECTION 3: POLYMARKET INTEGRATION -->
+        <section id="polymarket-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">Live Polymarket Integration</h2>
+                <p class="section-description">
+                    Real-time integration with Polymarket's Conditional Token Framework. Trade on actual markets with deep liquidity.
+                </p>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <input type="text" class="form-input" placeholder="🔍 Search markets..." onkeyup="searchMarkets(this.value)">
+            </div>
+
+            <div class="markets-grid" id="polymarket-grid">
+                <!-- Markets will be loaded here -->
+                <div class="market-card skeleton" style="height: 200px;"></div>
+                <div class="market-card skeleton" style="height: 200px;"></div>
+                <div class="market-card skeleton" style="height: 200px;"></div>
+            </div>
+
+            <div class="orderbook-container">
+                <div class="orderbook-side">
+                    <div class="orderbook-header bids">Bids</div>
+                    <div id="bids-book">
+                        <div class="order-row">
+                            <span class="order-price">$0.65</span>
+                            <span class="order-size">1,234</span>
+                            <span class="order-total">$802.10</span>
+                        </div>
+                        <div class="order-row">
+                            <span class="order-price">$0.64</span>
+                            <span class="order-size">2,456</span>
+                            <span class="order-total">$1,571.84</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="orderbook-side">
+                    <div class="orderbook-header asks">Asks</div>
+                    <div id="asks-book">
+                        <div class="order-row">
+                            <span class="order-price">$0.66</span>
+                            <span class="order-size">987</span>
+                            <span class="order-total">$651.42</span>
+                        </div>
+                        <div class="order-row">
+                            <span class="order-price">$0.67</span>
+                            <span class="order-size">1,543</span>
+                            <span class="order-total">$1,033.81</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: FLASH BETTING -->
+        <section id="flash-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">⚡ Flash Betting - Ultra Short-Term Markets</h2>
+                <p class="section-description">
+                    Experience the thrill of sub-minute betting with up to 500x leverage through chaining. 
+                    Markets resolve in 5-60 seconds using our micro-tau AMM pricing model.
+                </p>
+            </div>
+
+            <div class="flash-container">
+                <div class="flash-market">
+                    <div class="flash-timer">
+                        <svg width="80" height="80">
+                            <circle cx="40" cy="40" r="35" fill="none" stroke="rgba(255, 215, 0, 0.2)" stroke-width="4"/>
+                            <circle class="timer-circle" cx="40" cy="40" r="35" stroke-dasharray="220" stroke-dashoffset="0"/>
+                        </svg>
+                        <div class="timer-text" id="flash-timer-1">30s</div>
+                    </div>
+                    <h3 class="flash-title">⚽ Next Goal in 30 Seconds?</h3>
+                    
+                    <div class="market-odds">
+                        <button class="odds-btn yes" onclick="betFlash('yes', 1)">
+                            YES<br>
+                            <span style="font-size: 20px;">65%</span>
+                        </button>
+                        <button class="odds-btn no" onclick="betFlash('no', 1)">
+                            NO<br>
+                            <span style="font-size: 20px;">35%</span>
+                        </button>
+                    </div>
+
+                    <div class="leverage-slider">
+                        <div class="leverage-label">
+                            <span>Leverage</span>
+                            <span class="leverage-value" id="leverage-1">50x</span>
+                        </div>
+                        <input type="range" class="slider" min="1" max="100" value="50" 
+                               oninput="updateLeverage(1, this.value)">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Bet Amount (USDC)</label>
+                        <input type="number" class="form-input" value="100" id="bet-amount-1">
+                    </div>
+
+                    <button class="submit-order-btn" onclick="placeFlashBet(1)">
+                        Place Flash Bet
+                    </button>
+                </div>
+
+                <div class="flash-market">
+                    <h3>🔗 Chain Multiple Bets</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                        Chain up to 3 flash markets for 500x effective leverage!
+                    </p>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Market 1</label>
+                        <select class="form-select">
+                            <option>Next Corner Kick (45s)</option>
+                            <option>Yellow Card (30s)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Market 2</label>
+                        <select class="form-select">
+                            <option>Ball Out of Bounds (20s)</option>
+                            <option>Free Kick (15s)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Market 3</label>
+                        <select class="form-select">
+                            <option>Shot on Goal (10s)</option>
+                            <option>Penalty (5s)</option>
+                        </select>
+                    </div>
+
+                    <div style="padding: 15px; background: var(--bg-tertiary); border-radius: 10px; margin: 20px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Base Leverage:</span>
+                            <span style="font-weight: bold;">100x</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Chain Multiplier:</span>
+                            <span style="font-weight: bold;">5x</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border-color);">
+                            <span>Effective Leverage:</span>
+                            <span style="font-size: 24px; font-weight: bold; color: var(--warning-color);">500x</span>
+                        </div>
+                    </div>
+
+                    <button class="submit-order-btn" onclick="placeChainedBet()">
+                        🔗 Place Chained Bet
+                    </button>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; padding: 20px; background: var(--bg-secondary); border-radius: 15px;">
+                <h3>📊 Micro-Tau AMM Pricing</h3>
+                <p style="color: var(--text-secondary); margin: 15px 0;">
+                    Our proprietary micro-tau AMM adjusts prices based on time decay:
+                </p>
+                <code style="display: block; padding: 15px; background: var(--bg-primary); border-radius: 8px; color: var(--primary-color);">
+                    τ = 0.0001 * (time_left / 60.0)<br>
+                    price = base_price * (1 + τ * time_elapsed)
+                </code>
+            </div>
+        </section>
+
+        <!-- SECTION 5: QUANTUM POSITIONS -->
+        <section id="quantum-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">🌌 Quantum Positions & Superposition</h2>
+                <p class="section-description">
+                    Enter the quantum realm where positions exist in superposition until observed. 
+                    Bet on multiple correlated outcomes simultaneously across parallel universes.
+                </p>
+            </div>
+
+            <div class="quantum-container">
+                <div class="quantum-viz">
+                    <h3>Quantum State Visualization</h3>
+                    <div class="superposition-state">
+                        <div class="state-box" id="state-yes">
+                            YES<br>
+                            <span style="font-size: 14px; color: var(--text-secondary);">|1⟩</span>
+                        </div>
+                        <div class="quantum-particle" style="top: 50%; left: 50%;"></div>
+                        <div class="state-box" id="state-no">
+                            NO<br>
+                            <span style="font-size: 14px; color: var(--text-secondary);">|0⟩</span>
+                        </div>
+                    </div>
+                    <button class="collapse-btn" onclick="collapseQuantumState()">
+                        🌀 Collapse Wave Function
+                    </button>
+                </div>
+
+                <div class="quantum-viz">
+                    <h3>Quantum Position Builder</h3>
+                    <div class="form-group">
+                        <label class="form-label">Superposition State</label>
+                        <div style="display: flex; gap: 10px; margin: 10px 0;">
+                            <input type="range" class="slider" min="0" max="100" value="50" id="quantum-slider">
+                            <span id="quantum-probability">50% YES | 50% NO</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Entangled Markets</label>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <label><input type="checkbox" checked> Bitcoin > $100k</label>
+                            <label><input type="checkbox" checked> Ethereum > $10k</label>
+                            <label><input type="checkbox"> Gold > $3000</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Observation Trigger</label>
+                        <select class="form-select">
+                            <option>Time-based (1 hour)</option>
+                            <option>Price-based (5% move)</option>
+                            <option>Volume-based (1M traded)</option>
+                            <option>Manual observation</option>
+                        </select>
+                    </div>
+
+                    <button class="submit-order-btn" onclick="createQuantumPosition()">
+                        🌌 Create Quantum Position
+                    </button>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; padding: 20px; background: var(--bg-secondary); border-radius: 15px;">
+                <h3>🔬 Quantum Mechanics in Trading</h3>
+                <p style="color: var(--text-secondary); margin: 15px 0;">
+                    • <strong>Superposition:</strong> Positions exist in multiple states simultaneously<br>
+                    • <strong>Entanglement:</strong> Correlated positions across different markets<br>
+                    • <strong>Observation:</strong> Collapse triggers profit/loss realization<br>
+                    • <strong>Uncertainty:</strong> Higher potential rewards with quantum risk
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 6: VERSE HIERARCHY -->
+        <section id="verses-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">🌳 Verse Hierarchy System</h2>
+                <p class="section-description">
+                    Explore hierarchical market relationships through our verse system. 
+                    Parent verses spawn child markets with correlated outcomes.
+                </p>
+            </div>
+
+            <div class="verse-tree">
+                <div class="verse-node">
+                    <div class="verse-title">🗳️ 2024 US Presidential Election</div>
+                    <div class="verse-stats">
+                        <span>Volume: $45.2M</span>
+                        <span>Markets: 127</span>
+                        <span>Depth: 4 levels</span>
+                    </div>
+                    
+                    <div class="verse-children">
+                        <div class="verse-node">
+                            <div class="verse-title">📊 Electoral College Winner</div>
+                            <div class="verse-stats">
+                                <span>Volume: $12.3M</span>
+                                <span>Markets: 51</span>
+                            </div>
+                            
+                            <div class="verse-children">
+                                <div class="verse-node">
+                                    <div class="verse-title">🏛️ Swing State: Pennsylvania</div>
+                                    <div class="verse-stats">
+                                        <span>Volume: $3.2M</span>
+                                        <span>Correlation: 0.85</span>
+                                    </div>
+                                </div>
+                                <div class="verse-node">
+                                    <div class="verse-title">🏛️ Swing State: Michigan</div>
+                                    <div class="verse-stats">
+                                        <span>Volume: $2.8M</span>
+                                        <span>Correlation: 0.82</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="verse-node">
+                            <div class="verse-title">📈 Popular Vote Margin</div>
+                            <div class="verse-stats">
+                                <span>Volume: $8.7M</span>
+                                <span>Markets: 12</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <button class="action-btn primary" onclick="createVerse()">➕ Create New Verse</button>
+                <button class="action-btn" onclick="exploreVerses()">🔍 Explore All Verses</button>
+                <button class="action-btn" onclick="analyzeCorrelations()">📊 Correlation Matrix</button>
+            </div>
+        </section>
+
+        <!-- SECTION 7: ADVANCED TRADING -->
+        <section id="trading-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">📈 Professional Trading Terminal</h2>
+                <p class="section-description">
+                    Access advanced order types and professional trading tools for sophisticated strategies.
+                </p>
+            </div>
+
+            <div class="trading-terminal">
+                <div class="terminal-header">
+                    <div class="terminal-tabs">
+                        <div class="terminal-tab active" onclick="switchTerminalTab('market')">Market</div>
+                        <div class="terminal-tab" onclick="switchTerminalTab('limit')">Limit</div>
+                        <div class="terminal-tab" onclick="switchTerminalTab('stop')">Stop</div>
+                        <div class="terminal-tab" onclick="switchTerminalTab('iceberg')">Iceberg</div>
+                        <div class="terminal-tab" onclick="switchTerminalTab('twap')">TWAP</div>
+                    </div>
+                    <div style="color: var(--text-secondary);">
+                        BTC > $100k by 2025
+                    </div>
+                </div>
+
+                <div class="order-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Side</label>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="odds-btn yes" style="flex: 1;">YES</button>
+                                <button class="odds-btn no" style="flex: 1;">NO</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Order Type</label>
+                            <select class="form-select">
+                                <option>Market Order</option>
+                                <option>Limit Order</option>
+                                <option>Stop Loss</option>
+                                <option>Take Profit</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Amount (USDC)</label>
+                            <input type="number" class="form-input" value="1000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Price</label>
+                            <input type="number" class="form-input" value="0.65" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Advanced Options</label>
+                        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                            <label><input type="checkbox"> Post-Only Order</label>
+                            <label><input type="checkbox"> Reduce-Only</label>
+                            <label><input type="checkbox"> Hidden (Iceberg)</label>
+                            <label><input type="checkbox"> Time in Force: IOC</label>
+                        </div>
+                    </div>
+
+                    <div style="padding: 15px; background: var(--bg-tertiary); border-radius: 10px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Est. Execution Price:</span>
+                            <span>$0.6502</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Fee (0.1%):</span>
+                            <span>$1.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Total Cost:</span>
+                            <span style="font-weight: bold;">$1,001.00</span>
+                        </div>
+                    </div>
+
+                    <button class="submit-order-btn">Place Order</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 8: LEVERAGE & LIQUIDATION -->
+        <section id="leverage-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">💰 Leverage & Risk Management</h2>
+                <p class="section-description">
+                    Amplify your returns with up to 100x leverage. Our sophisticated liquidation engine ensures platform solvency.
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div style="padding: 30px; background: var(--bg-secondary); border-radius: 15px;">
+                    <h3>Leverage Calculator</h3>
+                    
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label class="form-label">Position Size</label>
+                        <input type="number" class="form-input" value="1000" id="position-size">
+                    </div>
+                    
+                    <div class="leverage-slider">
+                        <div class="leverage-label">
+                            <span>Leverage</span>
+                            <span class="leverage-value" id="calc-leverage">10x</span>
+                        </div>
+                        <input type="range" class="slider" min="1" max="100" value="10" 
+                               oninput="calculateLeverage(this.value)">
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 15px; background: var(--bg-tertiary); border-radius: 10px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Notional Value:</span>
+                            <span id="notional-value">$10,000</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Required Margin:</span>
+                            <span id="required-margin">$100</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Liquidation Price:</span>
+                            <span id="liquidation-price" style="color: var(--danger-color);">$0.45</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding: 30px; background: var(--bg-secondary); border-radius: 15px;">
+                    <h3>Risk Metrics</h3>
+                    
+                    <div class="portfolio-stats" style="margin-top: 20px;">
+                        <div class="stat-card">
+                            <div class="stat-label">Portfolio VaR</div>
+                            <div class="stat-value">$2,450</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Margin Ratio</div>
+                            <div class="stat-value">65%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Exposure</div>
+                            <div class="stat-value">$45.2k</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Health Score</div>
+                            <div class="stat-value" style="color: var(--success-color);">85/100</div>
+                        </div>
+                    </div>
+
+                    <button class="action-btn danger" style="margin-top: 20px; width: 100%;" 
+                            onclick="simulateLiquidation()">
+                        ⚠️ Simulate Liquidation
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 9: MMT TOKEN -->
+        <section id="mmt-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">🪙 MMT Token Economics</h2>
+                <p class="section-description">
+                    The MMT token powers the ecosystem with staking rewards, governance rights, and fee discounts.
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div class="stat-card">
+                    <div class="stat-label">Total Supply</div>
+                    <div class="stat-value">100M MMT</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Circulating Supply</div>
+                    <div class="stat-value">42.5M MMT</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Staked</div>
+                    <div class="stat-value">28.3M MMT</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">APY</div>
+                    <div class="stat-value" style="color: var(--success-color);">42.5%</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div style="padding: 30px; background: var(--bg-secondary); border-radius: 15px;">
+                    <h3>Stake MMT</h3>
+                    
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label class="form-label">Amount to Stake</label>
+                        <input type="number" class="form-input" value="1000" placeholder="MMT Amount">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Lock Period</label>
+                        <select class="form-select">
+                            <option>No Lock (20% APY)</option>
+                            <option>30 Days (35% APY)</option>
+                            <option>90 Days (45% APY)</option>
+                            <option>1 Year (60% APY)</option>
+                        </select>
+                    </div>
+
+                    <div style="padding: 15px; background: var(--bg-tertiary); border-radius: 10px; margin: 20px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Daily Rewards:</span>
+                            <span>1.23 MMT</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Annual Rewards:</span>
+                            <span style="font-weight: bold; color: var(--success-color);">450 MMT</span>
+                        </div>
+                    </div>
+
+                    <button class="submit-order-btn">Stake MMT</button>
+                </div>
+
+                <div style="padding: 30px; background: var(--bg-secondary); border-radius: 15px;">
+                    <h3>Token Utilities</h3>
+                    
+                    <div style="margin-top: 20px;">
+                        <div style="padding: 15px; margin-bottom: 10px; background: var(--bg-tertiary); border-radius: 10px;">
+                            <strong>🎯 Fee Discounts</strong><br>
+                            <span style="color: var(--text-secondary);">Up to 50% trading fee reduction</span>
+                        </div>
+                        
+                        <div style="padding: 15px; margin-bottom: 10px; background: var(--bg-tertiary); border-radius: 10px;">
+                            <strong>🗳️ Governance</strong><br>
+                            <span style="color: var(--text-secondary);">Vote on protocol upgrades</span>
+                        </div>
+                        
+                        <div style="padding: 15px; margin-bottom: 10px; background: var(--bg-tertiary); border-radius: 10px;">
+                            <strong>💎 Maker Rewards</strong><br>
+                            <span style="color: var(--text-secondary);">Earn extra rewards as liquidity provider</span>
+                        </div>
+                        
+                        <div style="padding: 15px; background: var(--bg-tertiary); border-radius: 10px;">
+                            <strong>🎁 Airdrops</strong><br>
+                            <span style="color: var(--text-secondary);">Exclusive access to new features</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 10: DEFI INTEGRATION -->
+        <section id="defi-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">🏦 DeFi Integration</h2>
+                <p class="section-description">
+                    Maximize capital efficiency with integrated DeFi features including CDPs, flash loans, and yield farming.
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="padding: 25px; background: var(--bg-secondary); border-radius: 15px;">
+                    <h3>💧 Liquidity Pools</h3>
+                    <p style="color: var(--text-secondary); margin: 15px 0;">
+                        Provide liquidity and earn fees + MMT rewards
+                    </p>
+                    
+                    <div style="padding: 15px; background: var(--bg-tertiary); border-radius: 10px; margin: 15px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>USDC-MMT Pool</span>
+                            <span style="color: var(--success-color);">124% APR</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>TVL: $4.2M</span>
+                            <span>Your Share: 0%</span>
+                        </div>
+                    </div>
+                    
+                    <button class="action-btn primary" style="width: 100%;">Add Liquidity</button>
+                </div>
+
+                <div style="padding: 25px; background: var(--bg-secondary); border-radius: 15px;">
+                    <h3>🏦 Position CDPs</h3>
+                    <p style="color: var(--text-secondary); margin: 15px 0;">
+                        Borrow against your winning positions
+                    </p>
+                    
+                    <div style="padding: 15px; background: var(--bg-tertiary); border-radius: 10px; margin: 15px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Collateral Value</span>
+                            <span>$10,000</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Max Borrow (60%)</span>
+                            <span>$6,000</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Interest Rate</span>
+                            <span>8.5% APR</span>
+                        </div>
+                    </div>
+                    
+                    <button class="action-btn primary" style="width: 100%;">Open CDP</button>
+                </div>
+
+                <div style="padding: 25px; background: var(--bg-secondary); border-radius: 15px;">
+                    <h3>⚡ Flash Loans</h3>
+                    <p style="color: var(--text-secondary); margin: 15px 0;">
+                        Borrow without collateral for arbitrage
+                    </p>
+                    
+                    <div style="padding: 15px; background: var(--bg-tertiary); border-radius: 10px; margin: 15px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span>Available</span>
+                            <span>$2.5M USDC</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Fee</span>
+                            <span>0.09%</span>
+                        </div>
+                    </div>
+                    
+                    <button class="action-btn primary" style="width: 100%;">Execute Flash Loan</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 11: PORTFOLIO -->
+        <section id="portfolio-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">💼 Portfolio Management</h2>
+                <p class="section-description">
+                    Track your positions, P&L, and overall portfolio performance in real-time.
+                </p>
+            </div>
+
+            <div class="portfolio-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Portfolio Value</div>
+                    <div class="stat-value">$124,567</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Today's P&L</div>
+                    <div class="stat-value pnl-positive">+$3,456</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Win Rate</div>
+                    <div class="stat-value">67.8%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Sharpe Ratio</div>
+                    <div class="stat-value">2.34</div>
+                </div>
+            </div>
+
+            <table class="positions-table">
+                <thead>
+                    <tr>
+                        <th>Market</th>
+                        <th>Side</th>
+                        <th>Size</th>
+                        <th>Entry</th>
+                        <th>Current</th>
+                        <th>P&L</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>BTC > $100k by 2025</td>
+                        <td><span style="color: var(--success-color);">YES</span></td>
+                        <td>$5,000</td>
+                        <td>$0.45</td>
+                        <td>$0.65</td>
+                        <td class="pnl-positive">+$2,222</td>
+                        <td>
+                            <button class="action-btn" style="padding: 5px 10px;">Close</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>ETH > $10k by 2024</td>
+                        <td><span style="color: var(--danger-color);">NO</span></td>
+                        <td>$3,000</td>
+                        <td>$0.70</td>
+                        <td>$0.75</td>
+                        <td class="pnl-negative">-$214</td>
+                        <td>
+                            <button class="action-btn" style="padding: 5px 10px;">Close</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>⚡ Goal in 30s</td>
+                        <td><span style="color: var(--success-color);">YES</span></td>
+                        <td>$1,000</td>
+                        <td>$0.60</td>
+                        <td>$0.85</td>
+                        <td class="pnl-positive">+$416</td>
+                        <td>
+                            <button class="action-btn" style="padding: 5px 10px;">Close</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="chart-container">
+                <canvas id="portfolio-chart"></canvas>
+            </div>
+        </section>
+
+        <!-- SECTION 12: ANALYTICS -->
+        <section id="analytics-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">📊 Advanced Analytics</h2>
+                <p class="section-description">
+                    Comprehensive analytics to track performance and optimize your trading strategies.
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div class="chart-container">
+                    <h3>P&L Over Time</h3>
+                    <canvas id="pnl-chart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>Win Rate by Market Type</h3>
+                    <canvas id="winrate-chart"></canvas>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; padding: 30px; background: var(--bg-secondary); border-radius: 15px;">
+                <h3>Performance Metrics</h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+                    <div>
+                        <div style="color: var(--text-secondary); font-size: 14px;">Total Trades</div>
+                        <div style="font-size: 24px; font-weight: bold;">1,234</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-secondary); font-size: 14px;">Avg Daily Return</div>
+                        <div style="font-size: 24px; font-weight: bold; color: var(--success-color);">+2.4%</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-secondary); font-size: 14px;">Max Drawdown</div>
+                        <div style="font-size: 24px; font-weight: bold; color: var(--danger-color);">-12.3%</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-secondary); font-size: 14px;">Profit Factor</div>
+                        <div style="font-size: 24px; font-weight: bold;">1.82</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="action-btn">📥 Export CSV</button>
+                    <button class="action-btn">📊 Generate Report</button>
+                    <button class="action-btn">🎯 Tax Report</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 13: API -->
+        <section id="api-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">🔌 API Integration</h2>
+                <p class="section-description">
+                    Build trading bots and integrate with our comprehensive REST and WebSocket APIs.
+                </p>
+            </div>
+
+            <div style="padding: 30px; background: var(--bg-secondary); border-radius: 15px;">
+                <h3>API Endpoints</h3>
+                
+                <div style="margin-top: 20px;">
+                    <div style="padding: 15px; margin-bottom: 15px; background: var(--bg-tertiary); border-radius: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="background: var(--success-color); padding: 2px 8px; border-radius: 4px; font-size: 12px;">GET</span>
+                                <span style="margin-left: 10px; font-family: monospace;">/api/markets</span>
+                            </div>
+                            <button class="action-btn" style="padding: 5px 10px;" onclick="testAPI('markets')">Test</button>
+                        </div>
+                        <div style="color: var(--text-secondary); margin-top: 5px; font-size: 14px;">
+                            Get all active markets
+                        </div>
+                    </div>
+                    
+                    <div style="padding: 15px; margin-bottom: 15px; background: var(--bg-tertiary); border-radius: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="background: var(--warning-color); padding: 2px 8px; border-radius: 4px; font-size: 12px;">POST</span>
+                                <span style="margin-left: 10px; font-family: monospace;">/api/trade/place</span>
+                            </div>
+                            <button class="action-btn" style="padding: 5px 10px;" onclick="testAPI('trade')">Test</button>
+                        </div>
+                        <div style="color: var(--text-secondary); margin-top: 5px; font-size: 14px;">
+                            Place a new trade
+                        </div>
+                    </div>
+                    
+                    <div style="padding: 15px; background: var(--bg-tertiary); border-radius: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="background: var(--primary-color); padding: 2px 8px; border-radius: 4px; font-size: 12px;">WS</span>
+                                <span style="margin-left: 10px; font-family: monospace;">/ws/v3</span>
+                            </div>
+                            <button class="action-btn" style="padding: 5px 10px;" onclick="connectWebSocket()">Connect</button>
+                        </div>
+                        <div style="color: var(--text-secondary); margin-top: 5px; font-size: 14px;">
+                            Real-time market data stream
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h3>Example Request</h3>
+                    <pre style="padding: 15px; background: var(--bg-primary); border-radius: 10px; overflow-x: auto;">
+<code style="color: var(--primary-color);">curl -X POST https://api.multiverse.betting/api/trade/place \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "market_id": "btc-100k-2025",
+    "side": "yes",
+    "amount": 1000,
+    "leverage": 10
+  }'</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 14: SECURITY -->
+        <section id="security-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">🔐 Security Features</h2>
+                <p class="section-description">
+                    Military-grade security protecting your assets with multiple layers of protection.
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="padding: 25px; background: var(--bg-secondary); border-radius: 15px;">
+                    <h3>🔑 Two-Factor Authentication</h3>
+                    <p style="color: var(--text-secondary); margin: 15px 0;">
+                        Secure your account with 2FA
+                    </p>
+                    <button class="action-btn success" style="width: 100%;">Enable 2FA</button>
+                </div>
+
+                <div style="padding: 25px; background: var(--bg-secondary); border-radius: 15px;">
+                    <h3>🛡️ Insurance Fund</h3>
+                    <p style="color: var(--text-secondary); margin: 15px 0;">
+                        $10M insurance fund protecting users
+                    </p>
+                    <div style="font-size: 24px; font-weight: bold; color: var(--success-color);">$10,234,567</div>
+                </div>
+
+                <div style="padding: 25px; background: var(--bg-secondary); border-radius: 15px;">
+                    <h3>📝 Audit Trail</h3>
+                    <p style="color: var(--text-secondary); margin: 15px 0;">
+                        Complete history of all actions
+                    </p>
+                    <button class="action-btn" style="width: 100%;">View Audit Log</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; padding: 30px; background: var(--bg-secondary); border-radius: 15px;">
+                <h3>Security Score: <span style="color: var(--success-color);">95/100</span></h3>
+                
+                <div style="margin-top: 20px;">
+                    <div style="margin-bottom: 15px;">
+                        ✅ Smart Contract Audited by CertiK<br>
+                        ✅ Bug Bounty Program ($500k Max Reward)<br>
+                        ✅ Multi-Sig Treasury<br>
+                        ✅ Rate Limiting & DDoS Protection<br>
+                        ✅ Cold Storage for 95% of Funds
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 15: GRAND FINALE -->
+        <section id="finale-section" class="demo-section">
+            <div class="section-header">
+                <h2 class="section-title">🎯 Complete Trading Journey</h2>
+                <p class="section-description">
+                    Watch a complete trading journey from market creation to profit realization, 
+                    showcasing all platform features in one seamless flow.
+                </p>
+            </div>
+
+            <div id="finale-steps" style="margin-top: 30px;">
+                <!-- Steps will be dynamically added here -->
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <button class="submit-order-btn" style="font-size: 20px; padding: 20px 40px;" 
+                        onclick="startGrandFinale()">
+                    🚀 Start Grand Finale Demo
+                </button>
+            </div>
+
+            <div style="margin-top: 40px; padding: 30px; background: var(--bg-secondary); border-radius: 15px;">
+                <h3>🎊 Congratulations!</h3>
+                <p style="color: var(--text-secondary); margin: 15px 0;">
+                    You've experienced the full power of the Multiverse Betting Platform. 
+                    From traditional prediction markets to quantum positions and flash betting, 
+                    you're now ready to trade across multiple dimensions of probability.
+                </p>
+                
+                <div style="margin-top: 20px;">
+                    <button class="action-btn primary">🎯 Start Trading Now</button>
+                    <button class="action-btn">📧 Contact Sales</button>
+                    <button class="action-btn">🎓 Learn More</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- DEMO SCRIPT -->
+    <script>
+        // ==================== INITIALIZATION ====================
+        let currentSection = 'intro';
+        let walletConnected = false;
+        let demoMode = false;
+        let wsConnection = null;
+        
+        // Demo data
+        let userBalance = 10000;
+        let positions = [];
+        let activeMarkets = 0;
+        let flashMarkets = 0;
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeDemo();
+            startAnimations();
+            loadMarkets();
+        });
+
+        function initializeDemo() {
+            // Start metric animations
+            animateValue('totalVolume', 0, 142567890, 3000, true);
+            animateValue('activeMarkets', 0, 1234, 2000);
+            animateValue('flashMarkets', 0, 89, 1500);
+            animateValue('usersOnline', 0, 5678, 2500);
+            
+            // Initialize charts
+            setTimeout(() => {
+                initializeCharts();
+            }, 1000);
+        }
+
+        // ==================== SECTION NAVIGATION ====================
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.demo-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            const section = document.getElementById(sectionName + '-section');
+            if (section) {
+                section.classList.add('active');
+            }
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentSection = sectionName;
+            
+            // Section-specific initialization
+            if (sectionName === 'flash') {
+                startFlashTimer();
+            } else if (sectionName === 'quantum') {
+                animateQuantumParticles();
+            }
+        }
+
+        // ==================== WALLET CONNECTION ====================
+        async function connectMetaMask() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ 
+                        method: 'eth_requestAccounts' 
+                    });
+                    
+                    if (accounts.length > 0) {
+                        const address = accounts[0];
+                        document.getElementById('metamask-address').textContent = 
+                            address.substring(0, 6) + '...' + address.substring(38);
+                        document.getElementById('metamask-status').classList.add('connected');
+                        
+                        // Get balance
+                        const balance = await window.ethereum.request({
+                            method: 'eth_getBalance',
+                            params: [address, 'latest']
+                        });
+                        
+                        const ethBalance = parseInt(balance, 16) / 1e18;
+                        document.getElementById('metamask-balance').textContent = 
+                            ethBalance.toFixed(4) + ' MATIC';
+                        
+                        showNotification('MetaMask connected successfully!', 'success');
+                        walletConnected = true;
+                    }
+                } catch (error) {
+                    showNotification('Failed to connect MetaMask', 'error');
+                }
+            } else {
+                showNotification('Please install MetaMask', 'error');
+            }
+        }
+
+        async function connectPhantom() {
+            if (window.solana && window.solana.isPhantom) {
+                try {
+                    const response = await window.solana.connect();
+                    const address = response.publicKey.toString();
+                    
+                    document.getElementById('phantom-address').textContent = 
+                        address.substring(0, 6) + '...' + address.substring(38);
+                    document.getElementById('phantom-status').classList.add('connected');
+                    
+                    // Mock balance for demo
+                    document.getElementById('phantom-balance').textContent = '42.5 SOL';
+                    
+                    showNotification('Phantom connected successfully!', 'success');
+                    walletConnected = true;
+                } catch (error) {
+                    showNotification('Failed to connect Phantom', 'error');
+                }
+            } else {
+                showNotification('Please install Phantom wallet', 'error');
+            }
+        }
+
+        function enableDemoMode() {
+            demoMode = true;
+            walletConnected = true;
+            
+            // Set demo values
+            document.getElementById('metamask-address').textContent = 'Demo Account';
+            document.getElementById('metamask-status').classList.add('connected');
+            document.getElementById('metamask-balance').textContent = '10,000 USDC';
+            
+            showNotification('Demo mode enabled with $10,000 virtual funds!', 'success');
+        }
+
+        // ==================== MARKET LOADING ====================
+        async function loadMarkets() {
+            try {
+                // Fetch from API or use demo data
+                const markets = await fetchMarkets();
+                displayMarkets(markets);
+            } catch (error) {
+                // Use demo data if API fails
+                displayDemoMarkets();
+            }
+        }
+
+        async function fetchMarkets() {
+            const response = await fetch('http://localhost:3000/api/markets');
+            return await response.json();
+        }
+
+        function displayDemoMarkets() {
+            const demoMarkets = [
+                {
+                    title: "Will Bitcoin reach $100k by 2025?",
+                    yesPrice: 0.65,
+                    noPrice: 0.35,
+                    volume: 4567890,
+                    liquidity: 1234567
+                },
+                {
+                    title: "Will Ethereum flip Bitcoin by 2026?",
+                    yesPrice: 0.23,
+                    noPrice: 0.77,
+                    volume: 2345678,
+                    liquidity: 987654
+                },
+                {
+                    title: "Will AI achieve AGI before 2030?",
+                    yesPrice: 0.42,
+                    noPrice: 0.58,
+                    volume: 8901234,
+                    liquidity: 3456789
+                }
+            ];
+            
+            const grid = document.getElementById('polymarket-grid');
+            grid.innerHTML = '';
+            
+            demoMarkets.forEach(market => {
+                const card = createMarketCard(market);
+                grid.appendChild(card);
+            });
+        }
+
+        function createMarketCard(market) {
+            const card = document.createElement('div');
+            card.className = 'market-card';
+            card.innerHTML = `
+                <div class="market-title">${market.title}</div>
+                <div class="market-odds">
+                    <button class="odds-btn yes" onclick="placeBet('${market.title}', 'yes')">
+                        YES<br><span style="font-size: 20px;">${(market.yesPrice * 100).toFixed(0)}%</span>
+                    </button>
+                    <button class="odds-btn no" onclick="placeBet('${market.title}', 'no')">
+                        NO<br><span style="font-size: 20px;">${(market.noPrice * 100).toFixed(0)}%</span>
+                    </button>
+                </div>
+                <div class="market-volume">
+                    <span>Volume: $${formatNumber(market.volume)}</span>
+                    <span>Liquidity: $${formatNumber(market.liquidity)}</span>
+                </div>
+            `;
+            return card;
+        }
+
+        function searchMarkets(query) {
+            // Filter markets based on search query
+            console.log('Searching for:', query);
+        }
+
+        // ==================== FLASH BETTING ====================
+        let flashTimers = {};
+        
+        function startFlashTimer() {
+            let timeLeft = 30;
+            const timerId = setInterval(() => {
+                timeLeft--;
+                document.getElementById('flash-timer-1').textContent = timeLeft + 's';
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    resolveFlashMarket();
+                }
+            }, 1000);
+            
+            flashTimers['flash-1'] = timerId;
+        }
+
+        function updateLeverage(id, value) {
+            document.getElementById('leverage-' + id).textContent = value + 'x';
+        }
+
+        function placeFlashBet(marketId) {
+            if (!walletConnected && !demoMode) {
+                showNotification('Please connect wallet first', 'error');
+                return;
+            }
+            
+            const amount = document.getElementById('bet-amount-' + marketId).value;
+            const leverage = document.getElementById('leverage-' + marketId).textContent;
+            
+            showNotification(`Flash bet placed: $${amount} at ${leverage} leverage!`, 'success');
+            
+            // Add to positions
+            positions.push({
+                type: 'flash',
+                market: 'Goal in 30s',
+                amount: amount,
+                leverage: leverage,
+                status: 'active'
+            });
+            
+            updatePortfolio();
+        }
+
+        function placeChainedBet() {
+            if (!walletConnected && !demoMode) {
+                showNotification('Please connect wallet first', 'error');
+                return;
+            }
+            
+            showNotification('Chained bet placed with 500x effective leverage!', 'success');
+            
+            // Animate the chaining effect
+            animateChainEffect();
+        }
+
+        function resolveFlashMarket() {
+            const won = Math.random() > 0.5;
+            if (won) {
+                showNotification('🎉 Flash bet WON! +$500 profit!', 'success');
+                userBalance += 500;
+                showConfetti();
+            } else {
+                showNotification('Flash bet lost', 'error');
+            }
+            updatePortfolio();
+        }
+
+        // ==================== QUANTUM FEATURES ====================
+        function animateQuantumParticles() {
+            const particles = document.querySelectorAll('.quantum-particle');
+            particles.forEach((particle, index) => {
+                particle.style.left = Math.random() * 80 + 10 + '%';
+                particle.style.top = Math.random() * 80 + 10 + '%';
+                particle.style.animationDelay = index * 0.5 + 's';
+            });
+        }
+
+        function collapseQuantumState() {
+            const result = Math.random() > 0.5 ? 'YES' : 'NO';
+            
+            // Animate collapse
+            const stateBoxes = document.querySelectorAll('.state-box');
+            stateBoxes.forEach(box => {
+                if (box.id === 'state-' + result.toLowerCase()) {
+                    box.style.border = '2px solid var(--success-color)';
+                    box.style.transform = 'scale(1.2)';
+                } else {
+                    box.style.opacity = '0.3';
+                }
+            });
+            
+            showNotification(`Quantum state collapsed to ${result}!`, 'success');
+        }
+
+        function createQuantumPosition() {
+            if (!walletConnected && !demoMode) {
+                showNotification('Please connect wallet first', 'error');
+                return;
+            }
+            
+            showNotification('Quantum position created in superposition!', 'success');
+            
+            positions.push({
+                type: 'quantum',
+                market: 'BTC/ETH Entangled',
+                amount: 1000,
+                state: 'superposition',
+                status: 'active'
+            });
+            
+            updatePortfolio();
+        }
+
+        // ==================== TRADING FUNCTIONS ====================
+        function placeBet(market, side) {
+            if (!walletConnected && !demoMode) {
+                showNotification('Please connect wallet first', 'error');
+                return;
+            }
+            
+            // Simple bet placement
+            showNotification(`Bet placed: ${side.toUpperCase()} on ${market}`, 'success');
+            
+            positions.push({
+                type: 'standard',
+                market: market,
+                side: side,
+                amount: 100,
+                status: 'active'
+            });
+            
+            updatePortfolio();
+        }
+
+        function calculateLeverage(value) {
+            document.getElementById('calc-leverage').textContent = value + 'x';
+            
+            const positionSize = document.getElementById('position-size').value || 1000;
+            const notional = positionSize * value;
+            const margin = positionSize / value;
+            const liquidationPrice = 0.65 - (0.2 / value);
+            
+            document.getElementById('notional-value').textContent = '$' + formatNumber(notional);
+            document.getElementById('required-margin').textContent = '$' + formatNumber(margin);
+            document.getElementById('liquidation-price').textContent = '$' + liquidationPrice.toFixed(3);
+        }
+
+        function simulateLiquidation() {
+            showNotification('⚠️ Liquidation triggered! Position closed at loss', 'error');
+            
+            // Animate liquidation
+            document.querySelector('#leverage-section').style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                document.querySelector('#leverage-section').style.animation = '';
+            }, 500);
+        }
+
+        // ==================== PORTFOLIO MANAGEMENT ====================
+        function updatePortfolio() {
+            // Update portfolio stats
+            const totalValue = userBalance + positions.reduce((sum, pos) => sum + parseFloat(pos.amount), 0);
+            document.querySelector('#portfolio-section .stat-value').textContent = '$' + formatNumber(totalValue);
+            
+            // Update position count
+            const openPositions = positions.filter(p => p.status === 'active').length;
+            document.getElementById('openPositionsCount').textContent = openPositions;
+        }
+
+        // ==================== CHARTS ====================
+        function initializeCharts() {
+            // Portfolio chart
+            const portfolioCtx = document.getElementById('portfolio-chart');
+            if (portfolioCtx) {
+                new Chart(portfolioCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Portfolio Value',
+                            data: [10000, 12000, 11000, 14000, 13500, 16000],
+                            borderColor: 'rgba(0, 212, 255, 1)',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // P&L chart
+            const pnlCtx = document.getElementById('pnl-chart');
+            if (pnlCtx) {
+                new Chart(pnlCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Daily P&L',
+                            data: [500, -200, 800, 1200, -100, 600, 900],
+                            backgroundColor: (context) => {
+                                const value = context.raw;
+                                return value >= 0 ? 'rgba(0, 255, 136, 0.5)' : 'rgba(255, 0, 68, 0.5)';
+                            }
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // ==================== GRAND FINALE ====================
+        async function startGrandFinale() {
+            const steps = [
+                { title: "Creating Flash Market", duration: 2000 },
+                { title: "Opening Leveraged Position", duration: 2000 },
+                { title: "Chaining with Polymarket", duration: 2000 },
+                { title: "Creating Quantum Position", duration: 2000 },
+                { title: "Market Resolving...", duration: 3000 },
+                { title: "Claiming Winnings", duration: 2000 },
+                { title: "Staking Rewards", duration: 2000 },
+                { title: "Complete! 🎉", duration: 1000 }
+            ];
+            
+            const container = document.getElementById('finale-steps');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < steps.length; i++) {
+                const step = steps[i];
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'stat-card';
+                stepDiv.style.opacity = '0.3';
+                stepDiv.innerHTML = `
+                    <div class="stat-label">Step ${i + 1}</div>
+                    <div class="stat-value">${step.title}</div>
+                `;
+                container.appendChild(stepDiv);
+                
+                await sleep(step.duration);
+                stepDiv.style.opacity = '1';
+                stepDiv.style.border = '2px solid var(--success-color)';
+                
+                if (i === steps.length - 1) {
+                    showConfetti();
+                    showNotification('Grand Finale Complete! You earned $2,500!', 'success');
+                }
+            }
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function showNotification(message, type = 'info') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: type === 'success' ? 'var(--success-color)' : 
+                               type === 'error' ? 'var(--danger-color)' : 'var(--primary-color)',
+            }).showToast();
+        }
+
+        function animateValue(id, start, end, duration, currency = false) {
+            const element = document.getElementById(id);
+            const range = end - start;
+            const increment = range / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                
+                if (currency) {
+                    element.textContent = '$' + formatNumber(Math.floor(current));
+                } else {
+                    element.textContent = Math.floor(current).toLocaleString();
+                }
+            }, 16);
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'k';
+            }
+            return num.toLocaleString();
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function showConfetti() {
+            // Create confetti effect
+            const confettiCount = 100;
+            const container = document.body;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '-10px';
+                confetti.style.zIndex = '10000';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                
+                container.appendChild(confetti);
+                
+                // Animate falling
+                confetti.animate([
+                    { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+                    { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], {
+                    duration: 3000 + Math.random() * 2000,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                }).onfinish = () => confetti.remove();
+            }
+        }
+
+        function animateChainEffect() {
+            // Create visual chain effect
+            const container = document.querySelector('.flash-container');
+            const chain = document.createElement('div');
+            chain.style.position = 'absolute';
+            chain.style.width = '100%';
+            chain.style.height = '2px';
+            chain.style.background = 'linear-gradient(90deg, transparent, var(--warning-color), transparent)';
+            chain.style.top = '50%';
+            chain.style.left = '0';
+            chain.style.animation = 'slide 1s ease';
+            
+            container.appendChild(chain);
+            setTimeout(() => chain.remove(), 1000);
+        }
+
+        function startAnimations() {
+            // Add ambient animations
+            setInterval(() => {
+                if (currentSection === 'quantum') {
+                    animateQuantumParticles();
+                }
+            }, 5000);
+        }
+
+        // ==================== API TESTING ====================
+        async function testAPI(endpoint) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/${endpoint}`);
+                const data = await response.json();
+                console.log('API Response:', data);
+                showNotification(`API call successful! Check console for data.`, 'success');
+            } catch (error) {
+                showNotification(`API call failed: ${error.message}`, 'error');
+            }
+        }
+
+        function connectWebSocket() {
+            if (wsConnection) {
+                wsConnection.close();
+            }
+            
+            wsConnection = new WebSocket('ws://localhost:3000/ws/v3');
+            
+            wsConnection.onopen = () => {
+                showNotification('WebSocket connected!', 'success');
+                wsConnection.send(JSON.stringify({
+                    type: 'subscribe',
+                    channels: ['prices', 'trades', 'orderbook']
+                }));
+            };
+            
+            wsConnection.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('WebSocket message:', data);
+                // Update UI with real-time data
+            };
+            
+            wsConnection.onerror = (error) => {
+                showNotification('WebSocket error', 'error');
+            };
+        }
+
+        // ==================== DEMO ACTIONS ====================
+        function startDemo() {
+            showSection('wallet');
+            showNotification('Welcome to the Interactive Demo! Let\'s start by connecting your wallet.', 'info');
+        }
+
+        function playVideo() {
+            window.open('https://youtube.com/watch?v=demo', '_blank');
+        }
+
+        function viewDocs() {
+            window.open('https://docs.multiverse.betting', '_blank');
+        }
+
+        function createVerse() {
+            showNotification('New verse created: "Super Bowl 2025"', 'success');
+        }
+
+        function exploreVerses() {
+            showNotification('Opening verse explorer...', 'info');
+        }
+
+        function analyzeCorrelations() {
+            showNotification('Generating correlation matrix...', 'info');
+        }
+
+        function switchTerminalTab(tab) {
+            document.querySelectorAll('.terminal-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            showNotification(`Switched to ${tab} orders`, 'info');
+        }
+
+        function betFlash(side, marketId) {
+            // Highlight selected side
+            showNotification(`Selected ${side.toUpperCase()} for flash market`, 'info');
+        }
+
+        // Initialize quantum slider
+        document.addEventListener('DOMContentLoaded', () => {
+            const slider = document.getElementById('quantum-slider');
+            if (slider) {
+                slider.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    document.getElementById('quantum-probability').textContent = 
+                        `${value}% YES | ${100-value}% NO`;
+                });
+            }
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1': showSection('intro'); break;
+                    case '2': showSection('wallet'); break;
+                    case '3': showSection('polymarket'); break;
+                    case '4': showSection('flash'); break;
+                    case '5': showSection('quantum'); break;
+                }
+            }
+        });
+
+        // Add CSS animation for shake effect
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            
+            @keyframes slide {
+                from { transform: translateX(-100%); }
+                to { transform: translateX(100%); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

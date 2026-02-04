@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Betting Platform - Complete UI Preview</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    
+    <style>
+        body {
+            padding: var(--spacing-xl);
+        }
+        
+        .preview-header {
+            text-align: center;
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-3xl);
+        }
+        
+        .preview-card {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            text-align: center;
+            transition: all var(--transition-base);
+        }
+        
+        .preview-card:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .preview-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .preview-card h3 {
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .preview-card p {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .features-list {
+            text-align: left;
+            margin: var(--spacing-xl) 0;
+        }
+        
+        .features-list h2 {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .feature-item {
+            padding: var(--spacing-md);
+            background-color: var(--color-bg-secondary);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .feature-item .icon {
+            font-size: 1.5rem;
+        }
+        
+        .status {
+            margin-left: auto;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status.complete {
+            background-color: var(--color-success-bg);
+            color: var(--color-success);
+        }
+        
+        .status.partial {
+            background-color: var(--color-warning-bg);
+            color: var(--color-warning);
+        }
+        
+        .technical-specs {
+            background-color: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-top: var(--spacing-3xl);
+        }
+        
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .spec-item {
+            text-align: center;
+        }
+        
+        .spec-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .spec-label {
+            color: var(--color-text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="preview-header">
+            <h1>Quantum Betting Platform</h1>
+            <p class="hero-subtitle">Complete UI Implementation Preview</p>
+        </div>
+
+        <div class="preview-grid">
+            <a href="index.html" class="preview-card">
+                <div class="preview-icon">🏠</div>
+                <h3>Landing Page</h3>
+                <p>Professional landing page with features, technology stack, and call-to-action</p>
+                <button class="btn btn-primary">View Page</button>
+            </a>
+
+            <a href="app/dashboard.html" class="preview-card">
+                <div class="preview-icon">📊</div>
+                <h3>Dashboard</h3>
+                <p>Main user dashboard with portfolio overview, trending markets, and quick actions</p>
+                <button class="btn btn-primary">View Page</button>
+            </a>
+
+            <a href="app/create-market.html" class="preview-card">
+                <div class="preview-icon">➕</div>
+                <h3>Create Market</h3>
+                <p>5-step wizard to create markets with verse selection and AMM configuration</p>
+                <button class="btn btn-primary">View Page</button>
+            </a>
+
+            <a href="app/verses.html" class="preview-card">
+                <div class="preview-icon">🌳</div>
+                <h3>Verse Management</h3>
+                <p>Create and manage 32-level verse hierarchies with tree visualization</p>
+                <button class="btn btn-primary">View Page</button>
+            </a>
+
+            <a href="app/markets.html" class="preview-card">
+                <div class="preview-icon">💹</div>
+                <h3>Markets</h3>
+                <p>Browse all markets with filters, categories, and quantum features</p>
+                <button class="btn btn-primary">View Page</button>
+            </a>
+
+            <a href="app/trading.html" class="preview-card">
+                <div class="preview-icon">📈</div>
+                <h3>Trading Terminal</h3>
+                <p>Professional trading interface with order book, charts, and advanced orders</p>
+                <button class="btn btn-primary">View Page</button>
+            </a>
+
+            <a href="app/portfolio.html" class="preview-card">
+                <div class="preview-icon">💼</div>
+                <h3>Portfolio</h3>
+                <p>Manage positions, view P&L, and analyze performance</p>
+                <button class="btn btn-primary">View Page</button>
+            </a>
+
+            <a href="app/defi.html" class="preview-card">
+                <div class="preview-icon">🏦</div>
+                <h3>DeFi Hub</h3>
+                <p>Stake MMT, provide liquidity, access flash loans</p>
+                <button class="btn btn-primary">View Page</button>
+            </a>
+        </div>
+
+        <div class="features-list">
+            <h2>Complete Feature Implementation</h2>
+            
+            <div class="feature-item">
+                <span class="icon">✓</span>
+                <div>
+                    <strong>Market Creation Wizard</strong>
+                    <p>5-step process with verse selection, AMM type selection, and parameter configuration</p>
+                </div>
+                <span class="status complete">Complete</span>
+            </div>
+
+            <div class="feature-item">
+                <span class="icon">✓</span>
+                <div>
+                    <strong>Verse Hierarchy System</strong>
+                    <p>32-level verse creation and management with tree visualization</p>
+                </div>
+                <span class="status complete">Complete</span>
+            </div>
+
+            <div class="feature-item">
+                <span class="icon">✓</span>
+                <div>
+                    <strong>Professional Design System</strong>
+                    <p>Dark mode with professional colors, comprehensive CSS components</p>
+                </div>
+                <span class="status complete">Complete</span>
+            </div>
+
+            <div class="feature-item">
+                <span class="icon">✓</span>
+                <div>
+                    <strong>Responsive Layout</strong>
+                    <p>Mobile-first design with breakpoints for all devices</p>
+                </div>
+                <span class="status complete">Complete</span>
+            </div>
+
+            <div class="feature-item">
+                <span class="icon">✓</span>
+                <div>
+                    <strong>Markets Browsing Page</strong>
+                    <p>Full market listing with filters, categories, and search functionality</p>
+                </div>
+                <span class="status complete">Complete</span>
+            </div>
+
+            <div class="feature-item">
+                <span class="icon">✓</span>
+                <div>
+                    <strong>Professional Trading Terminal</strong>
+                    <p>Order book, real-time charts, advanced order types, and position management</p>
+                </div>
+                <span class="status complete">Complete</span>
+            </div>
+
+            <div class="feature-item">
+                <span class="icon">✓</span>
+                <div>
+                    <strong>Portfolio Management</strong>
+                    <p>Track positions, P&L, performance analytics, and risk management</p>
+                </div>
+                <span class="status complete">Complete</span>
+            </div>
+
+            <div class="feature-item">
+                <span class="icon">✓</span>
+                <div>
+                    <strong>DeFi Hub</strong>
+                    <p>MMT staking, liquidity pools, flash loans, and yield farming</p>
+                </div>
+                <span class="status complete">Complete</span>
+            </div>
+
+            <div class="feature-item">
+                <span class="icon">⚡</span>
+                <div>
+                    <strong>Real-time Updates</strong>
+                    <p>Price updates, notifications, and live data feeds</p>
+                </div>
+                <span class="status partial">Simulated</span>
+            </div>
+
+            <div class="feature-item">
+                <span class="icon">⚛️</span>
+                <div>
+                    <strong>Quantum Features</strong>
+                    <p>Superposition, entanglement, and tunneling mechanics</p>
+                </div>
+                <span class="status partial">UI Ready</span>
+            </div>
+        </div>
+
+        <div class="technical-specs">
+            <h2>Technical Specifications</h2>
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <div class="spec-value">92</div>
+                    <div class="spec-label">Smart Contracts</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-value">5,250</div>
+                    <div class="spec-label">TPS Capacity</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-value">32</div>
+                    <div class="spec-label">Verse Levels</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-value">100x</div>
+                    <div class="spec-label">Max Leverage</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-value">3</div>
+                    <div class="spec-label">AMM Types</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-value">18.7%</div>
+                    <div class="spec-label">MMT APY</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: var(--spacing-3xl);">
+            <h3>Key Features Demonstrated</h3>
+            <ul style="text-align: left; max-width: 600px; margin: var(--spacing-xl) auto; list-style: none;">
+                <li style="margin-bottom: var(--spacing-md);">
+                    <strong>🎯 Market Creation:</strong> Users can create markets, select verse location, choose AMM type, and configure all parameters
+                </li>
+                <li style="margin-bottom: var(--spacing-md);">
+                    <strong>🌳 Verse Management:</strong> Create custom verses, manage 32-level hierarchy, set permissions and fees
+                </li>
+                <li style="margin-bottom: var(--spacing-md);">
+                    <strong>💹 Professional Trading:</strong> Full trading interface with leverage, advanced orders, and risk management
+                </li>
+                <li style="margin-bottom: var(--spacing-md);">
+                    <strong>⚛️ Quantum Mechanics:</strong> Superposition markets, entanglement, and quantum tunneling
+                </li>
+                <li style="margin-bottom: var(--spacing-md);">
+                    <strong>🏦 DeFi Integration:</strong> MMT staking, liquidity provision, flash loans, yield farming
+                </li>
+                <li style="margin-bottom: var(--spacing-md);">
+                    <strong>📱 Responsive Design:</strong> Works on all devices from mobile to 4K displays
+                </li>
+            </ul>
+            
+            <p style="margin-top: var(--spacing-xl); color: var(--color-text-secondary);">
+                Program ID: HKTkR5ubMM2bpjdhEo3auZsF8QAqKg6MZR5iWTosGPca
+            </p>
+        </div>
+    </div>
+</body>
+</html>

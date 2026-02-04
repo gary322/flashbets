@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check API Data Structure</title>
+    <style>
+        body { background: #000; color: #fff; font-family: monospace; padding: 20px; }
+        pre { background: #111; padding: 15px; border-radius: 8px; overflow: auto; }
+        .success { color: #4cd964; }
+        .error { color: #ff3b30; }
+    </style>
+</head>
+<body>
+    <h1>Checking API Data Structure</h1>
+    <div id="output"></div>
+    
+    <script>
+        async function checkAPI() {
+            const output = document.getElementById('output');
+            
+            try {
+                // Fetch from our backend
+                const response = await fetch('http://localhost:8081/api/polymarket/markets');
+                const data = await response.json();
+                
+                output.innerHTML = '<h2 class="success">Successfully fetched data</h2>';
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    const firstMarket = data[0];
+                    
+                    // Show all fields
+                    output.innerHTML += '<h3>First Market Fields:</h3>';
+                    output.innerHTML += '<pre>' + JSON.stringify(Object.keys(firstMarket), null, 2) + '</pre>';
+                    
+                    // Check if verses exist
+                    if (firstMarket.verses) {
+                        output.innerHTML += '<h3 class="success">✓ Market has verses field</h3>';
+                        output.innerHTML += '<pre>' + JSON.stringify(firstMarket.verses, null, 2) + '</pre>';
+                    } else {
+                        output.innerHTML += '<h3 class="error">✗ No verses field found in market data</h3>';
+                    }
+                    
+                    // Show sample market
+                    output.innerHTML += '<h3>Sample Market Data:</h3>';
+                    output.innerHTML += '<pre>' + JSON.stringify(firstMarket, null, 2) + '</pre>';
+                    
+                    // Check verses endpoint
+                    output.innerHTML += '<h3>Checking /api/verses endpoint...</h3>';
+                    try {
+                        const versesResponse = await fetch('http://localhost:8081/api/verses');
+                        if (versesResponse.ok) {
+                            const versesData = await versesResponse.json();
+                            output.innerHTML += '<p class="success">✓ Verses endpoint is available</p>';
+                            output.innerHTML += '<pre>' + JSON.stringify(versesData.slice(0, 3), null, 2) + '</pre>';
+                        } else {
+                            output.innerHTML += '<p class="error">✗ Verses endpoint returned: ' + versesResponse.status + '</p>';
+                        }
+                    } catch (verseError) {
+                        output.innerHTML += '<p class="error">✗ Failed to fetch from verses endpoint: ' + verseError.message + '</p>';
+                    }
+                }
+            } catch (error) {
+                output.innerHTML = '<h2 class="error">Error: ' + error.message + '</h2>';
+            }
+        }
+        
+        checkAPI();
+    </script>
+</body>
+</html>

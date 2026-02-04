@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct Verse Test</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 20px; }
+        
+        /* Copy exact styles from index.html */
+        .verses-section {
+            margin-top: 32px;
+        }
+
+        .verse-flow-container {
+            position: relative;
+            padding: 40px 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            min-height: 400px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+        
+        .verse-levels {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 80px;
+            min-width: 1000px;
+        }
+        
+        .verse-level {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            position: relative;
+        }
+        
+        .verse-level-label {
+            position: absolute;
+            left: -80px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.4);
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+        
+        .verse-connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .verse-connection {
+            stroke: rgba(255, 165, 0, 0.3);
+            stroke-width: 2;
+            fill: none;
+            transition: all 0.3s;
+        }
+        
+        .verse-connection.active {
+            stroke: #FFA500;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 6px rgba(255, 165, 0, 0.5));
+        }
+        
+        .verse-arrow {
+            fill: rgba(255, 165, 0, 0.5);
+        }
+        
+        .verse-arrow.active {
+            fill: #FFA500;
+        }
+        
+        .verse-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            z-index: 10;
+            width: 240px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .verse-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 16px rgba(255, 165, 0, 0.2);
+            z-index: 20;
+        }
+        
+        .verse-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+        
+        .verse-title {
+            font-size: 16px;
+            font-weight: 500;
+            flex: 1;
+        }
+        
+        .verse-multiplier {
+            font-size: 24px;
+            font-weight: 600;
+            color: #FFA500;
+        }
+        
+        .verse-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 16px;
+        }
+        
+        .verse-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .verse-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .verse-stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .verse-stat-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <h1>Direct Verse Flow Test</h1>
+    
+    <div class="verses-section">
+        <h2>Related Stages - Chain Your Leverage</h2>
+        <div class="verse-flow-container" id="verseFlowContainer">
+            <svg class="verse-connections" id="verseConnections">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="10" 
+                            refX="9" refY="5" orient="auto">
+                        <polygon points="0 0, 10 5, 0 10" class="verse-arrow" />
+                    </marker>
+                    <marker id="arrowhead-active" markerWidth="10" markerHeight="10" 
+                            refX="9" refY="5" orient="auto">
+                        <polygon points="0 0, 10 5, 0 10" class="verse-arrow active" />
+                    </marker>
+                </defs>
+            </svg>
+            <div class="verse-levels" id="verseLevels">
+                <!-- We'll add content here -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simplified test version
+        function createTestVerses() {
+            const verseLevels = document.getElementById('verseLevels');
+            const svgConnections = document.getElementById('verseConnections');
+            
+            // Test data
+            const levelData = {
+                1: [
+                    { id: 'safe', name: 'Safe Harbor', multiplier: 1.1, description: 'Conservative multiplier' },
+                    { id: 'hodl', name: 'HODL Gang', multiplier: 1.4, description: 'Diamond hands forever' }
+                ],
+                2: [
+                    { id: 'btc100k', name: 'BTC to $100k', multiplier: 2.5, description: 'For believers in six-figure Bitcoin' },
+                    { id: 'momentum', name: 'Momentum Rider', multiplier: 1.7, description: 'Ride the trend' }
+                ],
+                3: [
+                    { id: 'degen', name: 'Full Degen', multiplier: 5.0, description: 'Maximum risk, maximum reward' },
+                    { id: 'tail', name: 'Tail Risk Hunter', multiplier: 3.5, description: 'Betting against consensus' }
+                ]
+            };
+            
+            // Create levels
+            Object.entries(levelData).forEach(([level, verses]) => {
+                const levelContainer = document.createElement('div');
+                levelContainer.className = 'verse-level';
+                levelContainer.id = `verse-level-${level}`;
+                
+                // Add level label
+                const levelLabel = document.createElement('div');
+                levelLabel.className = 'verse-level-label';
+                levelLabel.textContent = `Level ${level}`;
+                levelContainer.appendChild(levelLabel);
+                
+                // Add verses
+                verses.forEach(verse => {
+                    const card = document.createElement('div');
+                    card.className = 'verse-card';
+                    card.innerHTML = `
+                        <div class="verse-header">
+                            <div class="verse-title">${verse.name}</div>
+                            <div class="verse-multiplier">${verse.multiplier}x</div>
+                        </div>
+                        <div class="verse-description">${verse.description}</div>
+                        <div class="verse-stats">
+                            <div class="verse-stat">
+                                <div class="verse-stat-label">Level</div>
+                                <div class="verse-stat-value">L${level}</div>
+                            </div>
+                            <div class="verse-stat">
+                                <div class="verse-stat-label">Risk</div>
+                                <div class="verse-stat-value">${verse.multiplier > 3 ? 'High' : verse.multiplier > 2 ? 'Med' : 'Low'}</div>
+                            </div>
+                        </div>
+                    `;
+                    levelContainer.appendChild(card);
+                });
+                
+                verseLevels.appendChild(levelContainer);
+            });
+            
+            // Draw connections after DOM is ready
+            setTimeout(() => {
+                drawTestConnections();
+            }, 100);
+        }
+        
+        function drawTestConnections() {
+            const svg = document.getElementById('verseConnections');
+            const container = document.getElementById('verseFlowContainer');
+            const containerRect = container.getBoundingClientRect();
+            
+            // Set SVG dimensions
+            svg.setAttribute('width', containerRect.width);
+            svg.setAttribute('height', containerRect.height);
+            
+            // Draw some test connections
+            const levels = [1, 2, 3];
+            for (let i = 0; i < levels.length - 1; i++) {
+                const sourceLevel = document.querySelector(`#verse-level-${levels[i]} .verse-card`);
+                const targetLevel = document.querySelector(`#verse-level-${levels[i+1]} .verse-card`);
+                
+                if (sourceLevel && targetLevel) {
+                    const sourceRect = sourceLevel.getBoundingClientRect();
+                    const targetRect = targetLevel.getBoundingClientRect();
+                    
+                    const sourceX = sourceRect.right - containerRect.left;
+                    const sourceY = sourceRect.top + sourceRect.height / 2 - containerRect.top;
+                    const targetX = targetRect.left - containerRect.left;
+                    const targetY = targetRect.top + targetRect.height / 2 - containerRect.top;
+                    
+                    const midX = (sourceX + targetX) / 2;
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', `M ${sourceX} ${sourceY} Q ${midX} ${sourceY} ${midX} ${targetY} T ${targetX} ${targetY}`);
+                    path.setAttribute('class', 'verse-connection');
+                    path.setAttribute('marker-end', 'url(#arrowhead)');
+                    
+                    svg.appendChild(path);
+                }
+            }
+        }
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            createTestVerses();
+        });
+    </script>
+</body>
+</html>

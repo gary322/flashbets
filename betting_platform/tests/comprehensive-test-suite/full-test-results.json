@@ -1,0 +1,313 @@
+{
+  "totalTests": 47,
+  "passed": 29,
+  "failed": 18,
+  "phases": {
+    "Phase 1": {
+      "passed": 9,
+      "failed": 9,
+      "tests": {
+        "1.1.1": {
+          "status": "passed"
+        },
+        "1.1.2": {
+          "status": "passed"
+        },
+        "1.1.3": {
+          "status": "failed",
+          "error": "HTTP 422: Failed to deserialize the JSON body into the target type: missing field `message` at line 1 column 429"
+        },
+        "1.1.4": {
+          "status": "failed",
+          "error": "Should reject invalid wallet"
+        },
+        "1.1.5": {
+          "status": "passed"
+        },
+        "1.1.6": {
+          "status": "passed"
+        },
+        "1.1.7": {
+          "status": "passed"
+        },
+        "1.1.8": {
+          "status": "passed"
+        },
+        "1.1.9": {
+          "status": "passed"
+        },
+        "1.1.10": {
+          "status": "failed",
+          "error": "Should reject special characters"
+        },
+        "1.2.1": {
+          "status": "failed",
+          "error": "Demo account creation incomplete"
+        },
+        "1.2.2": {
+          "status": "failed",
+          "error": "No demo wallet created"
+        },
+        "1.2.3": {
+          "status": "failed",
+          "error": "No demo wallet created"
+        },
+        "1.2.4": {
+          "status": "failed",
+          "error": "No demo wallet created"
+        },
+        "1.2.5": {
+          "status": "failed",
+          "error": "No demo wallet created"
+        },
+        "1.2.6": {
+          "status": "failed",
+          "error": "Demo wallets should be unique"
+        },
+        "1.3.1": {
+          "status": "passed"
+        },
+        "1.3.2": {
+          "status": "passed"
+        }
+      }
+    },
+    "Phase 2": {
+      "passed": 12,
+      "failed": 2,
+      "tests": {
+        "2.1.1": {
+          "status": "passed"
+        },
+        "2.1.2": {
+          "status": "passed"
+        },
+        "2.1.3": {
+          "status": "passed"
+        },
+        "2.1.4": {
+          "status": "passed"
+        },
+        "2.1.5": {
+          "status": "passed"
+        },
+        "2.1.6": {
+          "status": "failed",
+          "error": "Market details incomplete"
+        },
+        "2.1.7": {
+          "status": "passed"
+        },
+        "2.1.8": {
+          "status": "passed"
+        },
+        "2.2.1": {
+          "status": "passed"
+        },
+        "2.2.2": {
+          "status": "passed"
+        },
+        "2.2.3": {
+          "status": "passed"
+        },
+        "2.3.1": {
+          "status": "passed"
+        },
+        "2.3.2": {
+          "status": "failed",
+          "error": "HTTP 502: {\"error\":{\"code\":\"POLYMARKET_PARSE_ERROR\",\"message\":\"Failed to parse Polymarket response: error decoding response body: invalid type: map, expected a sequence at line 1 column 0\"}}"
+        },
+        "2.3.3": {
+          "status": "passed"
+        }
+      }
+    },
+    "Phase 3": {
+      "passed": 4,
+      "failed": 3,
+      "tests": {
+        "3.1.1": {
+          "status": "passed"
+        },
+        "3.1.2": {
+          "status": "passed"
+        },
+        "3.1.3": {
+          "status": "failed",
+          "error": "request to http://localhost:8081/api/trade/close failed, reason: socket hang up"
+        },
+        "3.2.1": {
+          "status": "passed"
+        },
+        "3.2.2": {
+          "status": "passed"
+        },
+        "3.2.3": {
+          "status": "failed",
+          "error": "Cancel order endpoint not found"
+        },
+        "3.2.4": {
+          "status": "failed",
+          "error": "No demo wallet"
+        }
+      }
+    },
+    "Phase 4": {
+      "passed": 1,
+      "failed": 2,
+      "tests": {
+        "4.1.1": {
+          "status": "passed"
+        },
+        "4.1.2": {
+          "status": "failed",
+          "error": "No demo wallet"
+        },
+        "4.1.3": {
+          "status": "failed",
+          "error": "No demo wallet"
+        }
+      }
+    },
+    "Phase 5": {
+      "passed": 1,
+      "failed": 2,
+      "tests": {
+        "5.1.1": {
+          "status": "failed",
+          "error": "No demo wallet"
+        },
+        "5.1.2": {
+          "status": "passed"
+        },
+        "5.1.3": {
+          "status": "failed",
+          "error": "Invalid quantum states response"
+        }
+      }
+    },
+    "Phase 6": {
+      "passed": 2,
+      "failed": 0,
+      "tests": {
+        "6.1.1": {
+          "status": "passed"
+        },
+        "6.1.2": {
+          "status": "passed"
+        }
+      }
+    }
+  },
+  "errors": [
+    {
+      "phase": "Phase 1",
+      "testId": "1.1.3",
+      "testName": "Wallet Signature Verification",
+      "error": "HTTP 422: Failed to deserialize the JSON body into the target type: missing field `message` at line 1 column 429"
+    },
+    {
+      "phase": "Phase 1",
+      "testId": "1.1.4",
+      "testName": "Invalid Wallet Format Rejection",
+      "error": "Should reject invalid wallet"
+    },
+    {
+      "phase": "Phase 1",
+      "testId": "1.1.10",
+      "testName": "Special Character Wallet Rejection",
+      "error": "Should reject special characters"
+    },
+    {
+      "phase": "Phase 1",
+      "testId": "1.2.1",
+      "testName": "Demo Account Creation",
+      "error": "Demo account creation incomplete"
+    },
+    {
+      "phase": "Phase 1",
+      "testId": "1.2.2",
+      "testName": "Demo Account Balance Verification",
+      "error": "No demo wallet created"
+    },
+    {
+      "phase": "Phase 1",
+      "testId": "1.2.3",
+      "testName": "Demo Account Position Check",
+      "error": "No demo wallet created"
+    },
+    {
+      "phase": "Phase 1",
+      "testId": "1.2.4",
+      "testName": "Demo Account Portfolio Check",
+      "error": "No demo wallet created"
+    },
+    {
+      "phase": "Phase 1",
+      "testId": "1.2.5",
+      "testName": "Demo Account Risk Metrics",
+      "error": "No demo wallet created"
+    },
+    {
+      "phase": "Phase 1",
+      "testId": "1.2.6",
+      "testName": "Multiple Demo Account Creation",
+      "error": "Demo wallets should be unique"
+    },
+    {
+      "phase": "Phase 2",
+      "testId": "2.1.6",
+      "testName": "Single Market Details",
+      "error": "Market details incomplete"
+    },
+    {
+      "phase": "Phase 2",
+      "testId": "2.3.2",
+      "testName": "Enhanced Polymarket Integration",
+      "error": "HTTP 502: {\"error\":{\"code\":\"POLYMARKET_PARSE_ERROR\",\"message\":\"Failed to parse Polymarket response: error decoding response body: invalid type: map, expected a sequence at line 1 column 0\"}}"
+    },
+    {
+      "phase": "Phase 3",
+      "testId": "3.1.3",
+      "testName": "Close Position Endpoint",
+      "error": "request to http://localhost:8081/api/trade/close failed, reason: socket hang up"
+    },
+    {
+      "phase": "Phase 3",
+      "testId": "3.2.3",
+      "testName": "Order Cancellation",
+      "error": "Cancel order endpoint not found"
+    },
+    {
+      "phase": "Phase 3",
+      "testId": "3.2.4",
+      "testName": "Orders List",
+      "error": "No demo wallet"
+    },
+    {
+      "phase": "Phase 4",
+      "testId": "4.1.2",
+      "testName": "Portfolio Value Calculation",
+      "error": "No demo wallet"
+    },
+    {
+      "phase": "Phase 4",
+      "testId": "4.1.3",
+      "testName": "Risk Metrics Calculation",
+      "error": "No demo wallet"
+    },
+    {
+      "phase": "Phase 5",
+      "testId": "5.1.1",
+      "testName": "Quantum Positions List",
+      "error": "No demo wallet"
+    },
+    {
+      "phase": "Phase 5",
+      "testId": "5.1.3",
+      "testName": "Quantum States",
+      "error": "Invalid quantum states response"
+    }
+  ],
+  "startTime": 1754124132577
+}

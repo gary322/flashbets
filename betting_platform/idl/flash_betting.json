@@ -1,0 +1,163 @@
+{
+  "version": "0.1.0",
+  "name": "mv_flash",
+  "programId": "FLASHxBETz8y3MQw9KqBwGkAHZydHJzf9nfEtVFuQ",
+  "instructions": [
+    {
+      "name": "createFlashMarket",
+      "accounts": [
+        {"name": "authority", "isMut": false, "isSigner": true},
+        {"name": "flashMarket", "isMut": true, "isSigner": false},
+        {"name": "parentVerse", "isMut": false, "isSigner": false},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "title", "type": "string"},
+        {"name": "duration", "type": "u64"},
+        {"name": "tau", "type": "u64"},
+        {"name": "sport", "type": "string"}
+      ]
+    },
+    {
+      "name": "openFlashPosition",
+      "accounts": [
+        {"name": "trader", "isMut": true, "isSigner": true},
+        {"name": "flashMarket", "isMut": true, "isSigner": false},
+        {"name": "position", "isMut": true, "isSigner": false},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "amount", "type": "u64"},
+        {"name": "leverage", "type": "u64"},
+        {"name": "isYes", "type": "bool"}
+      ]
+    },
+    {
+      "name": "placeChainedBet",
+      "accounts": [
+        {"name": "trader", "isMut": true, "isSigner": true},
+        {"name": "chainedBet", "isMut": true, "isSigner": false},
+        {"name": "systemProgram", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "marketIds", "type": {"vec": "publicKey"}},
+        {"name": "leverages", "type": {"vec": "u64"}},
+        {"name": "initialStake", "type": "u64"}
+      ]
+    },
+    {
+      "name": "resolveFlashMarket",
+      "accounts": [
+        {"name": "resolver", "isMut": false, "isSigner": true},
+        {"name": "flashMarket", "isMut": true, "isSigner": false},
+        {"name": "zkProof", "isMut": false, "isSigner": false}
+      ],
+      "args": [
+        {"name": "outcome", "type": "bool"},
+        {"name": "proofData", "type": "bytes"}
+      ]
+    },
+    {
+      "name": "claimFlashWinnings",
+      "accounts": [
+        {"name": "trader", "isMut": true, "isSigner": true},
+        {"name": "position", "isMut": true, "isSigner": false},
+        {"name": "flashMarket", "isMut": false, "isSigner": false}
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "FlashMarket",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "id", "type": "publicKey"},
+          {"name": "parentVerseId", "type": "publicKey"},
+          {"name": "title", "type": "string"},
+          {"name": "startTime", "type": "i64"},
+          {"name": "endTime", "type": "i64"},
+          {"name": "tau", "type": "u64"},
+          {"name": "totalVolume", "type": "u64"},
+          {"name": "yesShares", "type": "u64"},
+          {"name": "noShares", "type": "u64"},
+          {"name": "resolved", "type": "bool"},
+          {"name": "outcome", "type": "bool"},
+          {"name": "zkProofHash", "type": {"array": ["u8", 32]}}
+        ]
+      }
+    },
+    {
+      "name": "FlashPosition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "trader", "type": "publicKey"},
+          {"name": "marketId", "type": "publicKey"},
+          {"name": "shares", "type": "u64"},
+          {"name": "isYes", "type": "bool"},
+          {"name": "entryPrice", "type": "u64"},
+          {"name": "leverage", "type": "u64"},
+          {"name": "effectiveLeverage", "type": "u64"},
+          {"name": "isClosed", "type": "bool"}
+        ]
+      }
+    },
+    {
+      "name": "ChainedBet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {"name": "marketIds", "type": {"vec": "publicKey"}},
+          {"name": "leverages", "type": {"vec": "u64"}},
+          {"name": "totalStake", "type": "u64"},
+          {"name": "potentialPayout", "type": "u64"},
+          {"name": "trader", "type": "publicKey"},
+          {"name": "isActive", "type": "bool"}
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "SportTau",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {"name": "Soccer", "fields": [{"name": "value", "type": "u64"}]},
+          {"name": "Basketball", "fields": [{"name": "value", "type": "u64"}]},
+          {"name": "Tennis", "fields": [{"name": "value", "type": "u64"}]},
+          {"name": "Default", "fields": [{"name": "value", "type": "u64"}]}
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6100,
+      "name": "MarketExpired",
+      "msg": "Flash market has expired"
+    },
+    {
+      "code": 6101,
+      "name": "InvalidDuration",
+      "msg": "Duration must be between 5-300 seconds"
+    },
+    {
+      "code": 6102,
+      "name": "InvalidLeverage",
+      "msg": "Leverage exceeds maximum allowed"
+    },
+    {
+      "code": 6103,
+      "name": "ChainTooLong",
+      "msg": "Chain exceeds maximum length of 3"
+    },
+    {
+      "code": 6104,
+      "name": "InvalidZKProof",
+      "msg": "ZK proof verification failed"
+    }
+  ]
+}
