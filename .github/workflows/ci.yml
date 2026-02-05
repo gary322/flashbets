@@ -80,3 +80,141 @@ jobs:
             . -> target
 
       - run: cargo test --locked
+
+  e2e-demo:
+    name: E2E (Demo)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            betting_platform/app/package-lock.json
+            betting_platform/tests/playwright/package-lock.json
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            betting_platform/api_runner -> target
+
+      - name: Build UI (Next.js)
+        working-directory: betting_platform/app
+        env:
+          NEXT_PUBLIC_DEMO_WALLET_ENABLED: "true"
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install Playwright
+        working-directory: betting_platform/tests/playwright
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Build API (Rust)
+        working-directory: betting_platform/api_runner
+        run: cargo build --release --locked
+
+      - name: Run demo stack + Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p e2e-logs
+
+          cleanup() {
+            status=$?
+            echo "Cleaning up..."
+            kill "${UI_PID:-}" "${API_PID:-}" "${MOCK_PID:-}" 2>/dev/null || true
+
+            if [ "$status" -ne 0 ]; then
+              echo "=== polymarket-mock.log (tail) ==="
+              tail -n 200 e2e-logs/polymarket-mock.log || true
+              echo "=== api.log (tail) ==="
+              tail -n 200 e2e-logs/api.log || true
+              echo "=== ui.log (tail) ==="
+              tail -n 200 e2e-logs/ui.log || true
+            fi
+
+            exit "$status"
+          }
+          trap cleanup EXIT
+
+          echo "Starting Polymarket mock..."
+          node betting_platform/mock/polymarket_mock_server.js > e2e-logs/polymarket-mock.log 2>&1 &
+          MOCK_PID=$!
+
+          echo "Starting API..."
+          (
+            cd betting_platform/api_runner
+            SERVER_HOST=127.0.0.1 \
+            SERVER_PORT=8081 \
+            CACHE_ENABLED=false \
+            QUEUE_ENABLED=false \
+            CONFIG_WATCH_ENABLED=false \
+            STATE_PERSISTENCE_ENABLED=false \
+            KALSHI_ENABLED=false \
+            POLYMARKET_ENABLED=true \
+            POLYMARKET_CLOB_BASE_URL=http://127.0.0.1:8084 \
+            POLYMARKET_GAMMA_BASE_URL=http://127.0.0.1:8084 \
+            POLYMARKET_API_KEY=demo-key \
+            POLYMARKET_API_SECRET=ZHVtbXktc2VjcmV0 \
+            POLYMARKET_API_PASSPHRASE=demo-pass \
+            ./target/release/betting_platform_api
+          ) > e2e-logs/api.log 2>&1 &
+          API_PID=$!
+
+          echo "Waiting for API..."
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:8081/health > /dev/null; then
+              echo "API is up"
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:8081/health > /dev/null
+
+          echo "Starting UI..."
+          (
+            cd betting_platform/app
+            PORT=3000 \
+            API_PROXY_TARGET=http://127.0.0.1:8081 \
+            NEXT_PUBLIC_DEMO_WALLET_ENABLED=true \
+            npm run start
+          ) > e2e-logs/ui.log 2>&1 &
+          UI_PID=$!
+
+          echo "Waiting for UI..."
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:3000/markets > /dev/null; then
+              echo "UI is up"
+              break
+            fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:3000/markets > /dev/null
+
+          echo "Running Playwright..."
+          (cd betting_platform/tests/playwright && npx playwright test -c playwright.next.config.ts)
+
+      - name: Upload E2E logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-demo-logs
+          path: e2e-logs
+
+      - name: Upload Playwright results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-next-results
+          path: |
+            betting_platform/tests/playwright/results-next.xml
+            betting_platform/tests/playwright/test-results

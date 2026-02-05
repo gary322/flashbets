@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use tracing::{info, error, debug};
 use std::time::Duration;
 use chrono::{DateTime, Utc};
+use std::env;
 
 use super::{Platform, ExternalPrice, eip712_types::PolymarketOrder};
 
@@ -52,11 +53,17 @@ pub struct PolymarketPosition {
 const POLYMARKET_API_BASE: &str = "https://clob.polymarket.com";
 const POLYMARKET_GAMMA_API: &str = "https://gamma-api.polymarket.com";
 
+fn normalize_base_url(url: String) -> String {
+    url.trim_end_matches('/').to_string()
+}
+
 /// Polymarket client for API interactions
 pub struct PolymarketClient {
     client: Client,
     api_key: Option<String>,
     webhook_secret: Option<String>,
+    clob_base_url: String,
+    gamma_base_url: String,
 }
 
 impl PolymarketClient {
@@ -73,17 +80,26 @@ impl PolymarketClient {
             .default_headers(headers)
             .timeout(Duration::from_secs(30))
             .build()?;
+
+        let clob_base_url = normalize_base_url(
+            env::var("POLYMARKET_CLOB_BASE_URL").unwrap_or_else(|_| POLYMARKET_API_BASE.to_string()),
+        );
+        let gamma_base_url = normalize_base_url(
+            env::var("POLYMARKET_GAMMA_BASE_URL").unwrap_or_else(|_| POLYMARKET_GAMMA_API.to_string()),
+        );
             
         Ok(Self {
             client,
             api_key,
             webhook_secret,
+            clob_base_url,
+            gamma_base_url,
         })
     }
     
     /// Submit order to Polymarket CLOB
     pub async fn submit_order(&self, order: &PolymarketOrder, signature: &str) -> Result<OrderSubmissionResponse> {
-        let url = format!("{}/orders", POLYMARKET_API_BASE);
+        let url = format!("{}/orders", self.clob_base_url);
         
         let request_body = serde_json::json!({
             "order": order,
@@ -112,7 +128,7 @@ impl PolymarketClient {
     
     /// Get order status from Polymarket
     pub async fn get_order_status(&self, order_id: &str) -> Result<OrderStatusResponse> {
-        let url = format!("{}/orders/{}", POLYMARKET_API_BASE, order_id);
+        let url = format!("{}/orders/{}", self.clob_base_url, order_id);
         
         let response = self.client
             .get(&url)
@@ -129,7 +145,7 @@ impl PolymarketClient {
     
     /// Cancel order on Polymarket
     pub async fn cancel_order(&self, order_id: &str) -> Result<()> {
-        let url = format!("{}/orders/{}/cancel", POLYMARKET_API_BASE, order_id);
+        let url = format!("{}/orders/{}/cancel", self.clob_base_url, order_id);
         
         let response = self.client
             .delete(&url)
@@ -148,7 +164,7 @@ impl PolymarketClient {
     
     /// Get user positions from Polymarket
     pub async fn get_positions(&self, address: &str) -> Result<Vec<PolymarketPosition>> {
-        let url = format!("{}/positions?address={}", POLYMARKET_API_BASE, address);
+        let url = format!("{}/positions?address={}", self.clob_base_url, address);
         
         let response = self.client
             .get(&url)
@@ -165,7 +181,7 @@ impl PolymarketClient {
     
     /// Get user's open orders
     pub async fn get_open_orders(&self, address: &str, market_id: Option<&str>) -> Result<Vec<PolymarketOrder>> {
-        let mut url = format!("{}/orders?address={}&status=OPEN", POLYMARKET_API_BASE, address);
+        let mut url = format!("{}/orders?address={}&status=OPEN", self.clob_base_url, address);
         
         if let Some(market) = market_id {
             url.push_str(&format!("&market={}", market));
@@ -186,7 +202,7 @@ impl PolymarketClient {
     
     /// Get active markets from Polymarket
     pub async fn get_markets(&self, limit: usize) -> Result<Vec<PolymarketMarket>> {
-        let url = format!("{}/markets?limit={}&active=true", POLYMARKET_API_BASE, limit);
+        let url = format!("{}/markets?limit={}&active=true", self.clob_base_url, limit);
         
         debug!("Fetching Polymarket markets from: {}", url);
         
@@ -212,7 +228,7 @@ impl PolymarketClient {
     
     /// Get specific market details
     pub async fn get_market(&self, condition_id: &str) -> Result<PolymarketMarket> {
-        let url = format!("{}/markets/{}", POLYMARKET_API_BASE, condition_id);
+        let url = format!("{}/markets/{}", self.clob_base_url, condition_id);
         
         let response = self.client
             .get(&url)
@@ -229,7 +245,7 @@ impl PolymarketClient {
     
     /// Get order book for a market
     pub async fn get_order_book(&self, token_id: &str) -> Result<OrderBook> {
-        let url = format!("{}/book?token_id={}", POLYMARKET_API_BASE, token_id);
+        let url = format!("{}/book?token_id={}", self.clob_base_url, token_id);
         
         let response = self.client
             .get(&url)
@@ -254,7 +270,7 @@ impl PolymarketClient {
     ) -> Result<Vec<PricePoint>> {
         let url = format!(
             "{}/prices?conditionId={}&startTs={}&endTs={}&interval={}",
-            POLYMARKET_GAMMA_API, condition_id, start_ts, end_ts, interval
+            self.gamma_base_url, condition_id, start_ts, end_ts, interval
         );
         
         let response = self.client
@@ -305,7 +321,7 @@ impl PolymarketClient {
         };
         
         let response = self.client
-            .post(&format!("{}/webhooks/subscribe", POLYMARKET_API_BASE))
+            .post(&format!("{}/webhooks/subscribe", self.clob_base_url))
             .json(&subscription)
             .send()
             .await?;

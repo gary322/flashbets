@@ -64,7 +64,7 @@ impl PolymarketPublicClient {
         
         debug!("Parsed JSON type: {:?}", parsed);
         
-        // Check if it's an array or object
+        // Check if it's an array or object (some variants wrap in {data:[...]})
         match parsed {
             serde_json::Value::Array(arr) => {
                 info!("Got array response with {} items", arr.len());
@@ -76,13 +76,19 @@ impl PolymarketPublicClient {
                     .map_err(|e| anyhow!("Failed to parse array into markets: {}", e))?;
                 Ok(markets)
             }
-            serde_json::Value::Object(_) => {
+            serde_json::Value::Object(obj) => {
+                if let Some(arr) = obj.get("data").and_then(|d| d.as_array()).cloned() {
+                    info!("Got wrapped response with {} items", arr.len());
+                    let markets: Vec<PolymarketPublicMarket> =
+                        serde_json::from_value(serde_json::Value::Array(arr))
+                            .map_err(|e| anyhow!("Failed to parse wrapped data into markets: {}", e))?;
+                    return Ok(markets);
+                }
+
                 // Might be an error response
-                Err(anyhow!("Got object response instead of array. Response: {}", serde_json::to_string_pretty(&parsed).unwrap_or_else(|_| "unparseable".to_string())))
+                Err(anyhow!("Got object response instead of array. Response: {}", serde_json::to_string_pretty(&serde_json::Value::Object(obj)).unwrap_or_else(|_| "unparseable".to_string())))
             }
-            _ => {
-                Err(anyhow!("Unexpected response type: {:?}", parsed))
-            }
+            _ => Err(anyhow!("Unexpected response type: {:?}", parsed)),
         }
     }
     

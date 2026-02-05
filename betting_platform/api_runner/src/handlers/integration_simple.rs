@@ -38,7 +38,7 @@ pub async fn get_polymarket_markets_enhanced(
             .unwrap_or(20);
             
         info!("Fetching {} markets from Polymarket public API", limit);
-        match state.polymarket_public_client.get_markets(limit).await {
+        match state.polymarket_public_client.get_current_markets(limit).await {
             Ok(polymarket_markets) => {
                 info!("Successfully fetched {} markets from Polymarket", polymarket_markets.len());
                 // Convert Polymarket format to our format

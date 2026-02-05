@@ -237,7 +237,7 @@ interface MarketData {
   }>;
   total_volume: number;
   total_liquidity: number;
-  resolution_time?: string;
+  resolution_time?: string | number;
   source?: string;
 }
 
@@ -274,16 +274,43 @@ export default function Trade() {
       }
       
       const data = await response.json();
-      
-      // Ensure outcomes array exists
-      if (!data.outcomes || !Array.isArray(data.outcomes)) {
-        data.outcomes = [
-          { name: 'Yes', price: 0.5, volume: data.total_volume / 2 || 0, liquidity: data.total_liquidity / 2 || 0 },
-          { name: 'No', price: 0.5, volume: data.total_volume / 2 || 0, liquidity: data.total_liquidity / 2 || 0 }
-        ];
-      }
-      
-      setMarketData(data);
+
+      const totalVolume = typeof data.total_volume === 'number' ? data.total_volume : 0;
+      const totalLiquidity = typeof data.total_liquidity === 'number' ? data.total_liquidity : 0;
+
+      const rawOutcomes: any[] = Array.isArray(data.outcomes) ? data.outcomes : [];
+      const normalizedOutcomes =
+        rawOutcomes.length > 0
+          ? rawOutcomes.map((outcome, index) => ({
+              name: outcome?.name || outcome?.title || `Outcome ${index + 1}`,
+              price:
+                typeof outcome?.price === 'number'
+                  ? outcome.price
+                  : 1 / Math.max(rawOutcomes.length, 2),
+              volume:
+                typeof outcome?.volume === 'number'
+                  ? outcome.volume
+                  : totalVolume / Math.max(rawOutcomes.length, 1),
+              liquidity:
+                typeof outcome?.liquidity === 'number'
+                  ? outcome.liquidity
+                  : totalLiquidity / Math.max(rawOutcomes.length, 1),
+            }))
+          : [
+              { name: 'Yes', price: 0.5, volume: totalVolume / 2 || 0, liquidity: totalLiquidity / 2 || 0 },
+              { name: 'No', price: 0.5, volume: totalVolume / 2 || 0, liquidity: totalLiquidity / 2 || 0 },
+            ];
+
+      setMarketData({
+        id: String(data.id ?? marketId),
+        title: data.title || 'Unknown Market',
+        description: data.description || '',
+        outcomes: normalizedOutcomes,
+        total_volume: totalVolume,
+        total_liquidity: totalLiquidity,
+        resolution_time: data.resolution_time,
+        source: data.source,
+      });
     } catch (err) {
       console.error('Error fetching market data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load market data');
@@ -357,7 +384,8 @@ export default function Trade() {
       const result = await signAndSubmitOrder(preparedOrder);
       
       // Success! Redirect to portfolio or show success message
-      alert(`Order submitted successfully! Order ID: ${result.orderId}`);
+      const orderId = result?.orderId || result?.order_id || result?.orderID;
+      alert(`Order submitted successfully! Order ID: ${orderId ?? 'unknown'}`);
       setAmount('');
       
     } catch (err: any) {
@@ -459,6 +487,7 @@ export default function Trade() {
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
+                data-testid="trade-amount"
               />
             </InputGroup>
 
@@ -493,6 +522,7 @@ export default function Trade() {
             <TradeButton 
               onClick={handleTrade}
               disabled={isSubmitting || loading}
+              data-testid="trade-submit"
             >
               {isSubmitting ? 'Processing...' : 
                !wallet.isConnected ? 'Connect Wallet' :

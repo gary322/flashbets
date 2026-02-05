@@ -7,23 +7,47 @@
 
 ## Quick Start Guide
 
-### 1. Start the API
+### 1. Start the Polymarket mock (recommended for fully local demo)
+This enables `/api/orders/*` to work end-to-end without hitting the real Polymarket service.
+
+```bash
+node betting_platform/mock/polymarket_mock_server.js
+```
+
+### 2. Start the API (configured for the mock)
 ```bash
 cd betting_platform/api_runner
+POLYMARKET_ENABLED=true \
+POLYMARKET_CLOB_BASE_URL=http://127.0.0.1:8084 \
+POLYMARKET_GAMMA_BASE_URL=http://127.0.0.1:8084 \
+POLYMARKET_API_KEY=demo-key \
+POLYMARKET_API_SECRET=ZHVtbXktc2VjcmV0 \
+POLYMARKET_API_PASSPHRASE=demo-pass \
+CACHE_ENABLED=false \
+QUEUE_ENABLED=false \
 cargo run --release
 ```
 
-### 2. Start the UI
+### 3. Start the UI (demo wallet mode)
+Demo wallet mode avoids requiring a browser MetaMask extension.
+
 ```bash
 cd betting_platform/app
 npm ci
+NEXT_PUBLIC_DEMO_WALLET_ENABLED=true \
+API_PROXY_TARGET=http://127.0.0.1:8081 \
 npm run dev -- -p 3000
 ```
 
-### 3. (Optional) Enable Polymarket order endpoints for demo
-The `/api/orders/*` endpoints require Polymarket CLOB credentials. For a pure demo, you can use dummy credentials and point at a mock server:
-- Set `POLYMARKET_API_KEY`, `POLYMARKET_API_SECRET` (base64), `POLYMARKET_API_PASSPHRASE`
-- Optionally set `POLYMARKET_CLOB_BASE_URL` to a local mock
+### 4. (Optional) Run the end-to-end Playwright test
+In another terminal (after the mock + API + UI are running):
+
+```bash
+cd betting_platform/tests/playwright
+npm ci
+npx playwright install chromium
+npx playwright test -c playwright.next.config.ts
+```
 
 ## Alternate Demo (Static Root UI)
 

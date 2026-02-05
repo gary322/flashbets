@@ -26,6 +26,7 @@ use solana_sdk::{
 use tracing::{info, debug, error};
 use crate::{AppState, types::*, verse_generator::VerseGenerator, wallet_utils::WalletType, validation::ValidatedJson, response::{ApiResponse, responses}, queue};
 use std::collections::HashMap;
+use std::env;
 use uuid::Uuid;
 
 /// Get program information
@@ -58,12 +59,17 @@ pub async fn proxy_polymarket_markets(
 ) -> impl IntoResponse {
     let limit = params.get("limit").unwrap_or(&"10".to_string()).clone();
     let search = params.get("search");
+
+    let base_url = env::var("POLYMARKET_CLOB_BASE_URL")
+        .unwrap_or_else(|_| "https://clob.polymarket.com".to_string())
+        .trim_end_matches('/')
+        .to_string();
     
     // Make request to Polymarket API
     let url = if let Some(search_term) = search {
-        format!("https://clob.polymarket.com/markets?limit={}&search={}", limit, search_term)
+        format!("{}/markets?limit={}&search={}", base_url, limit, search_term)
     } else {
-        format!("https://clob.polymarket.com/markets?limit={}", limit)
+        format!("{}/markets?limit={}", base_url, limit)
     };
     
     match reqwest::get(&url).await {

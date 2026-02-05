@@ -300,6 +300,8 @@ export default function Markets() {
               <MarketCard 
                 key={market.id} 
                 onClick={() => handleMarketClick(market.id)}
+                data-testid="market-card"
+                data-market-id={market.id}
               >
                 <MarketTitle>{market.title}</MarketTitle>
                 <MarketDescription>{market.description}</MarketDescription>

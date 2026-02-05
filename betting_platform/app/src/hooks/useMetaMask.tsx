@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from 'react';
 import { metamask, WalletState } from '../lib/metamask';
 import { ethers } from 'ethers';
 
@@ -17,6 +17,8 @@ interface MetaMaskContextType {
 const MetaMaskContext = createContext<MetaMaskContextType | undefined>(undefined);
 
 export function MetaMaskProvider({ children }: { children: ReactNode }) {
+  const demoWalletEnabled = process.env.NEXT_PUBLIC_DEMO_WALLET_ENABLED === 'true';
+  const demoWalletRef = useRef<ethers.Wallet | null>(null);
   const [wallet, setWallet] = useState<WalletState>({
     isConnected: false,
     address: null,
@@ -26,8 +28,31 @@ export function MetaMaskProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const getOrCreateDemoWallet = useCallback((): ethers.Wallet => {
+    if (demoWalletRef.current) return demoWalletRef.current;
+
+    // Persist across reloads for a smoother demo experience.
+    if (typeof window !== 'undefined') {
+      const storageKey = 'flashbets_demo_wallet_private_key_v1';
+      let privateKey = window.localStorage.getItem(storageKey);
+      if (!privateKey) {
+        privateKey = ethers.Wallet.createRandom().privateKey;
+        window.localStorage.setItem(storageKey, privateKey);
+      }
+
+      demoWalletRef.current = new ethers.Wallet(privateKey);
+      return demoWalletRef.current;
+    }
+
+    // SSR fallback (shouldn't generally be used for signing).
+    demoWalletRef.current = ethers.Wallet.createRandom();
+    return demoWalletRef.current;
+  }, []);
+
   // Check if already connected on mount
   useEffect(() => {
+    if (demoWalletEnabled) return;
+
     const checkConnection = async () => {
       if (metamask.isInstalled()) {
         const account = await metamask.getAccount();
@@ -42,10 +67,11 @@ export function MetaMaskProvider({ children }: { children: ReactNode }) {
       }
     };
     checkConnection();
-  }, []);
+  }, [demoWalletEnabled]);
 
   // Listen to account and chain changes
   useEffect(() => {
+    if (demoWalletEnabled) return;
     if (!metamask.isInstalled()) return;
 
     const handleAccountsChanged = (accounts: string[]) => {
@@ -77,13 +103,24 @@ export function MetaMaskProvider({ children }: { children: ReactNode }) {
     return () => {
       metamask.removeAllListeners();
     };
-  }, []);
+  }, [demoWalletEnabled]);
 
   const connect = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
     try {
+      if (demoWalletEnabled) {
+        const demoWallet = getOrCreateDemoWallet();
+        setWallet({
+          isConnected: true,
+          address: demoWallet.address,
+          chainId: 137,
+          balance: '0',
+        });
+        return;
+      }
+
       if (!metamask.isInstalled()) {
         throw new Error('Please install MetaMask to continue');
       }
@@ -101,23 +138,26 @@ export function MetaMaskProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [demoWalletEnabled, getOrCreateDemoWallet]);
 
   const disconnect = useCallback(() => {
-    metamask.disconnect();
+    if (!demoWalletEnabled) {
+      metamask.disconnect();
+    }
     setWallet({
       isConnected: false,
       address: null,
       chainId: null,
       balance: null
     });
-  }, []);
+  }, [demoWalletEnabled]);
 
   const switchToPolygon = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
+      if (demoWalletEnabled) return;
       await metamask.switchToPolygon();
     } catch (err: any) {
       setError(err.message || 'Failed to switch network');
@@ -125,7 +165,7 @@ export function MetaMaskProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [demoWalletEnabled]);
 
   const signOrder = useCallback(async (orderData: any) => {
     setError(null);
@@ -133,6 +173,17 @@ export function MetaMaskProvider({ children }: { children: ReactNode }) {
     try {
       if (!wallet.isConnected) {
         throw new Error('Wallet not connected');
+      }
+
+      if (demoWalletEnabled) {
+        const demoWallet = getOrCreateDemoWallet();
+        const domain = orderData?.domain;
+        const types = orderData?.types || {};
+        const message = orderData?.message;
+
+        // ethers expects the EIP712Domain type to be omitted.
+        const { EIP712Domain: _ignored, ...signTypes } = types;
+        return await demoWallet._signTypedData(domain, signTypes, message);
       }
 
       // Ensure we're on Polygon
@@ -146,12 +197,16 @@ export function MetaMaskProvider({ children }: { children: ReactNode }) {
       setError(err.message || 'Failed to sign order');
       throw err;
     }
-  }, [wallet, switchToPolygon]);
+  }, [wallet, demoWalletEnabled, getOrCreateDemoWallet, switchToPolygon]);
 
   const getUSDCBalance = useCallback(async () => {
     try {
       if (!wallet.isConnected) {
         throw new Error('Wallet not connected');
+      }
+
+      if (demoWalletEnabled) {
+        return '100000.00';
       }
 
       const balance = await metamask.getUSDCBalance();
@@ -160,7 +215,7 @@ export function MetaMaskProvider({ children }: { children: ReactNode }) {
       setError(err.message || 'Failed to get USDC balance');
       throw err;
     }
-  }, [wallet]);
+  }, [wallet, demoWalletEnabled]);
 
   const approveUSDC = useCallback(async (spender: string, amount: string) => {
     setError(null);
@@ -170,13 +225,17 @@ export function MetaMaskProvider({ children }: { children: ReactNode }) {
         throw new Error('Wallet not connected');
       }
 
+      if (demoWalletEnabled) {
+        return `demo_approve_${spender}_${amount}_${Date.now()}`;
+      }
+
       const txHash = await metamask.approveUSDC(spender, amount);
       return txHash;
     } catch (err: any) {
       setError(err.message || 'Failed to approve USDC');
       throw err;
     }
-  }, [wallet]);
+  }, [wallet, demoWalletEnabled]);
 
   const value: MetaMaskContextType = {
     wallet,
