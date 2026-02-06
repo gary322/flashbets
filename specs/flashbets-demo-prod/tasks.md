@@ -49,7 +49,7 @@ This spec is primarily a **stabilization + CI green** effort.
     - `cargo test --locked --manifest-path betting_platform/api_runner/Cargo.toml`
     - `cargo test --locked` (in `betting_platform/flash_bets/program`)
 
-- [ ] 2.2 UI quality gates (clean checkout)
+- [x] 2.2 UI quality gates (clean checkout)
   - **Verify** (in `betting_platform/app`):
     - `npm ci`
     - `npm run type-check`
@@ -57,20 +57,20 @@ This spec is primarily a **stabilization + CI green** effort.
     - `npm run build`
   - **Done when**: all commands succeed
 
-- [ ] 2.3 E2E smoke (clean checkout)
+- [x] 2.3 E2E smoke (clean checkout)
   - **Verify**: run mock server + API + UI and execute Playwright smoke spec
   - **Done when**: `polymarket-trade-smoke.spec.ts` passes
   - _Reqs: AC-2.1_
 
 ## Phase 3: Release
 
-- [ ] 3.1 Repo hygiene + docs
+- [x] 3.1 Repo hygiene + docs
   - **Do**: remove junk/untracked artifacts; ensure no secrets are committed
   - **Verify**: `git status` is clean except intended changes
 
-- [ ] 3.2 Push to GitHub repo
+- [x] 3.2 Push to GitHub repo
   - **Do**: set `origin` to `git@github.com:gary322/flashbets.git`, commit, push
   - **Done when**: GitHub Actions runs on push
 
-- [ ] 3.3 Confirm CI green
+- [x] 3.3 Confirm CI green
   - **Do**: watch workflow run and fix any failures
