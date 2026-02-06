@@ -71,6 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RUSTFLAGS: "-C debuginfo=0"
+      CARGO_BUILD_JOBS: "1"
     steps:
       - uses: actions/checkout@v4
 
