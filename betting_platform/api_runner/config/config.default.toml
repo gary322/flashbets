@@ -1,6 +1,8 @@
 # Default configuration for betting platform API
 # This file contains all configuration options with their default values
 
+environment = "development"
+
 [server]
 host = "127.0.0.1"
 port = 8081

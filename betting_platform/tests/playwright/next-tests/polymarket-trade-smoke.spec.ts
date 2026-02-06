@@ -23,12 +23,12 @@ test('browse markets and submit a Polymarket order (demo)', async ({ page }) => 
   const amountInput = page.getByTestId('trade-amount');
   await amountInput.fill('10');
 
-  const confirmPromise = page.waitForEvent('dialog');
   const orderResponsePromise = page.waitForResponse((response) => {
     return response.url().includes('/api/orders/submit') && response.status() === 200;
   });
 
-  await submitButton.click();
+  const confirmPromise = page.waitForEvent('dialog');
+  const clickPromise = submitButton.click();
 
   const confirmDialog = await confirmPromise;
   expect(confirmDialog.type()).toBe('confirm');
@@ -36,6 +36,7 @@ test('browse markets and submit a Polymarket order (demo)', async ({ page }) => 
   const alertPromise = page.waitForEvent('dialog');
   await confirmDialog.accept();
 
+  await clickPromise;
   await orderResponsePromise;
 
   const alertDialog = await alertPromise;
@@ -43,4 +44,3 @@ test('browse markets and submit a Polymarket order (demo)', async ({ page }) => 
   expect(alertDialog.message()).toContain('Order submitted successfully');
   await alertDialog.accept();
 });
-

@@ -167,13 +167,31 @@ export function usePolymarketOrder() {
           order: preparedOrder.order,
           signature,
           market_id: preparedOrder.displayData.market,
-          marketId: preparedOrder.displayData.market
         })
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to submit order');
+        const raw = await response.text();
+        let message = `Failed to submit order (${response.status})`;
+
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (typeof parsed?.error?.message === 'string') {
+              message = parsed.error.message;
+            } else if (typeof parsed?.message === 'string') {
+              message = parsed.message;
+            } else if (typeof parsed?.error === 'string') {
+              message = parsed.error;
+            } else {
+              message = raw;
+            }
+          } catch {
+            message = raw;
+          }
+        }
+
+        throw new Error(message);
       }
 
       const result = await response.json();

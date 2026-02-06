@@ -59,6 +59,7 @@ betting_platform/tests/playwright/playwright-report/
 betting_platform/tests/playwright/test-results/
 betting_platform/tests/playwright/results.json
 betting_platform/tests/playwright/results.xml
+betting_platform/tests/playwright/results-next.xml
 betting_platform/tests/playwright/screenshots/
 betting_platform/tests/playwright/demo/*.png
 

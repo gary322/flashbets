@@ -310,6 +310,9 @@ impl EnvironmentConfigService {
         
         // Apply environment variable overrides
         config = Self::apply_env_overrides(config)?;
+
+        // Always reflect the detected runtime environment, regardless of what config files specify.
+        config.environment = environment;
         
         // Validate final configuration
         Self::validate_config(&config)?;
@@ -859,21 +862,74 @@ impl ConfigValidator for ProductionReadinessValidator {
 mod tests {
     use super::*;
     use tempfile::TempDir;
+    use std::sync::Mutex;
+
+    static ENV_LOCK: Mutex<()> = Mutex::new(());
+
+    struct EnvRestore {
+        backups: Vec<(&'static str, Option<String>)>,
+    }
+
+    impl EnvRestore {
+        fn set(vars: &[(&'static str, Option<&'static str>)]) -> Self {
+            let backups = vars
+                .iter()
+                .map(|(key, _)| (*key, env::var(key).ok()))
+                .collect::<Vec<_>>();
+
+            for (key, value) in vars {
+                match value {
+                    Some(value) => env::set_var(key, value),
+                    None => env::remove_var(key),
+                }
+            }
+
+            Self { backups }
+        }
+    }
+
+    impl Drop for EnvRestore {
+        fn drop(&mut self) {
+            for (key, value) in self.backups.drain(..) {
+                match value {
+                    Some(value) => env::set_var(key, value),
+                    None => env::remove_var(key),
+                }
+            }
+        }
+    }
     
     #[test]
     fn test_environment_detection() {
-        env::set_var("ENVIRONMENT", "production");
+        let _lock = ENV_LOCK.lock().unwrap();
+        let _restore = EnvRestore::set(&[
+            ("ENVIRONMENT", Some("production")),
+            ("ENV", None),
+            ("RUST_ENV", None),
+        ]);
+
         assert_eq!(EnvironmentConfigService::detect_environment(), Environment::Production);
-        
-        env::remove_var("ENVIRONMENT");
-        env::set_var("ENV", "staging");
+
+        let _restore = EnvRestore::set(&[
+            ("ENVIRONMENT", None),
+            ("ENV", Some("staging")),
+            ("RUST_ENV", None),
+        ]);
         assert_eq!(EnvironmentConfigService::detect_environment(), Environment::Staging);
     }
     
     #[tokio::test]
     async fn test_config_loading() {
         let temp_dir = TempDir::new().unwrap();
-        let config_service = EnvironmentConfigService::new(temp_dir.path().to_path_buf()).unwrap();
+        let config_service = {
+            let _lock = ENV_LOCK.lock().unwrap();
+            let _restore = EnvRestore::set(&[
+                ("ENVIRONMENT", None),
+                ("ENV", None),
+                ("RUST_ENV", None),
+            ]);
+            EnvironmentConfigService::new(temp_dir.path().to_path_buf()).unwrap()
+        };
         
         let config = config_service.get_config().await;
         assert_eq!(config.environment, Environment::Development);
@@ -883,7 +939,15 @@ mod tests {
     #[tokio::test]
     async fn test_config_override() {
         let temp_dir = TempDir::new().unwrap();
-        let config_service = EnvironmentConfigService::new(temp_dir.path().to_path_buf()).unwrap();
+        let config_service = {
+            let _lock = ENV_LOCK.lock().unwrap();
+            let _restore = EnvRestore::set(&[
+                ("ENVIRONMENT", None),
+                ("ENV", None),
+                ("RUST_ENV", None),
+            ]);
+            EnvironmentConfigService::new(temp_dir.path().to_path_buf()).unwrap()
+        };
         
         config_service.set_override(
             "server.port",

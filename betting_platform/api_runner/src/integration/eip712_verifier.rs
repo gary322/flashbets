@@ -115,9 +115,8 @@ impl EIP712Verifier {
     /// Encode order data according to EIP-712 encoding rules
     fn encode_order(order: &PolymarketOrder) -> Result<Vec<u8>, String> {
         // EIP-712 encoding: ORDER_TYPE_HASH || abi.encode(order fields)
-        let order_type_hash = hex::decode(
-            "7c72dc25e6ea53cf6c125a1ca1f3a9dc40871d1b9ce2cc85c5f96b87e4da9144"
-        ).map_err(|e| format!("Failed to decode type hash: {}", e))?;
+        // keccak256("Order(uint256 salt,address maker,address signer,address taker,uint256 tokenId,uint256 makerAmount,uint256 takerAmount,uint256 expiration,uint256 nonce,uint256 feeRateBps,uint8 side,uint8 signatureType)")
+        let order_type_hash = keccak256(b"Order(uint256 salt,address maker,address signer,address taker,uint256 tokenId,uint256 makerAmount,uint256 takerAmount,uint256 expiration,uint256 nonce,uint256 feeRateBps,uint8 side,uint8 signatureType)");
 
         let mut encoded = Vec::new();
         encoded.extend_from_slice(&order_type_hash);
