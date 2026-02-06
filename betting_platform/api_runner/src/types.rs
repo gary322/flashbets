@@ -137,7 +137,7 @@ pub enum OrderType {
 #[serde(tag = "type")]
 pub enum WsMessage {
     MarketUpdate {
-        market_id: u128,
+        market_id: crate::serialization::SafeU128,
         yes_price: f64,
         no_price: f64,
         volume: u64,

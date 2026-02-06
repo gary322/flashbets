@@ -1,9 +1,15 @@
 import type { AppProps } from 'next/app';
+import dynamic from 'next/dynamic';
 import { ThemeProvider } from '@emotion/react';
 import { Global, css } from '@emotion/react';
 import { theme } from '../ui/theme/theme';
 import { Layout } from '../components/layout/Layout';
 import { MetaMaskProvider } from '../hooks/useMetaMask';
+import { clusterApiUrl } from '@solana/web3.js';
+
+const SolanaWalletProviders = dynamic(() => import('../components/SolanaWalletProviders'), {
+  ssr: false,
+});
 
 const globalStyles = css`
   * {
@@ -53,14 +59,18 @@ const globalStyles = css`
 `;
 
 export default function App({ Component, pageProps }: AppProps) {
+  const endpoint = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl('devnet');
+
   return (
-    <MetaMaskProvider>
-      <ThemeProvider theme={theme}>
-        <Global styles={globalStyles} />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </ThemeProvider>
-    </MetaMaskProvider>
+    <SolanaWalletProviders endpoint={endpoint}>
+      <MetaMaskProvider>
+        <ThemeProvider theme={theme}>
+          <Global styles={globalStyles} />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ThemeProvider>
+      </MetaMaskProvider>
+    </SolanaWalletProviders>
   );
 }

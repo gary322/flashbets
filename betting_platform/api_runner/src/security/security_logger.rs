@@ -541,7 +541,7 @@ pub struct SecurityStatistics {
 
 /// Security logging middleware
 pub async fn security_logging_middleware<B>(
-    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    connect_info: Option<ConnectInfo<SocketAddr>>,
     matched_path: Option<MatchedPath>,
     request: Request<B>,
     next: Next<B>,
@@ -551,6 +551,9 @@ where
     B::Data: Send,
     B::Error: Into<axum::BoxError>,
 {
+    let addr = connect_info
+        .map(|ConnectInfo(addr)| addr)
+        .unwrap_or_else(|| SocketAddr::from(([0, 0, 0, 0], 0)));
     let start_time = Instant::now();
     let method = request.method().clone();
     let path = matched_path

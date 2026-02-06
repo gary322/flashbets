@@ -190,34 +190,34 @@ export default function Markets() {
   const [filter, setFilter] = useState<'all' | 'active' | 'resolved'>('all');
 
   useEffect(() => {
+    const fetchMarkets = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        let url = '/api/markets?limit=50';
+        if (filter === 'active') {
+          url += '&status=active';
+        } else if (filter === 'resolved') {
+          url += '&status=resolved';
+        }
+
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch markets: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setMarkets(data.markets || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load markets');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMarkets();
   }, [filter]);
-
-  const fetchMarkets = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      let url = '/api/markets?limit=50';
-      if (filter === 'active') {
-        url += '&status=active';
-      } else if (filter === 'resolved') {
-        url += '&status=resolved';
-      }
-      
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch markets: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      setMarkets(data.markets || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load markets');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const filteredMarkets = markets.filter(market => 
     market.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

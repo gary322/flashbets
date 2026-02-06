@@ -30,7 +30,7 @@ fn extract_correlation_id(headers: &HeaderMap) -> CorrelationId {
 pub async fn tracing_middleware(
     State(state): State<AppState>,
     OriginalUri(uri): OriginalUri,
-    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    connect_info: Option<ConnectInfo<SocketAddr>>,
     headers: HeaderMap,
     mut req: Request<Body>,
     next: Next<Body>,
@@ -49,7 +49,13 @@ pub async fn tracing_middleware(
     let mut context = logger.create_request_context(path.clone(), method.clone()).await;
     
     // Add request metadata
-    let client_ip = addr.ip().to_string();
+    let client_ip = headers
+        .get("x-forwarded-for")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|s| s.split(',').next())
+        .map(|s| s.trim().to_string())
+        .or_else(|| connect_info.map(|ConnectInfo(addr)| addr.ip().to_string()))
+        .unwrap_or_else(|| "unknown".to_string());
     let user_agent = headers
         .get("user-agent")
         .and_then(|v| v.to_str().ok())

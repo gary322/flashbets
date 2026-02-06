@@ -20,6 +20,8 @@ node_modules/
 **/node_modules/
 .next/
 **/.next/
+out/
+**/out/
 dist/
 build/
 coverage/
@@ -53,6 +55,12 @@ rocksdb/
 # Large test artifacts / results (keep test code, ignore outputs)
 betting_platform/tests/load-testing/
 betting_platform/test_e2e/results/
+betting_platform/tests/playwright/playwright-report/
+betting_platform/tests/playwright/test-results/
+betting_platform/tests/playwright/results.json
+betting_platform/tests/playwright/results.xml
+betting_platform/tests/playwright/screenshots/
+betting_platform/tests/playwright/demo/*.png
 
 # Redis dumps
 dump.rdb

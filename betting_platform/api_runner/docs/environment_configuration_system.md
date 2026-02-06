@@ -70,49 +70,49 @@ Configuration is loaded from multiple sources in priority order:
 host = "127.0.0.1"
 port = 8081
 workers = 4  # Optional, defaults to CPU count
-keep_alive = 75
-request_timeout = 30
+keep_alive = "75s"
+request_timeout = "30s"
 body_limit = 10485760  # 10MB
 
 [database]
 url = "postgresql://localhost/betting_platform"
 max_connections = 100
 min_connections = 10
-connect_timeout = 30
-idle_timeout = 600
-max_lifetime = 1800
+connect_timeout = "30s"
+idle_timeout = "10m"
+max_lifetime = "30m"
 enable_fallback = true
 
 [redis]
 url = "redis://localhost:6379"
 pool_size = 20
-timeout = 5
+timeout = "5s"
 retry_attempts = 3
-retry_delay = 100  # milliseconds
+retry_delay = "100ms"
 
 [solana]
 rpc_url = "https://api.devnet.solana.com"
 ws_url = "wss://api.devnet.solana.com"
 commitment = "confirmed"
 program_id = "11111111111111111111111111111111"
-request_timeout = 30
+request_timeout = "30s"
 max_retries = 3
-retry_delay = 500  # milliseconds
+retry_delay = "500ms"
 
 [websocket]
 max_connections = 10000
-ping_interval = 30
-pong_timeout = 10
+ping_interval = "30s"
+pong_timeout = "10s"
 message_buffer_size = 1000
 broadcast_capacity = 10000
 
 [security]
 jwt_secret = "change-me-in-production"
-jwt_expiry = 3600  # 1 hour
-refresh_token_expiry = 604800  # 7 days
+jwt_expiry = "1h"
+refresh_token_expiry = "168h"  # 7 days
 bcrypt_cost = 12
 rate_limit_requests = 100
-rate_limit_window = 60
+rate_limit_window = "60s"
 cors_origins = ["http://localhost:3000"]
 
 [external_apis.polymarket]
@@ -121,7 +121,7 @@ ws_url = "wss://ws.polymarket.com"
 rate_limit = 10
 
 [external_apis]
-timeout = 30
+timeout = "30s"
 max_retries = 3
 
 [features]
@@ -134,14 +134,14 @@ enable_circuit_breakers = true
 enable_health_checks = true
 
 [monitoring]
-health_check_interval = 30
-metrics_retention = 3600
+health_check_interval = "30s"
+metrics_retention = "1h"
 log_level = "info"
 enable_performance_tracking = true
 
 [performance]
-cache_ttl = 300
-query_timeout = 5
+cache_ttl = "5m"
+query_timeout = "5s"
 max_concurrent_requests = 1000
 enable_compression = true
 ```

@@ -103,12 +103,11 @@ pub fn identify_correlation_clusters(
     
     // Union markets with correlation above threshold
     for entry in &matrix.correlations {
-        // Convert correlation from [-1,1] representation to absolute value
-        let abs_corr = if entry.correlation < 0 {
-            (-entry.correlation) as u64
-        } else {
-            entry.correlation as u64
-        };
+        // Stored correlation is in mapped representation [0, 2*ONE] where ONE is 0 correlation.
+        // Convert to signed [-ONE, ONE] then take absolute magnitude [0, ONE].
+        const ONE: i64 = 1_000_000;
+        let signed = entry.correlation - ONE;
+        let abs_corr = signed.unsigned_abs();
         
         if abs_corr >= threshold {
             uf.union(entry.market_i, entry.market_j);
@@ -166,12 +165,10 @@ fn calculate_cluster_average_correlation(
             if let Some(entry) = matrix.correlations.iter()
                 .find(|e| (e.market_i == market_i && e.market_j == market_j) ||
                          (e.market_i == market_j && e.market_j == market_i)) {
-                
-                let abs_corr = if entry.correlation < 0 {
-                    (-entry.correlation) as u64
-                } else {
-                    entry.correlation as u64
-                };
+
+                const ONE: i64 = 1_000_000;
+                let signed = entry.correlation - ONE;
+                let abs_corr = signed.unsigned_abs();
                 
                 sum += abs_corr as u128;
                 count += 1;
@@ -294,21 +291,21 @@ mod tests {
                 CorrelationEntry {
                     market_i: 0,
                     market_j: 1,
-                    correlation: 900_000,  // 0.9
+                    correlation: 1_900_000,  // +0.9 in mapped representation
                     last_updated: 0,
                     sample_size: 7,
                 },
                 CorrelationEntry {
                     market_i: 1,
                     market_j: 2,
-                    correlation: 850_000,  // 0.85
+                    correlation: 1_850_000,  // +0.85
                     last_updated: 0,
                     sample_size: 7,
                 },
                 CorrelationEntry {
                     market_i: 0,
                     market_j: 2,
-                    correlation: 800_000,  // 0.8
+                    correlation: 1_800_000,  // +0.8
                     last_updated: 0,
                     sample_size: 7,
                 },
@@ -316,7 +313,7 @@ mod tests {
                 CorrelationEntry {
                     market_i: 3,
                     market_j: 4,
-                    correlation: 750_000,  // 0.75
+                    correlation: 1_750_000,  // +0.75
                     last_updated: 0,
                     sample_size: 7,
                 },
@@ -324,7 +321,7 @@ mod tests {
                 CorrelationEntry {
                     market_i: 0,
                     market_j: 3,
-                    correlation: 200_000,  // 0.2
+                    correlation: 1_200_000,  // +0.2
                     last_updated: 0,
                     sample_size: 7,
                 },

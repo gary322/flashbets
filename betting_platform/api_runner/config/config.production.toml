@@ -40,5 +40,5 @@ log_level = "warn"
 enable_performance_tracking = true
 
 [performance]
-cache_ttl = 600  # Longer cache in production
+cache_ttl = "10m"  # Longer cache in production
 max_concurrent_requests = 5000  # Higher limit for production

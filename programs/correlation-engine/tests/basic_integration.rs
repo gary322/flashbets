@@ -95,14 +95,16 @@ async fn test_basic_initialization() {
     let tracking_account = banks_client.get_account(verse_tracking_pda).await.unwrap().unwrap();
     println!("Tracking account data length: {}", tracking_account.data.len());
     // For VerseTracking, we need to handle dynamic size
-    let tracking = VerseTracking::try_from_slice(&tracking_account.data).unwrap();
+    let mut tracking_data: &[u8] = &tracking_account.data;
+    let tracking = VerseTracking::deserialize(&mut tracking_data).unwrap();
     assert!(tracking.is_initialized);
     assert_eq!(tracking.verse_id, verse_id);
 
     // Verify correlation matrix was initialized
     let matrix_account = banks_client.get_account(correlation_matrix_pda).await.unwrap().unwrap();
     println!("Matrix account data length: {}", matrix_account.data.len());
-    let matrix = CorrelationMatrix::try_from_slice(&matrix_account.data).unwrap();
+    let mut matrix_data: &[u8] = &matrix_account.data;
+    let matrix = CorrelationMatrix::deserialize(&mut matrix_data).unwrap();
     assert!(matrix.is_initialized);
     assert_eq!(matrix.verse_id, verse_id);
     assert_eq!(matrix.correlations.len(), 0); // No correlations yet
@@ -183,21 +185,21 @@ fn test_correlation_clustering() {
             CorrelationEntry {
                 market_i: 0,
                 market_j: 1,
-                correlation: 900_000,  // 0.9
+                correlation: 1_900_000,  // +0.9 in mapped representation
                 last_updated: 0,
                 sample_size: 7,
             },
             CorrelationEntry {
                 market_i: 1,
                 market_j: 2,
-                correlation: 850_000,  // 0.85
+                correlation: 1_850_000,  // +0.85
                 last_updated: 0,
                 sample_size: 7,
             },
             CorrelationEntry {
                 market_i: 0,
                 market_j: 2,
-                correlation: 800_000,  // 0.8
+                correlation: 1_800_000,  // +0.8
                 last_updated: 0,
                 sample_size: 7,
             },
@@ -205,7 +207,7 @@ fn test_correlation_clustering() {
             CorrelationEntry {
                 market_i: 3,
                 market_j: 4,
-                correlation: 750_000,  // 0.75
+                correlation: 1_750_000,  // +0.75
                 last_updated: 0,
                 sample_size: 7,
             },
@@ -213,7 +215,7 @@ fn test_correlation_clustering() {
             CorrelationEntry {
                 market_i: 0,
                 market_j: 3,
-                correlation: 200_000,  // 0.2
+                correlation: 1_200_000,  // +0.2
                 last_updated: 0,
                 sample_size: 7,
             },

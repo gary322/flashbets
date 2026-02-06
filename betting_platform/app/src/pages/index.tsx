@@ -175,7 +175,7 @@ export default function Home() {
           <Title>Quantum Betting Platform</Title>
           <Subtitle>The Future of Prediction Markets on Solana</Subtitle>
           <Description>
-            Experience the world's first quantum-enhanced prediction market platform. 
+            Experience the world&apos;s first quantum-enhanced prediction market platform. 
             Trade with superposition states, leverage verse multipliers, and unlock 
             unprecedented trading possibilities on native Solana.
           </Description>

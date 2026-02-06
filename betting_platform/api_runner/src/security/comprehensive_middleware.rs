@@ -100,12 +100,16 @@ fn check_path_traversal(path: &str) -> bool {
 /// Comprehensive security middleware
 pub async fn comprehensive_security_middleware(
     State(state): State<AppState>,
-    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    connect_info: Option<ConnectInfo<SocketAddr>>,
     matched_path: Option<MatchedPath>,
     request: Request<Body>,
     next: Next<Body>,
 ) -> impl IntoResponse {
     let start_time = Instant::now();
+
+    let addr = connect_info
+        .map(|ConnectInfo(addr)| addr)
+        .unwrap_or_else(|| SocketAddr::from(([0, 0, 0, 0], 0)));
     
     // Extract request info
     let method = request.method().clone();

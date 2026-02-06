@@ -265,9 +265,14 @@ pub enum MockProfile {
 impl MockProfile {
     pub fn to_config(self) -> MockConfig {
         match self {
-            MockProfile::Realistic => MockConfig::default(),
+            MockProfile::Realistic => {
+                let mut config = MockConfig::default();
+                config.enabled = true;
+                config
+            }
             MockProfile::Fast => {
                 let mut config = MockConfig::default();
+                config.enabled = true;
                 config.oracle.providers.iter_mut().for_each(|p| {
                     p.response_delay_ms = 10;
                     p.fail_rate = 0.0;
@@ -280,6 +285,7 @@ impl MockProfile {
             }
             MockProfile::Chaos => {
                 let mut config = MockConfig::default();
+                config.enabled = true;
                 config.oracle.providers.iter_mut().for_each(|p| {
                     p.fail_rate = 0.3;
                 });

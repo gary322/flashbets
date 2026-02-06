@@ -55,7 +55,10 @@ pub fn calculate_pearson_correlation(
     let var_y = (var_y_sum / n as u128 / U64F64::ONE as u128) as u64;
     
     // Check for zero variance
-    const VARIANCE_THRESHOLD: u64 = 1000; // 0.001 in fixed point
+    // Variance is in fixed point (scale = 1e6). A threshold of 10 means ~1e-5 variance
+    // (std dev ~0.0032), which avoids divide-by-zero while still working for typical
+    // prediction-market price ranges.
+    const VARIANCE_THRESHOLD: u64 = 10;
     if var_x < VARIANCE_THRESHOLD || var_y < VARIANCE_THRESHOLD {
         // No variance means undefined correlation, return 0 correlation (midpoint)
         return Ok(U64F64::ONE);

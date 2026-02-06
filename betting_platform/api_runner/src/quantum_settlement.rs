@@ -75,7 +75,11 @@ impl QuantumSettlementEngine {
         
         // Calculate base P&L
         let base_pnl = if is_winner {
-            (collapsed_state.amount as f64 * settlement_price) as i128 - collapsed_state.amount as i128
+            // Treat `probability` as the entry price (0..1). If the outcome wins, payout is
+            // `settlement_price / entry_price` times the stake (shares-style payout).
+            let entry_price = collapsed_state.probability.max(1e-9);
+            let payout = (collapsed_state.amount as f64 * settlement_price) / entry_price;
+            payout as i128 - collapsed_state.amount as i128
         } else {
             -(collapsed_state.amount as i128)
         };
@@ -329,11 +333,17 @@ mod tests {
             creator: Default::default(),
             outcomes: vec![
                 MarketOutcome {
+                    id: 0,
                     name: "Yes".to_string(),
+                    title: "Yes".to_string(),
+                    description: "Yes outcome".to_string(),
                     total_stake: 1000000,
                 },
                 MarketOutcome {
+                    id: 1,
                     name: "No".to_string(),
+                    title: "No".to_string(),
+                    description: "No outcome".to_string(),
                     total_stake: 1000000,
                 },
             ],
@@ -345,6 +355,7 @@ mod tests {
             winning_outcome: Some(0),
             created_at: Utc::now().timestamp() - 86400,
             verse_id: Some(1),
+            current_price: 0.55,
         };
 
         let settlement = engine.settle_quantum_position(&position, &market, 0)

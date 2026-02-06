@@ -73,7 +73,9 @@ pub struct ServerConfig {
     pub host: String,
     pub port: u16,
     pub workers: Option<usize>,
+    #[serde(with = "humantime_serde")]
     pub keep_alive: Duration,
+    #[serde(with = "humantime_serde")]
     pub request_timeout: Duration,
     pub body_limit: usize,
 }
@@ -83,8 +85,11 @@ pub struct DatabaseConfig {
     pub url: String,
     pub max_connections: u32,
     pub min_connections: u32,
+    #[serde(with = "humantime_serde")]
     pub connect_timeout: Duration,
+    #[serde(with = "humantime_serde")]
     pub idle_timeout: Duration,
+    #[serde(with = "humantime_serde")]
     pub max_lifetime: Duration,
     pub enable_fallback: bool,
 }
@@ -93,8 +98,10 @@ pub struct DatabaseConfig {
 pub struct RedisConfig {
     pub url: String,
     pub pool_size: u32,
+    #[serde(with = "humantime_serde")]
     pub timeout: Duration,
     pub retry_attempts: u32,
+    #[serde(with = "humantime_serde")]
     pub retry_delay: Duration,
 }
 
@@ -104,15 +111,19 @@ pub struct SolanaConfig {
     pub ws_url: String,
     pub commitment: String,
     pub program_id: String,
+    #[serde(with = "humantime_serde")]
     pub request_timeout: Duration,
     pub max_retries: u32,
+    #[serde(with = "humantime_serde")]
     pub retry_delay: Duration,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WebSocketConfig {
     pub max_connections: usize,
+    #[serde(with = "humantime_serde")]
     pub ping_interval: Duration,
+    #[serde(with = "humantime_serde")]
     pub pong_timeout: Duration,
     pub message_buffer_size: usize,
     pub broadcast_capacity: usize,
@@ -121,10 +132,13 @@ pub struct WebSocketConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SecurityConfig {
     pub jwt_secret: String,
+    #[serde(with = "humantime_serde")]
     pub jwt_expiry: Duration,
+    #[serde(with = "humantime_serde")]
     pub refresh_token_expiry: Duration,
     pub bcrypt_cost: u32,
     pub rate_limit_requests: u32,
+    #[serde(with = "humantime_serde")]
     pub rate_limit_window: Duration,
     pub cors_origins: Vec<String>,
 }
@@ -132,6 +146,7 @@ pub struct SecurityConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExternalApisConfig {
     pub polymarket: PolymarketConfig,
+    #[serde(with = "humantime_serde")]
     pub timeout: Duration,
     pub max_retries: u32,
 }
@@ -157,7 +172,9 @@ pub struct FeatureFlags {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MonitoringConfig {
+    #[serde(with = "humantime_serde")]
     pub health_check_interval: Duration,
+    #[serde(with = "humantime_serde")]
     pub metrics_retention: Duration,
     pub log_level: String,
     pub enable_performance_tracking: bool,
@@ -165,7 +182,9 @@ pub struct MonitoringConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PerformanceConfig {
+    #[serde(with = "humantime_serde")]
     pub cache_ttl: Duration,
+    #[serde(with = "humantime_serde")]
     pub query_timeout: Duration,
     pub max_concurrent_requests: usize,
     pub enable_compression: bool,
@@ -541,8 +560,10 @@ impl EnvironmentConfigService {
     
     /// Set configuration override
     pub async fn set_override(&self, path: &str, value: serde_json::Value) -> Result<()> {
-        let mut overrides = self.overrides.write().await;
-        overrides.insert(path.to_string(), value);
+        {
+            let mut overrides = self.overrides.write().await;
+            overrides.insert(path.to_string(), value);
+        }
         
         // Reload configuration with new override
         self.reload().await?;
@@ -558,7 +579,7 @@ impl EnvironmentConfigService {
         let overrides = self.overrides.read().await;
         let mut config = new_config;
         
-        // TODO: Apply overrides to config
+        Self::apply_overrides(&mut config, &overrides)?;
         
         // Validate with registered validators
         for validator in &self.validators {
@@ -573,6 +594,74 @@ impl EnvironmentConfigService {
         *self.config.write().await = config;
         
         info!("Configuration reloaded successfully");
+        Ok(())
+    }
+
+    fn apply_overrides(config: &mut Config, overrides: &HashMap<String, serde_json::Value>) -> Result<()> {
+        if overrides.is_empty() {
+            return Ok(());
+        }
+
+        let context = ErrorContext::new("environment_config", "apply_overrides");
+
+        let mut json = serde_json::to_value(&*config).map_err(|e| {
+            AppError::new(
+                ErrorKind::ConfigurationError,
+                &format!("Failed to serialize config for overrides: {}", e),
+                context.clone(),
+            )
+        })?;
+
+        for (path, value) in overrides {
+            Self::set_json_value_at_path(&mut json, path, value.clone())?;
+        }
+
+        *config = serde_json::from_value(json).map_err(|e| {
+            AppError::new(
+                ErrorKind::ConfigurationError,
+                &format!("Failed to deserialize config after overrides: {}", e),
+                context,
+            )
+        })?;
+
+        Ok(())
+    }
+
+    fn set_json_value_at_path(root: &mut serde_json::Value, path: &str, value: serde_json::Value) -> Result<()> {
+        let context = ErrorContext::new("environment_config", "set_override");
+        let parts: Vec<&str> = path.split('.').collect();
+
+        let mut current = root;
+        for (idx, part) in parts.iter().enumerate() {
+            let is_last = idx == parts.len() - 1;
+
+            if is_last {
+                match current {
+                    serde_json::Value::Object(map) => {
+                        map.insert((*part).to_string(), value);
+                        return Ok(());
+                    }
+                    _ => {
+                        return Err(AppError::new(
+                            ErrorKind::ConfigurationError,
+                            &format!("Override path does not point to an object: {}", path),
+                            context,
+                        ));
+                    }
+                }
+            }
+
+            current = current
+                .get_mut(*part)
+                .ok_or_else(|| {
+                    AppError::new(
+                        ErrorKind::ConfigurationError,
+                        &format!("Override path not found: {}", path),
+                        context.clone(),
+                    )
+                })?;
+        }
+
         Ok(())
     }
     

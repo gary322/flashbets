@@ -448,11 +448,17 @@ mod tests {
             creator: Pubkey::new_unique(),
             outcomes: vec![
                 MarketOutcome {
+                    id: 0,
                     name: "Yes".to_string(),
+                    title: "Yes".to_string(),
+                    description: "Yes outcome".to_string(),
                     total_stake: 50000,
                 },
                 MarketOutcome {
+                    id: 1,
                     name: "No".to_string(),
+                    title: "No".to_string(),
+                    description: "No outcome".to_string(),
                     total_stake: 50000,
                 },
             ],
@@ -464,6 +470,7 @@ mod tests {
             winning_outcome: None,
             created_at: chrono::Utc::now().timestamp(),
             verse_id: Some(1),
+            current_price: 0.5,
         }
     }
     
@@ -513,7 +520,7 @@ mod tests {
         assert_ne!(pda, pda3);
     }
     
-    #[tokio::test]
+    #[tokio::test(flavor = "multi_thread")]
     async fn test_place_trade() {
         let client = create_test_client();
         let user = Keypair::new();
@@ -536,7 +543,7 @@ mod tests {
         assert!(result.is_err());
     }
     
-    #[tokio::test]
+    #[tokio::test(flavor = "multi_thread")]
     async fn test_create_demo_account() {
         let client = create_test_client();
         let user = Keypair::new();
@@ -565,7 +572,7 @@ mod tests {
             leverage: 5,
         };
         
-        let data = instruction.try_to_vec().unwrap();
+        let data = _instruction.try_to_vec().unwrap();
         
         // Verify serialization
         assert_eq!(data[0], 0); // discriminator

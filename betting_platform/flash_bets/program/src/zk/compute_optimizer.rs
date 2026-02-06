@@ -39,6 +39,11 @@ impl FlashCompute {
     
     /// Check if proof can be verified within flash constraints
     pub fn can_verify_in_flash_time(proof_size: usize, time_left: u64) -> bool {
+        // Practical guardrail: very large proofs are disallowed when the market is ultra-short.
+        if time_left <= 10 && proof_size > 1024 {
+            return false;
+        }
+
         let verification_time = Self::estimate_verification_time(proof_size);
         let time_left_micros = time_left * 1_000_000; // Convert seconds to microseconds
         

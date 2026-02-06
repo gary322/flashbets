@@ -7,7 +7,7 @@ use solana_program::{
 pub struct CorrelationEntry {
     pub market_i: u16,
     pub market_j: u16,
-    pub correlation: i64,  // Fixed point, can be negative (-1 to +1 mapped to fixed point)
+    pub correlation: i64,  // Fixed point in [0, 2*ONE] where ONE represents 0 correlation
     pub last_updated: i64,
     pub sample_size: u32,
 }
@@ -81,6 +81,9 @@ impl CorrelationMatrix {
                 sample_size,
             });
         }
+
+        // Track the highest referenced market index (assuming 0..N-1 indexing).
+        self.market_count = self.market_count.max(j.saturating_add(1));
         
         Ok(())
     }
@@ -104,11 +107,20 @@ impl CorrelationMatrix {
             self.average_correlation = 0;
             return Ok(());
         }
-        
-        let sum: u128 = self.correlations.iter()
-            .map(|e| e.correlation.unsigned_abs() as u128)
+
+        // Convert mapped correlation [0, 2*ONE] into absolute correlation factor [0, ONE]
+        // where -1 => ONE, 0 => 0, +1 => ONE.
+        const ONE: u64 = 1_000_000;
+        let sum: u128 = self
+            .correlations
+            .iter()
+            .map(|e| {
+                let rep = u64::try_from(e.correlation).unwrap_or(0);
+                let abs_corr = if rep > ONE { rep - ONE } else { ONE - rep };
+                abs_corr as u128
+            })
             .sum();
-        
+
         self.average_correlation = (sum / self.correlations.len() as u128) as u64;
         Ok(())
     }

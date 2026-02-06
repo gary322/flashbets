@@ -192,26 +192,42 @@ impl QuantumEngine {
 
     /// Measure quantum position, causing wave function collapse
     pub async fn measure_quantum_position(&self, position_id: &str) -> Result<QuantumMeasurement> {
-        let mut positions = self.positions.write().await;
-        let position = positions.get_mut(position_id)
-            .ok_or_else(|| anyhow!("Quantum position not found"))?;
+        let (measured_state, measurement_time, probability, entanglement_group) = {
+            let mut positions = self.positions.write().await;
+            let position = positions
+                .get_mut(position_id)
+                .ok_or_else(|| anyhow!("Quantum position not found"))?;
 
-        if position.is_collapsed {
-            return Err(anyhow!("Position already collapsed"));
-        }
+            if position.is_collapsed {
+                return Err(anyhow!("Position already collapsed"));
+            }
 
-        // Perform quantum measurement based on probabilities
-        let measured_state = self.collapse_wave_function(&position.states)?;
-        let measurement_time = chrono::Utc::now().timestamp();
+            // Perform quantum measurement based on probabilities
+            let measured_state = self.collapse_wave_function(&position.states)?;
+            let measurement_time = chrono::Utc::now().timestamp();
 
-        // Collapse the position
-        position.is_collapsed = true;
-        position.last_measured = Some(measurement_time);
-        position.measurement_result = Some(measured_state.clone());
+            // Capture probability before we mutate/drop any state.
+            let probability = position
+                .states
+                .iter()
+                .find(|s| s.market_id == measured_state.market_id && s.outcome == measured_state.outcome)
+                .map(|s| s.probability)
+                .unwrap_or(0.0);
 
-        // Handle entangled positions
-        let affected_entangled = if let Some(group_id) = &position.entanglement_group {
-            self.collapse_entangled_positions(group_id, position_id, &measured_state).await?
+            let entanglement_group = position.entanglement_group.clone();
+
+            // Collapse the position
+            position.is_collapsed = true;
+            position.last_measured = Some(measurement_time);
+            position.measurement_result = Some(measured_state.clone());
+
+            (measured_state, measurement_time, probability, entanglement_group)
+        };
+
+        // Handle entangled positions outside the `positions` lock to avoid deadlocks.
+        let affected_entangled = if let Some(group_id) = entanglement_group.as_deref() {
+            self.collapse_entangled_positions(group_id, position_id, &measured_state)
+                .await?
         } else {
             Vec::new()
         };
@@ -219,10 +235,7 @@ impl QuantumEngine {
         let measurement = QuantumMeasurement {
             position_id: position_id.to_string(),
             measured_state,
-            probability: position.states.iter()
-                .find(|s| s.market_id == position.measurement_result.as_ref().unwrap().market_id)
-                .map(|s| s.probability)
-                .unwrap_or(0.0),
+            probability,
             timestamp: measurement_time,
             caused_collapse: true,
             affected_entangled,
@@ -262,14 +275,18 @@ impl QuantumEngine {
         measured_position_id: &str,
         measured_state: &QuantumState,
     ) -> Result<Vec<String>> {
-        let groups = self.entanglement_groups.read().await;
-        let group = groups.get(group_id)
-            .ok_or_else(|| anyhow!("Entanglement group not found"))?;
+        let (position_ids, correlation_matrix) = {
+            let groups = self.entanglement_groups.read().await;
+            let group = groups
+                .get(group_id)
+                .ok_or_else(|| anyhow!("Entanglement group not found"))?;
+            (group.positions.clone(), group.correlation_matrix.clone())
+        };
 
         let mut affected = Vec::new();
         let mut positions = self.positions.write().await;
 
-        for position_id in &group.positions {
+        for position_id in &position_ids {
             if position_id == measured_position_id {
                 continue; // Skip the measured position
             }
@@ -280,7 +297,7 @@ impl QuantumEngine {
                     let correlated_state = self.apply_entanglement_correlation(
                         &position.states,
                         measured_state,
-                        &group.correlation_matrix,
+                        &correlation_matrix,
                     )?;
 
                     position.is_collapsed = true;

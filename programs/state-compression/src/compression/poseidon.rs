@@ -223,7 +223,7 @@ mod tests {
         let mut tree = PoseidonMerkleTree::new();
         
         // Add leaves
-        for i in 0..8 {
+        for i in 0u64..8 {
             let mut hasher = PoseidonHasher::new();
             hasher.update(&i.to_le_bytes());
             tree.add_leaf(hasher.finalize());

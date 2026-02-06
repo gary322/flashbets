@@ -101,7 +101,7 @@ pub async fn start_market_updates(state: AppState) {
                 let no_price = 1.0 - yes_price;
                 
                 let update = WsMessage::MarketUpdate {
-                    market_id: market.id,
+                    market_id: crate::serialization::SafeU128(market.id),
                     yes_price,
                     no_price,
                     volume: market.total_volume,
@@ -162,7 +162,7 @@ mod tests {
         let mut rx3 = manager.subscribe();
         
         let msg = WsMessage::MarketUpdate {
-            market_id: 1000,
+            market_id: crate::serialization::SafeU128(1000),
             yes_price: 0.6,
             no_price: 0.4,
             volume: 100000,
@@ -192,7 +192,7 @@ mod tests {
         
         // Test market update
         let market_update = WsMessage::MarketUpdate {
-            market_id: 12345,
+            market_id: crate::serialization::SafeU128(12345),
             yes_price: 0.75,
             no_price: 0.25,
             volume: 50000,
@@ -239,7 +239,7 @@ mod tests {
                 level: "success".to_string(),
             },
             WsMessage::MarketUpdate {
-                market_id: 1234,
+                market_id: crate::serialization::SafeU128(1234),
                 yes_price: 0.55,
                 no_price: 0.45,
                 volume: 1000000,

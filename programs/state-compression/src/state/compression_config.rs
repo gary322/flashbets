@@ -49,6 +49,9 @@ pub struct CompressionConfig {
     
     /// Emergency pause flag
     pub emergency_pause: bool,
+
+    /// Reserved bytes for future upgrades (keeps account size stable)
+    pub reserved: [u8; 64],
 }
 
 impl CompressionConfig {
@@ -68,7 +71,7 @@ impl CompressionConfig {
         4 + // max_proof_size
         1 + // compression_version
         1 + // emergency_pause
-        64; // padding for future use
+        64; // reserved
     
     /// Create default configuration
     pub fn default(authority: Pubkey) -> Self {
@@ -87,6 +90,7 @@ impl CompressionConfig {
             max_proof_size: 1024 * 10, // 10KB max proof size
             compression_version: 1,
             emergency_pause: false,
+            reserved: [0u8; 64],
         }
     }
     

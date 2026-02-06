@@ -35,10 +35,13 @@ pub fn calculate_correlation_statistics(
         });
     }
     
-    // Extract all correlations
-    let mut correlations: Vec<i64> = matrix.correlations
+    // Stored correlation is in mapped representation [0, 2*ONE] where ONE is 0 correlation.
+    // Convert to signed [-ONE, ONE] for statistical analysis.
+    const ONE: i64 = 1_000_000;
+    let mut correlations: Vec<i64> = matrix
+        .correlations
         .iter()
-        .map(|e| e.correlation)
+        .map(|e| e.correlation - ONE)
         .collect();
     
     // Sort for median calculation
@@ -72,13 +75,12 @@ pub fn calculate_correlation_statistics(
     let std_deviation = integer_sqrt(variance) as u64;
     
     // Count high correlation pairs and negative pairs
-    let high_correlation_pairs = matrix.correlations.iter()
-        .filter(|e| e.correlation.abs() > 700_000)  // |corr| > 0.7
+    let high_correlation_pairs = correlations
+        .iter()
+        .filter(|c| c.abs() as u64 > 700_000) // |corr| > 0.7
         .count() as u16;
-    
-    let negative_correlation_pairs = matrix.correlations.iter()
-        .filter(|e| e.correlation < 0)
-        .count() as u16;
+
+    let negative_correlation_pairs = correlations.iter().filter(|c| **c < 0).count() as u16;
     
     Ok(CorrelationStatistics {
         min_correlation,
@@ -147,8 +149,14 @@ pub fn analyze_correlation_distribution(
     let mut buckets = Vec::new();
     
     for (start, end) in bucket_ranges {
-        let count = matrix.correlations.iter()
-            .filter(|e| e.correlation >= start && e.correlation < end)
+        const ONE: i64 = 1_000_000;
+        let count = matrix
+            .correlations
+            .iter()
+            .filter(|e| {
+                let signed = e.correlation - ONE;
+                signed >= start && signed < end
+            })
             .count() as u16;
         
         let percentage = if total_count > 0 {
@@ -195,10 +203,11 @@ pub fn analyze_market_connectivity(
     market_id: u16,
     significance_threshold: u64,  // e.g., 300_000 for |corr| > 0.3
 ) -> Result<MarketConnectivity, ProgramError> {
+    const ONE: i64 = 1_000_000;
     let connections: Vec<&crate::state::correlation_matrix::CorrelationEntry> = matrix.correlations
         .iter()
         .filter(|e| (e.market_i == market_id || e.market_j == market_id) && 
-                    e.correlation.abs() as u64 > significance_threshold)
+                    (e.correlation - ONE).abs() as u64 > significance_threshold)
         .collect();
     
     if connections.is_empty() {
@@ -215,7 +224,7 @@ pub fn analyze_market_connectivity(
     let mut max_corr = 0u64;
     
     for entry in &connections {
-        let abs_corr = entry.correlation.abs() as u64;
+        let abs_corr = (entry.correlation - ONE).abs() as u64;
         sum += abs_corr as u128;
         max_corr = max_corr.max(abs_corr);
     }
@@ -277,21 +286,21 @@ mod tests {
                 CorrelationEntry {
                     market_i: 0,
                     market_j: 1,
-                    correlation: 900_000,  // 0.9
+                    correlation: 1_900_000,  // +0.9 in mapped representation
                     last_updated: 0,
                     sample_size: 7,
                 },
                 CorrelationEntry {
                     market_i: 0,
                     market_j: 2,
-                    correlation: -500_000,  // -0.5
+                    correlation: 500_000,  // -0.5
                     last_updated: 0,
                     sample_size: 7,
                 },
                 CorrelationEntry {
                     market_i: 1,
                     market_j: 2,
-                    correlation: 200_000,  // 0.2
+                    correlation: 1_200_000,  // +0.2
                     last_updated: 0,
                     sample_size: 7,
                 },
@@ -318,11 +327,11 @@ mod tests {
             is_initialized: true,
             verse_id: [0u8; 16],
             correlations: vec![
-                CorrelationEntry { market_i: 0, market_j: 1, correlation: 900_000, last_updated: 0, sample_size: 7 },
-                CorrelationEntry { market_i: 0, market_j: 2, correlation: 750_000, last_updated: 0, sample_size: 7 },
-                CorrelationEntry { market_i: 0, market_j: 3, correlation: 300_000, last_updated: 0, sample_size: 7 },
-                CorrelationEntry { market_i: 1, market_j: 2, correlation: -200_000, last_updated: 0, sample_size: 7 },
-                CorrelationEntry { market_i: 1, market_j: 3, correlation: -700_000, last_updated: 0, sample_size: 7 },
+                CorrelationEntry { market_i: 0, market_j: 1, correlation: 1_900_000, last_updated: 0, sample_size: 7 }, // +0.9
+                CorrelationEntry { market_i: 0, market_j: 2, correlation: 1_750_000, last_updated: 0, sample_size: 7 }, // +0.75
+                CorrelationEntry { market_i: 0, market_j: 3, correlation: 1_300_000, last_updated: 0, sample_size: 7 }, // +0.3
+                CorrelationEntry { market_i: 1, market_j: 2, correlation: 800_000, last_updated: 0, sample_size: 7 }, // -0.2
+                CorrelationEntry { market_i: 1, market_j: 3, correlation: 300_000, last_updated: 0, sample_size: 7 }, // -0.7
             ],
             average_correlation: 0,
             last_calculated: 0,
@@ -353,10 +362,10 @@ mod tests {
             is_initialized: true,
             verse_id: [0u8; 16],
             correlations: vec![
-                CorrelationEntry { market_i: 0, market_j: 1, correlation: 800_000, last_updated: 0, sample_size: 7 },
-                CorrelationEntry { market_i: 0, market_j: 2, correlation: 700_000, last_updated: 0, sample_size: 7 },
-                CorrelationEntry { market_i: 0, market_j: 3, correlation: 600_000, last_updated: 0, sample_size: 7 },
-                CorrelationEntry { market_i: 1, market_j: 2, correlation: 100_000, last_updated: 0, sample_size: 7 },
+                CorrelationEntry { market_i: 0, market_j: 1, correlation: 1_800_000, last_updated: 0, sample_size: 7 }, // +0.8
+                CorrelationEntry { market_i: 0, market_j: 2, correlation: 1_700_000, last_updated: 0, sample_size: 7 }, // +0.7
+                CorrelationEntry { market_i: 0, market_j: 3, correlation: 1_600_000, last_updated: 0, sample_size: 7 }, // +0.6
+                CorrelationEntry { market_i: 1, market_j: 2, correlation: 1_100_000, last_updated: 0, sample_size: 7 }, // +0.1
             ],
             average_correlation: 0,
             last_calculated: 0,

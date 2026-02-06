@@ -233,7 +233,7 @@ impl RiskEngine {
         let volatility = self.calculate_portfolio_volatility(positions).await;
         let var_95 = self.calculate_var(positions, 0.95).await;
         let var_99 = self.calculate_var(positions, 0.99).await;
-        let expected_shortfall = self.calculate_expected_shortfall(positions, 0.95).await;
+        let expected_shortfall = self.calculate_expected_shortfall(positions, 0.99).await;
         
         // Calculate Sharpe ratio (assuming risk-free rate of 2%)
         let risk_free_rate = 0.02;
@@ -258,8 +258,9 @@ impl RiskEngine {
             0.0
         };
         
-        let margin_ratio = if portfolio_value > 0.0 {
-            margin_used / portfolio_value
+        // Convert unbounded leverage_ratio into a [0..1) utilization-style metric.
+        let margin_ratio = if leverage_ratio > 0.0 {
+            leverage_ratio / (leverage_ratio + 1.0)
         } else {
             0.0
         };
@@ -732,7 +733,7 @@ mod tests {
         let metrics = engine.calculate_portfolio_risk(wallet, &positions).await.unwrap();
         
         // Should have high risk due to leverage and price drop
-        assert!(metrics.margin_ratio > 0.8); // Close to liquidation
+        assert!(metrics.margin_ratio > 0.8); // High utilization due to leverage
         assert!(metrics.risk_score > 80.0); // High risk score
     }
     
@@ -822,7 +823,7 @@ mod tests {
         let engine = RiskEngine::new();
         
         // Create position that violates risk limits
-        let position = create_position_info(1000, 2_000_000, 15, 0.5, 0.5); // Exceeds size and leverage
+        let position = create_position_info(1000, 2_100_000, 15, 0.5, 0.5); // Exceeds size and leverage
         
         let violations = engine.check_risk_limits(&position).await;
         

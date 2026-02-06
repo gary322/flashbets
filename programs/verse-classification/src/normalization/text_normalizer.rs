@@ -61,8 +61,7 @@ impl TextNormalizer {
             .into_iter()
             .filter(|word| {
                 !stopwords.contains(&word.as_str()) &&
-                word.len() >= 2 &&
-                !word.chars().all(|c| c.is_numeric())
+                word.len() >= 2
             })
             .collect();
         
@@ -124,7 +123,7 @@ mod tests {
     fn test_keyword_extraction() {
         let text = "bitcoin price above 150000 december 2025";
         let keywords = TextNormalizer::extract_keywords(text, &crate::normalization::STOPWORDS).unwrap();
-        // Note: STOPWORDS includes "above", and numbers are filtered out
-        assert_eq!(keywords, vec!["bitcoin", "december", "price"]);
+        // Note: STOPWORDS includes "above".
+        assert_eq!(keywords, vec!["150000", "2025", "bitcoin", "december", "price"]);
     }
 }

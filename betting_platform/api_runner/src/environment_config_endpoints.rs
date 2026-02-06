@@ -435,32 +435,56 @@ pub struct ConfigValidationResult {
 
 /// Redact password from database URL
 fn redact_database_url(url: &str) -> String {
-    if let Ok(parsed) = url::Url::parse(url) {
-        if parsed.password().is_some() {
-            let mut redacted = parsed.clone();
-            let _ = redacted.set_password(Some("[REDACTED]"));
-            redacted.to_string()
-        } else {
-            url.to_string()
-        }
-    } else {
-        url.to_string()
-    }
+    redact_url_password(url)
 }
 
 /// Redact password from Redis URL
 fn redact_redis_url(url: &str) -> String {
-    if let Ok(parsed) = url::Url::parse(url) {
-        if parsed.password().is_some() {
-            let mut redacted = parsed.clone();
-            let _ = redacted.set_password(Some("[REDACTED]"));
-            redacted.to_string()
-        } else {
-            url.to_string()
-        }
-    } else {
-        url.to_string()
+    redact_url_password(url)
+}
+
+fn redact_url_password(url: &str) -> String {
+    let parsed = match url::Url::parse(url) {
+        Ok(parsed) => parsed,
+        Err(_) => return url.to_string(),
+    };
+
+    if parsed.password().is_none() {
+        return url.to_string();
     }
+
+    let host = match parsed.host_str() {
+        Some(host) => host,
+        None => return url.to_string(),
+    };
+
+    let mut out = String::new();
+    out.push_str(parsed.scheme());
+    out.push_str("://");
+
+    // URL userinfo can be `user:pass@` or `:pass@`. We always keep the username and redact the password.
+    out.push_str(parsed.username());
+    out.push(':');
+    out.push_str("[REDACTED]");
+    out.push('@');
+
+    out.push_str(host);
+    if let Some(port) = parsed.port() {
+        out.push(':');
+        out.push_str(&port.to_string());
+    }
+
+    out.push_str(parsed.path());
+    if let Some(query) = parsed.query() {
+        out.push('?');
+        out.push_str(query);
+    }
+    if let Some(fragment) = parsed.fragment() {
+        out.push('#');
+        out.push_str(fragment);
+    }
+
+    out
 }
 
 #[allow(dead_code)]#[cfg(test)]

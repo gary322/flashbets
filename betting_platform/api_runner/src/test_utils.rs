@@ -111,7 +111,7 @@ pub mod risk_factory {
     }
     
     pub fn create_risk_metrics(wallet: &str) -> RiskMetrics {
-        let mut correlation_matrix = HashMap::new();
+        let mut correlation_matrix = std::collections::HashMap::new();
         correlation_matrix.insert("BTC".to_string(), 0.8);
         correlation_matrix.insert("ETH".to_string(), 0.7);
         
@@ -170,11 +170,17 @@ pub mod market_factory {
             creator: Pubkey::new_unique(),
             outcomes: vec![
                 MarketOutcome {
+                    id: 0,
                     name: "Yes".to_string(),
+                    title: "Yes".to_string(),
+                    description: "Yes outcome".to_string(),
                     total_stake: 1000000,
                 },
                 MarketOutcome {
+                    id: 1,
                     name: "No".to_string(),
+                    title: "No".to_string(),
+                    description: "No outcome".to_string(),
                     total_stake: 1000000,
                 },
             ],
@@ -186,6 +192,7 @@ pub mod market_factory {
             winning_outcome: None,
             created_at: Utc::now().timestamp(),
             verse_id: Some((id % 400) as u128),
+            current_price: 0.5,
         }
     }
     
@@ -281,18 +288,43 @@ pub mod helpers {
             order_types::OrderMatchingEngine,
             seed_markets::SeededMarketStore,
             wallet_verification::WalletVerificationService,
-            cache::CacheService,
             integration::polymarket_public::PolymarketPublicClient,
         };
         
         let rpc_client = Arc::new(solana_client::rpc_client::RpcClient::new("http://localhost:8899".to_string()));
         let program_id = Pubkey::new_unique();
+        let ws_manager = Arc::new(crate::websocket::WebSocketManager::new());
+        let enhanced_ws_manager = Arc::new(crate::websocket::enhanced::EnhancedWebSocketManager::new());
+        
+        let cache_config = crate::cache::CacheConfig {
+            enabled: false, // Disable for tests
+            ..Default::default()
+        };
+        let cache = Arc::new(crate::cache::CacheService::new(cache_config).await.unwrap());
+
+        let polymarket_public_client = Arc::new(PolymarketPublicClient::new().unwrap());
+
+        let mut db_config = crate::db::DatabaseConfig::default();
+        db_config.max_connections = 1;
+        db_config.min_connections = 0;
+        db_config.connection_timeout = std::time::Duration::from_secs(1);
+        let database = Arc::new(crate::db::fallback::FallbackDatabase::new(db_config).await.unwrap());
+
+        let jwt_manager = Arc::new(crate::jwt_validation::JwtManager::new(
+            crate::jwt_validation::JwtConfig::default(),
+        ));
+        let authorization_service = Arc::new(crate::rbac_authorization::AuthorizationService::new());
+        let market_data_service = Arc::new(crate::market_data_service::MarketDataService);
+        let trading_engine = Arc::new(crate::trading_engine::TradingEngine::new(
+            crate::trading_engine::TradingEngineConfig::default(),
+            Some(enhanced_ws_manager.clone()),
+        ));
         
         AppState {
             rpc_client: rpc_client.clone(),
             program_id,
-            ws_manager: Arc::new(crate::websocket::WebSocketManager::new()),
-            enhanced_ws_manager: Some(Arc::new(crate::websocket::enhanced::EnhancedWebSocketManager::new())),
+            ws_manager,
+            enhanced_ws_manager: Some(enhanced_ws_manager.clone()),
             platform_client: Arc::new(crate::rpc_client::BettingPlatformClient::new(rpc_client, program_id)),
             integration_config: {
                 let mut config = integration::IntegrationConfig::default();
@@ -308,28 +340,40 @@ pub mod helpers {
             funded_trading_client: None,
             seeded_markets: Arc::new(SeededMarketStore::new()),
             wallet_verification: Arc::new(WalletVerificationService::new()),
-            cache: {
-                let config = crate::cache::CacheConfig {
-                    enabled: false, // Disable for tests
-                    ..Default::default()
-                };
-                Arc::new(tokio::task::block_in_place(|| {
-                    tokio::runtime::Handle::current().block_on(async {
-                        crate::cache::CacheService::new(config).await.unwrap()
-                    })
-                }))
-            },
-            polymarket_public_client: Arc::new(PolymarketPublicClient::new().unwrap()),
+            cache,
+            polymarket_public_client,
             polymarket_price_feed: None,
-            database: Arc::new(tokio::task::block_in_place(|| {
-                tokio::runtime::Handle::current().block_on(async {
-                    crate::db::Database::new(crate::db::DatabaseConfig::default()).await.unwrap()
-                })
-            })),
+            database,
             queue_service: None,
             security_logger: Arc::new(crate::security::security_logger::SecurityLogger::new(
                 crate::security::security_logger::SecurityLoggerConfig::default()
             )),
+            jwt_manager,
+            authorization_service,
+            market_data_service,
+            trading_engine,
+            solana_rpc_service: None,
+            solana_tx_manager: None,
+            solana_deployment_manager: None,
+            external_api_service: None,
+            circuit_breaker_manager: None,
+            service_circuit_breakers: None,
+            tracing_logger: None,
+            market_creation_service: None,
+            trade_execution_service: None,
+            settlement_service: None,
+            test_data_manager: None,
+            mock_service_manager: None,
+            health_check_service: None,
+            environment_config: None,
+            feature_flags: None,
+            state_manager: None,
+            validation_service: None,
+            polymarket_repository: None,
+            polymarket_order_service: None,
+            polymarket_clob_client: None,
+            polymarket_ctf_client: None,
+            polymarket_ws_client: None,
         }
     }
     

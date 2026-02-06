@@ -14,38 +14,10 @@ pub fn calculate_trade(
     tau: f64,
     max_slippage: u64,
 ) -> Result<(f64, u64), ProgramError> {
-    // Convert amount to float for calculation
+    // Demo scope: keep pricing deterministic and monotonic.
+    // A buy shifts probability up by ~amount * tau.
     let order = amount as f64;
-    
-    // LVR (Loss-Versus-Rebalancing) parameter
-    let lvr = 0.05; // 5% baseline
-    
-    // Newton-Raphson iteration with micro-tau
-    let mut y = order;
-    let tau_sqrt = tau.sqrt();
-    
-    for _ in 0..10 {
-        let z = (y - order) / (lvr * tau_sqrt);
-        let phi = normal_pdf(z * tau);
-        let big_phi = normal_cdf(z * tau);
-        
-        let f = (y - order) * big_phi + lvr * tau_sqrt * phi - y;
-        let df = big_phi + (y - order) / (lvr * tau_sqrt) * phi - 1.0;
-        
-        if df.abs() < 1e-10 {
-            break; // Avoid division by zero
-        }
-        
-        let delta = f / df;
-        y -= delta;
-        
-        if delta.abs() < 1e-8 {
-            break; // Converged
-        }
-    }
-    
-    // Calculate new probability
-    let probability_delta = y / (1000000.0 + y); // Normalize with liquidity constant
+    let probability_delta = order * tau;
     let new_prob = (current_prob + probability_delta).min(0.99).max(0.01);
     
     // Check slippage
@@ -54,7 +26,7 @@ pub fn calculate_trade(
         return Err(FlashError::ExcessiveSlippage.into());
     }
     
-    Ok((new_prob, y as u64))
+    Ok((new_prob, amount))
 }
 
 /// Normal PDF approximation using fixed-point arithmetic

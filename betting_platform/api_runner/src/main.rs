@@ -1290,7 +1290,7 @@ async fn async_main() -> Result<()> {
     axum::Server::from_tcp(std_listener)?
         .tcp_nodelay(true)
         .tcp_keepalive(Some(std::time::Duration::from_secs(75)))
-        .serve(app.into_make_service())
+        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
         .await?;
 
     Ok(())

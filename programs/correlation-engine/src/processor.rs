@@ -27,6 +27,11 @@ use crate::{
 pub struct Processor;
 
 impl Processor {
+    fn borsh_deserialize_unchecked<T: BorshDeserialize>(data: &[u8]) -> Result<T, ProgramError> {
+        let mut cursor: &[u8] = data;
+        T::deserialize(&mut cursor).map_err(|_| ProgramError::InvalidAccountData)
+    }
+
     pub fn process(
         program_id: &Pubkey,
         accounts: &[AccountInfo],
@@ -239,30 +244,58 @@ impl Processor {
         let account_info_iter = &mut accounts.iter();
         let keeper_info = next_account_info(account_info_iter)?;
         let price_history_info = next_account_info(account_info_iter)?;
+        let system_program_info = account_info_iter.next();
         let clock = Clock::get()?;
         
         // Verify keeper is signer
         if !keeper_info.is_signer {
             return Err(ProgramError::MissingRequiredSignature);
         }
-        
-        // Load or create price history
-        let mut price_history_data = price_history_info.try_borrow_mut_data()?;
-        let mut price_history = if price_history_data[0] == 0 {
-            // Not initialized, create new
-            let (expected_pubkey, bump) = Pubkey::find_program_address(
-                &[b"price_history", &market_id],
-                program_id,
-            );
-            
-            if expected_pubkey != *price_history_info.key {
-                return Err(CorrelationError::InvalidPDA.into());
+
+        let (expected_pubkey, bump) =
+            Pubkey::find_program_address(&[b"price_history", &market_id], program_id);
+
+        if expected_pubkey != *price_history_info.key {
+            return Err(CorrelationError::InvalidPDA.into());
+        }
+
+        // Create the PDA account on first use (clients can't create PDAs directly).
+        if price_history_info.owner != program_id {
+            let system_program_info =
+                system_program_info.ok_or(ProgramError::NotEnoughAccountKeys)?;
+
+            if *system_program_info.key != solana_program::system_program::id() {
+                return Err(ProgramError::IncorrectProgramId);
             }
-            
-            MarketPriceHistory::new(market_id, bump)
+
+            let rent = Rent::get()?;
+            let price_history_size = MarketPriceHistory::calculate_size();
+            let price_history_lamports = rent.minimum_balance(price_history_size);
+
+            invoke_signed(
+                &system_instruction::create_account(
+                    keeper_info.key,
+                    price_history_info.key,
+                    price_history_lamports,
+                    price_history_size as u64,
+                    program_id,
+                ),
+                &[
+                    keeper_info.clone(),
+                    price_history_info.clone(),
+                    system_program_info.clone(),
+                ],
+                &[&[b"price_history", &market_id, &[bump]]],
+            )?;
+        }
+
+        // Load or initialize price history
+        let mut price_history_data = price_history_info.try_borrow_mut_data()?;
+        let is_initialized = price_history_data.first().copied().unwrap_or(0) != 0;
+        let mut price_history = if is_initialized {
+            Self::borsh_deserialize_unchecked::<MarketPriceHistory>(&price_history_data)?
         } else {
-            MarketPriceHistory::try_from_slice(&price_history_data)
-                .map_err(|_| ProgramError::InvalidAccountData)?
+            MarketPriceHistory::new(market_id, bump)
         };
         
         // Add price point
@@ -306,15 +339,15 @@ impl Processor {
         
         // Load verse tracking
         let verse_tracking_data = verse_tracking_info.try_borrow_data()?;
-        let _verse_tracking: VerseTracking = VerseTracking::try_from_slice(&verse_tracking_data)
-            .map_err(|_| ProgramError::InvalidAccountData)?;
+        let _verse_tracking: VerseTracking =
+            Self::borsh_deserialize_unchecked::<VerseTracking>(&verse_tracking_data)?;
         
         // Load price histories
         let mut price_series = Vec::new();
         for (i, account) in price_history_accounts.iter().enumerate() {
             let data = account.try_borrow_data()?;
-            let history: MarketPriceHistory = MarketPriceHistory::try_from_slice(&data)
-                .map_err(|_| ProgramError::InvalidAccountData)?;
+            let history: MarketPriceHistory =
+                Self::borsh_deserialize_unchecked::<MarketPriceHistory>(&data)?;
             
             if history.has_sufficient_data() {
                 price_series.push((i, history.get_daily_prices()));
@@ -323,8 +356,8 @@ impl Processor {
         
         // Calculate pairwise correlations
         let mut correlation_matrix_data = correlation_matrix_info.try_borrow_mut_data()?;
-        let mut correlation_matrix: CorrelationMatrix = CorrelationMatrix::try_from_slice(&correlation_matrix_data)
-            .map_err(|_| ProgramError::InvalidAccountData)?;
+        let mut correlation_matrix: CorrelationMatrix =
+            Self::borsh_deserialize_unchecked::<CorrelationMatrix>(&correlation_matrix_data)?;
         
         let clock = Clock::get()?;
         
@@ -382,8 +415,8 @@ impl Processor {
         
         // Load correlation matrix
         let correlation_matrix_data = correlation_matrix_info.try_borrow_data()?;
-        let correlation_matrix: CorrelationMatrix = CorrelationMatrix::try_from_slice(&correlation_matrix_data)
-            .map_err(|_| ProgramError::InvalidAccountData)?;
+        let correlation_matrix: CorrelationMatrix =
+            Self::borsh_deserialize_unchecked::<CorrelationMatrix>(&correlation_matrix_data)?;
         
         // Load and update tail loss
         let mut tail_loss_data = tail_loss_info.try_borrow_mut_data()?;
@@ -434,8 +467,8 @@ impl Processor {
         
         // Load and update verse tracking
         let mut verse_tracking_data = verse_tracking_info.try_borrow_mut_data()?;
-        let mut verse_tracking: VerseTracking = VerseTracking::try_from_slice(&verse_tracking_data)
-            .map_err(|_| ProgramError::InvalidAccountData)?;
+        let mut verse_tracking: VerseTracking =
+            Self::borsh_deserialize_unchecked::<VerseTracking>(&verse_tracking_data)?;
         
         // Update weights
         for (market_index, weight) in market_weights {

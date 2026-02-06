@@ -109,13 +109,18 @@ libc = "0.2"
 toml = "0.8"
 notify = "6.1"
 serde_yaml = "0.9"
+humantime-serde = "1.1"
 
 # Additional dependencies
 once_cell = "1.19"
 bytes = "1.5"
 http-body-util = "0.1"
 
+[features]
+polymarket-integration-tests = []
+
 [dev-dependencies]
 # axum-test = "14.0"
 tokio-test = "0.4"
 futures-util = "0.3"
+tempfile = "3"

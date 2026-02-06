@@ -32,7 +32,7 @@ pub enum CorrelationInstruction {
     /// Accounts:
     /// 0. `[signer]` Price authority (keeper)
     /// 1. `[writable]` Market price history PDA
-    /// 2. `[]` Clock sysvar
+    /// 2. `[]` System program (required when creating PDA)
     UpdatePriceHistory {
         market_id: [u8; 16],
         price: u64,
@@ -57,7 +57,6 @@ pub enum CorrelationInstruction {
     /// 2. `[]` Verse tracking PDA
     /// 3. `[]` Correlation matrix PDA
     /// 4. `[writable]` Tail loss PDA
-    /// 5. `[]` Clock sysvar
     UpdateTailLoss {
         verse_id: [u8; 16],
         outcome_count: u32,
@@ -163,6 +162,96 @@ pub fn initialize_verse_tracking(
     
     let data = CorrelationInstruction::InitializeVerseTracking { verse_id }.pack();
     
+    Instruction {
+        program_id: *program_id,
+        accounts,
+        data,
+    }
+}
+
+pub fn update_price_history(
+    program_id: &Pubkey,
+    keeper: &Pubkey,
+    price_history_pda: &Pubkey,
+    market_id: [u8; 16],
+    price: u64,
+    volume: u64,
+) -> Instruction {
+    let accounts = vec![
+        AccountMeta::new(*keeper, true),
+        AccountMeta::new(*price_history_pda, false),
+        AccountMeta::new_readonly(solana_program::system_program::id(), false),
+    ];
+
+    let data = CorrelationInstruction::UpdatePriceHistory {
+        market_id,
+        price,
+        volume,
+    }
+    .pack();
+
+    Instruction {
+        program_id: *program_id,
+        accounts,
+        data,
+    }
+}
+
+pub fn calculate_correlations(
+    program_id: &Pubkey,
+    authority: &Pubkey,
+    engine_pda: &Pubkey,
+    verse_tracking_pda: &Pubkey,
+    correlation_matrix_pda: &Pubkey,
+    verse_id: [u8; 16],
+    market_price_history_pdas: &[Pubkey],
+) -> Instruction {
+    let mut accounts = vec![
+        AccountMeta::new(*authority, true),
+        AccountMeta::new_readonly(*engine_pda, false),
+        AccountMeta::new_readonly(*verse_tracking_pda, false),
+        AccountMeta::new(*correlation_matrix_pda, false),
+    ];
+
+    accounts.extend(
+        market_price_history_pdas
+            .iter()
+            .map(|pda| AccountMeta::new_readonly(*pda, false)),
+    );
+
+    let data = CorrelationInstruction::CalculateCorrelations { verse_id }.pack();
+
+    Instruction {
+        program_id: *program_id,
+        accounts,
+        data,
+    }
+}
+
+pub fn update_tail_loss(
+    program_id: &Pubkey,
+    authority: &Pubkey,
+    engine_pda: &Pubkey,
+    verse_tracking_pda: &Pubkey,
+    correlation_matrix_pda: &Pubkey,
+    tail_loss_pda: &Pubkey,
+    verse_id: [u8; 16],
+    outcome_count: u32,
+) -> Instruction {
+    let accounts = vec![
+        AccountMeta::new(*authority, true),
+        AccountMeta::new_readonly(*engine_pda, false),
+        AccountMeta::new_readonly(*verse_tracking_pda, false),
+        AccountMeta::new_readonly(*correlation_matrix_pda, false),
+        AccountMeta::new(*tail_loss_pda, false),
+    ];
+
+    let data = CorrelationInstruction::UpdateTailLoss {
+        verse_id,
+        outcome_count,
+    }
+    .pack();
+
     Instruction {
         program_id: *program_id,
         accounts,

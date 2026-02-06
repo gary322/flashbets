@@ -136,21 +136,17 @@ export const MigrationWizard: React.FC<MigrationWizardProps> = ({
     }, 2000);
   };
 
-  const calculateRewards = () => {
-    const selectedValue = positions
-      .filter(p => p.selected)
-      .reduce((sum, p) => sum + p.value, 0);
-    
-    // 2x MMT rewards for migration
-    const baseRewards = selectedValue * 0.01; // 1% base
-    const migrationBonus = baseRewards * 2; // 2x multiplier
-    
-    setEstimatedRewards(migrationBonus);
-  };
-
   useEffect(() => {
     if (positions.length > 0) {
-      calculateRewards();
+      const selectedValue = positions
+        .filter((position) => position.selected)
+        .reduce((sum, position) => sum + position.value, 0);
+
+      // 2x MMT rewards for migration
+      const baseRewards = selectedValue * 0.01; // 1% base
+      const migrationBonus = baseRewards * 2; // 2x multiplier
+
+      setEstimatedRewards(migrationBonus);
     }
   }, [positions]);
 

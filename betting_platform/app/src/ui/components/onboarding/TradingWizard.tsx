@@ -189,7 +189,7 @@ export const TradingWizard: React.FC<TradingWizardProps> = ({
             Welcome to the Future of Prediction Markets
           </Typography>
           <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
-            Let's set up your trading experience in just a few steps. This wizard will help you
+            Let&apos;s set up your trading experience in just a few steps. This wizard will help you
             understand our platform and configure it to match your trading style.
           </Typography>
           <Box display="flex" gap={2} flexWrap="wrap">
@@ -214,7 +214,7 @@ export const TradingWizard: React.FC<TradingWizardProps> = ({
       content: (
         <Box>
           <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 3 }}>
-            What's your experience with prediction markets?
+            What&apos;s your experience with prediction markets?
           </Typography>
           <Box display="flex" flexDirection="column" gap={2}>
             {['beginner', 'intermediate', 'advanced'].map((level) => (
@@ -254,7 +254,7 @@ export const TradingWizard: React.FC<TradingWizardProps> = ({
       content: (
         <Box>
           <Typography variant="h6" sx={{ color: '#FFFFFF', mb: 3 }}>
-            Let's configure your trading settings
+            Let&apos;s configure your trading settings
           </Typography>
           
           <Box mb={3}>
@@ -423,10 +423,10 @@ export const TradingWizard: React.FC<TradingWizardProps> = ({
         <Box textAlign="center">
           <CheckCircleIcon sx={{ fontSize: 64, color: '#8247E5', mb: 2 }} />
           <Typography variant="h5" sx={{ color: '#FFFFFF', mb: 2 }}>
-            You're All Set!
+            You&apos;re All Set!
           </Typography>
           <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
-            Your trading environment is configured and ready. Here's a summary of your settings:
+            Your trading environment is configured and ready. Here&apos;s a summary of your settings:
           </Typography>
           <Box display="flex" flexDirection="column" gap={1} alignItems="center">
             <InfoChip label={`Experience: ${settings.experience}`} />

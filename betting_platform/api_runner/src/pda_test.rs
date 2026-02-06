@@ -70,7 +70,9 @@ mod tests {
         
         // Verify the transaction uses the correct PDA
         let expected_market_pda = helpers::market_pda(&program_id, market_id);
-        assert_eq!(tx.message.account_keys[0], expected_market_pda);
+        let create_ix = tx.message.instructions.first().expect("create market instruction");
+        let market_account_idx = *create_ix.accounts.first().expect("market account index") as usize;
+        assert_eq!(tx.message.account_keys[market_account_idx], expected_market_pda);
         
         // Test place trade transaction
         let trader = Pubkey::new_unique();

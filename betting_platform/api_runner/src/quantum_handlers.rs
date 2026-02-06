@@ -711,7 +711,7 @@ mod tests {
     
     #[test]
     fn test_state_rebalancing() {
-        let _states = vec![
+        let states = vec![
             QuantumState {
                 market_id: 1000,
                 verse_id: 1,

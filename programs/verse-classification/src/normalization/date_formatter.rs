@@ -134,15 +134,15 @@ pub fn normalize_currency(text: &str) -> Result<String, ProgramError> {
         ("£", "GBP"),
         ("¥", "JPY"),
         ("₹", "INR"),
-        ("dollar", "USD"),
         ("dollars", "USD"),
-        ("euro", "EUR"),
+        ("dollar", "USD"),
         ("euros", "EUR"),
-        ("pound", "GBP"),
+        ("euro", "EUR"),
         ("pounds", "GBP"),
+        ("pound", "GBP"),
         ("yen", "JPY"),
-        ("rupee", "INR"),
         ("rupees", "INR"),
+        ("rupee", "INR"),
     ];
     
     let mut result = text.to_string();
@@ -188,6 +188,6 @@ mod tests {
     fn test_currency_normalization() {
         assert_eq!(normalize_currency("$100").unwrap(), "USD100");
         assert_eq!(normalize_currency("€50").unwrap(), "EUR50");
-        assert_eq!(normalize_currency("100 dollars").unwrap(), "100 USDs");  // "dollars" -> "USDs"
+        assert_eq!(normalize_currency("100 dollars").unwrap(), "100 USD");
     }
 }

@@ -24,7 +24,7 @@ pub struct VerseTailLoss {
 }
 
 impl VerseTailLoss {
-    pub const LEN: usize = 1 + 16 + (8 * 4 + 8) + 8 + 4 + 1;
+    pub const LEN: usize = 1 + 16 + (8 * 4) + 8 + 4 + 1;
     
     pub fn new(verse_id: [u8; 16], bump: u8) -> Self {
         Self {

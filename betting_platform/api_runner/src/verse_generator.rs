@@ -2,7 +2,6 @@
 //! Groups markets into hierarchical verses with leverage multipliers
 
 use serde::{Serialize, Deserialize};
-use std::collections::HashSet;
 use crate::verse_catalog;
 
 /// Stop words to filter during keyword extraction
@@ -24,13 +23,12 @@ const REPLACEMENTS: &[(&str, &str)] = &[
     ("dogecoin", "doge"),
     
     // Political terms
-    ("president", "election"),
     ("presidential", "election"),
+    ("president", "election"),
     ("trump", "trump"),
     ("biden", "biden"),
     
     // Time periods
-    ("by end of", "eoy"),
     ("end of year", "eoy"),
     ("end of month", "eom"),
     

@@ -1,3 +1,5 @@
+#![cfg(feature = "polymarket-integration-tests")]
+
 //! Polymarket Integration Tests
 //! Comprehensive test suite for Polymarket functionality
 

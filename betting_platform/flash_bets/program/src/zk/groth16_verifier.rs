@@ -1,7 +1,6 @@
 use ark_bls12_381::{Bls12_381, Fr};
-use ark_groth16::{Groth16, Proof, ProvingKey, VerifyingKey};
+use ark_groth16::{prepare_verifying_key, Groth16, Proof, ProvingKey, VerifyingKey};
 use ark_serialize::CanonicalDeserialize;
-use ark_snark::SNARK;
 use ark_std::rand::{rngs::StdRng, SeedableRng};
 use solana_program::program_error::ProgramError;
 use std::sync::OnceLock;
@@ -17,27 +16,29 @@ static QUANTUM_KEYS: OnceLock<Result<QuantumKeypair, ProgramError>> = OnceLock::
 fn flash_keys() -> Result<&'static FlashKeypair, ProgramError> {
     FLASH_KEYS
         .get_or_init(|| {
-        let mut rng = StdRng::seed_from_u64(42);
-        Groth16::<Bls12_381>::circuit_specific_setup(
-            FlashOutcomeCircuit::<Fr>::setup_example(),
-            &mut rng,
-        )
-        .map_err(|_| ProgramError::InvalidInstructionData)
+            let mut rng = StdRng::seed_from_u64(42);
+            let circuit = FlashOutcomeCircuit::<Fr>::setup_example();
+            let pk = Groth16::<Bls12_381>::generate_random_parameters_with_reduction(circuit, &mut rng)
+                .map_err(|_| ProgramError::InvalidInstructionData)?;
+            let vk = pk.vk.clone();
+            Ok((pk, vk))
         })
         .as_ref()
+        .map_err(|e| e.clone())
 }
 
 fn quantum_keys() -> Result<&'static QuantumKeypair, ProgramError> {
     QUANTUM_KEYS
         .get_or_init(|| {
-        let mut rng = StdRng::seed_from_u64(43);
-        Groth16::<Bls12_381>::circuit_specific_setup(
-            QuantumCollapseCircuit::<Fr>::setup_example(),
-            &mut rng,
-        )
-        .map_err(|_| ProgramError::InvalidInstructionData)
+            let mut rng = StdRng::seed_from_u64(43);
+            let circuit = QuantumCollapseCircuit::<Fr>::setup_example();
+            let pk = Groth16::<Bls12_381>::generate_random_parameters_with_reduction(circuit, &mut rng)
+                .map_err(|_| ProgramError::InvalidInstructionData)?;
+            let vk = pk.vk.clone();
+            Ok((pk, vk))
         })
         .as_ref()
+        .map_err(|e| e.clone())
 }
 
 fn deserialize_proof(proof_bytes: &[u8]) -> Result<Proof<Bls12_381>, ProgramError> {
@@ -75,7 +76,8 @@ impl Groth16Verifier {
             Fr::from(slot),
         ];
 
-        Groth16::<Bls12_381>::verify(vk, &public_inputs, &proof)
+        let pvk = prepare_verifying_key(vk);
+        Groth16::<Bls12_381>::verify_proof(&pvk, &proof, &public_inputs)
             .map_err(|_| ProgramError::InvalidInstructionData)
     }
 
@@ -96,7 +98,8 @@ impl Groth16Verifier {
             Fr::from(winning_outcome as u128),
         ];
 
-        Groth16::<Bls12_381>::verify(vk, &public_inputs, &proof)
+        let pvk = prepare_verifying_key(vk);
+        Groth16::<Bls12_381>::verify_proof(&pvk, &proof, &public_inputs)
             .map_err(|_| ProgramError::InvalidInstructionData)
     }
 }

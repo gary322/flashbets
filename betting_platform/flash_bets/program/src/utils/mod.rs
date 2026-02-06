@@ -48,21 +48,9 @@ pub fn generate_position_id() -> u128 {
 
 /// Calculate micro-tau value for flash markets (adjusted for duration)
 pub fn calculate_tau(time_left: u64) -> f64 {
-    // Adaptive tau based on duration
-    // Shorter times get higher tau for more concentrated liquidity
-    if time_left <= 60 {
-        // Ultra-flash: very concentrated
-        0.0001 * (time_left as f64 / 60.0)
-    } else if time_left <= 600 {
-        // Quick-flash: concentrated
-        0.00008 * (time_left as f64 / 600.0)
-    } else if time_left <= 3600 {
-        // Hour-flash: moderate concentration
-        0.00006 * (time_left as f64 / 3600.0)
-    } else {
-        // Match-long: lower concentration
-        0.00004 * (time_left as f64 / 7200.0)
-    }
+    // Keep tau consistent across modules:
+    // tau = 0.0001 * (time_left / 60)
+    0.0001 * (time_left as f64 / 60.0)
 }
 
 /// Sport-specific tau values
@@ -109,16 +97,11 @@ pub fn calculate_effective_leverage(
     }
     
     // Apply micro-tau efficiency bonus
-    let tau_bonus = 1.0 + tau * 1500.0;
+    let tau_bonus = 1.0 + tau * 2000.0;
     multiplier *= tau_bonus;
     
-    // Cap based on duration
-    let cap = match base_leverage {
-        1..=100 => 500.0,   // Ultra-flash cap
-        101..=150 => 250.0, // Quick-flash cap
-        151..=200 => 150.0, // Hour-flash cap
-        _ => 100.0,         // Match-long cap
-    };
+    // Demo scope: cap leverage at 500x.
+    let cap = 500.0;
     multiplier.min(cap)
 }
 

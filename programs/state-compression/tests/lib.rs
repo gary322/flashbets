@@ -14,12 +14,12 @@ use state_compression::{
         DecompressionCache,
         MarketEssentials,
         MarketStatus,
+        ProofType,
         MarketUpdate,
     },
     compression::{
         poseidon::{PoseidonHasher, PoseidonMerkleTree},
         proof_builder::{ProofBuilder, BatchProofBuilder},
-        ProofType,
     },
 };
 use borsh::BorshDeserialize;
@@ -259,7 +259,7 @@ async fn test_initialize_config_instruction() {
     let init_ix = {
         let accounts = vec![
             solana_program::instruction::AccountMeta::new(payer.pubkey(), true),
-            solana_program::instruction::AccountMeta::new(config_account.pubkey(), false),
+            solana_program::instruction::AccountMeta::new(config_account.pubkey(), true),
             solana_program::instruction::AccountMeta::new_readonly(solana_program::system_program::id(), false),
             solana_program::instruction::AccountMeta::new_readonly(solana_program::sysvar::rent::id(), false),
         ];
@@ -281,7 +281,7 @@ async fn test_initialize_config_instruction() {
         &[init_ix],
         Some(&payer.pubkey()),
     );
-    transaction.sign(&[&payer], recent_blockhash);
+    transaction.sign(&[&payer, &config_account], recent_blockhash);
     
     banks_client.process_transaction(transaction).await.unwrap();
     

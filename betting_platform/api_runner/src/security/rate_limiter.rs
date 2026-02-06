@@ -375,10 +375,13 @@ impl std::fmt::Display for RateLimitError {
 /// Rate limit middleware
 pub async fn rate_limit_middleware<B>(
     State(limiter): State<Arc<EnhancedRateLimiter>>,
-    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    connect_info: Option<ConnectInfo<SocketAddr>>,
     request: Request<B>,
     next: Next<B>,
 ) -> Response {
+    let addr = connect_info
+        .map(|ConnectInfo(addr)| addr)
+        .unwrap_or_else(|| SocketAddr::from(([0, 0, 0, 0], 0)));
     let ip = addr.ip();
     let path = request.uri().path().to_string();
     

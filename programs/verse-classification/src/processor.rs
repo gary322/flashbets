@@ -30,6 +30,11 @@ use crate::{
 pub struct Processor;
 
 impl Processor {
+    fn borsh_deserialize_unchecked<T: BorshDeserialize>(data: &[u8]) -> Result<T, ProgramError> {
+        let mut cursor: &[u8] = data;
+        T::deserialize(&mut cursor).map_err(|_| ProgramError::InvalidAccountData)
+    }
+
     pub fn process(
         program_id: &Pubkey,
         accounts: &[AccountInfo],
@@ -185,8 +190,7 @@ impl Processor {
         
         // Step 4: Load registry and check for similar verses
         let mut registry_data = registry_info.try_borrow_mut_data()?;
-        let mut registry: VerseRegistry = VerseRegistry::try_from_slice(&registry_data)
-            .map_err(|_| ProgramError::InvalidAccountData)?;
+        let mut registry: VerseRegistry = Self::borsh_deserialize_unchecked(&registry_data)?;
         
         let similar_verse = find_similar_verse(
             &registry,
@@ -343,8 +347,7 @@ impl Processor {
         
         // Load registry
         let registry_data = registry_info.try_borrow_data()?;
-        let registry: VerseRegistry = VerseRegistry::try_from_slice(&registry_data)
-            .map_err(|_| ProgramError::InvalidAccountData)?;
+        let registry: VerseRegistry = Self::borsh_deserialize_unchecked(&registry_data)?;
         
         // Search by keywords
         let mut results = Vec::new();

@@ -113,11 +113,25 @@ async fn test_classify_market() {
     let market_title = "Bitcoin price above $150,000 by December 2025".to_string();
     let market_id = "test_market_001".to_string();
     
-    // Calculate expected verse ID
-    let normalized = "bitcoin price above usd 150000 by 2025-12-01";
-    let keywords = vec!["150000", "2025", "bitcoin", "price", "usd"];
-    let mut expected_verse_id = [0u8; 16];
-    // In real test, would calculate actual Keccak256 hash
+    // Calculate expected verse ID (must match the program's derivation).
+    use verse_classification::{
+        classification::calculate_verse_id,
+        normalization::{TextNormalizer, get_default_synonyms, STOPWORDS},
+        state::{NormalizationConfig, DateFormat},
+    };
+
+    let config = NormalizationConfig {
+        lowercase_enabled: true,
+        punctuation_removal: true,
+        number_standardization: true,
+        date_format: DateFormat::ISO8601,
+        currency_normalization: true,
+    };
+
+    let synonyms = get_default_synonyms();
+    let normalized = TextNormalizer::normalize_title(&market_title, &config, &synonyms).unwrap();
+    let keywords = TextNormalizer::extract_keywords(&normalized, &STOPWORDS).unwrap();
+    let expected_verse_id = calculate_verse_id(&normalized, &keywords).unwrap();
     
     let (verse_pda, _) = Pubkey::find_program_address(
         &[b"verse", &expected_verse_id],
@@ -145,6 +159,7 @@ async fn test_classify_market() {
         &[classify_ix],
         Some(&payer.pubkey()),
     );
+    let recent_blockhash = banks_client.get_latest_blockhash().await.unwrap();
     transaction.sign(&[&payer, &authority], recent_blockhash);
     
     // Process transaction
@@ -191,7 +206,7 @@ fn test_levenshtein_distance() {
     let test_cases = vec![
         ("bitcoin", "bitcoin", 0),
         ("bitcoin", "bitcion", 2),  // 2 transpositions
-        ("btc", "bitcoin", 6),       // 6 insertions
+        ("btc", "bitcoin", 4),       // 4 insertions
         ("bitcoin 150k", "bitcoin 155k", 1), // 1 substitution
     ];
     

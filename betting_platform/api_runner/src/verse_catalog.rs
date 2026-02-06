@@ -195,6 +195,12 @@ pub fn find_verses_for_market(
     let mut matching_verses = Vec::new();
     let title_lower = market_title.to_lowercase();
     let detected_category_owned: String;
+
+    fn contains_token(haystack_lower: &str, token: &str) -> bool {
+        haystack_lower
+            .split(|c: char| !c.is_alphanumeric())
+            .any(|part| part == token)
+    }
     
     // Detect category from title if needed
     let detected_category = if market_category.is_empty() || market_category.eq_ignore_ascii_case("general") {
@@ -219,7 +225,7 @@ pub fn find_verses_for_market(
                   title_lower.contains("film") || title_lower.contains("music") ||
                   title_lower.contains("album") || title_lower.contains("award") {
             "entertainment"
-        } else if title_lower.contains("ai") || title_lower.contains("artificial intelligence") ||
+        } else if contains_token(&title_lower, "ai") || title_lower.contains("artificial intelligence") ||
                   title_lower.contains("tech") || title_lower.contains("software") ||
                   title_lower.contains("silicon valley") || title_lower.contains("startup") {
             "technology"

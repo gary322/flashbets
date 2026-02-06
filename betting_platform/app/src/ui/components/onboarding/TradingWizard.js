@@ -169,11 +169,11 @@ const TradingWizard = ({ open, onClose, onComplete, }) => {
             content: (<material_1.Box>
           <material_1.Typography variant="h4" sx={{ color: '#FFFFFF', mb: 2, fontWeight: 700 }}>
             Welcome to the Future of Prediction Markets
-          </material_1.Typography>
-          <material_1.Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
-            Let's set up your trading experience in just a few steps. This wizard will help you
-            understand our platform and configure it to match your trading style.
-          </material_1.Typography>
+	          </material_1.Typography>
+	          <material_1.Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
+	            Let&apos;s set up your trading experience in just a few steps. This wizard will help you
+	            understand our platform and configure it to match your trading style.
+	          </material_1.Typography>
           <material_1.Box display="flex" gap={2} flexWrap="wrap">
             <InfoChip icon={<RocketLaunch_1.default />} label="500x+ Leverage"/>
             <InfoChip icon={<TrendingUp_1.default />} label="30%+ Yields"/>
@@ -191,9 +191,9 @@ const TradingWizard = ({ open, onClose, onComplete, }) => {
             label: 'Experience Level',
             description: 'Tell us about your trading experience',
             content: (<material_1.Box>
-          <material_1.Typography variant="h6" sx={{ color: '#FFFFFF', mb: 3 }}>
-            What's your experience with prediction markets?
-          </material_1.Typography>
+	          <material_1.Typography variant="h6" sx={{ color: '#FFFFFF', mb: 3 }}>
+	            What&apos;s your experience with prediction markets?
+	          </material_1.Typography>
           <material_1.Box display="flex" flexDirection="column" gap={2}>
             {['beginner', 'intermediate', 'advanced'].map((level) => (<material_1.Paper key={level} sx={{
                         p: 2,
@@ -223,9 +223,9 @@ const TradingWizard = ({ open, onClose, onComplete, }) => {
             label: 'Initial Setup',
             description: 'Configure your trading parameters',
             content: (<material_1.Box>
-          <material_1.Typography variant="h6" sx={{ color: '#FFFFFF', mb: 3 }}>
-            Let's configure your trading settings
-          </material_1.Typography>
+	          <material_1.Typography variant="h6" sx={{ color: '#FFFFFF', mb: 3 }}>
+	            Let&apos;s configure your trading settings
+	          </material_1.Typography>
           
           <material_1.Box mb={3}>
             <material_1.Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 1 }}>
@@ -351,12 +351,12 @@ const TradingWizard = ({ open, onClose, onComplete, }) => {
             description: 'Ready to start trading!',
             content: (<material_1.Box textAlign="center">
           <CheckCircle_1.default sx={{ fontSize: 64, color: '#8247E5', mb: 2 }}/>
-          <material_1.Typography variant="h5" sx={{ color: '#FFFFFF', mb: 2 }}>
-            You're All Set!
-          </material_1.Typography>
-          <material_1.Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
-            Your trading environment is configured and ready. Here's a summary of your settings:
-          </material_1.Typography>
+	          <material_1.Typography variant="h5" sx={{ color: '#FFFFFF', mb: 2 }}>
+	            You&apos;re All Set!
+	          </material_1.Typography>
+	          <material_1.Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
+	            Your trading environment is configured and ready. Here&apos;s a summary of your settings:
+	          </material_1.Typography>
           <material_1.Box display="flex" flexDirection="column" gap={1} alignItems="center">
             <InfoChip label={`Experience: ${settings.experience}`}/>
             <InfoChip label={`Deposit: $${settings.initialDeposit}`}/>

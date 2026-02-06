@@ -1,7 +1,6 @@
 use ark_bls12_381::{Bls12_381, Fr};
 use ark_groth16::Groth16;
 use ark_serialize::CanonicalSerialize;
-use ark_snark::SNARK;
 use ark_std::rand::{rngs::StdRng, SeedableRng};
 use std::time::Instant;
 
@@ -34,7 +33,7 @@ impl FlashProver {
 
         // Deterministic RNG keeps tests stable and avoids needing OS randomness.
         let mut rng = StdRng::seed_from_u64(slot ^ (verse_id as u64));
-        let proof = Groth16::<Bls12_381>::prove(pk, circuit, &mut rng)?;
+        let proof = Groth16::<Bls12_381>::create_random_proof_with_reduction(circuit, pk, &mut rng)?;
 
         let mut bytes = Vec::new();
         proof.serialize_compressed(&mut bytes)?;
@@ -62,7 +61,7 @@ impl FlashProver {
         let pk = quantum_proving_key();
 
         let mut rng = StdRng::seed_from_u64((position_id as u64) ^ (verse_id as u64));
-        let proof = Groth16::<Bls12_381>::prove(pk, circuit, &mut rng)?;
+        let proof = Groth16::<Bls12_381>::create_random_proof_with_reduction(circuit, pk, &mut rng)?;
 
         let mut bytes = Vec::new();
         proof.serialize_compressed(&mut bytes)?;
@@ -134,4 +133,3 @@ mod tests {
         assert!(ok);
     }
 }
-
