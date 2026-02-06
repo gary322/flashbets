@@ -2,7 +2,7 @@
 
 This repo contains **multiple overlapping implementations** of a “betting / prediction markets” platform:
 
-- A **static, mock-only UI demo** at the repo root (`server.js` → `platform_ui.html` + `platform_main.js`).
+- A **static, mock-only UI demo** under `experiments/static-root-demo/` (`server.js` → `platform_ui.html` + `platform_main.js`).
 - A larger **full-stack prototype** under `betting_platform/` (Next.js UI + Rust/Axum API + Solana programs + Polygon contracts + keepers + heavy test artifacts).
 - A separate set of smaller Solana programs in the root Rust workspace (`programs/*`) that look like **modular experiments** (verse classification, correlation engine, leverage safety, state compression).
 
@@ -16,10 +16,10 @@ Because the repo includes **~290k files** (dominantly `node_modules/`, build out
 
 ## 1) Top-Level Inventory (repo root)
 
-### Root runtime/demo
-- `server.js` (Node http server, port **8080**) serves the static UI demo.
-- `platform_ui.html`, `platform_main.js`, `platform_styles.css`, `market_data.js`, plus many `*.html` “phase/demo” pages.
-- `solana_integration.js`, `verse_system.js`, `trading_interface.js`, `quantum_mode.js`: UI/logic scripts used by the static demo pages.
+### Static demo (experiments)
+- `experiments/static-root-demo/server.js` (Node http server, port **8080**) serves the static UI demo.
+- `experiments/static-root-demo/platform_ui.html`, `platform_main.js`, `platform_styles.css`, `market_data.js`, plus many `*.html` “phase/demo” pages.
+- `experiments/static-root-demo/solana_integration.js`, `verse_system.js`, `trading_interface.js`, `quantum_mode.js`: UI/logic scripts used by the static demo pages.
 
 ### Root Rust workspace (independent of `betting_platform/`)
 - `Cargo.toml` workspace members:
@@ -34,8 +34,8 @@ These are separate Solana programs with **placeholder program IDs** (e.g., `1111
 - `programs/betting_platform/`, `programs/betting_platform_native/`, `programs/phase10_betting/`: additional Solana programs and/or build artifacts. They are not part of the root workspace build by default.
 
 ### Mobile
-- `mobile/`: React Native app skeleton; contains imports to files that aren’t present (does not look buildable as-is).
-- `mobile-app/`: small component library (cards/gestures/curve editor/theme/types).
+- `experiments/mobile/mobile/`: React Native app skeleton; contains imports to files that aren’t present (does not look buildable as-is).
+- `experiments/mobile/mobile-app/`: small component library (cards/gestures/curve editor/theme/types).
 
 ### Docs / artifacts
 - Many `PHASE_*`, `PART7_*`, and “implementation report” markdown files. Several contradict the code reality (e.g., claim “no mocks/TODOs” while the code contains TODOs and explicit `NotImplemented` branches).
@@ -59,7 +59,7 @@ Wallet integration (MetaMask):
 - Listener/reconnect handling is fixed in `src/lib/metamask.ts` (provider init on reconnect; correct handler removal).
 
 Static demo assets inside Next:
-- `betting_platform/app/public/platform_ui.html` + `platform_main.js` **do call** `http://localhost:8081/api` (unlike the repo-root `platform_main.js`, which is mock-only).
+- `betting_platform/app/public/platform_ui.html` + `platform_main.js` **do call** `http://localhost:8081/api` (unlike `experiments/static-root-demo/platform_main.js`, which is mock-only).
 
 ### 2.2 Backend: `betting_platform/api_runner/` (Rust + Axum)
 Key entrypoint:
@@ -129,7 +129,7 @@ If you run only what is wired consistently in code:
 2) UI:
    - Next pages that call `http://localhost:8081/...` directly should work for read-only / demo flows.
    - `/api/*` calls go through a Next catch-all proxy route, so UI can use relative `/api/...` paths.
-3) The root `server.js` demo UI is largely mock-only and does not fetch backend data.
+3) The `experiments/static-root-demo/server.js` demo UI is largely mock-only and does not fetch backend data.
 
 ---
 

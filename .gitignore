@@ -36,6 +36,15 @@ target/
 **/target/
 **/*.rs.bk
 
+# rust-script compiled outputs (do not commit)
+part7_production_test
+part7_simple
+part7_user_journey_test
+test_amm_selection
+test_cpi_depth
+test_flash_loan_fee
+test_rate_limiting
+
 # Solidity/Hardhat generated
 artifacts/
 **/artifacts/

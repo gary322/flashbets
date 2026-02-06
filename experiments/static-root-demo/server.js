@@ -9,6 +9,7 @@ const path = require('path');
 const url = require('url');
 
 const PORT = 8080;
+const BASE_DIR = path.resolve(__dirname);
 const MIME_TYPES = {
     '.html': 'text/html',
     '.js': 'application/javascript',
@@ -27,15 +28,23 @@ const server = http.createServer((req, res) => {
 
     // Parse URL
     const parsedUrl = url.parse(req.url);
-    let pathname = `.${parsedUrl.pathname}`;
+    let pathname = parsedUrl.pathname || '/';
 
     // Default to index.html
-    if (pathname === './') {
-        pathname = './platform_ui.html';
+    if (pathname === '/') {
+        pathname = '/platform_ui.html';
+    }
+
+    // Resolve path relative to this directory (not the process CWD) and block traversal.
+    const filePath = path.resolve(BASE_DIR, `.${pathname}`);
+    if (!filePath.startsWith(`${BASE_DIR}${path.sep}`)) {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('Bad Request');
+        return;
     }
 
     // Get file extension
-    const ext = path.parse(pathname).ext;
+    const ext = path.extname(filePath);
 
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -50,7 +59,7 @@ const server = http.createServer((req, res) => {
     }
 
     // Read file
-    fs.readFile(pathname, (err, data) => {
+    fs.readFile(filePath, (err, data) => {
         if (err) {
             // File not found
             if (err.code === 'ENOENT') {

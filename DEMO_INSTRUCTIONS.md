@@ -51,9 +51,9 @@ npx playwright test -c playwright.next.config.ts
 
 ## Alternate Demo (Static Root UI)
 
-The repo root also contains a static UI demo served by `server.js`:
+The repo also contains a static UI demo under `experiments/static-root-demo/`:
 ```bash
-node server.js
+node experiments/static-root-demo/server.js
 ```
 This demo is mock-heavy and not the recommended “real app” stack.
 

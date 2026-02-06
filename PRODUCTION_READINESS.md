@@ -13,8 +13,8 @@ This document answers:
 
 There are effectively **three stacks**:
 
-1) **Root static demo (mock-first)**  
-   - Entry: `server.js` (serves `platform_ui.html` + `platform_main.js` at port 8080)
+1) **Static demo (mock-first, experiments)**  
+   - Entry: `experiments/static-root-demo/server.js` (serves `platform_ui.html` + `platform_main.js` at port 8080)
    - Primarily mock/demo behavior (does not consistently hit the real backend)
 
 2) **Full-stack prototype under `betting_platform/` (closest to real app)**  

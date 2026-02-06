@@ -316,9 +316,9 @@ If you only want one stack, focus on `betting_platform/`.
 
 ## Static Root Demo (Experimental)
 
-The repo root also contains a static HTML/JS demo served by:
+This repo also contains a static HTML/JS demo under `experiments/static-root-demo/`, served by:
 ```bash
-node server.js
+node experiments/static-root-demo/server.js
 ```
 
 This is not the recommended end-to-end path; it is mock-heavy and exists mainly as UI/UX experimentation.
