@@ -1,8 +1,4 @@
-use solana_program::{
-    msg,
-    program_error::ProgramError,
-    pubkey::Pubkey,
-};
+use solana_program::program_error::ProgramError;
 use borsh::{BorshDeserialize, BorshSerialize};
 
 use crate::{
@@ -52,9 +48,7 @@ impl ProofBuilder {
         if self.markets.is_empty() {
             return Err(ProgramError::InvalidInstructionData);
         }
-        
-        msg!("Building proof for {} markets", self.markets.len());
-        
+
         // Build merkle tree
         let root = self.merkle_tree.build()?;
         
@@ -70,10 +64,6 @@ impl ProofBuilder {
         };
         
         let compressed_size = proof_data.len();
-        
-        // Calculate compression ratio
-        let ratio = uncompressed_size as f64 / compressed_size as f64;
-        msg!("Compression ratio: {:.2}x", ratio);
         
         Ok(BuiltProof {
             root,
@@ -200,8 +190,7 @@ impl BatchProofBuilder {
         
         let mut built_proofs = Vec::new();
         
-        for (i, batch) in self.batches.into_iter().enumerate() {
-            msg!("Building batch {} with {} markets", i, batch.markets.len());
+        for batch in self.batches.into_iter() {
             built_proofs.push(batch.build()?);
         }
         
