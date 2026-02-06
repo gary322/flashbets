@@ -168,6 +168,88 @@ Implementation pointers:
 - EIP-712 verifier: `betting_platform/api_runner/src/integration/eip712_verifier.rs`
 - Polymarket client: `betting_platform/api_runner/src/integration/polymarket_clob.rs`
 
+## Domain Model (Market / Outcome / Order / Position)
+
+This is the simplified conceptual model used by the demo UI + API.
+
+```mermaid
+classDiagram
+  class Market {
+    +id: string
+    +question: string
+    +status: string
+  }
+
+  class Outcome {
+    +id: string
+    +label: string
+    +price: number
+  }
+
+  class Order {
+    +id: string
+    +side: BUY|SELL
+    +size: number
+    +limitPrice: number
+    +signature: bytes
+  }
+
+  class Position {
+    +wallet: string
+    +outcomeId: string
+    +size: number
+    +avgEntryPrice: number
+  }
+
+  Market "1" --> "1..*" Outcome : has
+  Outcome "1" --> "0..*" Order : trades
+  Outcome "1" --> "0..*" Position : held_as
+  Order "0..*" --> "0..*" Position : fills_update
+```
+
+Notes:
+- In Polymarket terms, an `Outcome` maps to a `(condition_id, token_id)` pair; the demo UI keeps this abstract.
+- Positions are derived from filled orders (the demo may compute or mock them depending on mode).
+
+## API Route Map (High-Level)
+
+This is a map of the demo-relevant routes exposed by the Rust API (see `betting_platform/api_runner/src/main.rs` for the full list).
+
+```mermaid
+flowchart TB
+  API["Rust API (:8081)<br/>betting_platform/api_runner<br/>/api/*"] --> Markets["Markets"]
+  API --> Orders["Orders (Polymarket-style)"]
+  API --> Wallet["Demo Wallet"]
+  API --> Portfolio["Positions / Portfolio"]
+  API --> Verses["Verses / Quantum"]
+  API --> Integrations["Integrations"]
+
+  Markets --> M1["GET /api/markets"]
+  Markets --> M2["GET /api/markets/:id"]
+  Markets --> M3["GET /api/markets/:id/orderbook"]
+  Markets --> M4["GET /api/v2/markets"]
+
+  Orders --> O1["POST /api/orders/submit"]
+  Orders --> O2["GET /api/orders/:order_id/status"]
+  Orders --> O3["DELETE /api/orders/:order_id/cancel"]
+  Orders --> O4["GET /api/orders"]
+
+  Wallet --> W1["POST /api/wallet/demo/create"]
+  Wallet --> W2["POST /api/demo/create (alias used by tests)"]
+
+  Portfolio --> P1["GET /api/positions/:wallet"]
+  Portfolio --> P2["GET /api/portfolio/:wallet"]
+  Portfolio --> P3["GET /api/risk/:wallet"]
+
+  Verses --> V1["GET /api/verses"]
+  Verses --> V2["GET /api/verses/:id"]
+  Verses --> Q1["POST /api/quantum/create"]
+  Verses --> Q2["GET /api/quantum/positions/:wallet"]
+
+  Integrations --> I1["GET /api/integration/status"]
+  Integrations --> I2["GET /api/polymarket/markets (proxy)"]
+```
+
 ## Testing
 
 ### Rust tests
